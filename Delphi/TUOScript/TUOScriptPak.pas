@@ -2,27 +2,19 @@ unit TUOScriptPak;
 
 interface
 uses
-  Classes,SysUtils, ToolsAPI,TUOScript, Dialogs;
+  Classes,SysUtils, ToolsAPI, TUOScript, Dialogs;
 
-type
-
-  TTUOScriptInsertComponent = class(TObject)
-  public
-    function InsertCompo(Params : TTUOScriptParams):TTUOScriptFunctionResult;
+type  
+  TTUOScriptPak = class
+    class function InsertCompo(Params : TTUOScriptParams):TTUOScriptFunctionResult;
+    class function TestParams(Params : TTUOScriptParams):TTUOScriptFunctionResult;
   end;
 
-  TTUOScriptTestFunctions = class(TObject)
-  public
-    function TestParams(Params : TTUOScriptParams):TTUOScriptFunctionResult;
-  end;
 
 
 implementation
 
-{$region 'TTUOScriptInsertComponent'}
-
-function TTUOScriptInsertComponent.InsertCompo(
-  Params: TTUOScriptParams): TTUOScriptFunctionResult;
+class function TTUOScriptPak.InsertCompo(Params: TTUOScriptParams): TTUOScriptFunctionResult;
 var
   services  : IOTAModuleServices;
   module    : IOTAModule;
@@ -34,11 +26,12 @@ var
   LastCode  : String;
   CName     : String;
 begin
-  MessageDlg('Starting script-procedure.', mtWarning, [mbOK], 0);
+  Result:=-1;
+
   if (Params.Count=0) then
     exit;
   CName:=Trim(Params[0]);
-  MessageDlg('It seems you want to insert a '+CName, mtWarning, [mbOK], 0);
+
   Services := BorlandIDEServices as IOTAModuleServices;
 
   Module:=services.CurrentModule;
@@ -56,12 +49,12 @@ begin
     if (NewCompo<>nil) then
     begin
       Result:=1;
-      MessageDlg('All ok ... component inside!', mtWarning, [mbOK], 0);
-    end
+      //MessageDlg('All ok ... component inside!', mtWarning, [mbOK], 0);
+    end                                       
     else
     begin
       Result:=0;
-      MessageDlg('Failed to insert new component.', mtError, [mbOK], 0);
+      //MessageDlg('Failed to insert new component.', mtError, [mbOK], 0);
     end;
 
     if Supports(Module.CurrentEditor, IOTASourceEditor, pas) and (Result=1) then
@@ -80,27 +73,21 @@ begin
     MessageDlg('Got no FormEditor!', mtError, [mbOK], 0);
 end;
 
-{$endregion}
 
-{$region 'TTUOScriptTestFunctions'}
-
-
-function TTUOScriptTestFunctions.TestParams(
-  Params: TTUOScriptParams): TTUOScriptFunctionResult;
+class function TTUOScriptPak.TestParams(Params: TTUOScriptParams): TTUOScriptFunctionResult;
 begin
   MessageDlg(Params.Text, mtInformation, [mbOK], 0);
 
   Result:=1;
 end;
 
-{$endregion}
 
 initialization                 
   TUOScriptEngine.RegisterFunction('InsertComponent',
-                    Integer(@TTUOScriptInsertComponent.InsertCompo));
+                    Integer(@TTUOScriptPak.InsertCompo));
 
-  TUOScriptEngine.RegisterFunction('TestParams',
-                    Integer(@TTUOScriptTestFunctions.TestParams));
+  TUOScriptEngine.RegisterFunction('TestParams',                 
+                    Integer(@TTUOScriptPak.TestParams));
 
 finalization
   TUOScriptEngine.UnregisterFunction('InsertComponent');

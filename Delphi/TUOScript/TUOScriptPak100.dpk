@@ -23,6 +23,7 @@ package TUOScriptPak100;
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'TUOScriptPak for Delphi 2006'}
+{$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires

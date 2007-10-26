@@ -15,7 +15,7 @@ unit TUOScript;
 interface
 
 uses
-  Classes, SysUtils, StrUtils, ToolsAPI, CodeTemplateAPI;
+  Classes, SysUtils, StrUtils, ToolsAPI, CodeTemplateAPI, Dialogs;
 
 type
   TTUOScriptParams = TStrings;
@@ -260,11 +260,11 @@ begin
         begin
           //Is this the function we want to call?
           if (AnsiSameText(ProcedureName,RegisteredFunctions[idxFunction])) then
-          begin
+          begin                                          
             Params.CommaText:=Copy(curCommand,posFirstBracket+1,posLastBracket-posFirstBracket);
             @Func:=Pointer(RegisteredFunctions.Objects[idxFunction]);
             Result:=Func(Params);
-          end;
+          end;                                       
         end;
       end;
     end;
