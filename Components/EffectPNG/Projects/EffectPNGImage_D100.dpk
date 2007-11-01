@@ -1,4 +1,4 @@
-package EffectPNG_D100;
+package EffectPNGImage_D100;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,15 +22,18 @@ package EffectPNG_D100;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'EffectPNG'}
+{$DESCRIPTION 'EffectPNGImage D100'}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
+  EffectPNG_D100,
   vcl,
-  PNGUtils_D100;
+  PNGSupport_D100,
+  PNGUtils_D100,
+  GDIPlusSupport_D100;
 
 contains
-  EffectPNG in '..\source\EffectPNG.pas';
+  EffectPNGImage in '..\EffectPNGImage.pas';
 
 end.

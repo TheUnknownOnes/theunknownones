@@ -1,4 +1,4 @@
-package PNGImageList_D100D;
+package PNGImageList_D100;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,16 +22,18 @@ package PNGImageList_D100D;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESIGNONLY}
+{$DESCRIPTION 'PNGImageList D100'}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  PNGImageList_D100,
-  DCLStd;
+  vcl,
+  PNGUtils_D100,
+  PNGSupport_D100,
+  BaseImageList_D100,
+  GDIPlusSupport_D100;
 
 contains
-  PNGImageList_Designers in '..\source\PNGImageList_Designers.pas',
-  PNGImageList_FormPNGObjectList in '..\source\PNGImageList_FormPNGObjectList.pas' {Form_PNGObjectList};
+  PNGImageList in '..\PNGImageList.pas';
 
 end.

@@ -1,4 +1,4 @@
-package PNGImageList_D100;
+package EffectPNGImageList_D100;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,15 +22,20 @@ package PNGImageList_D100;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
+{$DESCRIPTION 'EffectPNGImagelist D100'}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  ImageTypes100,
+  EffectPNG_D100,
+  PNGImageList_D100,
+  vcl,
+  PNGSupport_D100,
+  BaseImageList_D100,
   PNGUtils_D100,
-  BaseImageList_D100;
+  GDIPlusSupport_D100;
 
 contains
-  PNGImageList in '..\source\PNGImageList.pas';
+  EffectPNGImageList in '..\EffectPNGImageList.pas';
 
 end.

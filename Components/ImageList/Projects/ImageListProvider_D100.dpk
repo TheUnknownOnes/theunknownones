@@ -1,4 +1,4 @@
-package EffectEdit_D100;
+package ImageListProvider_D100;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,23 +22,15 @@ package EffectEdit_D100;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
+{$DESCRIPTION 'ImageListProvider D100'}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  vcl,
-  SearchEdit_D100,
-  ImageTypes100,
-  GDIPlus100,
-  EffectPNG_D100,
-  PNGUtils_D100,
-  TntUnicodeVcl,
-  vclactnband,
-  vclx,
-  vcldb,
-  dbrtl;
+  BaseImageList_D100,
+  vcl;
 
 contains
-  EffectEdit in '..\source\EffectEdit.pas';
+  ImageListProvider in '..\ImageListProvider.pas';
 
 end.

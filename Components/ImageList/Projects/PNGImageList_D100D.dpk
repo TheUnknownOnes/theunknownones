@@ -1,4 +1,4 @@
-package PNGUtils_D100;
+package PNGImageList_D100D;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,18 +22,25 @@ package PNGUtils_D100;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'PNGUtils D100'}
-{$RUNONLY}
+{$DESCRIPTION 'PNGImagelist D100D'}
+{$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
+  PNGImageList_D100,
+  DCLStd,
   vcl,
+  designide,
+  xmlrtl,
+  vclactnband,
+  vclx,
   PNGSupport_D100,
+  PNGUtils_D100,
   GDIPlusSupport_D100;
 
 contains
-  PNGCommon in '..\PNGCommon.pas',
-  PNGHelper in '..\PNGHelper.pas';
+  PNGImageList_FormPNGObjectList in '..\PNGImageList_FormPNGObjectList.pas',
+  PNGImageList_Designers in '..\PNGImageList_Designers.pas';
 
 end.

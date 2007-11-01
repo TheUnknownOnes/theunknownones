@@ -6,9 +6,8 @@ uses
   SysUtils, Classes, Controls, Windows, Messages, Graphics, PNGImage, Math,
   ComCtrls, Dialogs, StdCtrls;
 
-type                        
+type
 
- // {$REGION 'TPNGEffects declaration'}
   TPNGEffect = (peNothing, peGrayScale, peSepia, peColorize, peInvert, peGamma{, peTest});
   TEffectFrom = (efTop, efBottom, efLeft, efRight);
   TMirror = (mNothing, mHorizontal, mVertical, mCrossOver);
@@ -71,226 +70,10 @@ type
     property Mirror : TMirror read FMirror write SetMirror default mNothing;
     property GammaValue : Single read FGammaValue write SetGammaValue;
   end;
-  //{$ENDREGION}
 
-//  {$REGION 'TEffectPNG declaration'}
-  TEffectPNG = class(TGraphicControl)
-  private
-    FDrawing : Boolean;
-    FPicture: TPNGObject;
-    FForceDBP: Boolean;
-    FEffects: TPNGEffects;
-    FCenter: Boolean;
-
-    procedure SetForceDBP(const Value: Boolean);
-    procedure SetPicture(const Value: TPNGObject);
-    procedure SetEffects(const Value: TPNGEffects);
-    procedure SetCenter(const Value: Boolean);
-
-  protected
-    procedure Paint(); override;
-
-    procedure OnEffectChange(Sender : TObject);
-
-  public
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-
-    procedure DrawTo(ADc : HDC); overload;
-    procedure DrawTo(ACanvas : TCanvas); overload;
-  published
-    property ForceDoubleBufferedParent  : Boolean     read FForceDBP    write SetForceDBP   default true;
-    property Picture                    : TPNGObject  read FPicture     write SetPicture;
-
-    property Effects                    : TPNGEffects read FEffects     write SetEffects;
-    property Center                     : Boolean     read FCenter      write SetCenter default true;
-    property Align;
-    property Anchors;
-    property AutoSize;
-    property Constraints;
-    property DragCursor;
-    property DragKind;
-    property DragMode;
-    property Enabled;
-    property ParentShowHint;
-    property PopupMenu;
-    property ShowHint;
-    property Visible;
-    property OnClick;
-    property OnContextPopup;
-    property OnDblClick;
-    property OnDragDrop;
-    property OnDragOver;
-    property OnEndDock;
-    property OnEndDrag;
-    {$ifdef VER190}
-    property OnMouseActivate;
-    property OnMouseEnter;
-    property OnMouseLeave;
-    {$endif}
-    property OnMouseDown;
-
-
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnStartDock;
-    property OnStartDrag;
-  end;
-//  {$ENDREGION}
-
-//  {$REGION 'TEffectPNGToolButton declaration'}
-  TEffectPNGToolButton = class(TToolButton)
-  private
-    FImage: TPNGObject;
-    procedure SetImage(const Value: TPNGObject);
-  protected
-    procedure Paint(); override;
-  public
-    constructor Create(AOwner : TComponent); override;
-    destructor Destroy(); override;
-  published
-    property Image : TPNGObject read FImage write SetImage;
-
-  end;
-//  {$ENDREGION}
-
-//  {$REGION 'TEffectPNGToolBar declaration'}
-  TEffectPNGToolBar = class(TToolBar)
-  private
-    FImageEffectDefault: TPNGEffects;
-    FImageEffectDisabled: TPNGEffects;
-    procedure SetImageEffectDefault(const Value: TPNGEffects);
-    procedure SetImageEffectDisabled(const Value: TPNGEffects);
-    procedure OnEffectChange(Sender : TObject);
-  public
-    constructor Create(AOwner : TComponent); override;
-    destructor Destroy(); override;
-  published
-    property ImageEffectDefault : TPNGEffects read FImageEffectDefault write SetImageEffectDefault;
-    property ImageEffectDisabled : TPNGEffects read FImageEffectDisabled write SetImageEffectDisabled;
-  end;
-//  {$ENDREGION}
-
- 
-
-procedure Register;
 
 implementation
 
-procedure Register;
-begin
-  RegisterComponents('EffectControls', [TEffectPNG, TEffectPNGToolButton, TEffectPNGToolBar]);
-end;
-
-//{$region 'TEffectPNG implementation'}
-
-constructor TEffectPNG.Create(AOwner: TComponent);
-begin
-  FPicture:=TPNGObject.Create;
-  FForceDBP:=true;                
-  FEffects:=TPNGEffects.Create();
-  FEffects.OnChange:=OnEffectChange;
-  FCenter:=true;
-
-  inherited;
-end;
-
-destructor TEffectPNG.Destroy;
-begin
-  FPicture.Free;
-  FEffects.Free;
-  
-  inherited;
-end;
-
-procedure TEffectPNG.DrawTo(ACanvas: TCanvas);
-begin
-  DrawTo(ACanvas.Handle);
-end;
-
-procedure TEffectPNG.OnEffectChange(Sender: TObject);
-begin
-  Invalidate;
-end;
-
-procedure TEffectPNG.DrawTo(ADc: HDC);
-begin
-  Perform(WM_PAINT,ADC,0);
-end;
-
-procedure TEffectPNG.Paint;
-var
-  Result : TPNGObject;
-  TopLeft : TPoint;
-begin
-  if FDrawing then exit;
-
-  if Assigned(Parent) and FForceDBP and (not Parent.DoubleBuffered) then
-    Self.Parent.DoubleBuffered:=true;
-  
-  FDrawing:=true;
-
-  if csDesigning in ComponentState then
-  begin
-    with inherited Canvas do
-    begin
-      Pen.Style := psDash;
-      Brush.Style := bsClear;
-      Rectangle(0, 0, Width, Height);
-    end;
-  end;
-
-  Result:=TPNGObject.Create;
-  Result.Assign(FPicture);
-
-  if not Result.Empty then
-  begin
-    FEffects.ApplyEffects(Result);
-
-    if not FCenter then
-    begin
-      TopLeft.X:=0;
-      TopLeft.Y:=0;
-    end
-    else
-    begin
-      TopLeft.X:=(Width-Result.Width) div 2;
-      TopLeft.Y:=(Height-Result.Height) div 2;
-    end;
-
-    Canvas.Draw(TopLeft.X,TopLeft.Y,Result);
-  end;
-
-  Result.Free;
-
-  FDrawing:=false;
-end;
-
-procedure TEffectPNG.SetCenter(const Value: Boolean);
-begin
-  FCenter := Value;
-  Invalidate;
-end;
-
-procedure TEffectPNG.SetEffects(const Value: TPNGEffects);
-begin
-  FEffects.Assign(Value);
-end;
-
-procedure TEffectPNG.SetForceDBP(const Value: Boolean);
-begin
-  FForceDBP := Value;
-end;
-
-procedure TEffectPNG.SetPicture(const Value: TPNGObject);
-begin
-  FPicture.Assign(Value);
-  Invalidate;
-end;
-
-//{$endregion}
-
-//{$region 'TPNGEffects implementation'}
 
 procedure TPNGEffects.ApplyEffects(const APNG: TPNGObject);
 var
@@ -418,7 +201,6 @@ var
   NewGreen : Byte;
   ColDiff : Single;
 begin
- // {$REGION 'GrayScale, Sepia'}
   if FEffect in [peGrayScale, peSepia] then
   begin
     GrayCol:=(APixel.rgbtBlue+APixel.rgbtGreen+APixel.rgbtRed) div 3;
@@ -454,39 +236,26 @@ begin
       APixel.rgbtRed:=NewRed;
     end;
   end;
- // {$ENDREGION}
 
- // {$REGION 'Colorize'}
   if FEffect=peColorize then
   begin
     GrayCol:=(APixel.rgbtBlue+APixel.rgbtGreen+APixel.rgbtRed) div 3;
 
     CopyMemory(APixel,Pointer(Integer(@FGradient)+(GrayCol*3)),3);
   end;
-//  {$ENDREGION}
 
-//  {$REGION 'Invert'}
   if FEffect=peInvert then
   begin
     APixel.rgbtRed:=APixel.rgbtRed xor $FF;
     APixel.rgbtGreen:=APixel.rgbtGreen xor $FF;
     APixel.rgbtBlue:=APixel.rgbtBlue xor $FF;
   end;
-//  {$ENDREGION}
 
-//  {$REGION 'Gamma'}
   if FEffect=peGamma then
   begin
     DoGammaChange(APixel);
   end;
- // {$ENDREGION}
 
-//  {$REGION 'Test'}
-  {if FEffect=peTest then
-  begin
-  
-  end;}
- // {$ENDREGION}
 end;
 
 constructor TPNGEffects.Create;
@@ -546,7 +315,6 @@ begin
 
   TempPixel:=New(PRGBTriple);
 
-//  {$REGION 'Horizontal'}
   if FMirror=mHorizontal then
   begin
     RunToRow:=APNG.Height-1;
@@ -571,9 +339,7 @@ begin
       end;
     end;
   end;
- // {$ENDREGION}
 
-//  {$REGION 'Vertical'}
   if FMirror=mVertical then
   begin
     RunToRow:=APNG.Height div 2;
@@ -601,9 +367,7 @@ begin
       end;
     end;
   end;
-//  {$ENDREGION}
 
-//  {$REGION 'Crossover'}
   if FMirror=mCrossOver then
   begin
     RunToRow:=APNG.Height-1;
@@ -635,7 +399,6 @@ begin
       end;
     end;
   end;
-//  {$ENDREGION}
 
   Dispose(TempPixel);
 
@@ -709,100 +472,6 @@ begin
   else FSepiaDepth:=Value;
   DoChange;
 end;
-
-//{$endregion}
-
-//{$region 'TEffectPNGToolButton implementation'}
-
-constructor TEffectPNGToolButton.Create(AOwner: TComponent);
-begin
-  FImage:=TPNGObject.Create;
-  
-  inherited;
-end;
-
-destructor TEffectPNGToolButton.Destroy;
-begin
-  FImage.Free;
-  
-  inherited;
-end;
-
-procedure TEffectPNGToolButton.Paint;
-var
-  PNGToDraw : TPNGObject;
-begin
-  inherited;
-
-  if Parent is TEffectPNGToolBar then
-  begin
-    if not FImage.Empty then
-    begin
-      PNGToDraw:=TPNGObject.Create;
-      PNGToDraw.Assign(FImage);
-
-      if Self.Enabled then
-        TEffectPNGToolBar(Parent).ImageEffectDefault.ApplyEffects(PNGToDraw)
-      else
-        TEffectPNGToolBar(Parent).ImageEffectDisabled.ApplyEffects(PNGToDraw);
-
-      Self.Canvas.Draw((Self.Width div 2)-(PNGToDraw.Width div 2),
-                       (Self.Height div 2)-(PNGToDraw.Height div 2),
-                       PNGToDraw);
-
-      PNGToDraw.Free;
-    end;
-  end;
-end;
-
-procedure TEffectPNGToolButton.SetImage(const Value: TPNGObject);
-begin
-  FImage.Assign(Value);
-  Invalidate;
-end;
-//{$endregion}
-
-//{$region 'TEffectPNGToolBar implementation'}
-
-constructor TEffectPNGToolBar.Create(AOwner: TComponent);
-begin
-  FImageEffectDefault:=TPNGEffects.Create;
-  FImageEffectDefault.OnChange:=OnEffectChange;
-
-  FImageEffectDisabled:=TPNGEffects.Create;
-  FImageEffectDisabled.OnChange:=OnEffectChange;
-  
-  inherited;
-end;
-
-destructor TEffectPNGToolBar.Destroy;
-begin
-  FImageEffectDefault.Free;
-
-  FImageEffectDisabled.Free;
-  
-  inherited;
-end;
-
-procedure TEffectPNGToolBar.OnEffectChange(Sender: TObject);
-begin
-  Invalidate;
-end;
-
-procedure TEffectPNGToolBar.SetImageEffectDefault(const Value: TPNGEffects);
-begin
-  FImageEffectDefault.Assign(Value);
-  Invalidate;
-end;
-
-procedure TEffectPNGToolBar.SetImageEffectDisabled(const Value: TPNGEffects);
-begin
-  FImageEffectDisabled.Assign(Value);
-  Invalidate;
-end;
-
-//{$endregion}
-
 
 
 end.

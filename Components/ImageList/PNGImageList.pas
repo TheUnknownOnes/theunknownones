@@ -2,7 +2,7 @@ unit PNGImageList;
 
 interface
 
-{$R 'icons.res'}
+{$R 'PNGImagelist.res'}
 
 uses
   Classes,

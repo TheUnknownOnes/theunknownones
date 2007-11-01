@@ -1,4 +1,4 @@
-package EffectPNGImageList_D100;
+package EffectEdit_D100;
 
 {$R *.res}
 {$ALIGN 8}
@@ -26,10 +26,9 @@ package EffectPNGImageList_D100;
 
 requires
   rtl,
-  EffectPNG_D100,
-  PNGImageList_D100;
+  vcl;
 
 contains
-  EffectPNGImageList in '..\source\EffectPNGImageList.pas';
+  EffectEdit in '..\source\EffectEdit.pas';
 
 end.

@@ -5,12 +5,12 @@
 			<Option Name="Personality">Delphi.Personality</Option>
 			<Option Name="ProjectType"></Option>
 			<Option Name="Version">1.0</Option>
-			<Option Name="GUID">{ECC2542C-FF2C-48EB-8023-60555D7365A0}</Option>
+			<Option Name="GUID">{B12315C7-8D11-44DF-930D-2C5D73E6954B}</Option>
 		</Option>
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">PNGImageList_D100.dpk</Source>
+			<Source Name="MainSource">BaseImageList_D100.dpk</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -116,7 +116,7 @@
 			<Linker Name="MinStackSize">16384</Linker>
 			<Linker Name="MaxStackSize">1048576</Linker>
 			<Linker Name="ImageBase">4194304</Linker>
-			<Linker Name="ExeDescription"></Linker>
+			<Linker Name="ExeDescription">BaseImageList D100</Linker>
 		</Linker>
 		<Directories>
 			<Directories Name="OutputDir"></Directories>
@@ -171,10 +171,10 @@
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
 		</VersionInfoKeys>  <Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\EffectPNGImageList_D100.bpl">(Unbenannt)</Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\CommonGraphics100.bpl">(Unbenannt)</Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\VSPDFViewerX_D100.bpl">(Unbenannt)</Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\PowerPDF100.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="C:\Dokumente und Einstellungen\benjamin\Eigene Dateien\Borland Studio-Projekte\Bpl\ImageListProvider_D100.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="C:\Dokumente und Einstellungen\benjamin\Eigene Dateien\Borland Studio-Projekte\Bpl\PNGImageList_D100.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="C:\Dokumente und Einstellungen\benjamin\Eigene Dateien\Borland Studio-Projekte\Bpl\PNGImageList_D100D.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="C:\Dokumente und Einstellungen\benjamin\Eigene Dateien\Borland Studio-Projekte\Bpl\CNA2.bpl">CNA2 ComponentNamingAssistent</Excluded_Packages>
     </Excluded_Packages>
   </Delphi.Personality>
 	<StarTeamAssociation></StarTeamAssociation>

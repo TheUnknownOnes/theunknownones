@@ -5,12 +5,12 @@
 			<Option Name="Personality">Delphi.Personality</Option>
 			<Option Name="ProjectType"></Option>
 			<Option Name="Version">1.0</Option>
-			<Option Name="GUID">{C470D08B-8D6D-4AF9-95DD-A79AD93B4EDD}</Option>
+			<Option Name="GUID">{52E46115-E8A2-4A93-BB42-B4EF4751D358}</Option>
 		</Option>
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">ImageListProvider_D100.dpk</Source>
+			<Source Name="MainSource">EffectPNGToolbar_D100.dpk</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -116,7 +116,7 @@
 			<Linker Name="MinStackSize">16384</Linker>
 			<Linker Name="MaxStackSize">1048576</Linker>
 			<Linker Name="ImageBase">4194304</Linker>
-			<Linker Name="ExeDescription"></Linker>
+			<Linker Name="ExeDescription">EffectPNGToolbar D100</Linker>
 		</Linker>
 		<Directories>
 			<Directories Name="OutputDir"></Directories>
@@ -170,13 +170,16 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>  
-    
-    <Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\VSPDFViewerX_D100.bpl">(Unbenannt)</Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\PowerPDF100.bpl">(Unbenannt)</Excluded_Packages>
+		</VersionInfoKeys>  <Excluded_Packages>
+      <Excluded_Packages Name="C:\Dokumente und Einstellungen\benjamin\Eigene Dateien\Borland Studio-Projekte\Bpl\EffectPNGImageList_D100.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="C:\Dokumente und Einstellungen\benjamin\Eigene Dateien\Borland Studio-Projekte\Bpl\EffectPNGImage_D100.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="C:\Dokumente und Einstellungen\benjamin\Eigene Dateien\Borland Studio-Projekte\Bpl\CNA2.bpl">CNA2 ComponentNamingAssistent</Excluded_Packages>
     </Excluded_Packages>
   </Delphi.Personality>
-	<StarTeamAssociation></StarTeamAssociation>
-	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+	<CompactFramework_Emulator></CompactFramework_Emulator>
+	<CompactFramework_Resolution></CompactFramework_Resolution>
+	<CompactFramework_ProjectDeploy></CompactFramework_ProjectDeploy>
+	<CompactFramework_UseDefaultDeploy>True</CompactFramework_UseDefaultDeploy>
+	<DeployAdditionalFiles>False</DeployAdditionalFiles>
+	<CompactFramework>False</CompactFramework>
 </BorlandProject>

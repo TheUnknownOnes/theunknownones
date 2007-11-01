@@ -5,12 +5,12 @@
 			<Option Name="Personality">Delphi.Personality</Option>
 			<Option Name="ProjectType"></Option>
 			<Option Name="Version">1.0</Option>
-			<Option Name="GUID">{89072B4D-8378-4614-A319-603395C931A3}</Option>
+			<Option Name="GUID">{63264718-32F0-477F-8913-64952848DDB2}</Option>
 		</Option>
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">PNGUtils_D100.dpk</Source>
+			<Source Name="MainSource">PNGImageList_D100D.dpk</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -116,7 +116,7 @@
 			<Linker Name="MinStackSize">16384</Linker>
 			<Linker Name="MaxStackSize">1048576</Linker>
 			<Linker Name="ImageBase">4194304</Linker>
-			<Linker Name="ExeDescription">PNGUtils D100</Linker>
+			<Linker Name="ExeDescription">PNGImagelist D100D</Linker>
 		</Linker>
 		<Directories>
 			<Directories Name="OutputDir"></Directories>
@@ -170,9 +170,9 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>  
-    <Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\benjamin\Eigene Dateien\Borland Studio-Projekte\Bpl\CNA2.bpl">CNA2 ComponentNamingAssistent</Excluded_Packages>
+		</VersionInfoKeys>  <Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\VSPDFViewerX_D100.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\PowerPDF100.bpl">(Unbenannt)</Excluded_Packages>
     </Excluded_Packages>
   </Delphi.Personality>
 	<StarTeamAssociation></StarTeamAssociation>

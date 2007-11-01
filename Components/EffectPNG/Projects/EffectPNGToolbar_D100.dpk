@@ -1,4 +1,4 @@
-package PNGUtils_D100;
+package EffectPNGToolbar_D100;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,18 +22,14 @@ package PNGUtils_D100;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'PNGUtils D100'}
-{$RUNONLY}
+{$DESCRIPTION 'EffectPNGToolbar D100'}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  vcl,
-  PNGSupport_D100,
-  GDIPlusSupport_D100;
+  EffectPNG_D100;
 
 contains
-  PNGCommon in '..\PNGCommon.pas',
-  PNGHelper in '..\PNGHelper.pas';
+  EffectPNGToolbar in '..\EffectPNGToolbar.pas';
 
 end.

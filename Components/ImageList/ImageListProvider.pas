@@ -2,7 +2,7 @@ unit ImageListProvider;
 
 interface
 
-{$R 'icons.res'}
+{$R 'ImagelistProvider.res'}
 
 uses
   CommCtrl,

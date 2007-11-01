@@ -5,12 +5,12 @@
 			<Option Name="Personality">Delphi.Personality</Option>
 			<Option Name="ProjectType"></Option>
 			<Option Name="Version">1.0</Option>
-			<Option Name="GUID">{467C43B4-75E7-44DB-B8D0-D99D944BBB36}</Option>
+			<Option Name="GUID">{E9564148-5BD0-475E-B689-8BE28FA58725}</Option>
 		</Option>
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">EffectPNG_D100.dpk</Source>
+			<Source Name="MainSource">EffectPNGImageList_D100.dpk</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -116,7 +116,7 @@
 			<Linker Name="MinStackSize">16384</Linker>
 			<Linker Name="MaxStackSize">1048576</Linker>
 			<Linker Name="ImageBase">4194304</Linker>
-			<Linker Name="ExeDescription">EffectPNG</Linker>
+			<Linker Name="ExeDescription">EffectPNGImagelist D100</Linker>
 		</Linker>
 		<Directories>
 			<Directories Name="OutputDir"></Directories>
@@ -170,8 +170,10 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>
-	</Delphi.Personality>
-	<StarTeamAssociation></StarTeamAssociation>
-	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+		</VersionInfoKeys>  <Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\CommonGraphics100.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\VSPDFViewerX_D100.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\PowerPDF100.bpl">(Unbenannt)</Excluded_Packages>
+    </Excluded_Packages>
+  </Delphi.Personality>
 </BorlandProject>
