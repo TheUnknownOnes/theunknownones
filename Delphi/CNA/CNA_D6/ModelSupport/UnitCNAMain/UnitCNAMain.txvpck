@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nodeSet>
+  <view uin="la1t1j1rn_v">
+    <property name="$name" value="UnitCNAMain" />
+    <property name="$defaultDiagram" value="True" />
+    <property name="$metaclass" value="Package Diagram" />
+  </view>
+</nodeSet>

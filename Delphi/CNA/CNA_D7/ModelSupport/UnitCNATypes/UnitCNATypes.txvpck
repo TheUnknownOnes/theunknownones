@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nodeSet>
+  <view uin="p0164q14f_v">
+    <property name="$name" value="UnitCNATypes" />
+    <property name="$defaultDiagram" value="True" />
+    <property name="$metaclass" value="Package Diagram" />
+    <reference referencedUin="delphi:e_class:src:CNAExpert:UnitCNATypes.TCNASettings">
+      <property name="$shortcutReference" value="true" />
+    </reference>
+  </view>
+</nodeSet>

@@ -1,0 +1,61 @@
+package CNAExpert90;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'CNA (Component Naming Assistent)'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+{%File 'ModelSupport\UnitCNAMain\UnitCNAMain.txvpck'}
+{%File 'ModelSupport\unitCNALangs\unitCNALangs.txvpck'}
+{%File 'ModelSupport\unitCNAConfig\unitCNAConfig.txvpck'}
+{%File 'ModelSupport\UnitCNAData\UnitCNAData.txvpck'}
+{%File 'ModelSupport\UnitCNATypes\UnitCNATypes.txvpck'}
+{%File 'ModelSupport\Vorgabe.txvpck'}
+{%File 'ModelSupport\UnitCNAEditPropertyFloat\UnitCNAEditPropertyFloat.txvpck'}
+{%File 'ModelSupport\UnitCNAEditProperty\UnitCNAEditProperty.txvpck'}
+{%File 'ModelSupport\UnitCNAEditPropertyEnumeration\UnitCNAEditPropertyEnumeration.txvpck'}
+{%File 'ModelSupport\UnitCNAEditPropertySet\UnitCNAEditPropertySet.txvpck'}
+{%File 'ModelSupport\UnitCNAEditName\UnitCNAEditName.txvpck'}
+{%File 'ModelSupport\UnitCNAEditPropertyInteger\UnitCNAEditPropertyInteger.txvpck'}
+{%File 'ModelSupport\UnitCNAEditPropertyString\UnitCNAEditPropertyString.txvpck'}
+
+requires
+  designide,
+  rtl,
+  vcl;
+
+contains
+  UnitCNAMain in 'UnitCNAMain.pas',
+  UnitCNAData in 'UnitCNAData.pas' {CNADataModule},
+  UnitCNATypes in 'UnitCNATypes.pas',
+  unitCNALangs in 'unitCNALangs.pas',
+  unitCNAConfig in 'unitCNAConfig.pas' {formConfig},
+  UnitCNAEditProperty in 'UnitCNAEditProperty.pas' {FormCNAPropEdBase},
+  UnitCNAEditPropertyEnumeration in 'UnitCNAEditPropertyEnumeration.pas' {FormCNAPropEdEnum},
+  UnitCNAEditPropertySet in 'UnitCNAEditPropertySet.pas' {FormCNAPropEdSet},
+  UnitCNAEditPropertyInteger in 'UnitCNAEditPropertyInteger.pas' {FormCNAPropEdInteger},
+  UnitCNAEditPropertyString in 'UnitCNAEditPropertyString.pas' {FormCNAPropEdString},
+  UnitCNAEditPropertyFloat in 'UnitCNAEditPropertyFloat.pas' {FormCNAPropEdFloat},
+  UnitCNAEditName in 'UnitCNAEditName.pas' {formName};
+
+end.
