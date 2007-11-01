@@ -1,0 +1,1 @@
+For Delphi 2007 you may use the Delphi 2006 binaries. 
