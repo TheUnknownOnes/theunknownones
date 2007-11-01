@@ -288,6 +288,7 @@ end;
 procedure TForm_PNGObjectList.SyncLists;
 var
   PNG : TPNGObject;
+  ContainerBMP,
   BMP : TBitmap;
 begin
   lv_Images.Clear;
@@ -298,6 +299,9 @@ begin
   BMP.Width:=iml_LV.Width;
   BMP.Height:=iml_LV.Height;
 
+  ContainerBMP:=TBitmap.Create;
+  ContainerBMP.PixelFormat:=pf32bit;
+
   for PNG in FWorkList do
   begin
     BMP.Canvas.Brush.Color:=lv_Images.Color;
@@ -305,7 +309,9 @@ begin
     BMP.Canvas.FillRect(bmp.Canvas.ClipRect);
 
     if (png.Width>=bmp.Width) or (png.Height>=bmp.Height) then
-      PNG.Draw(bmp.Canvas, bmp.Canvas.ClipRect)
+    begin
+      bmp.Canvas.StretchDraw(Rect(0, 0, bmp.Width, bmp.Height), PNG);
+    end
     else
       bmp.Canvas.Draw((bmp.Width-png.Width) div 2,
                       (bmp.Height-png.Height) div 2,
@@ -319,6 +325,7 @@ begin
     end;
   end;
 
+  ContainerBMP.Free;
   bmp.Free;
 end;
 
