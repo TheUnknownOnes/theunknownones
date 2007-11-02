@@ -30,10 +30,8 @@ requires
   EffectPNG_D100,
   PNGImageList_D100,
   vcl,
-  PNGSupport_D100,
   BaseImageList_D100,
-  PNGUtils_D100,
-  GDIPlusSupport_D100;
+  PNGUtils_D100;
 
 contains
   EffectPNGImageList in '..\EffectPNGImageList.pas';

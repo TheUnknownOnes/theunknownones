@@ -29,9 +29,7 @@ requires
   rtl,
   EffectPNG_D100,
   vcl,
-  PNGSupport_D100,
-  PNGUtils_D100,
-  GDIPlusSupport_D100;
+  PNGUtils_D100;
 
 contains
   EffectPNGImage in '..\EffectPNGImage.pas';

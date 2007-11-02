@@ -35,9 +35,7 @@ requires
   xmlrtl,
   vclactnband,
   vclx,
-  PNGSupport_D100,
-  PNGUtils_D100,
-  GDIPlusSupport_D100;
+  PNGUtils_D100;
 
 contains
   PNGImageList_FormPNGObjectList in '..\PNGImageList_FormPNGObjectList.pas',

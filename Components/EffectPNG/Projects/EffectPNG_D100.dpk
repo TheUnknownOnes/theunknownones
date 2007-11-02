@@ -28,8 +28,7 @@ package EffectPNG_D100;
 requires
   rtl,
   vcl,
-  PNGUtils_D100,
-  PNGSupport_D100;
+  PNGUtils_D100;
 
 contains
   EffectPNG in '..\EffectPNG.pas';

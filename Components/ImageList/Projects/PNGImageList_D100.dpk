@@ -29,9 +29,7 @@ requires
   rtl,
   vcl,
   PNGUtils_D100,
-  PNGSupport_D100,
-  BaseImageList_D100,
-  GDIPlusSupport_D100;
+  BaseImageList_D100;
 
 contains
   PNGImageList in '..\PNGImageList.pas';
