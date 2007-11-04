@@ -21,6 +21,8 @@ type
     procedure SetEffect(const Index: TilDrawState; const Value: TPNGEffects);
     function GetEffect(const Index: TilDrawState): TPNGEffects;
 
+    procedure OnEffectChange(Sender : TObject); virtual;
+
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy(); override;
@@ -70,7 +72,10 @@ begin
   inherited;
 
   for idx := Low(TilDrawState) to High(TilDrawState) do
+  begin
     FEffects[idx]:=TPNGEffects.Create;
+    FEffects[idx].OnChange:=OnEffectChange;
+  end;
 end;
 
 destructor TCustomEffectPNGImageList.Destroy;
@@ -118,6 +123,11 @@ end;
 function TCustomEffectPNGImageList.GetEffect(const Index: TilDrawState): TPNGEffects;
 begin
   Result:=FEffects[Index];
+end;
+
+procedure TCustomEffectPNGImageList.OnEffectChange(Sender: TObject);
+begin
+  DoChange(-1);
 end;
 
 procedure TCustomEffectPNGImageList.SetEffect(const Index: TilDrawState;
