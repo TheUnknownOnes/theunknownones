@@ -1,3 +1,8 @@
+//**********************************************************
+// Developed by TheUnkownOnes.net
+// 
+// for more information look at www.TheUnknownOnes.net
+//**********************************************************
 unit UnitCNAMain;
 
 {$I '..\CNA_Includes\main_include.pas'}

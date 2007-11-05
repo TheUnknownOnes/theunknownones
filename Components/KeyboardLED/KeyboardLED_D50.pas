@@ -1,3 +1,8 @@
+//**********************************************************
+// Developed by TheUnkownOnes.net
+// 
+// for more information look at www.TheUnknownOnes.net
+//**********************************************************
 unit KeyboardLED_D50;
 
 {$R 'hwint.res'}

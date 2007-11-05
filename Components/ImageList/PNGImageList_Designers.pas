@@ -1,3 +1,8 @@
+//**********************************************************
+// Developed by TheUnkownOnes.net
+// 
+// for more information look at www.TheUnknownOnes.net
+//**********************************************************
 unit PNGImageList_Designers;
 
 interface
