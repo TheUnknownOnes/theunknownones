@@ -28,9 +28,7 @@ package PNGUtils_D100;
 
 requires
   rtl,
-  vcl,
-  PNGSupport_D100,
-  GDIPlusSupport_D100;
+  vcl;
 
 contains
   PNGCommon in '..\PNGCommon.pas',
