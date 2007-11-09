@@ -3,9 +3,9 @@
 	<PersonalityInfo>
 		<Option>
 			<Option Name="Personality">Delphi.Personality</Option>
-			<Option Name="ProjectType"></Option>
+			<Option Name="ProjectType">VCLApplication</Option>
 			<Option Name="Version">1.0</Option>
-			<Option Name="GUID">{20F3BB2F-48F2-490C-B280-AE95BABCB9A4}</Option>
+			<Option Name="GUID">{A563F03A-E690-4B71-8A02-9AA543C1A1E5}</Option>
 		</Option>
 	</PersonalityInfo>
 	<Delphi.Personality>
@@ -176,6 +176,4 @@
       <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\PowerPDF100.bpl">(Unbenannt)</Excluded_Packages>
     </Excluded_Packages>
   </Delphi.Personality>
-	<StarTeamAssociation></StarTeamAssociation>
-	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
 </BorlandProject>

@@ -6,24 +6,51 @@
 unit TUOScriptPak;
 
 interface
+
 uses
   Classes,SysUtils, ToolsAPI, TUOScript, Dialogs;
 
 type  
-  TTUOScriptPak = class
-    class function InsertCompo(Params : TTUOScriptParams):TTUOScriptFunctionResult;
-    class function TestParams(Params : TTUOScriptParams):TTUOScriptFunctionResult;
+  TTUOScriptPak = class(TInterfacedObject, ITUOScriptFunctionHandler)
+  private
+    function InsertCompo(Params : TTUOScriptParams; const AEditor : IOTAEditor) : TTUOScriptFunctionResult;
+    function TestParams(Params : TTUOScriptParams; const AEditor : IOTAEditor) : TTUOScriptFunctionResult;
+  public
+    function GetFunctionCount : Integer;
+    function GetFunctionName(AIndex : Integer) : WideString;
+    function GetFunctionItself(AIndex : Integer) : TTUOSctiptFunction2;
   end;
 
 
 
 implementation
 
-class function TTUOScriptPak.InsertCompo(Params: TTUOScriptParams): TTUOScriptFunctionResult;
 var
-  services  : IOTAModuleServices;
-  module    : IOTAModule;
-  edit      : IOTAEditor;
+  ScriptPak : TTUOScriptPak;
+
+function TTUOScriptPak.GetFunctionCount: Integer;
+begin
+  Result:=2;
+end;
+
+function TTUOScriptPak.GetFunctionItself(AIndex: Integer): TTUOSctiptFunction2;
+begin
+  case AIndex of
+    0: Result:=InsertCompo;
+    1: Result:=TestParams;
+  end;
+end;
+
+function TTUOScriptPak.GetFunctionName(AIndex: Integer): WideString;
+begin
+    case AIndex of
+    0: Result:='InsertComponent';
+    1: Result:='TestParams';
+  end;
+end;
+
+function TTUOScriptPak.InsertCompo(Params: TTUOScriptParams; const AEditor : IOTAEditor): TTUOScriptFunctionResult;
+var
   FormEditor : IOTAFormEditor;
   NewCompo :  IOTAComponent;
   pas       : IOTASourceEditor;
@@ -37,18 +64,10 @@ begin
     exit;
   CName:=Trim(Params[0]);
 
-  Services := BorlandIDEServices as IOTAModuleServices;
-
-  Module:=services.CurrentModule;
-
-  if module<>nil then
-    edit:=Module.ModuleFileEditors[1]
-  else
-    MessageDlg('Got no module', mtWarning, [mbOK], 0);
-
-  if (edit<>nil) then
+  if not Assigned(AEditor) then
+    MessageDlg('Got no module', mtWarning, [mbOK], 0)
+  else if Supports(AEditor.Module.ModuleFileEditors[1], IOTAFormEditor, FormEditor) then
   begin
-    FormEditor:=Edit as IOTAFormEditor;
     NewCompo:=FormEditor.CreateComponent(FormEditor.GetRootComponent,CName,0,0,50,50);
 
     if (NewCompo<>nil) then
@@ -62,7 +81,7 @@ begin
       //MessageDlg('Failed to insert new component.', mtError, [mbOK], 0);
     end;
 
-    if Supports(Module.CurrentEditor, IOTASourceEditor, pas) and (Result=1) then
+    if Supports(AEditor.Module.CurrentEditor, IOTASourceEditor, pas) and (Result=1) then
     begin
       EditView := pas.EditViews[0];
       pas.Show;
@@ -74,12 +93,12 @@ begin
         EditView.Position.BackspaceDelete(Length(CName));
     end;
   end
-  else
+  else                                     
     MessageDlg('Got no FormEditor!', mtError, [mbOK], 0);
 end;
 
 
-class function TTUOScriptPak.TestParams(Params: TTUOScriptParams): TTUOScriptFunctionResult;
+function TTUOScriptPak.TestParams(Params: TTUOScriptParams; const AEditor : IOTAEditor): TTUOScriptFunctionResult;
 begin
   MessageDlg(Params.Text, mtInformation, [mbOK], 0);
 
@@ -87,15 +106,11 @@ begin
 end;
 
 
-initialization                 
-  TUOScriptEngine.RegisterFunction('InsertComponent',
-                    Integer(@TTUOScriptPak.InsertCompo));
-
-  TUOScriptEngine.RegisterFunction('TestParams',                 
-                    Integer(@TTUOScriptPak.TestParams));
+initialization
+  ScriptPak:=TTUOScriptPak.Create;
+  TUOScriptEngine.RegisterFunctionHandler(ScriptPak);
 
 finalization
-  TUOScriptEngine.UnregisterFunction('InsertComponent');
+  TUOScriptEngine.UnregisterFunctionHandler(ScriptPak);
 
-  TUOScriptEngine.UnregisterFunction('TestParams');
 end.
