@@ -13,7 +13,7 @@ namespace System.Windows.Forms
 	/// Description of MyClass.
 	/// </summary>
 	
-	partial class Control
+	public partial class Control
 	{
 		public int TabIndex
 		{
