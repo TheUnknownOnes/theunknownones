@@ -4,6 +4,15 @@ imports System.ComponentModel
 
 Namespace System.Windows.Forms
 	
+	Public Class Button
+		Inherits Global.System.Windows.Forms.Button
+		
+		Public UseVisualStyleBackColor As Boolean
+		
+	End Class
+	
+	
+	
 	Public Class PictureBox
 		inherits Global.System.Windows.Forms.PictureBox
 		
