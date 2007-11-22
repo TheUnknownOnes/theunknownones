@@ -15,16 +15,11 @@ namespace System.Windows.Forms
 	
 	public partial class Control
 	{
-		public int TabIndex
+		public void set_TabIndex()
 		{
-		  get
-		  {
-		  	return 0;
-		  }
-		  set
-		  {
-		  }
+			
 		}
+		
 	}
 		
 }
