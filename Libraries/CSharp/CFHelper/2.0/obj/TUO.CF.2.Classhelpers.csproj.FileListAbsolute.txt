@@ -1,8 +1,0 @@
-D:\Libs\tuo\Libraries\CSharp\CFHelper\2.0\obj\Debug\ResolveAssemblyReference.cache
-D:\Libs\tuo\Libraries\CSharp\CFHelper\2.0\bin\Debug\TUO.CF.2.Classhelpers.dll
-D:\Libs\tuo\Libraries\CSharp\CFHelper\2.0\bin\Debug\TUO.CF.2.Classhelpers.pdb
-D:\Libs\tuo\Libraries\CSharp\CFHelper\2.0\obj\Debug\TUO.CF.2.Classhelpers.dll
-D:\Libs\tuo\Libraries\CSharp\CFHelper\2.0\obj\Debug\TUO.CF.2.Classhelpers.pdb
-D:\Libs\tuo\Libraries\CSharp\CFHelper\2.0\bin\Release\TUO.CF.2.Classhelpers.dll
-D:\Libs\tuo\Libraries\CSharp\CFHelper\2.0\obj\Release\ResolveAssemblyReference.cache
-D:\Libs\tuo\Libraries\CSharp\CFHelper\2.0\obj\Release\TUO.CF.2.Classhelpers.dll
