@@ -110,7 +110,7 @@ namespace TUO.System.Windows.Forms
 	}
 	
 	
-	public class PictureBox : global::System.Windows.Forms.PictureBox
+	public class PictureBox : global::System.Windows.Forms.PictureBox, ISupportInitialize
 	{
 		public String AccessibleDefaultActionDescription;
 		public String AccessibleDescription;
@@ -155,7 +155,68 @@ namespace TUO.System.Windows.Forms
 		public new Boolean TabStop;
 		public Boolean UseWaitCursor;
 		public Boolean WaitOnLoad;
+		
+		void ISupportInitialize.BeginInit()
+		{}
+		
+		void ISupportInitialize.EndInit()
+		{}
+		
 	}
 		
 	
+	public class TreeView : global::System.Windows.Forms.TreeView
+	{
+		public String AccessibleDefaultActionDescription;
+		public String AccessibleDescription;
+		public String AccessibleName;
+		public String AccessibleRole;
+		public Boolean AllowDrop;
+		public Point AutoScrollOffset;
+		public Boolean AutoSize;
+		public Image BackgroundImage;
+		public BorderStyle BorderStyle;
+		public Boolean CanFocus;
+		public Boolean CanSelect;
+		public Boolean CausesValidation;
+		public Boolean CheckForIllegalCrossThreadCalls;
+		public String CompanyName;
+		public IContainer Container;
+		public Boolean ContainsFocus;
+		public Boolean Created;
+		public Cursor Cursor;
+		public Color DefaultBackColor;
+		public Font DefaultFont;
+		public Color DefaultForeColor;
+		public Rectangle DisplayRectangle;
+		public Boolean Disposing;
+		public Boolean FullRowSelect;
+		public Boolean HasChildren;
+		public Boolean HideSelection;
+		public Boolean HotTracking;
+		public String ImageKey;
+		public Boolean IsAccessible;
+		public Boolean IsDisposed;
+		public Boolean IsHandleCreated;
+		public Boolean IsMirrored;
+		public Int32 ItemHeight;
+		public Boolean LabelEdit;
+		public Color LineColor;
+		public Size MaximumSize;
+		public Size MinimumSize;
+		public Keys ModifierKeys;
+		public Size PreferredSize;
+		public String ProductName;
+		public String ProductVersion;
+		public Boolean RecreatingHandle;
+		public Region Region;
+		public Boolean Scrollable;
+		public String SelectedImageKey;
+		public Boolean ShowNodeToolTips;
+		public Boolean Sorted;
+		public TreeNode TopNode;
+		public Boolean UseWaitCursor;
+		public Int32 VisibleCount;
+
+	}
 }
