@@ -219,4 +219,62 @@ namespace TUO.System.Windows.Forms
 		public Int32 VisibleCount;
 
 	}
+	
+	
+	public class ComboBox : global::System.Windows.Forms.ComboBox
+	{
+		public String AccessibleDefaultActionDescription;
+		public String AccessibleDescription;
+		public String AccessibleName;
+		public String AccessibleRole;
+		public Boolean AllowDrop;
+		public Boolean AutoCompleteCustomSource;
+		public Point AutoScrollOffset;
+		public Boolean AutoSize;
+		public Image BackgroundImage;
+		public Boolean CanFocus;
+		public Boolean CanSelect;
+		public Boolean CausesValidation;
+		public Boolean CheckForIllegalCrossThreadCalls;
+		public String CompanyName;
+		public IContainer Container;
+		public Boolean ContainsFocus;
+		public Boolean Created;
+		public Cursor Cursor;
+		public Color DefaultBackColor;
+		public Font DefaultFont;
+		public Color DefaultForeColor;
+		public Rectangle DisplayRectangle;
+		public Boolean Disposing;
+		public Int32 DropDownHeight;
+		public Int32 DropDownWidth;
+		public Boolean DroppedDown;
+		public IFormatProvider FormatInfo;
+		public String FormatString;
+		public Boolean FormattingEnabled;
+		public Boolean HasChildren;
+		public Int32 IntegralHeight;
+		public Boolean IsAccessible;
+		public Boolean IsDisposed;
+		public Boolean IsHandleCreated;
+		public Boolean IsMirrored;
+		public Int32 ItemHeight;
+		public Int32 MaxDropDownItems;
+		public Size MaximumSize;
+		public Int32 MaxLength;
+		public Size MinimumSize;
+		public Keys ModifierKeys;
+		public Int32 PreferredHeight;
+		public Size PreferredSize;
+		public String ProductName;
+		public String ProductVersion;
+		public Boolean RecreatingHandle;
+		public Region Region;
+		public String SelectedText;
+		public Int32 SelectionLength;
+		public Int32 SelectionStart;
+		public Boolean Sorted;
+		public Boolean UseWaitCursor;	
+	}
+	
 }
