@@ -1,8 +1,0 @@
-D:\Libs\tuo\Libraries\DotNet\CompactFramework\2.0\Helpers\obj\Debug\ResolveAssemblyReference.cache
-D:\Libs\tuo\Libraries\DotNet\CompactFramework\2.0\Helpers\bin\Debug\TUO.CompactFramework.2.Helpers.dll
-D:\Libs\tuo\Libraries\DotNet\CompactFramework\2.0\Helpers\bin\Debug\TUO.CompactFramework.2.Helpers.pdb
-D:\Libs\tuo\Libraries\DotNet\CompactFramework\2.0\Helpers\obj\Debug\TUO.CompactFramework.2.Helpers.dll
-D:\Libs\tuo\Libraries\DotNet\CompactFramework\2.0\Helpers\obj\Debug\TUO.CompactFramework.2.Helpers.pdb
-D:\Libs\tuo\Libraries\DotNet\CompactFramework\2.0\Helpers\bin\Release\TUO.CompactFramework.2.Helpers.dll
-D:\Libs\tuo\Libraries\DotNet\CompactFramework\2.0\Helpers\obj\Release\ResolveAssemblyReference.cache
-D:\Libs\tuo\Libraries\DotNet\CompactFramework\2.0\Helpers\obj\Release\TUO.CompactFramework.2.Helpers.dll
