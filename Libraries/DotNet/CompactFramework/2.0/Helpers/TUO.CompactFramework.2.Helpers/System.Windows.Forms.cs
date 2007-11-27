@@ -6,8 +6,16 @@ using System.Windows.Forms;
 
 namespace TUO.System.Windows.Forms
 {
-	
-	
+	public class DataGrid : global::System.Windows.Forms.DataGrid, ISupportInitialize
+	{
+		public String DataMember;
+		void ISupportInitialize.BeginInit()
+		{}
+		
+		void ISupportInitialize.EndInit()
+		{}
+	}
+
 	public class Button : global::System.Windows.Forms.Button
   {
   	public String AccessibleDefaultActionDescription;
@@ -57,7 +65,6 @@ namespace TUO.System.Windows.Forms
 		public Boolean UseWaitCursor;
   }
   
-	
 	
 	public class Label : global::System.Windows.Forms.Label
 	{

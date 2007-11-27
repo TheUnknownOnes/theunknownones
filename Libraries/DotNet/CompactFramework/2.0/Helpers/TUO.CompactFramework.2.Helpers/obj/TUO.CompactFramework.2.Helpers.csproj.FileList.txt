@@ -1,0 +1,8 @@
+obj\Debug\ResolveAssemblyReference.cache
+obj\Debug\TUO.CompactFramework.2.Helpers.dll
+obj\Debug\TUO.CompactFramework.2.Helpers.pdb
+bin\Debug\TUO.CompactFramework.2.Helpers.dll
+bin\Debug\TUO.CompactFramework.2.Helpers.pdb
+obj\Release\ResolveAssemblyReference.cache
+obj\Release\TUO.CompactFramework.2.Helpers.dll
+bin\Release\TUO.CompactFramework.2.Helpers.dll
