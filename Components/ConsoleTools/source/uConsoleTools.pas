@@ -320,7 +320,7 @@ begin
   if FRunning and FHookIO then
   begin
     WriteFile(FPipeInputWrite, AData[1], Length(AData), Written, nil);
-    FlushFileBuffers(FPipeInputWrite);
+    //FlushFileBuffers(FPipeInputWrite);
   end;
 end;
 
