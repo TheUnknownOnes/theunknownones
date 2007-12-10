@@ -72,6 +72,7 @@ type
   private
     FItemIndent : Integer;
     FActionLists: TActionLists;
+    FActionLinks: TList;
     FColors: TVirtualActionTreeColors;
     FLeftMousePressed : Boolean;
     function GetHint(Node: PVirtualNode): String;
@@ -225,8 +226,9 @@ var
 begin
   inherited;
   FLeftMousePressed:=False;
-  FColors:=TVirtualActionTreeColors.Create;
+  FColors:=TVirtualActionTreeColors.Create();
   FActionLists:=TActionLists.Create(self);
+  FActionLinks:=TList.Create();
   Opts :=TVirtualTreeOptions.Create(self);
   Opts.PaintOptions:=[toThemeAware,toHotTrack];
   Opts.SelectionOptions:=[toFullRowSelect];
@@ -241,8 +243,14 @@ end;
 destructor TVirtualActionTree.Destroy;
 begin
   inherited;
-  FActionLists.Free;
-  FColors.Free;
+  FActionLists.Free();
+  while FActionLinks.Count>0 do
+  begin
+    TObject(FActionLists[0]).Free;
+    FActionLists.Delete(0);
+  end;
+  FActionLinks.Free();
+  FColors.Free();
 end;
 
 function TVirtualActionTree.DoCollapsing(Node: PVirtualNode): Boolean;
