@@ -31,6 +31,7 @@ requires
   PNGUtils_D100;
 
 contains
-  EffectPNG in '..\EffectPNG.pas';
+  EffectPNG in '..\EffectPNG.pas',
+  EffectPNGHelper in '..\EffectPNGHelper.pas';
 
 end.

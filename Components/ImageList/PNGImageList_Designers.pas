@@ -16,14 +16,14 @@ uses
   PropertyCategories,
   Graphics,
   PNGCommon,
-  SysUtils;
+  SysUtils,
+  TypInfo,
+  PNGImageList_FormPNGObjectList;
 
 
 procedure Register;
 
 implementation
-
-uses TypInfo, PNGImageList_FormPNGObjectList;
 
 type
   TPNGListProperty = class(TPropertyEditor)

@@ -1,4 +1,4 @@
-package PNGImageList_D100D;
+package SearchEdit_D100;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,18 +22,14 @@ package PNGImageList_D100D;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'PNGImagelist D100D'}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  designide,
-  ImageTypes100,
-  GDIPlus100,
-  PNGUtils_D100;
+  vcl;
 
 contains
-  PNGImageList_FormPNGObjectList in '..\PNGImageList_FormPNGObjectList.pas',
-  PNGImageList_Designers in '..\PNGImageList_Designers.pas';
+  uEnumStringList in '..\uEnumStringList.pas',
+  uSearchEdit in '..\uSearchEdit.pas';
 
 end.

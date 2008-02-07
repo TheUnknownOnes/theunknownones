@@ -42,12 +42,11 @@ type
     procedure SetImages(const Value: TPNGObjectList); virtual;
 
     procedure DefineProperties(Filer: TFiler); override;
+    procedure DoDraw(AIndex: Integer; ACanvas: TCanvas; APos: TPoint;
+      AStates: TilDrawStates);  override;
   public
     constructor Create(AOwner : TComponent); override;
-    destructor Destroy(); override;
-
-    procedure Draw(AIndex : Integer; ACanvas : HDC; APos : TPoint; AStates : TilDrawStates); overload; override;
-    procedure Draw(AIndex : Integer; ACanvas : TCanvas; APos : TPoint; AStates : TilDrawStates); overload; override;
+    destructor Destroy(); override; 
 
     procedure GetImageSize(AIndex : Integer; out AWidth, AHeight : Integer); override;
 
@@ -100,27 +99,15 @@ begin
   inherited;
 end;
 
-procedure TCustomPNGImageList.Draw(AIndex: Integer; ACanvas: TCanvas;
+procedure TCustomPNGImageList.DoDraw(AIndex: Integer; ACanvas: TCanvas;
   APos: TPoint; AStates: TilDrawStates);
 var
   PNG : TPNGObject;
 begin
+  inherited;
+
   PNG:=Items[AIndex];
   ACanvas.Draw(APos.X, APos.Y, PNG);
-end;
-
-procedure TCustomPNGImageList.Draw(AIndex: Integer; ACanvas: HDC; APos: TPoint;
-  AStates: TilDrawStates);
-var
-  Canv : TCanvas;
-begin
-  Canv:=TCanvas.Create;
-  try
-    Canv.Handle:=ACanvas;
-    Draw(AIndex, Canv, APos, AStates);
-  finally
-    Canv.Free;
-  end;
 end;
 
 function TCustomPNGImageList.GetCount: Integer;

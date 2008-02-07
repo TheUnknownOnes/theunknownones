@@ -27,12 +27,11 @@ type
     function GetEffect(const Index: TilDrawState): TPNGEffects;
 
     procedure OnEffectChange(Sender : TObject); virtual;
-
+  protected
+    procedure DoDraw(AIndex : Integer; ACanvas : TCanvas; APos : TPoint; AState : TilDrawStates); override;
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy(); override;
-
-    procedure Draw(AIndex : Integer; ACanvas : TCanvas; APos : TPoint; AState : TilDrawStates); override;
 
     property EffectEnabled : TPNGEffects index ildEnabled read GetEffect write SetEffect;
     property EffectDisabled : TPNGEffects index ildDisabled read GetEffect write SetEffect;
@@ -93,7 +92,7 @@ begin
   inherited;
 end;
 
-procedure TCustomEffectPNGImageList.Draw(AIndex: Integer; ACanvas: TCanvas;
+procedure TCustomEffectPNGImageList.DoDraw(AIndex: Integer; ACanvas: TCanvas;
   APos: TPoint; AState: TilDrawStates);
 var
   PNG : TPNGObject;

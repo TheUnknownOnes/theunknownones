@@ -102,7 +102,6 @@ begin
   if Assigned(FImageList) then
     FImageList.Draw(Index, Canvas, Point(X, Y), States);
 
-
 end;
 
 

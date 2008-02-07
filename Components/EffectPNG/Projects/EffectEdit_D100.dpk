@@ -27,7 +27,6 @@ package EffectEdit_D100;
 requires
   rtl,
   vcl,
-  SearchEdit_D100,
   ImageTypes100,
   GDIPlus100,
   EffectPNG_D100,
@@ -36,7 +35,8 @@ requires
   vclactnband,
   vclx,
   vcldb,
-  dbrtl;
+  dbrtl,
+  SearchEdit_D100;
 
 contains
   EffectEdit in '..\EffectEdit.pas';

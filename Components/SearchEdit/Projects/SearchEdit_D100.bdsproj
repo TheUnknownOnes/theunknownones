@@ -5,12 +5,12 @@
 			<Option Name="Personality">Delphi.Personality</Option>
 			<Option Name="ProjectType"></Option>
 			<Option Name="Version">1.0</Option>
-			<Option Name="GUID">{63264718-32F0-477F-8913-64952848DDB2}</Option>
+			<Option Name="GUID">{3AA81288-78EE-4524-B55E-AE57FA69E296}</Option>
 		</Option>
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">PNGImageList_D100D.dpk</Source>
+			<Source Name="MainSource">SearchEdit_D100.dpk</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -116,7 +116,7 @@
 			<Linker Name="MinStackSize">16384</Linker>
 			<Linker Name="MaxStackSize">1048576</Linker>
 			<Linker Name="ImageBase">4194304</Linker>
-			<Linker Name="ExeDescription">PNGImagelist D100D</Linker>
+			<Linker Name="ExeDescription"></Linker>
 		</Linker>
 		<Directories>
 			<Directories Name="OutputDir"></Directories>
@@ -171,10 +171,20 @@
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
 		</VersionInfoKeys>  <Excluded_Packages>
-      <Excluded_Packages Name="d:\programme\borland\bds\4.0\Bin\dclbcbsmp100.bpl">Datei d:\programme\borland\bds\4.0\Bin\dclbcbsmp100.bpl nicht gefunden</Excluded_Packages>
-      <Excluded_Packages Name="d:\programme\borland\bds\4.0\Bin\bcbie100.bpl">Datei d:\programme\borland\bds\4.0\Bin\bcbie100.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="d:\development\borland\bds\BPL\ActiveX.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="d:\development\borland\bds\BPL\AdobePDF_D100.bpl">AdobePDF_D100</Excluded_Packages>
+      <Excluded_Packages Name="d:\development\borland\bds\BPL\SPPComponents100.bpl">von SPP erstellte Komponenten</Excluded_Packages>
+      <Excluded_Packages Name="d:\development\borland\bds\BPL\O406_d100.bpl">TurboPower Orpheus 4.06 designtime package - VCL70</Excluded_Packages>
+      <Excluded_Packages Name="d:\development\borland\bds\BPL\SPPTools100.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="d:\development\borland\bds\4.0\Bin\dcltee100.bpl">TeeChart-Komponenten</Excluded_Packages>
+      <Excluded_Packages Name="D:\DEVELO~1\Borland\BDS\BPL\JclUsesExpert100.bpl">JCL Uses Wizard</Excluded_Packages>
+      <Excluded_Packages Name="d:\development\borland\bds\4.0\Bin\dclofficexp100.bpl">Datei d:\development\borland\bds\4.0\Bin\dclofficexp100.bpl nicht gefunden</Excluded_Packages>
     </Excluded_Packages>
   </Delphi.Personality>
-	<StarTeamAssociation></StarTeamAssociation>
-	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+	<CompactFramework_Emulator></CompactFramework_Emulator>
+	<CompactFramework_Resolution></CompactFramework_Resolution>
+	<CompactFramework_ProjectDeploy></CompactFramework_ProjectDeploy>
+	<CompactFramework_UseDefaultDeploy>False</CompactFramework_UseDefaultDeploy>
+	<DeployAdditionalFiles>False</DeployAdditionalFiles>
+	<CompactFramework>False</CompactFramework>
 </BorlandProject>

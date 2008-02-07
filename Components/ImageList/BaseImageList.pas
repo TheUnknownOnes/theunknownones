@@ -42,8 +42,6 @@ type
   TilDrawStates = set of TilDrawState;
 
   TBaseImagelist = class(TComponent)
-  private
-
   {- the mother of all image lists}
   protected
     FChangeLinks : TList;
@@ -53,14 +51,16 @@ type
     function GetCount: Integer; virtual;
 
     procedure DoChange(AIndex : Integer);
+    function IsValidIndex(AIndex: Integer): Boolean;
+    procedure DoDraw(AIndex : Integer; ACanvas : TCanvas; APos : TPoint; AStates : TilDrawStates); virtual;
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy(); override;
 
     property Count : Integer read GetCount;
 
-    procedure Draw(AIndex : Integer; ACanvas : HDC; APos : TPoint; AStates : TilDrawStates); overload; virtual;
-    procedure Draw(AIndex : Integer; ACanvas : TCanvas; APos : TPoint; AStates : TilDrawStates); overload; virtual;
+    procedure Draw(AIndex : Integer; ACanvas : HDC; APos : TPoint; AStates : TilDrawStates); overload;
+    procedure Draw(AIndex : Integer; ACanvas : TCanvas; APos : TPoint; AStates : TilDrawStates); overload;
 
     procedure RegisterChangeLink(AChangeLink : TImageListChangeLink); virtual;
     procedure UnregisterChangeLink(AChangeLink : TImageListChangeLink); virtual;
@@ -73,6 +73,9 @@ type
 
 
 implementation
+
+uses
+  SysUtils;
 
 { TBaseImageList }
 
@@ -96,6 +99,7 @@ begin
   inherited;
 end;
 
+
 procedure TBaseImagelist.DoChange(AIndex: Integer);
 var
   idx : Integer;
@@ -107,16 +111,38 @@ begin
     TImageListChangeLink(FChangeLinks[idx]).DoChange(AIndex);
 end;
 
-procedure TBaseImagelist.Draw(AIndex: Integer; ACanvas: TCanvas; APos: TPoint;
+procedure TBaseImagelist.DoDraw(AIndex: Integer; ACanvas: TCanvas; APos: TPoint;
   AStates: TilDrawStates);
 begin
 
 end;
 
-procedure TBaseImagelist.Draw(AIndex: Integer; ACanvas: HDC; APos: TPoint;
+function TBaseImageList.IsValidIndex(AIndex : Integer) : Boolean;
+begin
+  Result := (AIndex>=0) and (AIndex < Count);
+end;
+
+procedure TBaseImagelist.Draw(AIndex: Integer; ACanvas: TCanvas; APos: TPoint;
   AStates: TilDrawStates);
 begin
+  if IsValidIndex(AIndex) then
+    DoDraw(AIndex, ACanvas, APos, AStates);
+end;
 
+procedure TBaseImagelist.Draw(AIndex: Integer; ACanvas: HDC; APos: TPoint;
+  AStates: TilDrawStates);
+var
+  Canv : TCanvas;
+begin
+  inherited;
+
+  Canv:=TCanvas.Create;
+  try
+    Canv.Handle:=ACanvas;
+    Draw(AIndex, Canv, APos, AStates);
+  finally
+    Canv.Free;
+  end;
 end;
 
 function TBaseImagelist.GetCount: Integer;
