@@ -75,7 +75,7 @@ begin
   Assert(Assigned(Node) and (Node <> RootNode), 'Invalid parameter.');
 
   repeat
-    if not ((vsVisible in Node.States) = Value) then
+    if ((vsVisible in Node.States) <> Value) then
       IsVisible[Node] := Value;
 
     Node := Node.Parent;
