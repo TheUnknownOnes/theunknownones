@@ -10,14 +10,44 @@ type
   private
     function GetVisibleRecursive(Node: PVirtualNode): Boolean;
     procedure SetVisibleRecursive(Node: PVirtualNode; const Value: Boolean);
+
+
   public
     property VisibleRecursive[Node: PVirtualNode]: Boolean read GetVisibleRecursive write SetVisibleRecursive;
+
+    function GetCheckedChildrenCountRecursive(Node: PVirtualNode; VisibleOnly : Boolean = false): Integer;
   end;
 
 
 implementation
 
 { TBaseVirtualTreeHelper }
+
+function TBaseVirtualTreeHelper.GetCheckedChildrenCountRecursive(
+  Node: PVirtualNode; VisibleOnly : Boolean): Integer;
+
+// Returns the number of children of "Node" which are checked
+
+var
+  Child : PVirtualNode;
+begin
+  Result := 0;
+
+  Child := GetFirstChild(Node);
+  while Assigned(Node) do
+  begin
+    if (CheckState[Child] = csCheckedNormal) then
+    begin
+      if (VisibleOnly and IsVisible[Child]) or
+         (not VisibleOnly) then
+        Inc(Result);
+    end;
+
+    Inc(Result, GetCheckedChildrenCountRecursive(Child, VisibleOnly));
+
+    Child := GetNextSibling(Child);
+  end;
+end;
 
 function TBaseVirtualTreeHelper.GetVisibleRecursive(
   Node: PVirtualNode): Boolean;
