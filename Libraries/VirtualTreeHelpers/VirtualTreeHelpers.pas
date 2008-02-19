@@ -34,7 +34,7 @@ begin
   Result := 0;
 
   Child := GetFirstChild(Node);
-  while Assigned(Node) do
+  while Assigned(Child) do
   begin
     if (CheckState[Child] = csCheckedNormal) then
     begin
