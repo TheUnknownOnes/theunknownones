@@ -908,10 +908,10 @@ begin
 
   SDKPropCode := psTranslateToSDKConst(Byte(FCode), psPropertyCodes);
 
-  if psCheckResponse(FManager.Lib.GetDevicePropValue(FCamera.Handle,
+  if psResponseErrorID(FManager.Lib.GetDevicePropValue(FCamera.Handle,
                                                        SDKPropCode,
                                                        BufferSize,
-                                                       nil)); = prINSUFFICIENT_BUFFER then
+                                                       nil)) = prINSUFFICIENT_BUFFER then
   begin
     CreateValue(Result, BufferSize);
 
