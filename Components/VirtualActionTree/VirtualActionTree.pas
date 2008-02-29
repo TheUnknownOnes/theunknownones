@@ -100,6 +100,7 @@ type
     procedure HandleMouseDown(var Message: TWMMouse; const HitInfo: THitInfo); override;
     procedure HandleMouseUp(var Message: TWMMouse; const HitInfo: THitInfo); override;
     function DoKeyAction(var CharCode: Word; var Shift: TShiftState): Boolean; override;
+    procedure DoExit; override;
     {$ENDREGION}
   public
     procedure AfterConstruction; override;
@@ -260,6 +261,12 @@ end;
 function TVirtualActionTree.DoCollapsing(Node: PVirtualNode): Boolean;
 begin
   Result:=False;
+end;
+
+procedure TVirtualActionTree.DoExit;
+begin
+  inherited;
+  SetHotAction(nil);
 end;
 
 procedure TVirtualActionTree.DoFreeNode(Node: PVirtualNode);
@@ -603,13 +610,17 @@ var
   Node : PVirtualNode;
   ARect : TRect;
 begin
-  Node:=GetNodeFromAction(AAction);
-  if Assigned(Node) then
+  HandleHotTrack(-1, -1);
+  if Assigned(AAction) then
   begin
-    ARect:=Self.GetDisplayRect(Node,-1,False);
-    HandleHotTrack(ARect.Left, ARect.Top);
-    Self.SetFocus;
-    //Mouse.CursorPos:=Self.ClientToScreen(ARect.TopLeft);
+    Node:=GetNodeFromAction(AAction);
+    if Assigned(Node) then
+    begin
+      ARect:=Self.GetDisplayRect(Node,-1,False);
+      HandleHotTrack(ARect.Left, ARect.Top);
+      Self.SetFocus;
+      //Mouse.CursorPos:=Self.ClientToScreen(ARect.TopLeft);
+    end;
   end;
 end;
 
