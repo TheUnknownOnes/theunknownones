@@ -99,9 +99,11 @@ type
     procedure Click; override;
     procedure HandleMouseDown(var Message: TWMMouse; const HitInfo: THitInfo); override;
     procedure HandleMouseUp(var Message: TWMMouse; const HitInfo: THitInfo); override;
+    function DoKeyAction(var CharCode: Word; var Shift: TShiftState): Boolean; override;
     {$ENDREGION}
   public
     procedure AfterConstruction; override;
+    procedure SetHotAction(const AAction : TBasicAction);
   published
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -117,6 +119,8 @@ type
     property Font;
     property Ctl3D;
     property Colors : TVirtualActionTreeColors read FColors write SetColors;
+    property TabStop;
+    property TabOrder;
   end;
 
 procedure Register;
@@ -292,6 +296,26 @@ begin
   R.Top:=0;
   R.Right:=Canvas.TextWidth(GetHint(Node))+6;
   R.Bottom:=Canvas.TextHeight(GetHint(Node))+6;
+end;
+
+function TVirtualActionTree.DoKeyAction(var CharCode: Word;
+  var Shift: TShiftState): Boolean;
+var
+  NData : TObject;
+begin
+  if CharCode=VK_RETURN then
+  begin
+    if Assigned(HotNode) then
+    begin
+      NData:=TObject(self.GetNodeData(HotNode)^);
+      if (NData is TVirtualActionLink) and (TVirtualActionLink(NData).Action is TCustomAction) then
+      begin
+        Result:=TCustomAction(TVirtualActionLink(NData).Action).Execute;
+      end;
+    end;
+  end
+  else
+    Result:=inherited DoKeyAction(CharCode, Shift);
 end;
 
 procedure TVirtualActionTree.DoPaintNode(var PaintInfo: TVTPaintInfo);
@@ -572,6 +596,21 @@ end;
 procedure TVirtualActionTree.SetColors(const Value: TVirtualActionTreeColors);
 begin
   FColors.Assign(Value);
+end;
+
+procedure TVirtualActionTree.SetHotAction(const AAction: TBasicAction);
+var
+  Node : PVirtualNode;
+  ARect : TRect;
+begin
+  Node:=GetNodeFromAction(AAction);
+  if Assigned(Node) then
+  begin
+    ARect:=Self.GetDisplayRect(Node,-1,False);
+    HandleHotTrack(ARect.Left, ARect.Top);
+    Self.SetFocus;
+    //Mouse.CursorPos:=Self.ClientToScreen(ARect.TopLeft);
+  end;
 end;
 
 { TVirtualActionLink }
