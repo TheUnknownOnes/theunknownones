@@ -8,7 +8,7 @@ Canon Digital Imaging Developer Programme
 
 Translation of the Digital Camera SDK PS-ReC SDK v1.1.0d to Delphi.
 
-The component can be used for remote controlling follwing devices:
+The component can be used for remote controlling following devices:
 PowerShot G9, 
 PowerShot G7, 
 PowerShot S5 IS, 
