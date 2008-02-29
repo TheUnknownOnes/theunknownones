@@ -908,6 +908,7 @@ begin
 
   SDKPropCode := psTranslateToSDKConst(Byte(FCode), psPropertyCodes);
 
+  //
   if psResponseErrorID(FManager.Lib.GetDevicePropValue(FCamera.Handle,
                                                        SDKPropCode,
                                                        BufferSize,
