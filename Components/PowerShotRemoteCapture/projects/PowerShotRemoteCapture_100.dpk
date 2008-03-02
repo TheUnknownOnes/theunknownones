@@ -35,6 +35,7 @@ contains
   psrcLibrary in '..\psrcLibrary.pas',
   psrcError in '..\psrcError.pas',
   psrcMain in '..\psrcMain.pas',
-  psrcType in '..\psrcType.pas';
+  psrcType in '..\psrcType.pas',
+  psType in '..\psType.pas';
 
 end.

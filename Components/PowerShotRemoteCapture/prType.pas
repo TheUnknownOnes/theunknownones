@@ -14,7 +14,7 @@ uses
 type
   // Basic Data Types
   prUInt8     = type Byte; PprUInt8 = ^prUInt8;
-  prInt8      = type Byte;
+  prInt8      = type ShortInt;
   prChar      = type Char;
   prWChar     = type WCHAR;
   prUInt16    = type Word;
