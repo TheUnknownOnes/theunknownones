@@ -68,6 +68,8 @@ type
     property PressedFrame : TGPColor  read FPressedFrame write FPressedFrame;
   end;
 
+  TVirtualActionTreeNodeType = (vatntNoNode, vatntAction, vatntActionGroup);
+
   TVirtualActionTree = class(TCustomVirtualDrawTree)
   private
     FItemIndent : Integer;
@@ -80,6 +82,7 @@ type
   protected
     function GetActionGroup(const ACaption : String; ACanCreate: Boolean): PVirtualNode;
     function GetNodeFromAction(const AAction: TBasicAction): PVirtualNode;
+    function GetActionFromNode(const ANode: pVirtualNode; var Action: TBasicAction): TVirtualActionTreeNodeType;
 
     procedure InternalDrawHint(Sender: TBaseVirtualTree; HintCanvas: TCanvas; Node: PVirtualNode; R: TRect;
                                Column: TColumnIndex);
@@ -309,6 +312,8 @@ function TVirtualActionTree.DoKeyAction(var CharCode: Word;
   var Shift: TShiftState): Boolean;
 var
   NData : TObject;
+  Node : PVirtualNode;
+  Action : TBasicAction;
 begin
   if CharCode=VK_RETURN then
   begin
@@ -320,6 +325,40 @@ begin
         Result:=TCustomAction(TVirtualActionLink(NData).Action).Execute;
       end;
     end;
+  end
+  else
+  if CharCode=VK_UP then
+  begin
+    if not Assigned(HotNode) then
+      Node:=GetLast
+    else
+      Node := GetPrevious(HotNode);
+
+    while (GetActionFromNode(Node, Action)=vatntActionGroup) or
+          (Assigned(Action) and (not TAction(Action).Enabled)) do
+    begin
+      Node:=GetPrevious(Node);
+    end;
+
+    if Assigned(Action) then
+      SetHotAction(Action);
+  end
+  else
+  if CharCode=VK_DOWN then
+  begin
+    if not Assigned(HotNode) then
+      Node:=GetFirst
+    else
+      Node := GetNext(HotNode);
+
+    while (GetActionFromNode(Node, Action)=vatntActionGroup) or
+          (Assigned(Action) and (not TAction(Action).Enabled)) do
+    begin
+      Node:=GetNext(Node);
+    end;
+
+    if Assigned(Action) then
+      SetHotAction(Action);
   end
   else
     Result:=inherited DoKeyAction(CharCode, Shift);
@@ -491,6 +530,32 @@ begin
              ds,
              itImage,
              actEnabled);
+  end;
+end;
+
+function TVirtualActionTree.GetActionFromNode(const ANode: pVirtualNode;
+  var Action: TBasicAction): TVirtualActionTreeNodeType;
+var
+  NData : TObject;
+begin
+  Action:=nil;
+
+  if not Assigned(ANode) then
+  begin
+    Result:=vatntNoNode;
+  end
+  else
+  begin
+    NData:=TObject(Self.GetNodeData(ANode)^);
+
+    if NData is TVirtualActionGroup then
+      Result:=vatntActionGroup
+    else
+    if NData is TVirtualActionLink then
+    begin
+      Result:=vatntAction;
+      Action:=TVirtualActionLink(Self.GetNodeData(ANode)^).Action;
+    end;
   end;
 end;
 
