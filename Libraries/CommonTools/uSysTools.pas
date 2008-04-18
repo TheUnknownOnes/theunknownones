@@ -91,6 +91,10 @@ function KeyToogled(AKey : Smallint) : Boolean; overload;
 function KeyToogled(AKey : Byte) : Boolean; overload;
 {$ENDREGION}
 
+{$REGION 'SpecialFolder'}
+function GetShellFolder(CSIDL: integer): string;
+{$ENDREGION}
+
 implementation
 
 uses
@@ -598,6 +602,40 @@ end;
 function KeyToogled(AKey : Byte) : Boolean; overload;
 begin
   Result:=(AKey shl ((SizeOf(AKey)*8)-1))=1;
+end;
+{$ENDREGION}
+
+{$REGION 'SpecialFolder'}
+function GetShellFolder(CSIDL: integer): string;
+//thx to Michael (http://www.michael-puff.de/Artikel/HOMEDIR.php)
+var
+  pidl                   : PItemIdList;
+  FolderPath             : string;
+  SystemFolder           : Integer;
+  Malloc                 : IMalloc;
+begin
+  Malloc := nil;
+  FolderPath := '';
+  SHGetMalloc(Malloc);
+  if Malloc = nil then
+  begin
+    Result := FolderPath;
+    Exit;
+  end;
+  try
+    SystemFolder := CSIDL;
+    if SUCCEEDED(SHGetSpecialFolderLocation(0, SystemFolder, pidl)) then
+    begin
+      SetLength(FolderPath, max_path);
+      if SHGetPathFromIDList(pidl, PChar(FolderPath)) then
+      begin
+        SetLength(FolderPath, length(PChar(FolderPath)));
+      end;
+    end;
+    Result := FolderPath;
+  finally
+    Malloc.Free(pidl);
+  end;
 end;
 {$ENDREGION}
 
