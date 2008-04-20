@@ -393,7 +393,7 @@ type
 
     {$REGION 'Config'}
     procedure EnableGIPSTracing(AEnable : Boolean);
-    procedure SetUserAgenName(AName : String; AIncludePlatform : Boolean = true);
+    procedure SetUserAgentName(AName : String; AIncludePlatform : Boolean = true);
     procedure SetOutboundProxy(AProxy : String);
     procedure SetRegisterResponseWaitSeconds(ASeconds : Integer);
     procedure SetDnsSrvFailoverTimeout(ASeconds : Integer);
@@ -1503,7 +1503,7 @@ begin
   );
 end;
 
-procedure TsxInstance.SetUserAgenName(AName: String; AIncludePlatform: Boolean);
+procedure TsxInstance.SetUserAgentName(AName: String; AIncludePlatform: Boolean);
 begin
   sxCheckResultForError(
     sipxConfigSetUserAgentName(FInstance, PChar(AName), AIncludePlatform)
