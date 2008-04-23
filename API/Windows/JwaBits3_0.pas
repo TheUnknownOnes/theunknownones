@@ -1,4 +1,58 @@
-unit Bits3_0;
+{******************************************************************************}
+{                                                                              }
+{ Background Intelligent Transfer API interface Unit for Object Pascal         }
+{                                                                              }
+{ Portions created by Microsoft are Copyright (C) 1995-2001 Microsoft          }
+{ Corporation. All Rights Reserved.                                            }
+{                                                                              }
+{ The original file is: bitscfg.h, released August 2001. The original Pascal   }
+{ code is: Bits.pas, released October 2001. The initial developer of the       }
+{ Pascal code is Wayne Sherman (body1233 att yahoo dott com).                  }
+{                                                                              }
+{ Portions created by Wayne Sherman are Copyright (C) 1999-2001                }
+{ Marcel van Brakel. All Rights Reserved.                                      }
+{                                                                              }
+{ Obtained through: Joint Endeavour of Delphi Innovators (Project JEDI)        }
+{                                                                              }
+{ You may retrieve the latest version of this file at the Project JEDI         }
+{ APILIB home page, located at http://jedi-apilib.sourceforge.net              }
+{                                                                              }
+{ The contents of this file are used with permission, subject to the Mozilla   }
+{ Public License Version 1.1 (the "License"); you may not use this file except }
+{ in compliance with the License. You may obtain a copy of the License at      }
+{ http://www.mozilla.org/MPL/MPL-1.1.html                                      }
+{                                                                              }
+{ Software distributed under the License is distributed on an "AS IS" basis,   }
+{ WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for }
+{ the specific language governing rights and limitations under the License.    }
+{                                                                              }
+{ Alternatively, the contents of this file may be used under the terms of the  }
+{ GNU Lesser General Public License (the  "LGPL License"), in which case the   }
+{ provisions of the LGPL License are applicable instead of those above.        }
+{ If you wish to allow use of your version of this file only under the terms   }
+{ of the LGPL License and not to allow others to use your version of this file }
+{ under the MPL, indicate your decision by deleting  the provisions above and  }
+{ replace  them with the notice and other provisions required by the LGPL      }
+{ License.  If you do not delete the provisions above, a recipient may use     }
+{ your version of this file under either the MPL or the LGPL License.          }
+{                                                                              }
+{ For more information about the LGPL: http://www.gnu.org/copyleft/lesser.html }
+{                                                                              }
+{******************************************************************************}
+
+{$IFNDEF JWA_OMIT_SECTIONS}
+unit JwaBits3_0;
+
+{$WEAKPACKAGEUNIT}
+{$ENDIF JWA_OMIT_SECTIONS}
+
+{$HPPEMIT ''}
+{$HPPEMIT '#include "bits3_0.h"'}
+{$HPPEMIT ''}
+
+{$IFNDEF JWA_OMIT_SECTIONS}
+{$I jediapilib.inc}
+
 
 interface
 
@@ -7,8 +61,13 @@ uses
   JwaWinType,
   JwaBits,
   JwaBits1_5,
-  Bits2_0,
-  Bits2_5;
+  JwaBits2_0,
+  JwaBits2_5;
+  
+{$ENDIF JWA_OMIT_SECTIONS}
+
+
+{$IFNDEF JWA_IMPLEMENTATIONSECTION}
 
 const
   IID_IBitsPeerCacheRecord : TGUID = '{659cdeaf-489e-11d9-a9cd-000d56965251}';
@@ -149,7 +208,21 @@ const
   {$EXTERNALSYM LIBID_BackgroundCopyManager3_0}
   CLSID_BackgroundCopyManager3_0: GUID = '{659cdea7-489e-11d9-a9cd-000d56965251}';
   {$EXTERNALSYM CLSID_BackgroundCopyManager3_0}
+  
+{$ENDIF JWA_IMPLEMENTATIONSECTION}
+
+
+
+{$IFNDEF JWA_OMIT_SECTIONS}
 
 implementation
+//uses ...
+{$ENDIF JWA_OMIT_SECTIONS}
 
+{$IFNDEF JWA_INTERFACESECTION}
+//your implementation here
+{$ENDIF JWA_INTERFACESECTION}
+
+{$IFNDEF JWA_OMIT_SECTIONS}
 end.
+{$ENDIF JWA_OMIT_SECTIONS}
