@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{3FE1F020-6F89-489F-A60A-6942C5BFF197}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="ConsoleTools_D100.bpl">ConsoleTools\Projects\D10\ConsoleTools.bdsproj</Projects>
+      <Projects Name="XMLTools_D100.bpl">..\Libraries\XMLTools\Projects\D10\XMLTools.bdsproj</Projects>
+      <Projects Name="VSTHeaderSaver_D100.bpl">VSTHeaderSaver\Projects\D10\VSTHeaderSaver.bdsproj</Projects>
+      <Projects Name="SearchEdit_D100.bpl">SearchEdit\Projects\D10\SearchEdit.bdsproj</Projects>
+      <Projects Name="VSTSearchEdit.bpl">VSTSearchEdit\Projects\D10\VSTSearchEdit.bdsproj</Projects>
+      <Projects Name="PNGUtils_D100.bpl">PNGUtils\Projects\D10\PNGUtils.bdsproj</Projects>
+      <Projects Name="BaseImageList_D100.bpl">ImageList\Projects\D10\BaseImageList.bdsproj</Projects>
+      <Projects Name="PNGImageList_D100.bpl">ImageList\Projects\D10\PNGImageList.bdsproj</Projects>
+      <Projects Name="ImageListProvider_D100.bpl">ImageList\Projects\D10\ImageListProvider.bdsproj</Projects>
+      <Projects Name="PNGImageListDesigner_D100D.bpl">ImageList\Projects\D10\PNGImageListDesigner.bdsproj</Projects>
+      <Projects Name="EffectPNG_D100.bpl">EffectPNG\Projects\D10\EffectPNG.bdsproj</Projects>
+      <Projects Name="EffectPNGImage_D100.bpl">EffectPNG\Projects\D10\EffectPNGImage.bdsproj</Projects>
+      <Projects Name="EffectPNGEdit_D100.bpl">EffectPNG\Projects\D10\EffectPNGEdit.bdsproj</Projects>
+      <Projects Name="EffectPNGImageList_D100.bpl">EffectPNG\Projects\D10\EffectPNGImageList.bdsproj</Projects>
+      <Projects Name="EffectPNGToolbar_D100.bpl">EffectPNG\Projects\D10\EffectPNGToolbar.bdsproj</Projects>
+      <Projects Name="GroupListView_D100.bpl">GroupListView\Projects\D10\GroupListView.bdsproj</Projects>
+      <Projects Name="Targets">ConsoleTools_D100.bpl XMLTools_D100.bpl VSTHeaderSaver_D100.bpl SearchEdit_D100.bpl VSTSearchEdit.bpl PNGUtils_D100.bpl BaseImageList_D100.bpl PNGImageList_D100.bpl ImageListProvider_D100.bpl PNGImageListDesigner_D100D.bpl EffectPNG_D100.bpl EffectPNGImage_D100.bpl EffectPNGEdit_D100.bpl EffectPNGImageList_D100.bpl EffectPNGToolbar_D100.bpl GroupListView_D100.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

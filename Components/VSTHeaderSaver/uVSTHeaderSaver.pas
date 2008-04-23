@@ -70,7 +70,7 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('SPPDesk', [TVSTHeaderSaver]);
+  RegisterComponents('TUO', [TVSTHeaderSaver]);
 end;
 
 { TVSTHeaderSaver }
