@@ -2,7 +2,7 @@
 // Developed by TheUnkownOnes.net
 // 
 // for more information look at www.TheUnknownOnes.net
-//**********************************************************
+//********************************************************** 
 unit uConsoleTools;
 
 interface
