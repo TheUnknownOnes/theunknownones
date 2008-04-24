@@ -29,7 +29,7 @@ package VSTHeaderSaver;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'VSTHeaderSaver'}
 {$LIBSUFFIX '_D100'}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
   rtl,

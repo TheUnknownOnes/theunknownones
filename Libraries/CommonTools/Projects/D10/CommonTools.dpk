@@ -30,7 +30,7 @@ requires
   rtl,
   vcl,
   dbrtl,
-  RegExp100,
+  RegExp,
   VirtualTreesD10,
   TntUnicodeVcl,
   vclactnband,

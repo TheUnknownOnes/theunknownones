@@ -1822,7 +1822,7 @@ function TStream.GetSize: Longint;
     ResGlobal: HGlobal;
   begin
     {Obtains the resource ID}
-    ResID := FindResource(hInstance, PChar(ResName), RT_RCDATA);
+    ResID := FindResource(hInstance, PChar(ResName), 'PNG');
     if ResID = 0 then raise EPNGError.Create('');
     {Obtains memory and size}
     ResGlobal := LoadResource(hInstance, ResID);
@@ -5139,7 +5139,7 @@ var
   ResStream: TResourceStream;
 begin
   {Creates an especial stream to load from the resource}
-  try ResStream := TResourceStream.Create(Instance, Name, RT_RCDATA);
+  try ResStream := TResourceStream.Create(Instance, Name, 'PNG');
   except RaiseError(EPNGCouldNotLoadResource, EPNGCouldNotLoadResourceText);
   exit; end;
 
