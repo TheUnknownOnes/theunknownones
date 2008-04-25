@@ -29,7 +29,7 @@ package PNGImageListDesigner;
 requires
   rtl,
   designide,
-  ImageTypes100,
+  PNGSupport,
   GDIPlus100,
   PNGUtils,
   vcl,

@@ -170,9 +170,7 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>  
-    
-    <Excluded_Packages>
+		</VersionInfoKeys>  <Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\eltreeD10.bpl">EldoS Visual Components</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\qrpt100.bpl">QuickReport Runtime Package</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\VirtualTreesD10.bpl">Virtual Treeview runtime package</Excluded_Packages>

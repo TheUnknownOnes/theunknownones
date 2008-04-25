@@ -171,7 +171,10 @@
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
 		</VersionInfoKeys>  <Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\ImageListProvider_D100.bpl">ImageListProvider D100</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\RichViewEditor_D100.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\PowerShotRemoteCapture_100.bpl">Datei C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\PowerShotRemoteCapture_100.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\PowerShotRemoteCapture_D100.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\Fastreport_Components_D100.bpl">Fastreport Components</Excluded_Packages>
       <Excluded_Packages Name="d:\programme\borland\bds\4.0\Bin\dclbcbsmp100.bpl">Datei d:\programme\borland\bds\4.0\Bin\dclbcbsmp100.bpl nicht gefunden</Excluded_Packages>
       <Excluded_Packages Name="d:\programme\borland\bds\4.0\Bin\bcbie100.bpl">Datei d:\programme\borland\bds\4.0\Bin\bcbie100.bpl nicht gefunden</Excluded_Packages>
     </Excluded_Packages>
