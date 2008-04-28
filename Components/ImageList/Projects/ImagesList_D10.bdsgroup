@@ -10,12 +10,13 @@
 	</PersonalityInfo>
 	<Default.Personality>  <Projects>
       <Projects Name="BaseImageList_D100.bpl">D10\BaseImageList.bdsproj</Projects>
-      <Projects Name="PNGImageList_D100.bpl">D10\PNGImageList_D100.bdsproj</Projects>
       <Projects Name="ImageListProvider_D100.bpl">D10\ImageListProvider.bdsproj</Projects>
-      <Projects Name="PNGImageList_D100D.bpl">D10\PNGImageList.bdsproj</Projects>
-      <Projects Name="Targets">BaseImageList_D100.bpl PNGImageList_D100.bpl ImageListProvider_D100.bpl PNGImageList_D100D.bpl</Projects>
+      <Projects Name="PNGImageListDesigner_D100D.bpl">D10\PNGImageListDesigner.bdsproj</Projects>
+      <Projects Name="PNGImageList_D100.bpl">D10\PNGImageList.bdsproj</Projects>
+      <Projects Name="Targets">BaseImageList_D100.bpl ImageListProvider_D100.bpl PNGImageListDesigner_D100D.bpl PNGImageList_D100.bpl</Projects>
     </Projects>
     <Dependencies/>
-  </Default.Personality>  <StarTeamAssociation></StarTeamAssociation>
-  <StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
 </BorlandProject>

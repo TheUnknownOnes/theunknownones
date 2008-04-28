@@ -24,6 +24,7 @@ package PNGImageListDesigner;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'PNGImagelist D100D'}
 {$LIBSUFFIX '_D100D'}
+{$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
