@@ -9,9 +9,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, Spin, DWMAPI;
-
-
+  Dialogs, StdCtrls, ExtCtrls, Spin, uDWMHelper, JwaDwmapi;
 
 type
   TForm1 = class(TForm)
@@ -40,6 +38,7 @@ var
 implementation
 
 {$R *.dfm}
+
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin

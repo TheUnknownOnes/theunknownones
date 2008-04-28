@@ -55,9 +55,11 @@ unit JwaDwmapi;
 interface
 
 uses
-  JwaWinType,
-  JwaUxTheme;
+  JwaUxTheme,
+  JwaWinType;
 {$ENDIF JWA_OMIT_SECTIONS}
+
+
 
 
 const
@@ -71,7 +73,7 @@ const
 type
   _DWM_BLURBEHIND = record
     dwFlags                 : DWORD;
-    fEnbaled                : BOOL;
+    fEnable                 : BOOL;
     hRgnBlur                : HRGN;
     fTransitionOnMaximized  : BOOL;
   end;
@@ -321,7 +323,7 @@ type
 
     // The number of buffers in the flipchain
     // that are empty.   An application can 
-    // present that number of times and guarantee 
+    // present that number of times and guarantee
     // it won't be blocked waiting for a buffer to 
     // become empty to present to
     cBuffersEmpty : DWM_FRAME_COUNT;
@@ -447,11 +449,6 @@ implementation
 {$IFNDEF JWA_INCLUDEMODE}
 const
   dwmlib = 'dwmapi.dll';
-  {$IFDEF UNICODE}
-  AWSuffix = 'W';
-  {$ELSE}
-  AWSuffix = 'A';
-  {$ENDIF UNICODE}
 {$ENDIF JWA_INCLUDEMODE}
 
 {$IFDEF DYNAMIC_LINK}

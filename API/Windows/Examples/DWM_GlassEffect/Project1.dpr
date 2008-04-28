@@ -2,11 +2,9 @@ program Project1;
 
 uses
   Forms,
-  Unit1 in 'Unit1.pas' {Form1},
-  DWMApi in '..\DWMApi.pas';
+  Unit1 in 'Unit1.pas' {Form1};
 
 {$R *.res}
-{$R winxp.res}
 
 begin
   Application.Initialize;
