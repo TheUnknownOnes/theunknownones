@@ -5,8 +5,7 @@
 { Portions created by Microsoft are Copyright (C) 1995-2001 Microsoft          }
 { Corporation. All Rights Reserved.                                            }
 {                                                                              }
-{ The original file is: dwmapi.h The original Pascal                           }
-{ code is: UxTheme.pas, released July 2001. The initial developer of the       }
+{ The original file is: dwmapi.h  The initial developer of the                 }
 { Pascal code is TUO (http://www.TheUnknownOnes.net)                           }
 {                                                                              }
 {                                                                              }

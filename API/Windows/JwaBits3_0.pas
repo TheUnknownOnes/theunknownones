@@ -5,12 +5,8 @@
 { Portions created by Microsoft are Copyright (C) 1995-2001 Microsoft          }
 { Corporation. All Rights Reserved.                                            }
 {                                                                              }
-{ The original file is: bitscfg.h, released August 2001. The original Pascal   }
-{ code is: Bits.pas, released October 2001. The initial developer of the       }
-{ Pascal code is Wayne Sherman (body1233 att yahoo dott com).                  }
-{                                                                              }
-{ Portions created by Wayne Sherman are Copyright (C) 1999-2001                }
-{ Marcel van Brakel. All Rights Reserved.                                      }
+{ The original file is: bits3_0.h, The initial developer of the                }
+{ Pascal code is TUO (http://www.TheUnknownOnes.net).                          }
 {                                                                              }
 { Obtained through: Joint Endeavour of Delphi Innovators (Project JEDI)        }
 {                                                                              }
