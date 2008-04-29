@@ -171,6 +171,7 @@
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
 		</VersionInfoKeys>
-	</Delphi.Personality>  <StarTeamAssociation></StarTeamAssociation>
-  <StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+	</Delphi.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
 </BorlandProject>

@@ -9,7 +9,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, Spin, uDWMHelper, JwaDwmapi;
+  Dialogs, StdCtrls, ExtCtrls, Spin, uDWMHelper, JwaDwmapi, xpman;
 
 type
   TForm1 = class(TForm)
@@ -21,12 +21,13 @@ type
     SpinEdit4: TSpinEdit;
     Button3: TButton;
     Button4: TButton;
+    Button5: TButton;
     procedure Button1Click(Sender: TObject);
     procedure SpinEdit1Change(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
   private
   public
     { Public-Deklarationen }
@@ -37,6 +38,8 @@ var
 
 implementation
 
+uses Unit2;
+
 {$R *.dfm}
 
 
@@ -46,8 +49,9 @@ begin
   SpinEdit2.Value:=0;
   SpinEdit3.Value:=0;
   SpinEdit4.Value:=0;
-  DWM_EnableBlurBehind(self.Handle, true);
-  DWM_ExtendFrameIntoClientArea(self.Handle, 0,0,0,0);
+
+  DWM_EnableBlurBehind(form2.Handle, true);
+  DWM_ExtendFrameIntoClientArea(form2.Handle, 0,0,0,0);
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
@@ -60,8 +64,11 @@ end;
 
 procedure TForm1.Button3Click(Sender: TObject);
 begin
-  DWM_EnableBlurBehind(self.Handle, False);
-  DWM_ExtendFrameIntoAll(Self.Handle);
+  DWM_EnableBlurBehind(form2.Handle, False);
+
+
+  //SetLayeredWindowAttributes(form2.Handle, ColorToRGB(form2.Color), 0, LWA_COLORKEY);
+  DWM_SheetOfGlass(form2.Handle);
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
@@ -73,15 +80,18 @@ begin
   MessageDlg(IntToHex(col,8), mtWarning, [mbOK], 0);
 end;
 
-procedure TForm1.FormCreate(Sender: TObject);
+procedure TForm1.Button5Click(Sender: TObject);
+var
+  rgn : HRGN;
 begin
-  Button1.Click;
+  rgn:=CreateEllipticRgn(0,0,form2.clientwidth,form2.clientheight);
+  DWM_EnableBlurBehind(form2.Handle, true, rgn, false, DWM_BB_ENABLE or DWM_BB_BLURREGION);
 end;
 
 procedure TForm1.SpinEdit1Change(Sender: TObject);
 begin
-  DWM_EnableBlurBehind(self.Handle, False);
-  DWM_ExtendFrameIntoClientArea(self.Handle, SpinEdit1.Value, SpinEdit3.Value, SpinEdit2.Value, SpinEdit4.Value);
+  DWM_EnableBlurBehind(form2.Handle, true);
+  DWM_ExtendFrameIntoClientArea(form2.Handle, SpinEdit1.Value, SpinEdit3.Value, SpinEdit2.Value, SpinEdit4.Value);
 end;
 
 end.

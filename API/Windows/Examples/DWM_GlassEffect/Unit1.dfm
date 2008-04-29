@@ -2,9 +2,9 @@ object Form1: TForm1
   Left = 214
   Top = 116
   Caption = 'Form1'
-  ClientHeight = 246
+  ClientHeight = 280
   ClientWidth = 269
-  Color = clBlack
+  Color = 15790320
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -12,7 +12,6 @@ object Form1: TForm1
   Font.Style = []
   OldCreateOrder = False
   ShowHint = True
-  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object Button1: TButton
@@ -41,7 +40,7 @@ object Form1: TForm1
   end
   object SpinEdit1: TSpinEdit
     Left = 119
-    Top = 103
+    Top = 151
     Width = 65
     Height = 22
     MaxValue = 0
@@ -52,7 +51,7 @@ object Form1: TForm1
   end
   object SpinEdit2: TSpinEdit
     Left = 119
-    Top = 159
+    Top = 207
     Width = 65
     Height = 22
     MaxValue = 0
@@ -63,7 +62,7 @@ object Form1: TForm1
   end
   object SpinEdit3: TSpinEdit
     Left = 48
-    Top = 131
+    Top = 179
     Width = 65
     Height = 22
     MaxValue = 0
@@ -74,7 +73,7 @@ object Form1: TForm1
   end
   object SpinEdit4: TSpinEdit
     Left = 190
-    Top = 131
+    Top = 179
     Width = 65
     Height = 22
     MaxValue = 0
@@ -94,11 +93,20 @@ object Form1: TForm1
   end
   object Button4: TButton
     Left = 16
-    Top = 192
+    Top = 240
     Width = 120
     Height = 25
     Caption = 'active Colorization Color'
     TabOrder = 7
     OnClick = Button4Click
+  end
+  object Button5: TButton
+    Left = 16
+    Top = 101
+    Width = 120
+    Height = 25
+    Caption = 'Region Blur'
+    TabOrder = 8
+    OnClick = Button5Click
   end
 end
