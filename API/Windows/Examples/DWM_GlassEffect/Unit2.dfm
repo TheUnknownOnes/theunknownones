@@ -1,6 +1,6 @@
 object Form2: TForm2
-  Left = 0
-  Top = 0
+  Left = 720
+  Top = 459
   AlphaBlendValue = 20
   Caption = 'DWM API - Demo'
   ClientHeight = 249
@@ -13,6 +13,7 @@ object Form2: TForm2
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poDesigned
   Visible = True
   OnCreate = FormCreate
   PixelsPerInch = 96
