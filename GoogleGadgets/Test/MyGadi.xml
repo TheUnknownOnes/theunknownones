@@ -3,9 +3,9 @@
   <ModulePrefs title="hello world example">
     <Require feature="dynamic-height" />  
   </ModulePrefs>
-  <Content type="html">
+  <Content type="inline-html">
      <![CDATA[ 
-       Hello, world!
+
      ]]>
   </Content> 
 </Module>
