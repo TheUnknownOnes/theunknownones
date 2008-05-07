@@ -4,8 +4,9 @@
     <Require feature="dynamic-height" />  
   </ModulePrefs>
   <Content type="inline-html">
-     <![CDATA[ 
-
-     ]]>
+  <![CDATA[
+    <div id="content_div" />
+    <script type="text/javascript" src="MyGadi.js" />
+  ]]>
   </Content> 
 </Module>
