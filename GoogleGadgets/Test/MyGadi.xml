@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
-  <ModulePrefs title="hello world example">
+  <ModulePrefs title="MyGadi">
     <Require feature="dynamic-height" />  
   </ModulePrefs>
-  <Content type="inline-html">
+  <Content type="html">
   <![CDATA[
     <div id="content_div" />
     <script type="text/javascript" src="MyGadi.js" />
