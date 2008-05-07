@@ -4,20 +4,18 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, JvExControls, JvEditorCommon, JvEditor,
-  JvHLEditor, JvHLEditorPropertyForm, ComCtrls, uEffectPNGToolbar, ToolWin,
-  JvAppStorage, JvAppXMLStorage, JvComponentBase, JvFormPlacement, Menus,
-  IniFiles, RegExpr, Math, JvAppIniStorage;
+  Dialogs, ExtCtrls, StdCtrls,
+  ComCtrls, uEffectPNGToolbar, ToolWin,
+  Menus, uSysTools,
+  IniFiles, RegExpr, Math, JvComponentBase, JvDragDrop;
 
 type
   Tform_Main = class(TForm)
     gb_Source: TGroupBox;
-    ed_Source: TJvHLEditor;
     gb_Result: TGroupBox;
     pan_Client: TPanel;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
-    ed_Result: TJvHLEditor;
     EffectPNGToolBar1: TEffectPNGToolBar;
     btn_LoadSource: TEffectPNGToolButton;
     dlg_LoadSource: TOpenDialog;
@@ -48,6 +46,9 @@ type
     pb_All: TProgressBar;
     pb_Expression: TProgressBar;
     cb_RemoveEmptyLines: TCheckBox;
+    ed_Source: TMemo;
+    ed_Result: TMemo;
+    dt_Source: TJvDropTarget;
     procedure btn_LoadSourceClick(Sender: TObject);
     procedure btn_SaveResultClick(Sender: TObject);
     procedure btn_NewExpressionClick(Sender: TObject);
@@ -62,8 +63,15 @@ type
       Data: Integer; var Compare: Integer);
     procedure btn_MoveDownClick(Sender: TObject);
     procedure cb_RunPerLineClick(Sender: TObject);
+    procedure dt_SourceDragAccept(Sender: TJvDropTarget;
+      var Accept: Boolean);
+    procedure dt_SourceDragDrop(Sender: TJvDropTarget;
+      var Effect: TJvDropEffect; Shift: TShiftState; X, Y: Integer);
+    procedure dt_SourceDragEnter(Sender: TJvDropTarget;
+      var Effect: TJvDropEffect);
   private
     function DoWork(AText : String) : String;
+    function ReplaceSpecialChars(AText : String) : String;
   public
     { Public-Deklarationen }
   end;
@@ -226,10 +234,16 @@ procedure Tform_Main.btn_RunClick(Sender: TObject);
 var
   Line : String;
   idx : Integer;
+  Lines : TStrings;
 begin
+  if lv_Expressions.Items.Count = 0 then
+    exit;
+
   if cb_RunPerLine.Checked then
   begin
     ed_Result.Clear;
+
+    Lines := TStringList.Create;
 
     pb_All.Max := ed_Source.Lines.Count - 1;
 
@@ -243,12 +257,16 @@ begin
       if cb_RemoveEmptyLines.Checked then
       begin
         if Trim(Line) <> EmptyStr then
-          ed_Result.Lines.Add(Line);
+          Lines.Add(Line);
       end
       else
-        ed_Result.Lines.Add(Line);
+        Lines.Add(Line);
 
     end;
+
+    ed_Result.Lines.Assign(Lines);
+
+    Lines.Free;
   end
   else
   begin
@@ -334,7 +352,7 @@ begin
       begin
         Reg.Expression := li.SubItems[0];
         if reg.Exec then
-          Reg.InputString := reg.Substitute(li.SubItems[1]);
+          Reg.InputString := reg.Replace(reg.InputString, ReplaceSpecialChars(li.SubItems[1]), true);
       end;
     end;
 
@@ -342,6 +360,34 @@ begin
   finally
     reg.Free;
   end;
+end;
+
+procedure Tform_Main.dt_SourceDragAccept(Sender: TJvDropTarget;
+  var Accept: Boolean);
+begin
+  Accept := true;
+end;
+
+procedure Tform_Main.dt_SourceDragDrop(Sender: TJvDropTarget;
+  var Effect: TJvDropEffect; Shift: TShiftState; X, Y: Integer);
+var
+  Files : TStringList;
+begin
+  Files := TStringList.Create;
+  try
+    Sender.GetFilenames(Files);
+
+    if Files.Count > 0 then
+      ed_Source.Lines.LoadFromFile(Files[0]);
+  finally
+    Files.Free;
+  end;
+end;
+
+procedure Tform_Main.dt_SourceDragEnter(Sender: TJvDropTarget;
+  var Effect: TJvDropEffect);
+begin
+  Effect := deCopy;
 end;
 
 procedure Tform_Main.lv_ExpressionsCompare(Sender: TObject; Item1,
@@ -353,6 +399,22 @@ end;
 procedure Tform_Main.lv_ExpressionsDblClick(Sender: TObject);
 begin
   btn_EditExpression.Click;
+end;
+
+function Tform_Main.ReplaceSpecialChars(AText: String): String;
+begin
+  Result := MultipleStringReplace(AText, ['\t',
+                                          '\n',
+                                          '\r',
+                                          '\f',
+                                          '\a',
+                                          '\e'],
+                                         [#$09,
+                                          #$0A,
+                                          #$0D,
+                                          #$0C,
+                                          #$07,
+                                          #$1B], [rfReplaceAll]);
 end;
 
 end.

@@ -43,8 +43,7 @@ object form_EditExpression: Tform_EditExpression
     Height = 30
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 1
-    ExplicitTop = 213
+    TabOrder = 2
     object btn_OK: TButton
       AlignWithMargins = True
       Left = 145
@@ -56,9 +55,6 @@ object form_EditExpression: Tform_EditExpression
       Default = True
       ModalResult = 1
       TabOrder = 0
-      ExplicitLeft = 112
-      ExplicitTop = 8
-      ExplicitHeight = 25
     end
     object btn_Cancel: TButton
       AlignWithMargins = True
@@ -71,9 +67,6 @@ object form_EditExpression: Tform_EditExpression
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 1
-      ExplicitLeft = 193
-      ExplicitTop = 8
-      ExplicitHeight = 25
     end
   end
   object ed_ReplaceBy: TEdit
@@ -81,6 +74,6 @@ object form_EditExpression: Tform_EditExpression
     Top = 73
     Width = 272
     Height = 21
-    TabOrder = 2
+    TabOrder = 1
   end
 end
