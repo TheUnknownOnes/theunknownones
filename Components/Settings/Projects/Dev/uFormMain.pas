@@ -16,12 +16,14 @@ type
     Settings2: TSettings;
     SettingsLSFile1: TSettingsLSFile;
     btn_Save: TButton;
+    btn_Load: TButton;
     procedure FormCreate(Sender: TObject);
     procedure btn_SetValueClick(Sender: TObject);
     procedure btn_ValuesExistsClick(Sender: TObject);
     procedure btn_GetValueClick(Sender: TObject);
     procedure btn_DeleteValueClick(Sender: TObject);
     procedure btn_SaveClick(Sender: TObject);
+    procedure btn_LoadClick(Sender: TObject);
   private
 
   public
@@ -44,8 +46,14 @@ procedure TForm1.btn_GetValueClick(Sender: TObject);
 var
   I : TSettingNameValue;
 begin
-  if Settings1.GetItem('/Bli/bl[a|o]{1}/blubber', I, true,true, true) then
+  if Settings1.GetItem('/Bli/bl[a|o]{1}/blubber', I, true, true, true) then
     MessageDlg(i.Name + ' = ' + VarToStr(i.Value), mtWarning, [mbOK], 0);
+end;
+
+procedure TForm1.btn_LoadClick(Sender: TObject);
+begin
+  if not Settings2.Load then
+    MessageDlg('shitty shit', mtWarning, [mbOK], 0);
 end;
 
 procedure TForm1.btn_SaveClick(Sender: TObject);

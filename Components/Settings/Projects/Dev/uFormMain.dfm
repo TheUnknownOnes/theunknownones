@@ -59,12 +59,22 @@ object Form1: TForm1
     TabOrder = 4
     OnClick = btn_SaveClick
   end
+  object btn_Load: TButton
+    Left = 24
+    Top = 163
+    Width = 75
+    Height = 25
+    Caption = 'Load'
+    TabOrder = 5
+    OnClick = btn_LoadClick
+  end
   object Settings1: TSettings
     Supplier = Settings2
     Left = 256
     Top = 64
   end
   object Settings2: TSettings
+    Loader = SettingsLSFile1
     Saver = SettingsLSFile1
     Left = 296
     Top = 64
