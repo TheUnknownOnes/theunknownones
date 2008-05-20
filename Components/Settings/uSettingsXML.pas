@@ -74,10 +74,8 @@ var
 
   attrib : IXMLDOMNode;
 begin
-  if XReadAttribute(AXMLNode, 'VarType', attrib) then
-    ValueType := attrib.nodeValue
-  else
-    VarClear(AValue);
+  XReadAttribute(AXMLNode, 'VarType', attrib);
+  ValueType := attrib.nodeValue;
 
   case ValueType of
     varEmpty    : VarClear(AValue);
