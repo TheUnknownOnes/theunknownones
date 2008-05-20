@@ -658,10 +658,13 @@ procedure TVirtualActionTree.RemoveActionList(const AActionList: TActionList);
 var
   idx : integer;
 begin
-  if not (csDesigning in Self.ComponentState) then
-  begin
-    for idx:=0 to AActionList.ActionCount-1 do
-      RemoveAction(AActionList.Actions[idx]);
+  try
+    if not (csDesigning in Self.ComponentState) then
+    begin
+      for idx:=0 to AActionList.ActionCount-1 do
+        RemoveAction(AActionList.Actions[idx]);
+    end;
+  except
   end;
 end;
 
