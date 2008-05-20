@@ -157,16 +157,17 @@ var
   Value : TSettingValue;
   attrib : IXMLDOMNode;
 begin
+ if XReadAttribute(AXMLNode, 'Name', attrib) then
+    ASetting.Name:=attrib.text;
+
+  ReadValue(AXMLNode, Value);
+  ASetting.Value:=Value;
+
   for idx := 0 to AXMLNode.childNodes.length - 1 do
   begin
     if AXMLNode.childNodes[idx].nodeType<>NODE_TEXT then
     begin
       Child := TSetting.Create(ASetting, EmptyWideStr);
-      if XReadAttribute(AXMLNode.childNodes[idx], 'Name', attrib) then
-        Child.Name:=attrib.text;
-
-      ReadValue(AXMLNode.childNodes[idx], Value);
-      ASetting.Value:=Value;
 
       LoadSetting(Child, AXMLNode.childNodes[idx]);
     end;
