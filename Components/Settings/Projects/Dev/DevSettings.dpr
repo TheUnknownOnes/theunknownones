@@ -4,7 +4,8 @@ uses
   Forms,
   uFormMain in 'uFormMain.pas' {Form1},
   uSettings in '..\..\uSettings.pas',
-  uSettingsStream in '..\..\uSettingsStream.pas';
+  uSettingsStream in '..\..\uSettingsStream.pas',
+  uSettingsComponentLinksDefault in '..\..\uSettingsComponentLinksDefault.pas';
 
 {$R *.res}
 

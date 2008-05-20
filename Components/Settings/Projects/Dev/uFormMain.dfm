@@ -70,8 +70,8 @@ object Form1: TForm1
   end
   object Settings2: TSettingsXMLFile
     FileName = 'c:\temp\test.xml'
-    Left = 248
-    Top = 128
+    Left = 296
+    Top = 80
   end
   object Settings1: TSettingsXMLFile
     FileName = 'c:\temp\test1.xml'

@@ -30,11 +30,13 @@ requires
   rtl,
   RegExp,
   xmlrtl,
-  xmltools;
+  xmltools,
+  vcl;
 
 contains
   uSettings in '..\..\uSettings.pas',
   uSettingsStream in '..\..\uSettingsStream.pas',
-  uSettingsXML in '..\..\uSettingsXML.pas';
+  uSettingsXML in '..\..\uSettingsXML.pas',
+  uSettingsComponentLinksDefault in '..\..\uSettingsComponentLinksDefault.pas';
 
 end.

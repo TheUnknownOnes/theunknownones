@@ -29,7 +29,8 @@
       <Projects Name="GroupListView_D100.bpl">GroupListView\Projects\D10\GroupListView.bdsproj</Projects>
       <Projects Name="CommonTools_D100.bpl">..\Libraries\CommonTools\Projects\D10\CommonTools.bdsproj</Projects>
       <Projects Name="VirtualActionTree_D100.bpl">VirtualActionTree\Projects\D10\VirtualActionTree.bdsproj</Projects>
-      <Projects Name="Targets">RegExp_D100.bpl ConsoleTools_D100.bpl PNGSupport_D100.bpl XMLTools_D100.bpl VSTHeaderSaver_D100.bpl SearchEdit_D100.bpl VSTSearchEdit_D100.bpl PNGUtils_D100.bpl BaseImageList_D100.bpl PNGImageList_D100.bpl ImageListProvider_D100.bpl PNGImageListDesigner_D100D.bpl EffectPNG_D100.bpl EffectPNGImage_D100.bpl EffectPNGEdit_D100.bpl EffectPNGImageList_D100.bpl EffectPNGToolbar_D100.bpl GroupListView_D100.bpl CommonTools_D100.bpl VirtualActionTree_D100.bpl</Projects>
+      <Projects Name="Settings_D100.bpl">Settings\Projects\D10\Settings.bdsproj</Projects>
+      <Projects Name="Targets">RegExp_D100.bpl ConsoleTools_D100.bpl PNGSupport_D100.bpl XMLTools_D100.bpl VSTHeaderSaver_D100.bpl SearchEdit_D100.bpl VSTSearchEdit_D100.bpl PNGUtils_D100.bpl BaseImageList_D100.bpl PNGImageList_D100.bpl ImageListProvider_D100.bpl PNGImageListDesigner_D100D.bpl EffectPNG_D100.bpl EffectPNGImage_D100.bpl EffectPNGEdit_D100.bpl EffectPNGImageList_D100.bpl EffectPNGToolbar_D100.bpl GroupListView_D100.bpl CommonTools_D100.bpl VirtualActionTree_D100.bpl Settings_D100.bpl</Projects>
     </Projects>
     <Dependencies/>
   </Default.Personality>
