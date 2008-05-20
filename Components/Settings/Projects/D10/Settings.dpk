@@ -31,6 +31,7 @@ requires
   RegExp;
 
 contains
-  uSettings in '..\..\uSettings.pas';
+  uSettings in '..\..\uSettings.pas',
+  uSettingsStream in '..\..\uSettingsStream.pas';
 
 end.

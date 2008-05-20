@@ -68,20 +68,14 @@ object Form1: TForm1
     TabOrder = 5
     OnClick = btn_LoadClick
   end
-  object Settings1: TSettings
-    Supplier = Settings2
-    Left = 256
-    Top = 64
+  object Settings1: TSettingsFile
+    ParentSettings = Settings2
+    Left = 280
+    Top = 56
   end
-  object Settings2: TSettings
-    Loader = SettingsLSFile1
-    Saver = SettingsLSFile1
-    Left = 296
-    Top = 64
-  end
-  object SettingsLSFile1: TSettingsLSFile
+  object Settings2: TSettingsFile
     FileName = 'd:\test.bin'
-    Left = 256
-    Top = 104
+    Left = 312
+    Top = 56
   end
 end

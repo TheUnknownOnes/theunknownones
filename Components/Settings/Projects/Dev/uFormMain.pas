@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, uSettings, StdCtrls;
+  Dialogs, StdCtrls, uSettings, uSettingsStream;
 
 type
   TForm1 = class(TForm)
@@ -12,11 +12,10 @@ type
     btn_ValuesExists: TButton;
     btn_GetValue: TButton;
     btn_DeleteValue: TButton;
-    Settings1: TSettings;
-    Settings2: TSettings;
-    SettingsLSFile1: TSettingsLSFile;
     btn_Save: TButton;
     btn_Load: TButton;
+    Settings1: TSettingsFile;
+    Settings2: TSettingsFile;
     procedure FormCreate(Sender: TObject);
     procedure btn_SetValueClick(Sender: TObject);
     procedure btn_ValuesExistsClick(Sender: TObject);
@@ -44,10 +43,17 @@ end;
 
 procedure TForm1.btn_GetValueClick(Sender: TObject);
 var
-  I : TSettingNameValue;
+  v : Variant;
+  nv : TSettingNameValues;
+  idx : Integer;
 begin
-  if Settings1.GetItem('/Bli/bl[a|o]{1}/blubber', I, true, true, true) then
-    MessageDlg(i.Name + ' = ' + VarToStr(i.Value), mtWarning, [mbOK], 0);
+  v := Settings1.GetValue('/Bli/bla/blubber', false);
+  if not VarIsEmpty(v) then
+    MessageDlg(VarToStr(v), mtWarning, [mbOK], 0);
+
+  nv := Settings1.GetSubNameValues(EmptyWideStr, false);
+  for idx := Low(nv) to High(nv) do
+    MessageDlg(nv[idx].Name + ' = ' + VarToStr(nv[idx].Value), mtWarning, [mbOK], 0);
 end;
 
 procedure TForm1.btn_LoadClick(Sender: TObject);
@@ -64,21 +70,35 @@ end;
 
 procedure TForm1.btn_SetValueClick(Sender: TObject);
 begin
-  Settings2.SetValue(Now, '/Bli/bla/blubber');
+  Settings2.SetValue('/Bli/bla/blubber', Now);
 end;
 
 procedure TForm1.btn_ValuesExistsClick(Sender: TObject);
 begin
-  if Settings1.ItemsExists('/Bli/bl[a|o]{1}/blubber', true) then
+  if Settings1.Exists('/Bli/bl[a|o]{1}/blubber', true) then
     MessageDlg('jo', mtWarning, [mbOK], 0)
   else
     MessageDlg('neeeeee', mtWarning, [mbOK], 0);
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
+//var
+  //s1, s2, s3 : TSetting;
 begin
   ReportMemoryLeaksOnShutdown := true;
 
+
+  {s1 := TSetting.Create;
+  s2 := TSetting.Create(nil);
+  s3 := TSetting.Create(s2, 'bla');
+
+  s1.Assign(s2);
+
+
+  MessageDlg(s2.Index[s2.Index.IndexOfObject(s3)], mtWarning, [mbOK], 0);
+
+  s1.Free;
+  s2.Free;}
 end;
 
 end.
