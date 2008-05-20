@@ -28,10 +28,13 @@ package Settings;
 
 requires
   rtl,
-  RegExp;
+  RegExp,
+  xmlrtl,
+  xmltools;
 
 contains
   uSettings in '..\..\uSettings.pas',
-  uSettingsStream in '..\..\uSettingsStream.pas';
+  uSettingsStream in '..\..\uSettingsStream.pas',
+  uSettingsXML in '..\..\uSettingsXML.pas';
 
 end.

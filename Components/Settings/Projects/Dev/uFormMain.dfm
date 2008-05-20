@@ -68,14 +68,14 @@ object Form1: TForm1
     TabOrder = 5
     OnClick = btn_LoadClick
   end
-  object Settings1: TSettingsFile
-    ParentSettings = Settings2
-    Left = 280
-    Top = 56
+  object Settings2: TSettingsXMLFile
+    FileName = 'c:\temp\test.xml'
+    Left = 248
+    Top = 128
   end
-  object Settings2: TSettingsFile
-    FileName = 'd:\test.bin'
-    Left = 312
-    Top = 56
+  object Settings1: TSettingsXMLFile
+    FileName = 'c:\temp\test1.xml'
+    Left = 248
+    Top = 80
   end
 end
