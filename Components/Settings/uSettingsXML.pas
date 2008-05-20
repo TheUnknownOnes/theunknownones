@@ -180,7 +180,7 @@ begin
   Result:=DoLoadXMLContent(Root);
 
   if Result then
-    LoadSetting(FRootSetting, Root);
+    LoadSetting(FRootSetting, Root.firstChild);
 end;
 
 function TCustomSettingsXML.DoSave: Boolean;
