@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, uSettings, uSettingsStream, uSettingsXML;
+  Dialogs, StdCtrls, uSettings, uSettingsStream, uSettingsXML,
+  uSettingsComponentLinksDefault;
 
 type
   TForm1 = class(TForm)
@@ -16,6 +17,7 @@ type
     btn_Load: TButton;
     Settings2: TSettingsXMLFile;
     Settings1: TSettingsXMLFile;
+    SettingsComponentLinkControl1: TSettingsComponentLinkControl;
     procedure FormCreate(Sender: TObject);
     procedure btn_SetValueClick(Sender: TObject);
     procedure btn_ValuesExistsClick(Sender: TObject);

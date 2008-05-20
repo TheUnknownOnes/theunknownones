@@ -9,12 +9,31 @@ uses
   uSettings;
 
 type
-  TCustomSettingsComponentLinkControl = class(TCustomSettingsComponentLink)
+  TCustomSettingsComponentLinkControl = class(TSettingsComponentLink)
   protected
     function ValidComponent(const AComponent : TComponent) : Boolean; override;
   end;
 
+
+//==============================================================================
+
+
+  TSettingsComponentLinkControl = class(TCustomSettingsComponentLinkControl)
+
+  end;
+
+
+//==============================================================================
+
+
+procedure Register;
+
 implementation
+
+procedure Register;
+begin
+  RegisterComponents('TUO', [TSettingsComponentLinkControl]);
+end;
 
 { TCustomSettingsComponentLinkControl }
 

@@ -78,4 +78,10 @@ object Form1: TForm1
     Left = 248
     Top = 80
   end
+  object SettingsComponentLinkControl1: TSettingsComponentLinkControl
+    Component = btn_SetValue
+    Settings = Settings2
+    RootSetting = '/Form1/btn_SetValue'
+    Left = 72
+  end
 end
