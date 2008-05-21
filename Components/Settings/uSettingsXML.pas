@@ -1,3 +1,12 @@
+{----------------------------------------------------------------------------- 
+ Project: Settings
+ Purpose: Contains components for saving and loading Settings in XML
+ Created: 21.05.2008 14:46:24
+
+ (c) by TheUnknownOnes
+ see http://www.TheUnknownOnes.net
+-----------------------------------------------------------------------------}
+
 unit uSettingsXML;
 
 interface
@@ -7,7 +16,7 @@ uses
   SysUtils,
   Variants,
   WideStrings,
-  uSettingsBase,
+  uSettingsBase,     
   MSXML,
   uXMLTools;
 

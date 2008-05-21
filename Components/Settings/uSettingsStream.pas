@@ -1,3 +1,12 @@
+{----------------------------------------------------------------------------- 
+ Project: Settings
+ Purpose: Contains components for loading and saving Settings in Streams,Files ...
+ Created: 21.05.2008 14:45:06
+
+ (c) by TheUnknownOnes
+ see http://www.TheUnknownOnes.net
+-----------------------------------------------------------------------------}
+
 unit uSettingsStream;
 
 interface
@@ -11,7 +20,7 @@ uses
   uSettingsBase;
 
 type
-  TCustomSettingsStream = class(TCustomSettings)
+  TCustomSettingsStream = class(TCustomSettings) 
   protected
     procedure WriteValue(const AStream : TStream; AValue : Smallint); overload;
     procedure WriteValue(const AStream : TStream; AValue : Integer); overload;

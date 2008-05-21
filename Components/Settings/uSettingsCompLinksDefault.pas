@@ -1,3 +1,11 @@
+{-----------------------------------------------------------------------------
+ Project: Settings
+ Purpose: Contains links for components shipped with Delphi 
+ Created: 21.05.2008 14:40:01
+ 
+ (c) by TheUnknownOnes
+ see http://www.TheUnknownOnes.net
+-----------------------------------------------------------------------------}
 unit uSettingsCompLinksDefault;
 
 interface
@@ -14,10 +22,10 @@ uses
 type
   TCustomSettingsCompLinkControl = class(TCustomSettingsCompLink)
   protected
-    FSaveOptions : array of Boolean;
+    FSaveControlOptions : array[0..3] of Boolean;
 
-    function GetSaveOption(const Index: Integer): Boolean;
-    procedure SetSaveOption(const Index: Integer; const Value: Boolean);
+    function GetSaveControlOption(const Index: Integer): Boolean;
+    procedure SetSaveControlOption(const Index: Integer; const Value: Boolean);
 
     function ValidComponent(const AComponent : TComponent) : Boolean; override;
 
@@ -26,10 +34,10 @@ type
   public
     constructor Create(AOwner: TComponent); override;
 
-    property SaveLeft : Boolean index 0 read GetSaveOption write SetSaveOption default false;
-    property SaveTop : Boolean index 1 read GetSaveOption write SetSaveOption default false;
-    property SaveWidth : Boolean index 2 read GetSaveOption write SetSaveOption default false;
-    property SaveHeight : Boolean index 3 read GetSaveOption write SetSaveOption default false;
+    property SaveLeft : Boolean index 0 read GetSaveControlOption write SetSaveControlOption default false;
+    property SaveTop : Boolean index 1 read GetSaveControlOption write SetSaveControlOption default false;
+    property SaveWidth : Boolean index 2 read GetSaveControlOption write SetSaveControlOption default false;
+    property SaveHeight : Boolean index 3 read GetSaveControlOption write SetSaveControlOption default false;
   end;
 
 
@@ -212,8 +220,6 @@ constructor TCustomSettingsCompLinkControl.Create(AOwner: TComponent);
 begin
   inherited;
 
-  SetLength(FSaveOptions, 4);
-
   SaveLeft := false;
   SaveTop := false;
   SaveWidth := false;
@@ -281,16 +287,16 @@ begin
   end;
 end;
 
-function TCustomSettingsCompLinkControl.GetSaveOption(
+function TCustomSettingsCompLinkControl.GetSaveControlOption(
   const Index: Integer): Boolean;
 begin
-  Result := FSaveOptions[Index];
+  Result := FSaveControlOptions[Index];
 end;
 
-procedure TCustomSettingsCompLinkControl.SetSaveOption(
+procedure TCustomSettingsCompLinkControl.SetSaveControlOption(
   const Index: Integer; const Value: Boolean);
 begin
-  FSaveOptions[Index] := Value;
+  FSaveControlOptions[Index] := Value;
 end;
 
 function TCustomSettingsCompLinkControl.ValidComponent(

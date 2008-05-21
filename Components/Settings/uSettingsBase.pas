@@ -1,3 +1,11 @@
+{-----------------------------------------------------------------------------
+ Project: Settings
+ Purpose: Contains the base classes for working with Settings 
+ Created: 21.05.2008 14:40:48
+ 
+ (c) by TheUnknownOnes
+ see http://www.TheUnknownOnes.net
+-----------------------------------------------------------------------------}
 unit uSettingsBase;
 
 interface
@@ -1146,7 +1154,7 @@ begin
 
     InitiateLoad;
   end;
-end;
+end;                                                          
 
 procedure TCustomSettingsCompLink.SetRootSetting(
   const Value: TSettingName);
