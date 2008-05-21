@@ -228,6 +228,8 @@ type
     procedure SetComponent(const Value: TComponent);
     procedure SetRootSetting(const Value: TSettingName);
 
+    procedure InitiateLoad; virtual;
+
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
     procedure DoLoadSettings; virtual; abstract;
@@ -241,8 +243,6 @@ type
 
     procedure OnAfterLoadSettings; virtual;
     procedure OnBeforeSaveSettings; virtual;
-    procedure OnStartLoadSession; virtual;
-    procedure OnEndLoadSession; virtual;
 
     property Component : TComponent read FComponent write SetComponent;
     property Settings : TCustomSettings read FSettings write SetSettings;
@@ -912,17 +912,8 @@ var
   idx : Integer;
 begin
   for idx := 0 to FComponentLinks.Count - 1 do
-    FComponentLinks[idx].OnStartLoadSession;
+    FComponentLinks[idx].OnAfterLoadSettings;
 
-  try
-
-    for idx := 0 to FComponentLinks.Count - 1 do
-      FComponentLinks[idx].OnAfterLoadSettings;
-
-  finally
-    for idx := 0 to FComponentLinks.Count - 1 do
-      FComponentLinks[idx].OnEndLoadSession;
-  end;
 end;
 
 procedure TCustomSettings.InformComponentLinksAboutSave;
@@ -1105,6 +1096,11 @@ begin
   end;
 end;
 
+procedure TCustomSettingsCompLink.InitiateLoad;
+begin
+  OnAfterLoadSettings;
+end;
+
 procedure TCustomSettingsCompLink.Notification(AComponent: TComponent;
   Operation: TOperation);
 begin
@@ -1130,16 +1126,6 @@ begin
   DoSaveSettings;
 end;
 
-procedure TCustomSettingsCompLink.OnEndLoadSession;
-begin
-  
-end;
-
-procedure TCustomSettingsCompLink.OnStartLoadSession;
-begin
-
-end;
-
 procedure TCustomSettingsCompLink.SetComponent(const Value: TComponent);
 begin
   if FComponent <> Value then
@@ -1157,6 +1143,8 @@ begin
 
     if WideSameText(FRootSetting, EmptyWideStr) then
       RootSetting := GenerateRootSettingName(FComponent);
+
+    InitiateLoad;
   end;
 end;
 
@@ -1189,6 +1177,8 @@ begin
       FSettings.RegisterComponentLink(Self);
       FSettings.FreeNotification(Self);
     end;
+
+    InitiateLoad;
   end;
 end;
 

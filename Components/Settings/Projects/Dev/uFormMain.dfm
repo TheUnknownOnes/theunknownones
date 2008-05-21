@@ -131,10 +131,6 @@ object Form1: TForm1
       TabOrder = 1
       object TabSheet1: TTabSheet
         Caption = 'TabSheet1'
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
     end
   end
@@ -241,5 +237,12 @@ object Form1: TForm1
     RootSetting = '/Form1/ListView1'
     Left = 352
     Top = 208
+  end
+  object SettingsCompLinkVST1: TSettingsCompLinkVST
+    Component = VirtualStringTree1
+    Settings = Settings2
+    RootSetting = '/Form1/VirtualStringTree1'
+    Left = 184
+    Top = 392
   end
 end

@@ -4,8 +4,9 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, uSettings, uSettingsStream, uSettingsXML,
-  uSettingsCompLinksDefault, ExtCtrls, ComCtrls, inifiles, VirtualTrees;
+  Dialogs, StdCtrls, uSettingsStream, uSettingsXML,
+  uSettingsCompLinksDefault, ExtCtrls, ComCtrls, inifiles, VirtualTrees,
+  uSettingsCompLinkVirtualTrees, uSettingsBase;
 
 type
   TForm1 = class(TForm)
@@ -31,6 +32,7 @@ type
     ListView1: TListView;
     SettingsCompLinkListView1: TSettingsCompLinkListView;
     VirtualStringTree1: TVirtualStringTree;
+    SettingsCompLinkVST1: TSettingsCompLinkVST;
     procedure FormCreate(Sender: TObject);
     procedure btn_SetValueClick(Sender: TObject);
     procedure btn_ValuesExistsClick(Sender: TObject);
