@@ -5,12 +5,12 @@
 			<Option Name="Personality">Delphi.Personality</Option>
 			<Option Name="ProjectType"></Option>
 			<Option Name="Version">1.0</Option>
-			<Option Name="GUID">{E620028D-8F57-4449-A610-6CF3E12A5923}</Option>
+			<Option Name="GUID">{DD83CCE9-D01A-402E-BB1D-DAF1682A5DC4}</Option>
 		</Option>
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">Settings.dpk</Source>
+			<Source Name="MainSource">Settings_VirtualTrees.dpk</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -116,7 +116,7 @@
 			<Linker Name="MinStackSize">16384</Linker>
 			<Linker Name="MaxStackSize">1048576</Linker>
 			<Linker Name="ImageBase">4194304</Linker>
-			<Linker Name="ExeDescription">Settings Base and default VCL Components</Linker>
+			<Linker Name="ExeDescription">Settings Support for VirtualTrees</Linker>
 		</Linker>
 		<Directories>
 			<Directories Name="OutputDir"></Directories>
@@ -170,9 +170,7 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>  
-    <Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\SettingsBase_D100.bpl">Datei C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\SettingsBase_D100.bpl nicht gefunden</Excluded_Packages>
+		</VersionInfoKeys>  <Excluded_Packages>
       <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\VirtualActionTree100.bpl">Datei C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\VirtualActionTree100.bpl nicht gefunden</Excluded_Packages>
       <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\PowerShotRemoteCapture_100.bpl">Datei C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\PowerShotRemoteCapture_100.bpl nicht gefunden</Excluded_Packages>
       <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\Fastreport_Components_D100.bpl">Fastreport Components</Excluded_Packages>

@@ -3,9 +3,9 @@ program DevSettings;
 uses
   Forms,
   uFormMain in 'uFormMain.pas' {Form1},
-  uSettings in '..\..\uSettings.pas',
+  uSettingsBase in '..\..\uSettingsBase.pas',
   uSettingsStream in '..\..\uSettingsStream.pas',
-  uSettingsComponentLinksDefault in '..\..\uSettingsComponentLinksDefault.pas';
+  uSettingsCompLinksDefault in '..\..\uSettingsCompLinksDefault.pas';
 
 {$R *.res}
 

@@ -8,10 +8,10 @@ uses
   Variants,
   WideStrings,
   WideStrUtils,
-  uSettings;
+  uSettingsBase;
 
 type
-  TCustomSettingsStream = class(TSettings)
+  TCustomSettingsStream = class(TCustomSettings)
   protected
     procedure WriteValue(const AStream : TStream; AValue : Smallint); overload;
     procedure WriteValue(const AStream : TStream; AValue : Integer); overload;
@@ -65,7 +65,35 @@ type
     function DoSaveStreamContent(const AStream : TStream) : Boolean; override;
 
   published
+    property ParentSettings;
+    property ParentMode;
+
     property FileName : String read FFilename write FFilename;
+  end;
+
+
+//==============================================================================
+
+
+  TSettingsStreamNeedStreamProc = function(ARead : Boolean; out AStream : TStream) : Boolean of object;
+  TSettingsStreamContentProc = function(const AStream : TStream) : Boolean of object;
+
+  TSettingsStream = class(TCustomSettingsStream)
+  protected
+    FOnLoadStreamContent: TSettingsStreamContentProc;
+    FOnSaveStreamContent: TSettingsStreamContentProc;
+    FOnNeedStream: TSettingsStreamNeedStreamProc;
+
+    function DoCreateStream(out AStream : TStream; ARead : Boolean) : Boolean; override;
+    function DoLoadStreamContent(const AStream : TStream) : Boolean; override;
+    function DoSaveStreamContent(const AStream : TStream) : Boolean; override;
+  published
+    property ParentSettings;
+    property ParentMode;
+
+    property OnNeedStream : TSettingsStreamNeedStreamProc read FOnNeedStream write FOnNeedStream;
+    property OnLoadStreamContent : TSettingsStreamContentProc read FOnLoadStreamContent write FOnLoadStreamContent;
+    property OnSaveStreamContent : TSettingsStreamContentProc read FOnSaveStreamContent write FOnSaveStreamContent;
   end;
 
 procedure Register;
@@ -74,7 +102,8 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('TUO', [TSettingsFile]);
+  RegisterComponents(SettingsComponentGroup, [TSettingsFile,
+                                              TSettingsStream]);
 end;
 
 //==============================================================================
@@ -87,12 +116,15 @@ var
 begin
   Result := DoCreateStream(Stream, true);
 
+  if Result then
+    Result := Assigned(Stream);
+
   if not Result then
     exit;
 
   try
     Result := DoLoadStreamContent(Stream);
-    
+
     if Result then
       LoadSetting(FRootSetting, Stream);
   finally
@@ -106,6 +138,9 @@ var
   Stream  : TStream;
 begin
   Result := DoCreateStream(Stream, False);
+
+  if Result then
+    Result := Assigned(Stream);
 
   if not Result then
     exit;
@@ -466,6 +501,33 @@ end;
 function TSettingsFile.DoSaveStreamContent(const AStream: TStream): Boolean;
 begin
   Result := true;
+end;
+
+{ TSettingsStream }
+
+function TSettingsStream.DoCreateStream(out AStream: TStream;
+  ARead: Boolean): Boolean;
+begin
+  Result := Assigned(FOnNeedStream);
+
+  if Result then
+    Result := FOnNeedStream(ARead, AStream);
+end;
+
+function TSettingsStream.DoLoadStreamContent(const AStream: TStream): Boolean;
+begin
+  Result := Assigned(FOnLoadStreamContent);
+
+  if Result then
+    Result := FOnLoadStreamContent(AStream);
+end;
+
+function TSettingsStream.DoSaveStreamContent(const AStream: TStream): Boolean;
+begin
+  Result := Assigned(FOnSaveStreamContent);
+
+  if Result then
+    Result := FOnSaveStreamContent(AStream);
 end;
 
 end.

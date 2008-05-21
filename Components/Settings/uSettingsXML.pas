@@ -7,12 +7,12 @@ uses
   SysUtils,
   Variants,
   WideStrings,
-  uSettings,
+  uSettingsBase,
   MSXML,
   uXMLTools;
 
 type
-  TCustomSettingsXML = class(TSettings)
+  TCustomSettingsXML = class(TCustomSettings)
   private
     procedure ReadValue(const AXMLNode: IXMLDOMNode; out AValue: Variant);
   protected
@@ -36,6 +36,9 @@ type
     function DoSaveXMLContent(const AXMLNode : IXMLDOMNode) : Boolean; override;
 
   published
+    property ParentSettings;
+    property ParentMode;
+
     property FileName : String read FFilename write FFilename;
   end;
 
@@ -49,7 +52,7 @@ uses
 
 procedure Register;
 begin
-  RegisterComponents('TUO', [TSettingsXMLFile]);
+  RegisterComponents(SettingsComponentGroup, [TSettingsXMLFile]);
 end;
 
 { TCustomSettingsXML }
@@ -151,9 +154,8 @@ end;
 procedure TCustomSettingsXML.LoadSetting(ASetting: TSetting;
   AXMLNode: IXMLDOMNode);
 var
-  idx, ChildCount : Integer;
+  idx : Integer;
   Child : TSetting;
-  Name : TSettingName;
   Value : TSettingValue;
   attrib : IXMLDOMNode;
 begin
@@ -204,7 +206,9 @@ var
   SettingNode : IXMLDOMNode;
   idx : integer;
 begin
-  SettingNode:=XAddChildOrGetIfExists(AXMLNode,'Setting');
+  SettingNode := AXMLNode.ownerDocument.createElement('Setting');
+  SettingNode := AXMLNode.appendChild(SettingNode);
+  
   XAddAttribute(SettingNode, 'VarType', VarType(ASetting.Value));
   XAddAttribute(SettingNode, 'Name', ASetting.Name);
   if ASetting.Value<>Null then

@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, uSettings, uSettingsStream, uSettingsXML,
-  uSettingsComponentLinksDefault;
+  uSettingsCompLinksDefault, ExtCtrls, ComCtrls, inifiles, VirtualTrees;
 
 type
   TForm1 = class(TForm)
@@ -17,7 +17,20 @@ type
     btn_Load: TButton;
     Settings2: TSettingsXMLFile;
     Settings1: TSettingsXMLFile;
-    SettingsComponentLinkControl1: TSettingsComponentLinkControl;
+    SettingsCompLinkControl1: TSettingsCompLinkControl;
+    pan_Right: TPanel;
+    Splitter1: TSplitter;
+    TabControl1: TTabControl;
+    SettingsCompLinkTabControl1: TSettingsCompLinkTabControl;
+    Splitter2: TSplitter;
+    SettingsCompLinkForm1: TSettingsCompLinkForm;
+    PageControl1: TPageControl;
+    Splitter3: TSplitter;
+    TabSheet1: TTabSheet;
+    SettingsCompLinkPageControl1: TSettingsCompLinkPageControl;
+    ListView1: TListView;
+    SettingsCompLinkListView1: TSettingsCompLinkListView;
+    VirtualStringTree1: TVirtualStringTree;
     procedure FormCreate(Sender: TObject);
     procedure btn_SetValueClick(Sender: TObject);
     procedure btn_ValuesExistsClick(Sender: TObject);
@@ -25,6 +38,7 @@ type
     procedure btn_DeleteValueClick(Sender: TObject);
     procedure btn_SaveClick(Sender: TObject);
     procedure btn_LoadClick(Sender: TObject);
+    procedure btn_Button1Click(Sender: TObject);
   private
 
   public
@@ -37,6 +51,13 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TForm1.btn_Button1Click(Sender: TObject);
+begin
+  TabControl1.Height := 50;
+  PageControl1.Height := 55;
+  Height := 500;
+end;
 
 procedure TForm1.btn_DeleteValueClick(Sender: TObject);
 begin
@@ -101,6 +122,7 @@ begin
 
   s1.Free;
   s2.Free;}
+
 end;
 
 end.

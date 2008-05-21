@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
-  <PersonalityInfo>
-    <Option>
-      <Option Name="Personality">Default.Personality</Option>
-      <Option Name="ProjectType"></Option>
-      <Option Name="Version">1.0</Option>
-      <Option Name="GUID">{E9E2FE52-2FA6-4D03-8D48-2860AB3E89BB}</Option>
-    </Option>
-  </PersonalityInfo>
-  <Default.Personality>
-    
-    <Projects>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{E9E2FE52-2FA6-4D03-8D48-2860AB3E89BB}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
       <Projects Name="DevSettings.exe">DevSettings.bdsproj</Projects>
       <Projects Name="Settings_D100.bpl">..\D10\Settings.bdsproj</Projects>
-      <Projects Name="Targets">DevSettings.exe Settings_D100.bpl</Projects>
+      <Projects Name="Settings_VirtualTrees.bpl">..\D10\Settings_VirtualTrees.bdsproj</Projects>
+      <Projects Name="Targets">DevSettings.exe Settings_D100.bpl Settings_VirtualTrees.bpl</Projects>
     </Projects>
     <Dependencies/>
-  </Default.Personality>
+  </Default.Personality>  <StarTeamAssociation></StarTeamAssociation>
+  <StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
 </BorlandProject>

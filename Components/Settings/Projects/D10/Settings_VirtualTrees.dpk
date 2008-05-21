@@ -1,4 +1,4 @@
-package Settings;
+package Settings_VirtualTrees;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,20 +22,16 @@ package Settings;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'Settings Base and default VCL Components'}
+{$DESCRIPTION 'Settings Support for VirtualTrees'}
 {$LIBSUFFIX '_D100'}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  RegExp,
-  xmltools,
-  vcl;
+  Settings,
+  VirtualTreesD10;
 
 contains
-  uSettingsBase in '..\..\uSettingsBase.pas',
-  uSettingsStream in '..\..\uSettingsStream.pas',
-  uSettingsXML in '..\..\uSettingsXML.pas',
-  uSettingsCompLinksDefault in '..\..\uSettingsCompLinksDefault.pas';
+  uSettingsCompLinkVirtualTrees in '..\..\uSettingsCompLinkVirtualTrees.pas';
 
 end.
