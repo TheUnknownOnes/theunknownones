@@ -166,22 +166,44 @@ type
                        AIsRegExPath : Boolean = false);
 
     function GetValues(APath : TSettingName;
-                       AIsRegExPath : Boolean = true) : TSettingValues;
+                       AIsRegExPath : Boolean = true) : TSettingValues; overload;
+
+    function GetValues(APath : TSettingName;
+                       ADefault : Variant;
+                       AIsRegExPath : Boolean = true) : TSettingValues; overload;
 
     function GetValue(APath : TSettingName;
-                      AIsRegExPath : Boolean = false) : TSettingValue;
+                      AIsRegExPath : Boolean = false) : TSettingValue; overload;
+
+    function GetValue(APath : TSettingName;
+                      ADefault : Variant;
+                      AIsRegExPath : Boolean = false) : TSettingValue; overload;
 
     function GetNameValues(APath : TSettingName;
                            AIsRegExPath : Boolean = true;
                            AGetNames : Boolean = true;
                            AFullPathNames : Boolean = false;
-                           AGetValues : Boolean = true) : TSettingNameValues;
+                           AGetValues : Boolean = true) : TSettingNameValues; overload;
+
+    function GetNameValues(APath : TSettingName;
+                           ADefault : Variant;
+                           AIsRegExPath : Boolean = true;
+                           AGetNames : Boolean = true;
+                           AFullPathNames : Boolean = false;
+                           AGetValues : Boolean = true) : TSettingNameValues; overload;
 
     function GetNameValue(APath : TSettingName;
                           AIsRegEx : Boolean = false;
                           AGetName : Boolean = true;
                           AFullPathName : Boolean = false;
-                          AGetValues : Boolean = true) : TSettingNameValue;
+                          AGetValues : Boolean = true) : TSettingNameValue; overload;
+
+    function GetNameValue(APath : TSettingName;
+                          ADefault : Variant;
+                          AIsRegEx : Boolean = false;
+                          AGetName : Boolean = true;
+                          AFullPathName : Boolean = false;
+                          AGetValues : Boolean = true) : TSettingNameValue; overload;
 
     function GetSubNameValues(APath : TSettingName;
                               AIsRegExPath : Boolean = false;
@@ -866,6 +888,33 @@ begin
     Result := NameValues[0];
 end;
 
+function TCustomSettings.GetNameValue(APath: TSettingName; ADefault: Variant;
+  AIsRegEx, AGetName, AFullPathName, AGetValues: Boolean): TSettingNameValue;
+begin
+  Result := GetNameValue(APath, AIsRegEx, AGetName, AFullPathName, AGetValues);
+
+  if AGetValues and VarIsEmpty(Result.Value) then
+    Result.Value := ADefault;
+end;
+
+function TCustomSettings.GetNameValues(APath: TSettingName; ADefault: Variant;
+  AIsRegExPath, AGetNames, AFullPathNames,
+  AGetValues: Boolean): TSettingNameValues;
+var
+  idx : Integer;
+begin
+  Result := GetNameValues(APath, AIsRegExPath, AGetNames, AFullPathNames, AGetValues);
+
+  if AGetValues then
+  begin
+    for idx := Low(Result) to High(Result) do
+    begin
+      if VarIsEmpty(Result[idx].Value) then
+        Result[idx].Value := ADefault;
+    end;
+  end;
+end;
+
 function TCustomSettings.GetNameValues(APath : TSettingName;
                                        AIsRegExPath : Boolean;
                                        AGetNames : Boolean;
@@ -915,6 +964,27 @@ begin
     Result := vals[0]
   else
     VarClear(Result);
+end;
+
+function TCustomSettings.GetValue(APath: TSettingName; ADefault: Variant;
+  AIsRegExPath: Boolean): TSettingValue;
+begin
+  Result := GetValue(APath, ADefault, AIsRegExPath);
+end;
+
+function TCustomSettings.GetValues(APath: TSettingName; ADefault: Variant;
+  AIsRegExPath: Boolean): TSettingValues;
+var
+  idx : Integer;
+begin
+  Result := GetValues(APath, AIsRegExPath);
+
+  for idx := Low(Result) to High(Result) do
+  begin
+    if VarIsEmpty(Result[idx]) then
+      Result[idx] := ADefault;
+  end;
+
 end;
 
 function TCustomSettings.GetValues(APath: TSettingName;
