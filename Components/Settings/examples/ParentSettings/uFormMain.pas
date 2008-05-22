@@ -56,31 +56,13 @@ begin
 end;
 
 procedure TForm1.btn_GetValueChild1Click(Sender: TObject);
-var
-  Value : Variant;
-  Text : String;
 begin
-  Value := ChildSettings.GetValue(SettingsPath);
-  if VarIsEmpty(Value) then
-    Text := '--Empty--'
-  else
-    Text := Value;
-
-  MessageDlg(Text, mtWarning, [mbOK], 0);
+  MessageDlg(ChildSettings.GetValue(SettingsPath, '--Empty--'), mtWarning, [mbOK], 0);
 end;
 
 procedure TForm1.btn_GetValueParent1Click(Sender: TObject);
-var
-  Value : Variant;
-  Text : String;
 begin
-  Value := ParentSettings.GetValue(SettingsPath);
-  if VarIsEmpty(Value) then
-    Text := '--Empty--'
-  else
-    Text := Value;
-
-  MessageDlg(Text, mtWarning, [mbOK], 0);
+  MessageDlg(ParentSettings.GetValue(SettingsPath, '--Empty--'), mtWarning, [mbOK], 0);
 end;
 
 procedure TForm1.btn_SetValueChild1Click(Sender: TObject);

@@ -969,7 +969,10 @@ end;
 function TCustomSettings.GetValue(APath: TSettingName; ADefault: Variant;
   AIsRegExPath: Boolean): TSettingValue;
 begin
-  Result := GetValue(APath, ADefault, AIsRegExPath);
+  Result := GetValue(APath, AIsRegExPath);
+
+  if VarIsEmpty(Result) then
+    Result := ADefault;
 end;
 
 function TCustomSettings.GetValues(APath: TSettingName; ADefault: Variant;
