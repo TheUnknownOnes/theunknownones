@@ -75,6 +75,7 @@ type
   published
     property Settings;
     property DefaultRootSetting;
+    property OnNeedRootSetting;
 
     property SaveLeft;
     property SaveTop;
