@@ -1,4 +1,4 @@
-package PNGImageListDesigner;
+package ConsoleTools_D110D;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,22 +22,16 @@ package PNGImageListDesigner;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'PNGImagelist - Design'}
+{$DESCRIPTION 'ConsoleTools - Design'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  designide,
-  GDIPlus100,
   vcl,
-  vclx,
-  DirectX9_D10,
-  PNGUtils_D100R,
-  PNGSupport_D100;
+  ConsoleTools_D110R;
 
 contains
-  uPNGImageList_Designers in '..\..\uPNGImageList_Designers.pas',
-  uPNGImageList_FormPNGObjectList in '..\..\uPNGImageList_FormPNGObjectList.pas';
+  uRegConsoleTools in '..\..\Design\uRegConsoleTools.pas';
 
 end.

@@ -1,0 +1,44 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{7e83def2-02d3-441b-b144-6abe34b67f26}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="D11\SearchEdit_D110D.dproj" />
+    <Projects Include="D11\SearchEdit_D110R.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="SearchEdit_D110R">
+    <MSBuild Projects="D11\SearchEdit_D110R.dproj" Targets="" />
+  </Target>
+  <Target Name="SearchEdit_D110R:Clean">
+    <MSBuild Projects="D11\SearchEdit_D110R.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="SearchEdit_D110R:Make">
+    <MSBuild Projects="D11\SearchEdit_D110R.dproj" Targets="Make" />
+  </Target>
+  <Target Name="SearchEdit_D110D">
+    <MSBuild Projects="D11\SearchEdit_D110D.dproj" Targets="" />
+  </Target>
+  <Target Name="SearchEdit_D110D:Clean">
+    <MSBuild Projects="D11\SearchEdit_D110D.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="SearchEdit_D110D:Make">
+    <MSBuild Projects="D11\SearchEdit_D110D.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="SearchEdit_D110R;SearchEdit_D110D" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="SearchEdit_D110R:Clean;SearchEdit_D110D:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="SearchEdit_D110R:Make;SearchEdit_D110D:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>
