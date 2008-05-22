@@ -1125,12 +1125,15 @@ procedure TCustomSettingsLink.SaveSettings;
 var
   RootSetting : TSettingName;
 begin
-  if Assigned(FOnNeedRootSetting) then
-    FOnNeedRootSetting(Self, RootSetting)
-  else
-    RootSetting := DefaultRootSetting;
+  if not (csDesigning in Self.ComponentState) then
+  begin
+    if Assigned(FOnNeedRootSetting) then
+      FOnNeedRootSetting(Self, RootSetting)
+    else
+      RootSetting := DefaultRootSetting;
 
-  DoSaveSettings(ExcludeTrailingSettingsPathDelimiter(IncludeLeadingSettingsPathDelimiter(RootSetting)));
+    DoSaveSettings(ExcludeTrailingSettingsPathDelimiter(IncludeLeadingSettingsPathDelimiter(RootSetting)));
+  end;
 end;
 
 procedure TCustomSettingsLink.SetRootSetting(
