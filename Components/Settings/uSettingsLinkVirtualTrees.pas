@@ -390,8 +390,7 @@ begin
 
       if SaveColumnAllowClick then
         DoWriteColumnOption(coFixed, 'Fixed');
-    end;
-    
+    end;    
   end;
 end;
 
