@@ -24,30 +24,35 @@ uses
 type
   TCustomSettingsLinkVST = class(TCustomSettingsLinkControl)
   protected
-    FSaveVSTOptions : array[0..10] of Boolean;
+    FSaveVSTOptions : array[0..11] of Boolean;
+
+    function GetTree: TVirtualStringTree;
+    procedure SetTree(const Value: TVirtualStringTree);
 
     function GetSaveVSTOption(const Index: Integer): Boolean;
     procedure SetSaveVSTOption(const Index: Integer; const Value: Boolean);
 
     procedure DoApplySettings; override;
     procedure DoSaveSettings; override;
-
-    function ValidComponent(const AComponent : TComponent) : Boolean; override;
   published
   public
     constructor Create(AOwner: TComponent); override;
 
-    property SaveHeaderWidth : Boolean index 0 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderPos : Boolean index 1 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderAllowClick : Boolean index 2 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderDraggable : Boolean index 3 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderEnabled : Boolean index 4 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderParentColor : Boolean index 5 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderResizable : Boolean index 6 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderShowDropMark : Boolean index 7 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderVisible : Boolean index 8 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderAutoSpring : Boolean index 9 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderFixed : Boolean index 10 read GetSaveVSTOption write SetSaveVSTOption default true;
+    property Tree : TVirtualStringTree read GetTree write SetTree; 
+
+    property SaveColumnWidth : Boolean index 0 read GetSaveVSTOption write SetSaveVSTOption default true;
+    property SaveColumnPos : Boolean index 1 read GetSaveVSTOption write SetSaveVSTOption default true;
+    property SaveColumnAllowClick : Boolean index 2 read GetSaveVSTOption write SetSaveVSTOption default true;
+    property SaveColumnDraggable : Boolean index 3 read GetSaveVSTOption write SetSaveVSTOption default true;
+    property SaveColumnEnabled : Boolean index 4 read GetSaveVSTOption write SetSaveVSTOption default true;
+    property SaveColumnParentColor : Boolean index 5 read GetSaveVSTOption write SetSaveVSTOption default true;
+    property SaveColumnResizable : Boolean index 6 read GetSaveVSTOption write SetSaveVSTOption default true;
+    property SaveColumnShowDropMark : Boolean index 7 read GetSaveVSTOption write SetSaveVSTOption default true;
+    property SaveColumnVisible : Boolean index 8 read GetSaveVSTOption write SetSaveVSTOption default true;
+    property SaveColumnAutoSpring : Boolean index 9 read GetSaveVSTOption write SetSaveVSTOption default true;
+    property SaveColumnFixed : Boolean index 10 read GetSaveVSTOption write SetSaveVSTOption default true;
+
+    property SaveHeaderStyle : Boolean index 11 read GetSaveVSTOption write SetSaveVSTOption default true;
   end;
 
 
@@ -65,17 +70,17 @@ type
     property SaveWidth;
     property SaveHeight;
 
-    property SaveHeaderWidth;
-    property SaveHeaderPos;
-    property SaveHeaderAllowClick;
-    property SaveHeaderDraggable;
-    property SaveHeaderEnabled;
-    property SaveHeaderParentColor;
-    property SaveHeaderResizable;
-    property SaveHeaderShowDropMark;
-    property SaveHeaderVisible;
-    property SaveHeaderAutoSpring;
-    property SaveHeaderFixed;
+    property SaveColumnWidth;
+    property SaveColumnPos;
+    property SaveColumnAllowClick;
+    property SaveColumnDraggable;
+    property SaveColumnEnabled;
+    property SaveColumnParentColor;
+    property SaveColumnResizable;
+    property SaveColumnShowDropMark;
+    property SaveColumnVisible;
+    property SaveColumnAutoSpring;
+    property SaveColumnFixed;
   end;
 
 
@@ -116,11 +121,11 @@ var
   VST : TVirtualStringTree;
   idx : Integer;
   Col : TVirtualTreeColumn;
-  ColumSettingsPath : TSettingName;
+  SettingsPath : TSettingName;
 
   procedure SetColumnOption(AOption : TVTColumnOption; ASettingName : TSettingName);
   begin
-    Value := FSettings.GetValue(ColumSettingsPath + ASettingName);
+    Value := Settings.GetValue(SettingsPath + ASettingName);
     if not VarIsEmpty(Value) then
     begin
       if Boolean(Value) then
@@ -132,58 +137,69 @@ var
 begin
   inherited;
 
-  if Assigned(FComponent) and Assigned(FSettings) then
+  if Assigned(Component) and Assigned(Settings) then
   begin
-    VST := TVirtualStringTree(FComponent);
+    VST := TVirtualStringTree(Component);
+
     VST.BeginUpdate;
-    
     try
+
+      SettingsPath := FRootSetting + SettingsPathDelimiter +
+                      'Header' + SettingsPathDelimiter;
+
+      if SaveHeaderStyle then
+      begin
+        Value := Settings.GetValue(SettingsPath + 'Style');
+        if not VarIsEmpty(Value) then
+          VST.Header.Style := TVTHeaderStyle(Value);
+      end;
+
       for idx := 0 to VST.Header.Columns.Count - 1 do
       begin
         Col := VST.Header.Columns[idx];
 
-        ColumSettingsPath := FRootSetting + SettingsPathDelimiter +
+        SettingsPath := FRootSetting + SettingsPathDelimiter +
                              Format(ColSettingNamePattern, [Col.Index]) + SettingsPathDelimiter;
 
-        if SaveHeaderPos then
+        if SaveColumnPos then
         begin
-          Value := FSettings.GetValue(ColumSettingsPath + 'Position');
+          Value := Settings.GetValue(SettingsPath + 'Position');
           if not VarIsEmpty(Value) then
             Col.Position := Value;
         end;
 
-        if SaveHeaderWidth then
+        if SaveColumnWidth then
         begin
-          Value := FSettings.GetValue(ColumSettingsPath + 'Width');
+          Value := Settings.GetValue(SettingsPath + 'Width');
           if not VarIsEmpty(Value) then
             Col.Width := Value;
         end;
 
-        if SaveHeaderAllowClick then
+        if SaveColumnAllowClick then
           SetColumnOption(coAllowClick, 'AllowClick');
 
-        if SaveHeaderAllowClick then
+        if SaveColumnAllowClick then
           SetColumnOption(coDraggable, 'Draggable');
 
-        if SaveHeaderAllowClick then
+        if SaveColumnAllowClick then
           SetColumnOption(coEnabled, 'Enabled');
 
-        if SaveHeaderAllowClick then
+        if SaveColumnAllowClick then
           SetColumnOption(coParentColor, 'ParentColor');
 
-        if SaveHeaderAllowClick then
+        if SaveColumnAllowClick then
           SetColumnOption(coResizable, 'Resizable');
 
-        if SaveHeaderAllowClick then
+        if SaveColumnAllowClick then
           SetColumnOption(coShowDropMark, 'ShowDropMark');
 
-        if SaveHeaderAllowClick then
+        if SaveColumnAllowClick then
           SetColumnOption(coVisible, 'Visible');
 
-        if SaveHeaderAllowClick then
+        if SaveColumnAllowClick then
           SetColumnOption(coAutoSpring, 'AutoSpring');
 
-        if SaveHeaderAllowClick then
+        if SaveColumnAllowClick then
           SetColumnOption(coFixed, 'Fixed');
       end;
 
@@ -198,57 +214,63 @@ var
   VST : TVirtualStringTree;
   idx : Integer;
   Col : TVirtualTreeColumn;
-  ColumSettingsPath : TSettingName;
+  SettingsPath : TSettingName;
 
   procedure DoWriteColumnOption(AOption : TVTColumnOption; ASettingName : TSettingName);
   begin
-    FSettings.SetValue(ColumSettingsPath + ASettingName, AOption in Col.Options)
+    Settings.SetValue(SettingsPath + ASettingName, AOption in Col.Options)
   end;
 begin
   inherited;
 
-  if Assigned(FComponent) and Assigned(FSettings) then
+  if Assigned(Component) and Assigned(Settings) then
   begin
-    VST := TVirtualStringTree(FComponent);
+    VST := TVirtualStringTree(Component);
+
+    SettingsPath := FRootSetting + SettingsPathDelimiter +
+                    'Header' + SettingsPathDelimiter;
+
+    if SaveHeaderStyle then
+      Settings.SetValue(SettingsPath + 'Style', Integer(VST.Header.Style));
 
     for idx := 0 to VST.Header.Columns.Count - 1 do
     begin
       Col := VST.Header.Columns[idx];
 
-      ColumSettingsPath := FRootSetting + SettingsPathDelimiter +
+      SettingsPath := FRootSetting + SettingsPathDelimiter +
                              Format(ColSettingNamePattern, [Col.Index]) + SettingsPathDelimiter;
 
-      if SaveHeaderPos then
-        FSettings.SetValue(ColumSettingsPath + 'Position', Col.Position);
+      if SaveColumnPos then
+        Settings.SetValue(SettingsPath + 'Position', Col.Position);
 
-      if SaveHeaderWidth then
-        FSettings.SetValue(ColumSettingsPath + 'Width', Col.Width);
+      if SaveColumnWidth then
+        Settings.SetValue(SettingsPath + 'Width', Col.Width);
 
-      if SaveHeaderAllowClick then
+      if SaveColumnAllowClick then
           DoWriteColumnOption(coAllowClick, 'AllowClick');
 
-      if SaveHeaderAllowClick then
+      if SaveColumnAllowClick then
         DoWriteColumnOption(coDraggable, 'Draggable');
 
-      if SaveHeaderAllowClick then
+      if SaveColumnAllowClick then
         DoWriteColumnOption(coEnabled, 'Enabled');
 
-      if SaveHeaderAllowClick then
+      if SaveColumnAllowClick then
         DoWriteColumnOption(coParentColor, 'ParentColor');
 
-      if SaveHeaderAllowClick then
+      if SaveColumnAllowClick then
         DoWriteColumnOption(coResizable, 'Resizable');
 
-      if SaveHeaderAllowClick then
+      if SaveColumnAllowClick then
         DoWriteColumnOption(coShowDropMark, 'ShowDropMark');
 
-      if SaveHeaderAllowClick then
+      if SaveColumnAllowClick then
         DoWriteColumnOption(coVisible, 'Visible');
 
-      if SaveHeaderAllowClick then
+      if SaveColumnAllowClick then
         DoWriteColumnOption(coAutoSpring, 'AutoSpring');
 
-      if SaveHeaderAllowClick then
+      if SaveColumnAllowClick then
         DoWriteColumnOption(coFixed, 'Fixed');
     end;
     
@@ -261,16 +283,20 @@ begin
   Result := FSaveVSTOptions[Index];
 end;
 
+function TCustomSettingsLinkVST.GetTree: TVirtualStringTree;
+begin
+  Result := TVirtualStringTree(Component);
+end;
+
 procedure TCustomSettingsLinkVST.SetSaveVSTOption(const Index: Integer;
   const Value: Boolean);
 begin
   FSaveVSTOptions[Index] := Value;                                    
 end;
 
-function TCustomSettingsLinkVST.ValidComponent(
-  const AComponent: TComponent): Boolean;
+procedure TCustomSettingsLinkVST.SetTree(const Value: TVirtualStringTree);
 begin
-  Result := AComponent is TVirtualStringTree;
+  Component := Tree;
 end;
 
 end.

@@ -24,15 +24,18 @@ type
   protected
     FSaveControlOptions : array[0..3] of Boolean;
 
+    function GetControl: TControl;
+    procedure SetControl(const Value: TControl);
+
     function GetSaveControlOption(const Index: Integer): Boolean;
     procedure SetSaveControlOption(const Index: Integer; const Value: Boolean);
-
-    function ValidComponent(const AComponent : TComponent) : Boolean; override;
 
     procedure DoApplySettings; override;
     procedure DoSaveSettings; override;
   public
     constructor Create(AOwner: TComponent); override;
+
+    property Control : TControl read GetControl write SetControl;
 
     property SaveLeft : Boolean index 0 read GetSaveControlOption write SetSaveControlOption default false;
     property SaveTop : Boolean index 1 read GetSaveControlOption write SetSaveControlOption default false;
@@ -46,10 +49,10 @@ type
 
   TSettingsLinkControl = class(TCustomSettingsLinkControl)
   published
-    property Component;
     property Settings;
     property RootSetting;
 
+    property Control;
     property SaveLeft;
     property SaveTop;
     property SaveWidth;
@@ -63,12 +66,15 @@ type
   protected
     FSaveTabIndex: Boolean;
 
+    function GetTabControl: TTabControl;
+    procedure SetTabControl(const Value: TTabControl);
+
     procedure DoApplySettings; override;
     procedure DoSaveSettings; override;
-
-    function ValidComponent(const AComponent : TComponent) : Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
+
+    property TabControl : TTabControl read GetTabControl write SetTabControl;
 
     property SaveTabIndex : Boolean read FSaveTabIndex write FSaveTabIndex default true;
   end;
@@ -79,7 +85,6 @@ type
 
   TSettingsLinkTabControl = class(TCustomSettingsComponentLinkTabControl)
   published
-    property Component;
     property Settings;
     property RootSetting;
 
@@ -88,6 +93,7 @@ type
     property SaveWidth;
     property SaveHeight;
 
+    property TabControl;
     property SaveTabIndex;
   end;
 
@@ -101,8 +107,6 @@ type
 
     procedure DoApplySettings; override;
     procedure DoSaveSettings; override;
-
-    function ValidComponent(const AComponent : TComponent) : Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
 
@@ -134,12 +138,15 @@ type
   protected
     FSaveTabIndex: Boolean;
 
+    function GetPageControl: TPageControl;
+    procedure SetPageControl(const Value: TPageControl);
+
     procedure DoApplySettings; override;
     procedure DoSaveSettings; override;
-
-    function ValidComponent(const AComponent : TComponent) : Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
+
+    property PageControl : TPageControl read GetPageControl write SetPageControl;
 
     property SaveTabIndex : Boolean read FSaveTabIndex write FSaveTabIndex default true;
   end;
@@ -150,7 +157,6 @@ type
 
   TSettingsLinkPageControl = class(TCustomSettingsComponentLinkPageControl)
   published
-    property Component;
     property Settings;
     property RootSetting;
 
@@ -159,6 +165,7 @@ type
     property SaveWidth;
     property SaveHeight;
 
+    property PageControl;
     property SaveTabIndex;
   end;
 
@@ -170,13 +177,15 @@ type
   protected
     FSaveColumnWidth : Boolean;
 
+    function GetListView: TListView;
+    procedure SetListView(const Value: TListView);
+
     procedure DoApplySettings; override;
     procedure DoSaveSettings; override;
-
-    function ValidComponent(const AComponent : TComponent) : Boolean; override;
-
   public
     constructor Create(AOwner: TComponent); override;
+
+    property ListView : TListView read GetListView write SetListView;
 
     property SaveColumnWidth : Boolean read FSaveColumnWidth write FSaveColumnWidth default true;
   end;
@@ -187,7 +196,6 @@ type
 
   TSettingsLinkListView = class(TCustomSettingsComponentLinkListView)
   published
-    property Component;
     property Settings;
     property RootSetting;
 
@@ -196,6 +204,7 @@ type
     property SaveWidth;
     property SaveHeight;
 
+    property ListView;
     property SaveColumnWidth;
   end;
 
@@ -231,34 +240,34 @@ var
   Control : TControl;
   Value : Variant;
 begin
-  if Assigned(FComponent) and Assigned(FSettings) then
+  if Assigned(Component) and Assigned(Settings) then
   begin
-    Control := TControl(FComponent);
+    Control := TControl(Component);
 
     if SaveLeft then
     begin
-      Value := FSettings.GetValue(FRootSetting + SettingsPathDelimiter + 'Left');
+      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'Left');
       if not VarIsEmpty(Value) then
         Control.Left := Value;
     end;
 
     if SaveTop then
     begin
-      Value := FSettings.GetValue(FRootSetting + SettingsPathDelimiter + 'Top');
+      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'Top');
       if not VarIsEmpty(Value) then
         Control.Top := Value;
     end;
 
     if SaveWidth then
     begin
-      Value := FSettings.GetValue(FRootSetting + SettingsPathDelimiter + 'Width');
+      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'Width');
       if not VarIsEmpty(Value) then
         Control.Width := Value;
     end;
 
     if SaveHeight then
     begin
-      Value := FSettings.GetValue(FRootSetting + SettingsPathDelimiter + 'Height');
+      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'Height');
       if not VarIsEmpty(Value) then
         Control.Height := Value;
     end;
@@ -269,22 +278,27 @@ procedure TCustomSettingsLinkControl.DoSaveSettings;
 var
   Control : TControl;
 begin
-  if Assigned(FComponent) and Assigned(FSettings) then
+  if Assigned(Component) and Assigned(Settings) then
   begin
-    Control := TControl(FComponent);
+    Control := TControl(Component);
 
     if SaveLeft then
-      FSettings.SetValue(FRootSetting + SettingsPathDelimiter + 'Left', Control.Left);
+      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'Left', Control.Left);
 
     if SaveTop then
-      FSettings.SetValue(FRootSetting + SettingsPathDelimiter + 'Top', Control.Top);
+      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'Top', Control.Top);
 
     if SaveWidth then
-      FSettings.SetValue(FRootSetting + SettingsPathDelimiter + 'Width', Control.Width);
+      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'Width', Control.Width);
 
     if SaveHeight then
-      FSettings.SetValue(FRootSetting + SettingsPathDelimiter + 'Height', Control.Height);
+      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'Height', Control.Height);
   end;
+end;
+
+function TCustomSettingsLinkControl.GetControl: TControl;
+begin
+  Result := TControl(Component);
 end;
 
 function TCustomSettingsLinkControl.GetSaveControlOption(
@@ -293,17 +307,20 @@ begin
   Result := FSaveControlOptions[Index];
 end;
 
+procedure TCustomSettingsLinkControl.SetControl(const Value: TControl);
+begin
+  Component := Value;
+end;
+
 procedure TCustomSettingsLinkControl.SetSaveControlOption(
   const Index: Integer; const Value: Boolean);
 begin
   FSaveControlOptions[Index] := Value;
 end;
 
-function TCustomSettingsLinkControl.ValidComponent(
-  const AComponent: TComponent): Boolean;
-begin
-  Result := AComponent is TControl;
-end;
+
+//==============================================================================
+
 
 { TCustomSettingsComponentLinkTabControl }
 
@@ -321,13 +338,13 @@ var
 begin
   inherited;
 
-  if Assigned(FComponent) and Assigned(FSettings) then
+  if Assigned(Component) and Assigned(Settings) then
   begin
-    TabControl := TTabControl(FComponent);
+    TabControl := TTabControl(Component);
 
     if FSaveTabIndex then
     begin
-      Value := FSettings.GetValue(FRootSetting + SettingsPathDelimiter + 'TabIndex');
+      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'TabIndex');
       if not VarIsEmpty(Value) then
         TabControl.TabIndex := Value;
     end;
@@ -340,20 +357,29 @@ var
 begin
   inherited;
 
-  if Assigned(FComponent) and Assigned(FSettings) then
+  if Assigned(Component) and Assigned(Settings) then
   begin
-    TabControl := TTabControl(FComponent);
+    TabControl := TTabControl(Component);
 
     if FSaveTabIndex then
-      FSettings.SetValue(FRootSetting + SettingsPathDelimiter + 'TabIndex', TabControl.TabIndex);
+      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'TabIndex', TabControl.TabIndex);
   end;
 end;
 
-function TCustomSettingsComponentLinkTabControl.ValidComponent(
-  const AComponent: TComponent): Boolean;
+
+function TCustomSettingsComponentLinkTabControl.GetTabControl: TTabControl;
 begin
-  Result := AComponent is TTabControl;
+  Result := TTabControl(Component);
 end;
+
+procedure TCustomSettingsComponentLinkTabControl.SetTabControl(
+  const Value: TTabControl);
+begin
+  Component := Value;
+end;
+
+//==============================================================================
+
 
 { TCustomSettingsComponentLinkForm }
 
@@ -364,8 +390,8 @@ begin
   if not (AOwner is TCustomForm) then
     raise Exception.Create('This link may only be owned by a Form');
 
-  FComponent := TCustomForm(AOwner);
-  FRootSetting := SettingsPathDelimiter + FComponent.Name;
+  Component := TCustomForm(AOwner);
+  FRootSetting := SettingsPathDelimiter + Component.Name;
 
   SaveWindowState := true;
 end;
@@ -377,13 +403,13 @@ var
 begin
   inherited;
 
-  if Assigned(FComponent) and Assigned(FSettings) then
+  if Assigned(Component) and Assigned(Settings) then
   begin
-    Form := TCustomForm(FComponent);
+    Form := TCustomForm(Component);
 
     if SaveWindowState then
     begin
-      Value := FSettings.GetValue(FRootSetting + SettingsPathDelimiter + 'WindowState');
+      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'WindowState');
       if not VarIsEmpty(Value) then
         Form.WindowState := TWindowState(Value);
     end;
@@ -396,20 +422,18 @@ var
 begin
   inherited;
 
-  if Assigned(FComponent) and Assigned(FSettings) then
+  if Assigned(Component) and Assigned(Settings) then
   begin
-    Form := TCustomForm(FComponent);
+    Form := TCustomForm(Component);
 
     if SaveWindowState then
-      FSettings.SetValue(FRootSetting + SettingsPathDelimiter + 'WindowState', Integer(Form.WindowState));
+      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'WindowState', Integer(Form.WindowState));
   end;
 end;
 
-function TCustomSettingsComponentLinkForm.ValidComponent(
-  const AComponent: TComponent): Boolean;
-begin
-  Result := AComponent is TCustomForm;
-end;
+
+//==============================================================================
+
 
 { TCustomSettingsComponentLinkPageControl }
 
@@ -427,13 +451,13 @@ var
 begin
   inherited;
 
-  if Assigned(FComponent) and Assigned(FSettings) then
+  if Assigned(Component) and Assigned(Settings) then
   begin
-    PageControl := TPageControl(FComponent);
+    PageControl := TPageControl(Component);
 
     if FSaveTabIndex then
     begin
-      Value := FSettings.GetValue(FRootSetting + SettingsPathDelimiter + 'TabIndex');
+      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'TabIndex');
       if not VarIsEmpty(Value) then
         PageControl.TabIndex := Value;
     end;
@@ -446,20 +470,29 @@ var
 begin
   inherited;
 
-  if Assigned(FComponent) and Assigned(FSettings) then
+  if Assigned(Component) and Assigned(Settings) then
   begin
-    PageControl := TPageControl(FComponent);
+    PageControl := TPageControl(Component);
 
     if FSaveTabIndex then
-      FSettings.SetValue(FRootSetting + SettingsPathDelimiter + 'TabIndex', PageControl.TabIndex);
+      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'TabIndex', PageControl.TabIndex);
   end;
 end;
 
-function TCustomSettingsComponentLinkPageControl.ValidComponent(
-  const AComponent: TComponent): Boolean;
+
+function TCustomSettingsComponentLinkPageControl.GetPageControl: TPageControl;
 begin
-  Result := AComponent is TPageControl;
+  Result := TPageControl(Component);
 end;
+
+procedure TCustomSettingsComponentLinkPageControl.SetPageControl(
+  const Value: TPageControl);
+begin
+  Component := Value;
+end;
+
+//==============================================================================
+
 
 { TCustomSettingsComponentLinkListView }
 
@@ -481,9 +514,9 @@ const
 begin
   inherited;
 
-  if Assigned(FComponent) and Assigned(FSettings) then
+  if Assigned(Component) and Assigned(Settings) then
   begin
-    ListView := TListView(FComponent);
+    ListView := TListView(Component);
 
     for idx := 0 to ListView.Columns.Count - 1 do
     begin
@@ -491,7 +524,7 @@ begin
 
       if FSaveColumnWidth then
       begin
-        Value := FSettings.GetValue(FRootSetting + SettingsPathDelimiter +
+        Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter +
                                     Format(ColSettingNamePattern, [idx]) +
                                     SettingsPathDelimiter + 'Width');
 
@@ -512,9 +545,9 @@ const
 begin
   inherited;
 
-  if Assigned(FComponent) and Assigned(FSettings) then
+  if Assigned(Component) and Assigned(Settings) then
   begin
-    ListView := TListView(FComponent);
+    ListView := TListView(Component);
 
     for idx := 0 to ListView.Columns.Count - 1 do
     begin
@@ -522,7 +555,7 @@ begin
 
       if FSaveColumnWidth then
       begin
-        FSettings.SetValue(FRootSetting + SettingsPathDelimiter +
+        Settings.SetValue(FRootSetting + SettingsPathDelimiter +
                            Format(ColSettingNamePattern, [idx]) +
                            SettingsPathDelimiter + 'Width', Col.Width);
       end;
@@ -530,10 +563,16 @@ begin
   end;
 end;
 
-function TCustomSettingsComponentLinkListView.ValidComponent(
-  const AComponent: TComponent): Boolean;
+
+function TCustomSettingsComponentLinkListView.GetListView: TListView;
 begin
-  Result := AComponent is TListView;
+  Result := TListView(Component);
+end;
+
+procedure TCustomSettingsComponentLinkListView.SetListView(
+  const Value: TListView);
+begin
+  Component := Value;
 end;
 
 end.

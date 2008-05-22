@@ -255,20 +255,16 @@ type
   protected
     FComponent: TComponent;
 
-    procedure SetComponent(const Value: TComponent);
+    procedure SetComponent(const Value: TComponent); 
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
     function GenerateRootSettingName(AComponent : TComponent) : TSettingName; virtual;
 
-    function ValidComponent(const AComponent : TComponent) : Boolean; virtual; abstract;
-      //Use this to decide, which components this link handles
-
+    property Component : TComponent read FComponent write SetComponent;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-
-    property Component : TComponent read FComponent write SetComponent;
   end;
 
 
@@ -1210,7 +1206,7 @@ end;
 
 destructor TCustomSettingsComponentLink.Destroy;
 begin
-  Component := nil;
+  SetComponent(nil);
 
   inherited;
 end;
@@ -1262,9 +1258,6 @@ procedure TCustomSettingsComponentLink.SetComponent(const Value: TComponent);
 begin
   if FComponent <> Value then
   begin
-    if Assigned(Value) and (not ValidComponent(Value)) then
-      raise Exception.Create('This component is invalid for this link');
-
     if Assigned(FComponent) then
       FComponent.RemoveFreeNotification(Self);
 
