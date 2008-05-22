@@ -1,5 +1,7 @@
 package Settings;
 
+{$R 'Images.res'}
+
 {$R *.res}
 {$ALIGN 8}
 {$ASSERTIONS ON}
