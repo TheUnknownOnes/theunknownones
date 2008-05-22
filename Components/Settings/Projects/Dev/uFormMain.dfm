@@ -131,6 +131,10 @@ object Form1: TForm1
       TabOrder = 1
       object TabSheet1: TTabSheet
         Caption = 'TabSheet1'
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
       end
     end
   end
@@ -197,7 +201,7 @@ object Form1: TForm1
     Left = 248
     Top = 80
   end
-  object SettingsCompLinkControl1: TSettingsCompLinkControl
+  object SettingsLinkControl1: TSettingsLinkControl
     Component = pan_Right
     Settings = Settings2
     RootSetting = '/Form1/pan_Right'
@@ -205,7 +209,7 @@ object Form1: TForm1
     Left = 696
     Top = 16
   end
-  object SettingsCompLinkTabControl1: TSettingsCompLinkTabControl
+  object SettingsLinkTabControl1: TSettingsLinkTabControl
     Component = TabControl1
     Settings = Settings2
     RootSetting = '/Form1/pan_Right/TabControl1'
@@ -213,7 +217,7 @@ object Form1: TForm1
     Left = 608
     Top = 312
   end
-  object SettingsCompLinkForm1: TSettingsCompLinkForm
+  object SettingsLinkForm1: TSettingsLinkForm
     Settings = Settings2
     RootSetting = '/Form1'
     SaveLeft = True
@@ -223,7 +227,7 @@ object Form1: TForm1
     Left = 456
     Top = 32
   end
-  object SettingsCompLinkPageControl1: TSettingsCompLinkPageControl
+  object SettingsLinkPageControl1: TSettingsLinkPageControl
     Component = PageControl1
     Settings = Settings2
     RootSetting = '/Form1/pan_Right/PageControl1'
@@ -231,17 +235,20 @@ object Form1: TForm1
     Left = 584
     Top = 168
   end
-  object SettingsCompLinkListView1: TSettingsCompLinkListView
+  object SettingsLinkListView1: TSettingsLinkListView
     Component = ListView1
     Settings = Settings2
     RootSetting = '/Form1/ListView1'
     Left = 352
     Top = 208
   end
-  object SettingsCompLinkVST1: TSettingsCompLinkVST
+  object SettingsLinkVST1: TSettingsLinkVST
     Component = VirtualStringTree1
     Settings = Settings2
     RootSetting = '/Form1/VirtualStringTree1'
+    SaveHeaderVisible = False
+    SaveHeaderAutoSpring = False
+    SaveHeaderFixed = False
     Left = 184
     Top = 392
   end

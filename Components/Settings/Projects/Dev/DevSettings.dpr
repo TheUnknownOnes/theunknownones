@@ -5,7 +5,7 @@ uses
   uFormMain in 'uFormMain.pas' {Form1},
   uSettingsBase in '..\..\uSettingsBase.pas',
   uSettingsStream in '..\..\uSettingsStream.pas',
-  uSettingsCompLinksDefault in '..\..\uSettingsCompLinksDefault.pas';
+  uSettingsLinksDefault in '..\..\uSettingsLinksDefault.pas';
 
 {$R *.res}
 

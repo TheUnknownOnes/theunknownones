@@ -32,6 +32,6 @@ requires
   VirtualTreesD10;
 
 contains
-  uSettingsCompLinkVirtualTrees in '..\..\uSettingsCompLinkVirtualTrees.pas';
+  uSettingsLinkVirtualTrees in '..\..\uSettingsLinkVirtualTrees.pas';
 
 end.

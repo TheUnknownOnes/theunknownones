@@ -6,7 +6,7 @@
  (c) by TheUnknownOnes
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
-unit uSettingsCompLinksDefault;
+unit uSettingsLinksDefault;
 
 interface
 
@@ -20,7 +20,7 @@ uses
   ComCtrls;
 
 type
-  TCustomSettingsCompLinkControl = class(TCustomSettingsCompLink)
+  TCustomSettingsLinkControl = class(TCustomSettingsComponentLink)
   protected
     FSaveControlOptions : array[0..3] of Boolean;
 
@@ -29,7 +29,7 @@ type
 
     function ValidComponent(const AComponent : TComponent) : Boolean; override;
 
-    procedure DoLoadSettings; override;
+    procedure DoApplySettings; override;
     procedure DoSaveSettings; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -44,7 +44,7 @@ type
 //==============================================================================
 
 
-  TSettingsCompLinkControl = class(TCustomSettingsCompLinkControl)
+  TSettingsLinkControl = class(TCustomSettingsLinkControl)
   published
     property Component;
     property Settings;
@@ -59,11 +59,11 @@ type
 
 //==============================================================================
 
-  TCustomSettingsCompLinkTabControl = class(TCustomSettingsCompLinkControl)
+  TCustomSettingsComponentLinkTabControl = class(TCustomSettingsLinkControl)
   protected
     FSaveTabIndex: Boolean;
 
-    procedure DoLoadSettings; override;
+    procedure DoApplySettings; override;
     procedure DoSaveSettings; override;
 
     function ValidComponent(const AComponent : TComponent) : Boolean; override;
@@ -77,7 +77,7 @@ type
 //==============================================================================
 
 
-  TSettingsCompLinkTabControl = class(TCustomSettingsCompLinkTabControl)
+  TSettingsLinkTabControl = class(TCustomSettingsComponentLinkTabControl)
   published
     property Component;
     property Settings;
@@ -95,11 +95,11 @@ type
 //==============================================================================
 
 
-  TCustomSettingsCompLinkForm = class(TCustomSettingsCompLinkControl)
+  TCustomSettingsComponentLinkForm = class(TCustomSettingsLinkControl)
   protected
     FSaveWindowState: Boolean;
 
-    procedure DoLoadSettings; override;
+    procedure DoApplySettings; override;
     procedure DoSaveSettings; override;
 
     function ValidComponent(const AComponent : TComponent) : Boolean; override;
@@ -113,7 +113,7 @@ type
 //==============================================================================
 
 
-  TSettingsCompLinkForm = class(TCustomSettingsCompLinkForm)
+  TSettingsLinkForm = class(TCustomSettingsComponentLinkForm)
   published
     property Settings;
     property RootSetting;
@@ -130,11 +130,11 @@ type
 //==============================================================================
 
 
-  TCustomSettingsCompLinkPageControl = class(TCustomSettingsCompLinkControl)
+  TCustomSettingsComponentLinkPageControl = class(TCustomSettingsLinkControl)
   protected
     FSaveTabIndex: Boolean;
 
-    procedure DoLoadSettings; override;
+    procedure DoApplySettings; override;
     procedure DoSaveSettings; override;
 
     function ValidComponent(const AComponent : TComponent) : Boolean; override;
@@ -148,7 +148,7 @@ type
 //==============================================================================
 
 
-  TSettingsCompLinkPageControl = class(TCustomSettingsCompLinkPageControl)
+  TSettingsLinkPageControl = class(TCustomSettingsComponentLinkPageControl)
   published
     property Component;
     property Settings;
@@ -166,11 +166,11 @@ type
 //==============================================================================
 
 
-  TCustomSettingsCompLinkListView = class(TCustomSettingsCompLinkControl)
+  TCustomSettingsComponentLinkListView = class(TCustomSettingsLinkControl)
   protected
     FSaveColumnWidth : Boolean;
 
-    procedure DoLoadSettings; override;
+    procedure DoApplySettings; override;
     procedure DoSaveSettings; override;
 
     function ValidComponent(const AComponent : TComponent) : Boolean; override;
@@ -185,7 +185,7 @@ type
 //==============================================================================
 
 
-  TSettingsCompLinkListView = class(TCustomSettingsCompLinkListView)
+  TSettingsLinkListView = class(TCustomSettingsComponentLinkListView)
   published
     property Component;
     property Settings;
@@ -206,17 +206,17 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents(SettingsComponentGroup, [ TSettingsCompLinkControl,
-                                               TSettingsCompLinkTabControl,
-                                               TSettingsCompLinkForm,
-                                               TSettingsCompLinkPageControl,
-                                               TSettingsCompLinkListView]);
+  RegisterComponents(SettingsComponentGroup, [ TSettingsLinkControl,
+                                               TSettingsLinkTabControl,
+                                               TSettingsLinkForm,
+                                               TSettingsLinkPageControl,
+                                               TSettingsLinkListView]);
 end;
 
-{ TCustomSettingsCompLinkControl }
+{ TCustomSettingsLinkControl }
 
 
-constructor TCustomSettingsCompLinkControl.Create(AOwner: TComponent);
+constructor TCustomSettingsLinkControl.Create(AOwner: TComponent);
 begin
   inherited;
 
@@ -226,7 +226,7 @@ begin
   SaveHeight := false;
 end;
 
-procedure TCustomSettingsCompLinkControl.DoLoadSettings;
+procedure TCustomSettingsLinkControl.DoApplySettings;
 var
   Control : TControl;
   Value : Variant;
@@ -265,7 +265,7 @@ begin
   end;
 end;
 
-procedure TCustomSettingsCompLinkControl.DoSaveSettings;
+procedure TCustomSettingsLinkControl.DoSaveSettings;
 var
   Control : TControl;
 begin
@@ -287,34 +287,34 @@ begin
   end;
 end;
 
-function TCustomSettingsCompLinkControl.GetSaveControlOption(
+function TCustomSettingsLinkControl.GetSaveControlOption(
   const Index: Integer): Boolean;
 begin
   Result := FSaveControlOptions[Index];
 end;
 
-procedure TCustomSettingsCompLinkControl.SetSaveControlOption(
+procedure TCustomSettingsLinkControl.SetSaveControlOption(
   const Index: Integer; const Value: Boolean);
 begin
   FSaveControlOptions[Index] := Value;
 end;
 
-function TCustomSettingsCompLinkControl.ValidComponent(
+function TCustomSettingsLinkControl.ValidComponent(
   const AComponent: TComponent): Boolean;
 begin
   Result := AComponent is TControl;
 end;
 
-{ TCustomSettingsCompLinkTabControl }
+{ TCustomSettingsComponentLinkTabControl }
 
-constructor TCustomSettingsCompLinkTabControl.Create(AOwner: TComponent);
+constructor TCustomSettingsComponentLinkTabControl.Create(AOwner: TComponent);
 begin
   inherited;
 
   FSaveTabIndex := true;
 end;
 
-procedure TCustomSettingsCompLinkTabControl.DoLoadSettings;
+procedure TCustomSettingsComponentLinkTabControl.DoApplySettings;
 var
   Value : Variant;
   TabControl : TTabControl;
@@ -334,7 +334,7 @@ begin
   end;
 end;
 
-procedure TCustomSettingsCompLinkTabControl.DoSaveSettings;
+procedure TCustomSettingsComponentLinkTabControl.DoSaveSettings;
 var
   TabControl : TTabControl;
 begin
@@ -349,15 +349,15 @@ begin
   end;
 end;
 
-function TCustomSettingsCompLinkTabControl.ValidComponent(
+function TCustomSettingsComponentLinkTabControl.ValidComponent(
   const AComponent: TComponent): Boolean;
 begin
   Result := AComponent is TTabControl;
 end;
 
-{ TCustomSettingsCompLinkForm }
+{ TCustomSettingsComponentLinkForm }
 
-constructor TCustomSettingsCompLinkForm.Create(AOwner: TComponent);
+constructor TCustomSettingsComponentLinkForm.Create(AOwner: TComponent);
 begin
   inherited;
 
@@ -370,7 +370,7 @@ begin
   SaveWindowState := true;
 end;
 
-procedure TCustomSettingsCompLinkForm.DoLoadSettings;
+procedure TCustomSettingsComponentLinkForm.DoApplySettings;
 var
   Form : TCustomForm;
   Value : Variant;
@@ -390,7 +390,7 @@ begin
   end;
 end;
 
-procedure TCustomSettingsCompLinkForm.DoSaveSettings;
+procedure TCustomSettingsComponentLinkForm.DoSaveSettings;
 var
   Form : TCustomForm;
 begin
@@ -405,22 +405,22 @@ begin
   end;
 end;
 
-function TCustomSettingsCompLinkForm.ValidComponent(
+function TCustomSettingsComponentLinkForm.ValidComponent(
   const AComponent: TComponent): Boolean;
 begin
   Result := AComponent is TCustomForm;
 end;
 
-{ TCustomSettingsCompLinkPageControl }
+{ TCustomSettingsComponentLinkPageControl }
 
-constructor TCustomSettingsCompLinkPageControl.Create(AOwner: TComponent);
+constructor TCustomSettingsComponentLinkPageControl.Create(AOwner: TComponent);
 begin
   inherited;
 
   FSaveTabIndex := true;
 end;
 
-procedure TCustomSettingsCompLinkPageControl.DoLoadSettings;
+procedure TCustomSettingsComponentLinkPageControl.DoApplySettings;
 var
   Value : Variant;
   PageControl : TPageControl;
@@ -440,7 +440,7 @@ begin
   end;
 end;
 
-procedure TCustomSettingsCompLinkPageControl.DoSaveSettings;
+procedure TCustomSettingsComponentLinkPageControl.DoSaveSettings;
 var
   PageControl : TPageControl;
 begin
@@ -455,22 +455,22 @@ begin
   end;
 end;
 
-function TCustomSettingsCompLinkPageControl.ValidComponent(
+function TCustomSettingsComponentLinkPageControl.ValidComponent(
   const AComponent: TComponent): Boolean;
 begin
   Result := AComponent is TPageControl;
 end;
 
-{ TCustomSettingsCompLinkListView }
+{ TCustomSettingsComponentLinkListView }
 
-constructor TCustomSettingsCompLinkListView.Create(AOwner: TComponent);
+constructor TCustomSettingsComponentLinkListView.Create(AOwner: TComponent);
 begin
   inherited;
 
   FSaveColumnWidth := true;
 end;
 
-procedure TCustomSettingsCompLinkListView.DoLoadSettings;
+procedure TCustomSettingsComponentLinkListView.DoApplySettings;
 var
   ListView : TListView;
   Value : Variant;
@@ -502,7 +502,7 @@ begin
   end;
 end;
 
-procedure TCustomSettingsCompLinkListView.DoSaveSettings;
+procedure TCustomSettingsComponentLinkListView.DoSaveSettings;
 var
   ListView : TListView;
   Col : TListColumn;
@@ -530,7 +530,7 @@ begin
   end;
 end;
 
-function TCustomSettingsCompLinkListView.ValidComponent(
+function TCustomSettingsComponentLinkListView.ValidComponent(
   const AComponent: TComponent): Boolean;
 begin
   Result := AComponent is TListView;

@@ -36,6 +36,6 @@ contains
   uSettingsBase in '..\..\uSettingsBase.pas',
   uSettingsStream in '..\..\uSettingsStream.pas',
   uSettingsXML in '..\..\uSettingsXML.pas',
-  uSettingsCompLinksDefault in '..\..\uSettingsCompLinksDefault.pas';
+  uSettingsLinksDefault in '..\..\uSettingsLinksDefault.pas';
 
 end.

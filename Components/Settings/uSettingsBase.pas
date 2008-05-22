@@ -24,8 +24,8 @@ type
   
   TSetting = class;
 
-  TCustomSettingsCompLink = class;
-  TCustomSettingsCompLinkList = class;
+  TCustomSettingsLink = class;
+  TCustomSettingsLinkList = class;
 
   TSettingName = WideString;
 
@@ -137,7 +137,7 @@ type
     FParentSettings: TCustomSettings;
     FParentMode: TParentMode;
 
-    FComponentLinks : TCustomSettingsCompLinkList;
+    FComponentLinks : TCustomSettingsLinkList;
 
     procedure SetParentSettings(const Value: TCustomSettings);
 
@@ -191,8 +191,8 @@ type
     function Exists(APath : TSettingName; AIsRegEx : Boolean = false) : Boolean;
     procedure Delete(APath : TSettingName; AIsRegEx : Boolean = false);
 
-    procedure RegisterComponentLink(ALink : TCustomSettingsCompLink);
-    procedure UnRegisterComponentLink(ALink : TCustomSettingsCompLink);
+    procedure RegisterComponentLink(ALink : TCustomSettingsLink);
+    procedure UnRegisterComponentLink(ALink : TCustomSettingsLink);
 
     property ParentSettings : TCustomSettings read FParentSettings write SetParentSettings;
     property ParentMode : TParentMode read FParentMode write FParentMode default pmAddsMissing;
@@ -205,56 +205,70 @@ type
 //==============================================================================
 
 
-  TCustomSettingsCompLinkList = class(TList)
+  TCustomSettingsLinkList = class(TList)
   protected
-    function GetItem(Index: Integer): TCustomSettingsCompLink;
-    procedure SetItem(Index: Integer; const Value: TCustomSettingsCompLink);
+    function GetItem(Index: Integer): TCustomSettingsLink;
+    procedure SetItem(Index: Integer; const Value: TCustomSettingsLink);
   public
-    function Add(ALink: TCustomSettingsCompLink): Integer;
-    function Extract(Item: TCustomSettingsCompLink): TCustomSettingsCompLink;
-    function Remove(ALink: TCustomSettingsCompLink): Integer;
-    function IndexOf(ALink: TCustomSettingsCompLink): Integer; overload;
-    procedure Insert(Index: Integer; ALink: TCustomSettingsCompLink);
-    function First: TCustomSettingsCompLink;
-    function Last: TCustomSettingsCompLink;
-    property Items[Index: Integer]: TCustomSettingsCompLink read GetItem write SetItem; default;
+    function Add(ALink: TCustomSettingsLink): Integer;
+    function Extract(Item: TCustomSettingsLink): TCustomSettingsLink;
+    function Remove(ALink: TCustomSettingsLink): Integer;
+    function IndexOf(ALink: TCustomSettingsLink): Integer; overload;
+    procedure Insert(Index: Integer; ALink: TCustomSettingsLink);
+    function First: TCustomSettingsLink;
+    function Last: TCustomSettingsLink;
+    property Items[Index: Integer]: TCustomSettingsLink read GetItem write SetItem; default;
   end;
 
 
 //==============================================================================
 
 
-  TCustomSettingsCompLink = class(TComponent)
+  TCustomSettingsLink = class(TComponent)
   protected
-    FComponent: TComponent;
     FSettings: TCustomSettings;
     FRootSetting: TSettingName;
 
-    function GenerateRootSettingName(AComponent : TComponent) : TSettingName; virtual;
-
     procedure SetSettings(const Value: TCustomSettings);
-    procedure SetComponent(const Value: TComponent);
     procedure SetRootSetting(const Value: TSettingName);
-
-    procedure InitiateLoad; virtual;
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
-    procedure DoLoadSettings; virtual; abstract;
+    procedure DoApplySettings; virtual; abstract;
     procedure DoSaveSettings; virtual; abstract;
-
-    function ValidComponent(const AComponent : TComponent) : Boolean; virtual; abstract;
-      //Use this to decide, which components this link handles
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
-    procedure OnAfterLoadSettings; virtual;
-    procedure OnBeforeSaveSettings; virtual;
+    procedure ApplySettings;
+    procedure SaveSettings;
 
-    property Component : TComponent read FComponent write SetComponent;
     property Settings : TCustomSettings read FSettings write SetSettings;
     property RootSetting : TSettingName read FRootSetting write SetRootSetting;
+  end;
+
+
+//==============================================================================
+
+
+  TCustomSettingsComponentLink = class(TCustomSettingsLink)
+  protected
+    FComponent: TComponent;
+
+    procedure SetComponent(const Value: TComponent);
+
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+
+    function GenerateRootSettingName(AComponent : TComponent) : TSettingName; virtual;
+
+    function ValidComponent(const AComponent : TComponent) : Boolean; virtual; abstract;
+      //Use this to decide, which components this link handles
+
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    property Component : TComponent read FComponent write SetComponent;
   end;
 
 
@@ -742,7 +756,7 @@ constructor TCustomSettings.Create(AOwner: TComponent);
 begin
   inherited;
 
-  FComponentLinks := TCustomSettingsCompLinkList.Create;
+  FComponentLinks := TCustomSettingsLinkList.Create;
 
   FParentMode := pmAddsMissing;
   FParentSettings := nil;
@@ -920,7 +934,7 @@ var
   idx : Integer;
 begin
   for idx := 0 to FComponentLinks.Count - 1 do
-    FComponentLinks[idx].OnAfterLoadSettings;
+    FComponentLinks[idx].ApplySettings;
 
 end;
 
@@ -929,7 +943,7 @@ var
   idx : Integer;
 begin
   for idx := 0 to FComponentLinks.Count - 1 do
-    FComponentLinks[idx].OnBeforeSaveSettings;
+    FComponentLinks[idx].SaveSettings;
 end;
 
 function TCustomSettings.Load: Boolean;
@@ -991,7 +1005,7 @@ begin
 end;
 
 procedure TCustomSettings.RegisterComponentLink(
-  ALink: TCustomSettingsCompLink);
+  ALink: TCustomSettingsLink);
 begin
   if FComponentLinks.IndexOf(ALink) = -1 then
     FComponentLinks.Add(ALink);
@@ -1042,7 +1056,7 @@ end;
 
 
 procedure TCustomSettings.UnRegisterComponentLink(
-  ALink: TCustomSettingsCompLink);
+  ALink: TCustomSettingsLink);
 var
   idx : Integer;
 begin
@@ -1055,25 +1069,153 @@ end;
 //==============================================================================
 
 
-{ TCustomSettingsCompLink }
+{ TCustomSettingsLink }
 
-constructor TCustomSettingsCompLink.Create(AOwner: TComponent);
+procedure TCustomSettingsLink.ApplySettings;
+begin
+  DoApplySettings;
+end;
+
+constructor TCustomSettingsLink.Create(AOwner: TComponent);
 begin
   inherited;
 
   FSettings := nil;
+end;
+
+destructor TCustomSettingsLink.Destroy;
+begin
+  Settings := nil;
+
+  inherited;
+end;
+
+procedure TCustomSettingsLink.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+
+  if Operation = opRemove then
+  begin
+    if AComponent = FSettings then
+      FSettings := nil;
+  end;
+end;
+
+procedure TCustomSettingsLink.SaveSettings;
+begin
+  DoSaveSettings;
+end;
+
+procedure TCustomSettingsLink.SetRootSetting(
+  const Value: TSettingName);
+begin
+  if Value <> EmptyStr then
+    FRootSetting := IncludeLeadingSettingsPathDelimiter(Value)
+  else
+    FRootSetting := Value;
+
+  FRootSetting := ExcludeTrailingSettingsPathDelimiter(FRootSetting);
+end;
+
+procedure TCustomSettingsLink.SetSettings(
+  const Value: TCustomSettings);
+begin
+  if FSettings <> Value then
+  begin
+    if Assigned(FSettings) then
+    begin
+      FSettings.UnRegisterComponentLink(Self);
+      FSettings.RemoveFreeNotification(Self);
+    end;
+
+    FSettings := Value;
+
+    if Assigned(FSettings) then
+    begin
+      FSettings.RegisterComponentLink(Self);
+      FSettings.FreeNotification(Self);
+    end;
+
+    ApplySettings;
+  end;
+end;
+
+
+//==============================================================================
+
+
+{ TCustomSettingsLinkList }
+
+function TCustomSettingsLinkList.Add(
+  ALink: TCustomSettingsLink): Integer;
+begin
+  Result := inherited Add(ALink);
+end;
+
+function TCustomSettingsLinkList.Extract(
+  Item: TCustomSettingsLink): TCustomSettingsLink;
+begin
+  Result := inherited Extract(Item);
+end;
+
+function TCustomSettingsLinkList.First: TCustomSettingsLink;
+begin
+  Result := inherited First;
+end;
+
+function TCustomSettingsLinkList.GetItem(
+  Index: Integer): TCustomSettingsLink;
+begin
+  Result := inherited Get(Index);
+end;
+
+function TCustomSettingsLinkList.IndexOf(
+  ALink: TCustomSettingsLink): Integer;
+begin
+  Result := inherited IndexOf(ALink);
+end;
+
+procedure TCustomSettingsLinkList.Insert(Index: Integer;
+  ALink: TCustomSettingsLink);
+begin
+  inherited Insert(Index, ALink);
+end;
+
+function TCustomSettingsLinkList.Last: TCustomSettingsLink;
+begin
+  Result := inherited Last;
+end;
+
+function TCustomSettingsLinkList.Remove(
+  ALink: TCustomSettingsLink): Integer;
+begin
+  Result := inherited Remove(ALink);
+end;
+
+procedure TCustomSettingsLinkList.SetItem(Index: Integer;
+  const Value: TCustomSettingsLink);
+begin
+  inherited Put(Index, Value);
+end;
+
+{ TCustomSettingsComponentLink }
+
+constructor TCustomSettingsComponentLink.Create(AOwner: TComponent);
+begin
+  inherited;
+
   FComponent := nil;
 end;
 
-destructor TCustomSettingsCompLink.Destroy;
+destructor TCustomSettingsComponentLink.Destroy;
 begin
-  Settings := nil;
   Component := nil;
 
   inherited;
 end;
 
-function TCustomSettingsCompLink.GenerateRootSettingName(
+function TCustomSettingsComponentLink.GenerateRootSettingName(
   AComponent: TComponent): TSettingName;
 var
   Path : TWideStringList;
@@ -1094,7 +1236,7 @@ begin
         Path.Insert(0, EmptyWideStr);
         break;
       end;
-        
+
       Compo := Compo.GetParentComponent;
     end;
 
@@ -1104,37 +1246,19 @@ begin
   end;
 end;
 
-procedure TCustomSettingsCompLink.InitiateLoad;
-begin
-  OnAfterLoadSettings;
-end;
-
-procedure TCustomSettingsCompLink.Notification(AComponent: TComponent;
+procedure TCustomSettingsComponentLink.Notification(AComponent: TComponent;
   Operation: TOperation);
 begin
-  inherited Notification(AComponent, Operation);
+  inherited;
 
   if Operation = opRemove then
   begin
     if AComponent = FComponent then
       FComponent := nil
-    else
-    if AComponent = FSettings then
-      FSettings := nil;
   end;
 end;
 
-procedure TCustomSettingsCompLink.OnAfterLoadSettings;
-begin
-  DoLoadSettings;
-end;
-
-procedure TCustomSettingsCompLink.OnBeforeSaveSettings;
-begin
-  DoSaveSettings;
-end;
-
-procedure TCustomSettingsCompLink.SetComponent(const Value: TComponent);
+procedure TCustomSettingsComponentLink.SetComponent(const Value: TComponent);
 begin
   if FComponent <> Value then
   begin
@@ -1152,100 +1276,8 @@ begin
     if WideSameText(FRootSetting, EmptyWideStr) then
       RootSetting := GenerateRootSettingName(FComponent);
 
-    InitiateLoad;
+    ApplySettings;
   end;
-end;                                                          
-
-procedure TCustomSettingsCompLink.SetRootSetting(
-  const Value: TSettingName);
-begin
-  if Value <> EmptyStr then
-    FRootSetting := IncludeLeadingSettingsPathDelimiter(Value)
-  else
-    FRootSetting := Value;
-
-  FRootSetting := ExcludeTrailingSettingsPathDelimiter(FRootSetting);
-end;
-
-procedure TCustomSettingsCompLink.SetSettings(
-  const Value: TCustomSettings);
-begin
-  if FSettings <> Value then
-  begin
-    if Assigned(FSettings) then
-    begin
-      FSettings.UnRegisterComponentLink(Self);
-      FSettings.RemoveFreeNotification(Self);
-    end;
-
-    FSettings := Value;
-
-    if Assigned(FSettings) then
-    begin
-      FSettings.RegisterComponentLink(Self);
-      FSettings.FreeNotification(Self);
-    end;
-
-    InitiateLoad;
-  end;
-end;
-
-
-//==============================================================================
-
-
-{ TCustomSettingsCompLinkList }
-
-function TCustomSettingsCompLinkList.Add(
-  ALink: TCustomSettingsCompLink): Integer;
-begin
-  Result := inherited Add(ALink);
-end;
-
-function TCustomSettingsCompLinkList.Extract(
-  Item: TCustomSettingsCompLink): TCustomSettingsCompLink;
-begin
-  Result := inherited Extract(Item);
-end;
-
-function TCustomSettingsCompLinkList.First: TCustomSettingsCompLink;
-begin
-  Result := inherited First;
-end;
-
-function TCustomSettingsCompLinkList.GetItem(
-  Index: Integer): TCustomSettingsCompLink;
-begin
-  Result := inherited Get(Index);
-end;
-
-function TCustomSettingsCompLinkList.IndexOf(
-  ALink: TCustomSettingsCompLink): Integer;
-begin
-  Result := inherited IndexOf(ALink);
-end;
-
-procedure TCustomSettingsCompLinkList.Insert(Index: Integer;
-  ALink: TCustomSettingsCompLink);
-begin
-  inherited Insert(Index, ALink);
-end;
-
-function TCustomSettingsCompLinkList.Last: TCustomSettingsCompLink;
-begin
-  Result := inherited Last;
-end;
-
-function TCustomSettingsCompLinkList.Remove(
-  ALink: TCustomSettingsCompLink): Integer;
-begin
-  Result := inherited Remove(ALink);
-end;
-
-procedure TCustomSettingsCompLinkList.SetItem(Index: Integer;
-  const Value: TCustomSettingsCompLink);
-begin
-  inherited Put(Index, Value);
 end;
 
 end.

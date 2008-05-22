@@ -7,7 +7,7 @@
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 
-unit uSettingsCompLinkVirtualTrees;
+unit uSettingsLinkVirtualTrees;
 
 interface
                                          
@@ -16,18 +16,18 @@ uses
   SysUtils,
   Variants,
   uSettingsBase,
-  uSettingsCompLinksDefault,
+  uSettingsLinksDefault,
   VirtualTrees;
 
 type
-  TCustomSettingsCompLinkVST = class(TCustomSettingsCompLinkControl)
+  TCustomSettingsLinkVST = class(TCustomSettingsLinkControl)
   protected
     FSaveVSTOptions : array[0..10] of Boolean;
 
     function GetSaveVSTOption(const Index: Integer): Boolean;
     procedure SetSaveVSTOption(const Index: Integer; const Value: Boolean);
 
-    procedure DoLoadSettings; override;
+    procedure DoApplySettings; override;
     procedure DoSaveSettings; override;
 
     function ValidComponent(const AComponent : TComponent) : Boolean; override;
@@ -52,7 +52,7 @@ type
 //==============================================================================
 
 
-  TSettingsCompLinkVST = class(TCustomSettingsCompLinkVST)
+  TSettingsLinkVST = class(TCustomSettingsLinkVST)
   published
     property Component;
     property Settings;
@@ -86,7 +86,7 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents(SettingsComponentGroup, [TSettingsCompLinkVST]);
+  RegisterComponents(SettingsComponentGroup, [TSettingsLinkVST]);
 end;
 
 const
@@ -96,9 +96,9 @@ const
 //==============================================================================
 
 
-{ TCustomSettingsCompLinkVST }
+{ TCustomSettingsLinkVST }
 
-constructor TCustomSettingsCompLinkVST.Create(AOwner: TComponent);
+constructor TCustomSettingsLinkVST.Create(AOwner: TComponent);
 var
   idx : Integer;
 begin
@@ -108,7 +108,7 @@ begin
     FSaveVSTOptions[idx] := true;
 end;
 
-procedure TCustomSettingsCompLinkVST.DoLoadSettings;
+procedure TCustomSettingsLinkVST.DoApplySettings;
 var
   Value : Variant;
   VST : TVirtualStringTree;
@@ -191,7 +191,7 @@ begin
   end;
 end;
 
-procedure TCustomSettingsCompLinkVST.DoSaveSettings;
+procedure TCustomSettingsLinkVST.DoSaveSettings;
 var
   VST : TVirtualStringTree;
   idx : Integer;
@@ -253,19 +253,19 @@ begin
   end;
 end;
 
-function TCustomSettingsCompLinkVST.GetSaveVSTOption(
+function TCustomSettingsLinkVST.GetSaveVSTOption(
   const Index: Integer): Boolean;
 begin
   Result := FSaveVSTOptions[Index];
 end;
 
-procedure TCustomSettingsCompLinkVST.SetSaveVSTOption(const Index: Integer;
+procedure TCustomSettingsLinkVST.SetSaveVSTOption(const Index: Integer;
   const Value: Boolean);
 begin
   FSaveVSTOptions[Index] := Value;                                    
 end;
 
-function TCustomSettingsCompLinkVST.ValidComponent(
+function TCustomSettingsLinkVST.ValidComponent(
   const AComponent: TComponent): Boolean;
 begin
   Result := AComponent is TVirtualStringTree;

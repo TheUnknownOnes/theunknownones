@@ -5,8 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, uSettingsStream, uSettingsXML,
-  uSettingsCompLinksDefault, ExtCtrls, ComCtrls, inifiles, VirtualTrees,
-  uSettingsCompLinkVirtualTrees, uSettingsBase;
+  uSettingsLinksDefault, ExtCtrls, ComCtrls, inifiles, VirtualTrees,
+  uSettingsLinkVirtualTrees, uSettingsBase;
 
 type
   TForm1 = class(TForm)
@@ -18,21 +18,21 @@ type
     btn_Load: TButton;
     Settings2: TSettingsXMLFile;
     Settings1: TSettingsXMLFile;
-    SettingsCompLinkControl1: TSettingsCompLinkControl;
+    SettingsLinkControl1: TSettingsLinkControl;
     pan_Right: TPanel;
     Splitter1: TSplitter;
     TabControl1: TTabControl;
-    SettingsCompLinkTabControl1: TSettingsCompLinkTabControl;
+    SettingsLinkTabControl1: TSettingsLinkTabControl;
     Splitter2: TSplitter;
-    SettingsCompLinkForm1: TSettingsCompLinkForm;
+    SettingsLinkForm1: TSettingsLinkForm;
     PageControl1: TPageControl;
     Splitter3: TSplitter;
     TabSheet1: TTabSheet;
-    SettingsCompLinkPageControl1: TSettingsCompLinkPageControl;
+    SettingsLinkPageControl1: TSettingsLinkPageControl;
     ListView1: TListView;
-    SettingsCompLinkListView1: TSettingsCompLinkListView;
+    SettingsLinkListView1: TSettingsLinkListView;
     VirtualStringTree1: TVirtualStringTree;
-    SettingsCompLinkVST1: TSettingsCompLinkVST;
+    SettingsLinkVST1: TSettingsLinkVST;
     procedure FormCreate(Sender: TObject);
     procedure btn_SetValueClick(Sender: TObject);
     procedure btn_ValuesExistsClick(Sender: TObject);
