@@ -223,7 +223,7 @@ type
 
 //==============================================================================
 
-  TNeedRootSettingProc = procedure(out ARootSetting : TSettingName) of object;
+  TNeedRootSettingProc = procedure(const ALink : TCustomSettingsLink; out ARootSetting : TSettingName) of object;
 
 
   TCustomSettingsLink = class(TComponent)
@@ -1080,7 +1080,7 @@ begin
   if not (csDesigning in Self.ComponentState) then
   begin
     if Assigned(FOnNeedRootSetting) then
-      FOnNeedRootSetting(RootSetting)
+      FOnNeedRootSetting(Self, RootSetting)
     else
       RootSetting := DefaultRootSetting;
 
@@ -1119,7 +1119,7 @@ var
   RootSetting : TSettingName;
 begin
   if Assigned(FOnNeedRootSetting) then
-    FOnNeedRootSetting(RootSetting)
+    FOnNeedRootSetting(Self, RootSetting)
   else
     RootSetting := DefaultRootSetting;
 
