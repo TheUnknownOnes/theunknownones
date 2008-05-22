@@ -10,6 +10,8 @@
 unit uSettingsLinkVirtualTrees;
 
 interface
+
+{$R Images.res}
                                          
 uses
   Classes,
