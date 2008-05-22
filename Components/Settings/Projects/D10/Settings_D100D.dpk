@@ -1,6 +1,7 @@
-package Settings_VirtualTrees;
+package Settings_D100D;
 
 {$R *.res}
+{$R '..\..\Design\Images.res'}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
@@ -22,16 +23,14 @@ package Settings_VirtualTrees;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'Settings Support for VirtualTrees'}
-{$LIBSUFFIX '_D100'}
+{$DESCRIPTION 'Settings Base and default VCL Components - Design'}
+{$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
-  rtl,
-  Settings,
-  VirtualTreesD10;
+  rtl, Settings_d100r;
 
 contains
-  uSettingsLinkVirtualTrees in '..\..\uSettingsLinkVirtualTrees.pas';
+  uRegSettings in '..\..\Design\uRegSettings.pas';
 
 end.

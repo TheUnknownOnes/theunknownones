@@ -51,18 +51,10 @@ type
     property FileName : String read FFilename write FFilename;
   end;
 
-
-procedure Register;
-
 implementation
 
 uses
   ComObj;
-
-procedure Register;
-begin
-  RegisterComponents(SettingsComponentGroup, [TSettingsXMLFile]);
-end;
 
 { TCustomSettingsXML }
 

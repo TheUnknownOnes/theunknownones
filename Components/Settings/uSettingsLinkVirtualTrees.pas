@@ -10,8 +10,6 @@
 unit uSettingsLinkVirtualTrees;
 
 interface
-
-{$R Images.res}
                                          
 uses
   Classes,
@@ -116,14 +114,7 @@ type
 //==============================================================================
 
 
-procedure Register;
-
 implementation
-
-procedure Register;
-begin
-  RegisterComponents(SettingsComponentGroup, [TSettingsLinkVST]);
-end;
 
 const
   ColSettingNamePattern = 'Column%.4d';

@@ -213,19 +213,7 @@ type
     property SaveColumnWidth;
   end;
 
-
-procedure Register;
-
 implementation
-
-procedure Register;
-begin
-  RegisterComponents(SettingsComponentGroup, [ TSettingsLinkControl,
-                                               TSettingsLinkTabControl,
-                                               TSettingsLinkForm,
-                                               TSettingsLinkPageControl,
-                                               TSettingsLinkListView]);
-end;
 
 { TCustomSettingsLinkControl }
 

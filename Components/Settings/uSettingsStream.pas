@@ -105,15 +105,7 @@ type
     property OnSaveStreamContent : TSettingsStreamContentProc read FOnSaveStreamContent write FOnSaveStreamContent;
   end;
 
-procedure Register;
-
-implementation
-
-procedure Register;
-begin
-  RegisterComponents(SettingsComponentGroup, [TSettingsFile,
-                                              TSettingsStream]);
-end;
+implementation    
 
 //==============================================================================
 
