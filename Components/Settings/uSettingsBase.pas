@@ -1163,7 +1163,7 @@ begin
       FSettings.FreeNotification(Self);
     end;
 
-    SaveSettings;
+    ApplySettings;
   end;
 end;
 
@@ -1280,7 +1280,11 @@ begin
   if Operation = opRemove then
   begin
     if AComponent = FComponent then
+    begin
+      SaveSettings;
+      
       FComponent := nil
+    end;
   end;
 end;
 
