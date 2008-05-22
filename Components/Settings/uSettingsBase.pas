@@ -1102,6 +1102,8 @@ end;
 
 destructor TCustomSettingsLink.Destroy;
 begin
+  SaveSettings;
+
   Settings := nil;
 
   inherited;
@@ -1161,7 +1163,7 @@ begin
       FSettings.FreeNotification(Self);
     end;
 
-    ApplySettings;
+    SaveSettings;
   end;
 end;
 
