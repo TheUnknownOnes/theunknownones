@@ -32,8 +32,8 @@ type
     function GetSaveVSTOption(const Index: Integer): Boolean;
     procedure SetSaveVSTOption(const Index: Integer; const Value: Boolean);
 
-    procedure DoApplySettings; override;
-    procedure DoSaveSettings; override;
+    procedure DoApplySettings(const ARootSetting : TSettingName); override;
+    procedure DoSaveSettings(const ARootSetting : TSettingName); override;
   public
     constructor Create(AOwner: TComponent); override;
 
@@ -74,7 +74,7 @@ type
   TSettingsLinkVST = class(TCustomSettingsLinkVST)
   published
     property Settings;
-    property RootSetting;
+    property DefaultRootSetting;
 
     property SaveLeft;
     property SaveTop;
@@ -143,7 +143,7 @@ begin
     FSaveVSTOptions[idx] := true;
 end;
 
-procedure TCustomSettingsLinkVST.DoApplySettings;
+procedure TCustomSettingsLinkVST.DoApplySettings(const ARootSetting : TSettingName);
 var
   Value : Variant;
   VST : TVirtualStringTree;
@@ -184,7 +184,7 @@ begin
     VST.BeginUpdate;
     try
 
-      SettingsPath := FRootSetting + SettingsPathDelimiter +
+      SettingsPath := ARootSetting + SettingsPathDelimiter +
                       'Header' + SettingsPathDelimiter;
 
       if SaveHeaderStyle then
@@ -234,7 +234,7 @@ begin
       begin
         Col := VST.Header.Columns[idx];
 
-        SettingsPath := FRootSetting + SettingsPathDelimiter +
+        SettingsPath := ARootSetting + SettingsPathDelimiter +
                              Format(ColSettingNamePattern, [Col.Index]) + SettingsPathDelimiter;
 
         if SaveColumnPos then
@@ -285,7 +285,7 @@ begin
   end;
 end;
 
-procedure TCustomSettingsLinkVST.DoSaveSettings;
+procedure TCustomSettingsLinkVST.DoSaveSettings(const ARootSetting : TSettingName);
 var
   VST : TVirtualStringTree;
   idx : Integer;
@@ -308,7 +308,7 @@ begin
   begin
     VST := TVirtualStringTree(Component);
 
-    SettingsPath := FRootSetting + SettingsPathDelimiter +
+    SettingsPath := ARootSetting + SettingsPathDelimiter +
                     'Header' + SettingsPathDelimiter;
 
     if SaveHeaderStyle then
@@ -354,7 +354,7 @@ begin
     begin
       Col := VST.Header.Columns[idx];
 
-      SettingsPath := FRootSetting + SettingsPathDelimiter +
+      SettingsPath := ARootSetting + SettingsPathDelimiter +
                              Format(ColSettingNamePattern, [Col.Index]) + SettingsPathDelimiter;
 
       if SaveColumnPos then

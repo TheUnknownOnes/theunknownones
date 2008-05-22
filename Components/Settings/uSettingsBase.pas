@@ -223,19 +223,23 @@ type
 
 //==============================================================================
 
+  TNeedRootSettingProc = procedure(out ARootSetting : TSettingName) of object;
+
 
   TCustomSettingsLink = class(TComponent)
   protected
     FSettings: TCustomSettings;
-    FRootSetting: TSettingName;
+    FDefaultRootSetting: TSettingName;
+
+    FOnNeedRootSetting: TNeedRootSettingProc;
 
     procedure SetSettings(const Value: TCustomSettings);
     procedure SetRootSetting(const Value: TSettingName);
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
-    procedure DoApplySettings; virtual; abstract;
-    procedure DoSaveSettings; virtual; abstract;
+    procedure DoApplySettings(const ARootSetting : TSettingName); virtual; abstract;
+    procedure DoSaveSettings(const ARootSetting : TSettingName); virtual; abstract;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -244,7 +248,9 @@ type
     procedure SaveSettings;
 
     property Settings : TCustomSettings read FSettings write SetSettings;
-    property RootSetting : TSettingName read FRootSetting write SetRootSetting;
+    property DefaultRootSetting : TSettingName read FDefaultRootSetting write SetRootSetting;
+
+    property OnNeedRootSetting : TNeedRootSettingProc read FOnNeedRootSetting write FOnNeedRootSetting;
   end;
 
 
@@ -1068,9 +1074,18 @@ end;
 { TCustomSettingsLink }
 
 procedure TCustomSettingsLink.ApplySettings;
+var
+  RootSetting : TSettingName;
 begin
-  if not (csDesigning in Self.ComponentState) then  
-    DoApplySettings;
+  if not (csDesigning in Self.ComponentState) then
+  begin
+    if Assigned(FOnNeedRootSetting) then
+      FOnNeedRootSetting(RootSetting)
+    else
+      RootSetting := DefaultRootSetting;
+
+    DoApplySettings(ExcludeTrailingSettingsPathDelimiter(IncludeLeadingSettingsPathDelimiter(RootSetting)));
+  end;
 end;
 
 constructor TCustomSettingsLink.Create(AOwner: TComponent);
@@ -1100,19 +1115,26 @@ begin
 end;
 
 procedure TCustomSettingsLink.SaveSettings;
+var
+  RootSetting : TSettingName;
 begin
-  DoSaveSettings;
+  if Assigned(FOnNeedRootSetting) then
+    FOnNeedRootSetting(RootSetting)
+  else
+    RootSetting := DefaultRootSetting;
+
+  DoSaveSettings(ExcludeTrailingSettingsPathDelimiter(IncludeLeadingSettingsPathDelimiter(RootSetting)));
 end;
 
 procedure TCustomSettingsLink.SetRootSetting(
   const Value: TSettingName);
 begin
   if Value <> EmptyStr then
-    FRootSetting := IncludeLeadingSettingsPathDelimiter(Value)
+    FDefaultRootSetting := IncludeLeadingSettingsPathDelimiter(Value)
   else
-    FRootSetting := Value;
+    FDefaultRootSetting := Value;
 
-  FRootSetting := ExcludeTrailingSettingsPathDelimiter(FRootSetting);
+  FDefaultRootSetting := ExcludeTrailingSettingsPathDelimiter(FDefaultRootSetting);
 end;
 
 procedure TCustomSettingsLink.SetSettings(
@@ -1267,8 +1289,8 @@ begin
     if Assigned(FComponent) then
       FComponent.FreeNotification(Self);
 
-    if WideSameText(FRootSetting, EmptyWideStr) then
-      RootSetting := GenerateRootSettingName(FComponent);
+    if WideSameText(FDefaultRootSetting, EmptyWideStr) then
+      DefaultRootSetting := GenerateRootSettingName(FComponent);
 
     ApplySettings;
   end;

@@ -30,8 +30,8 @@ type
     function GetSaveControlOption(const Index: Integer): Boolean;
     procedure SetSaveControlOption(const Index: Integer; const Value: Boolean);
 
-    procedure DoApplySettings; override;
-    procedure DoSaveSettings; override;
+    procedure DoApplySettings(const ARootSetting : TSettingName); override;
+    procedure DoSaveSettings(const ARootSetting : TSettingName); override;
   public
     constructor Create(AOwner: TComponent); override;
 
@@ -50,7 +50,8 @@ type
   TSettingsLinkControl = class(TCustomSettingsLinkControl)
   published
     property Settings;
-    property RootSetting;
+    property DefaultRootSetting;
+    property OnNeedRootSetting;
 
     property Control;
     property SaveLeft;
@@ -69,8 +70,8 @@ type
     function GetTabControl: TTabControl;
     procedure SetTabControl(const Value: TTabControl);
 
-    procedure DoApplySettings; override;
-    procedure DoSaveSettings; override;
+    procedure DoApplySettings(const ARootSetting : TSettingName); override;
+    procedure DoSaveSettings(const ARootSetting : TSettingName); override;
   public
     constructor Create(AOwner: TComponent); override;
 
@@ -86,7 +87,8 @@ type
   TSettingsLinkTabControl = class(TCustomSettingsComponentLinkTabControl)
   published
     property Settings;
-    property RootSetting;
+    property DefaultRootSetting;
+    property OnNeedRootSetting;
 
     property SaveLeft;
     property SaveTop;
@@ -105,8 +107,8 @@ type
   protected
     FSaveWindowState: Boolean;
 
-    procedure DoApplySettings; override;
-    procedure DoSaveSettings; override;
+    procedure DoApplySettings(const ARootSetting : TSettingName); override;
+    procedure DoSaveSettings(const ARootSetting : TSettingName); override;
   public
     constructor Create(AOwner: TComponent); override;
 
@@ -120,7 +122,8 @@ type
   TSettingsLinkForm = class(TCustomSettingsComponentLinkForm)
   published
     property Settings;
-    property RootSetting;
+    property DefaultRootSetting;
+    property OnNeedRootSetting;
 
     property SaveLeft;
     property SaveTop;
@@ -141,8 +144,8 @@ type
     function GetPageControl: TPageControl;
     procedure SetPageControl(const Value: TPageControl);
 
-    procedure DoApplySettings; override;
-    procedure DoSaveSettings; override;
+    procedure DoApplySettings(const ARootSetting : TSettingName); override;
+    procedure DoSaveSettings(const ARootSetting : TSettingName); override;
   public
     constructor Create(AOwner: TComponent); override;
 
@@ -158,7 +161,8 @@ type
   TSettingsLinkPageControl = class(TCustomSettingsComponentLinkPageControl)
   published
     property Settings;
-    property RootSetting;
+    property DefaultRootSetting;
+    property OnNeedRootSetting;
 
     property SaveLeft;
     property SaveTop;
@@ -180,8 +184,8 @@ type
     function GetListView: TListView;
     procedure SetListView(const Value: TListView);
 
-    procedure DoApplySettings; override;
-    procedure DoSaveSettings; override;
+    procedure DoApplySettings(const ARootSetting : TSettingName); override;
+    procedure DoSaveSettings(const ARootSetting : TSettingName); override;
   public
     constructor Create(AOwner: TComponent); override;
 
@@ -197,7 +201,8 @@ type
   TSettingsLinkListView = class(TCustomSettingsComponentLinkListView)
   published
     property Settings;
-    property RootSetting;
+    property DefaultRootSetting;
+    property OnNeedRootSetting;
 
     property SaveLeft;
     property SaveTop;
@@ -235,7 +240,7 @@ begin
   SaveHeight := false;
 end;
 
-procedure TCustomSettingsLinkControl.DoApplySettings;
+procedure TCustomSettingsLinkControl.DoApplySettings(const ARootSetting : TSettingName);
 var
   Control : TControl;
   Value : Variant;
@@ -246,35 +251,35 @@ begin
 
     if SaveLeft then
     begin
-      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'Left');
+      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'Left');
       if not VarIsEmpty(Value) then
         Control.Left := Value;
     end;
 
     if SaveTop then
     begin
-      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'Top');
+      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'Top');
       if not VarIsEmpty(Value) then
         Control.Top := Value;
     end;
 
     if SaveWidth then
     begin
-      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'Width');
+      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'Width');
       if not VarIsEmpty(Value) then
         Control.Width := Value;
     end;
 
     if SaveHeight then
     begin
-      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'Height');
+      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'Height');
       if not VarIsEmpty(Value) then
         Control.Height := Value;
     end;
   end;
 end;
 
-procedure TCustomSettingsLinkControl.DoSaveSettings;
+procedure TCustomSettingsLinkControl.DoSaveSettings(const ARootSetting : TSettingName);
 var
   Control : TControl;
 begin
@@ -283,16 +288,16 @@ begin
     Control := TControl(Component);
 
     if SaveLeft then
-      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'Left', Control.Left);
+      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'Left', Control.Left);
 
     if SaveTop then
-      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'Top', Control.Top);
+      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'Top', Control.Top);
 
     if SaveWidth then
-      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'Width', Control.Width);
+      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'Width', Control.Width);
 
     if SaveHeight then
-      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'Height', Control.Height);
+      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'Height', Control.Height);
   end;
 end;
 
@@ -331,7 +336,7 @@ begin
   FSaveTabIndex := true;
 end;
 
-procedure TCustomSettingsComponentLinkTabControl.DoApplySettings;
+procedure TCustomSettingsComponentLinkTabControl.DoApplySettings(const ARootSetting : TSettingName);
 var
   Value : Variant;
   TabControl : TTabControl;
@@ -344,14 +349,14 @@ begin
 
     if FSaveTabIndex then
     begin
-      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'TabIndex');
+      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'TabIndex');
       if not VarIsEmpty(Value) then
         TabControl.TabIndex := Value;
     end;
   end;
 end;
 
-procedure TCustomSettingsComponentLinkTabControl.DoSaveSettings;
+procedure TCustomSettingsComponentLinkTabControl.DoSaveSettings(const ARootSetting : TSettingName);
 var
   TabControl : TTabControl;
 begin
@@ -362,7 +367,7 @@ begin
     TabControl := TTabControl(Component);
 
     if FSaveTabIndex then
-      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'TabIndex', TabControl.TabIndex);
+      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'TabIndex', TabControl.TabIndex);
   end;
 end;
 
@@ -391,12 +396,12 @@ begin
     raise Exception.Create('This link may only be owned by a Form');
 
   Component := TCustomForm(AOwner);
-  FRootSetting := SettingsPathDelimiter + Component.Name;
+  FDefaultRootSetting := SettingsPathDelimiter + Component.Name;
 
   SaveWindowState := true;
 end;
 
-procedure TCustomSettingsComponentLinkForm.DoApplySettings;
+procedure TCustomSettingsComponentLinkForm.DoApplySettings(const ARootSetting : TSettingName);
 var
   Form : TCustomForm;
   Value : Variant;
@@ -409,14 +414,14 @@ begin
 
     if SaveWindowState then
     begin
-      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'WindowState');
+      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'WindowState');
       if not VarIsEmpty(Value) then
         Form.WindowState := TWindowState(Value);
     end;
   end;
 end;
 
-procedure TCustomSettingsComponentLinkForm.DoSaveSettings;
+procedure TCustomSettingsComponentLinkForm.DoSaveSettings(const ARootSetting : TSettingName);
 var
   Form : TCustomForm;
 begin
@@ -427,7 +432,7 @@ begin
     Form := TCustomForm(Component);
 
     if SaveWindowState then
-      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'WindowState', Integer(Form.WindowState));
+      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'WindowState', Integer(Form.WindowState));
   end;
 end;
 
@@ -444,7 +449,7 @@ begin
   FSaveTabIndex := true;
 end;
 
-procedure TCustomSettingsComponentLinkPageControl.DoApplySettings;
+procedure TCustomSettingsComponentLinkPageControl.DoApplySettings(const ARootSetting : TSettingName);
 var
   Value : Variant;
   PageControl : TPageControl;
@@ -457,14 +462,14 @@ begin
 
     if FSaveTabIndex then
     begin
-      Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter + 'TabIndex');
+      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'TabIndex');
       if not VarIsEmpty(Value) then
         PageControl.TabIndex := Value;
     end;
   end;
 end;
 
-procedure TCustomSettingsComponentLinkPageControl.DoSaveSettings;
+procedure TCustomSettingsComponentLinkPageControl.DoSaveSettings(const ARootSetting : TSettingName);
 var
   PageControl : TPageControl;
 begin
@@ -475,7 +480,7 @@ begin
     PageControl := TPageControl(Component);
 
     if FSaveTabIndex then
-      Settings.SetValue(FRootSetting + SettingsPathDelimiter + 'TabIndex', PageControl.TabIndex);
+      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'TabIndex', PageControl.TabIndex);
   end;
 end;
 
@@ -503,7 +508,7 @@ begin
   FSaveColumnWidth := true;
 end;
 
-procedure TCustomSettingsComponentLinkListView.DoApplySettings;
+procedure TCustomSettingsComponentLinkListView.DoApplySettings(const ARootSetting : TSettingName);
 var
   ListView : TListView;
   Value : Variant;
@@ -524,7 +529,7 @@ begin
 
       if FSaveColumnWidth then
       begin
-        Value := Settings.GetValue(FRootSetting + SettingsPathDelimiter +
+        Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter +
                                     Format(ColSettingNamePattern, [idx]) +
                                     SettingsPathDelimiter + 'Width');
 
@@ -535,7 +540,7 @@ begin
   end;
 end;
 
-procedure TCustomSettingsComponentLinkListView.DoSaveSettings;
+procedure TCustomSettingsComponentLinkListView.DoSaveSettings(const ARootSetting : TSettingName);
 var
   ListView : TListView;
   Col : TListColumn;
@@ -555,7 +560,7 @@ begin
 
       if FSaveColumnWidth then
       begin
-        Settings.SetValue(FRootSetting + SettingsPathDelimiter +
+        Settings.SetValue(ARootSetting + SettingsPathDelimiter +
                            Format(ColSettingNamePattern, [idx]) +
                            SettingsPathDelimiter + 'Width', Col.Width);
       end;
