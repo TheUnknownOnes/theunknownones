@@ -26,7 +26,6 @@ implementation
 procedure TForm1.FormCreate(Sender: TObject);
 var
   AppDir : String;
-  LastStartTime : Variant;
 begin
   AppDir := ExtractFilePath(Application.ExeName);
 
@@ -34,10 +33,7 @@ begin
 
   if FileExists(SettingsFile1.FileName) and SettingsFile1.Load then
   begin
-    LastStartTime := SettingsFile1.GetValue('/Application/LastStart');
-
-    if not VarIsEmpty(LastStartTime) then
-      MessageDlg('Last start ' + DateTimeToStr(LastStartTime), mtWarning, [mbOK], 0);
+    MessageDlg(vartostr(SettingsFile1.GetValue('/Application/LastStart', 'unknown')), mtWarning, [mbOK], 0);
   end;
 
   SettingsFile1.SetValue('/Application/LastStart', Now);
