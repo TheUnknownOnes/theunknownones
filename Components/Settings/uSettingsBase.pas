@@ -785,9 +785,6 @@ end;
 
 destructor TCustomSettings.Destroy;
 begin
-  while FComponentLinks.Count > 0 do
-    FComponentLinks.First.Settings := nil;
-
   FComponentLinks.Free;
 
   FRootSetting.Free;
