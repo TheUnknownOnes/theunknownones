@@ -151,14 +151,7 @@ function GetConsoleColorValue(const AConsoleColors : TConsoleColors) : Cardinal;
 var
   Default_Security_Attributes : TSecurityAttributes;
 
-procedure Register;
-
 implementation
-
-procedure Register;
-begin
-  RegisterComponents('TUO',[TConsoleProcess]);
-end;
 
 function GetConsoleColorValue(const AConsoleColors : TConsoleColors) : Cardinal;
 var

@@ -57,14 +57,7 @@ type
     property OnChange;
   end;
 
-procedure Register;
-
 implementation
-
-procedure Register;
-begin
-  RegisterComponents('Imagelists',[TEffectPNGImageList]);
-end;
 
 { TCustomEffectPNGImageList }
 

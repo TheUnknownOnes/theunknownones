@@ -66,14 +66,7 @@ type
     property OnChange;
   end;
 
-procedure Register;
-
 implementation
-
-procedure Register;
-begin
-  RegisterComponents('Imagelists',[TPNGImageList]);
-end;
 
 { TCustomPNGImageList }
 

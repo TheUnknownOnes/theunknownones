@@ -190,8 +190,6 @@ type
     constructor Create(AManager : TWiimoteManager);
   end;
 
-procedure Register;
-
 implementation
 
 type
@@ -235,11 +233,6 @@ type
     function GetIRDot(AIndex : Byte) : TWiimoteIRDot;
     {$ENDREGION}
   end;
-
-procedure Register;
-begin
-  RegisterComponents('TUO', [TWiimoteManager]);
-end;
 
 { TWiimoteManager }
 

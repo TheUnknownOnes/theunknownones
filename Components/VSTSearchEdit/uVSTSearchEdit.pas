@@ -38,17 +38,11 @@ type
     property Progress : TProgressBar read FProgress write FProgress;
   end;
 
-procedure Register;
 
 implementation
 
 uses
   Forms, Controls, TntStdCtrls;
-
-procedure Register;
-begin
-  RegisterComponents('TUO', [TVSTSearchEdit]);
-end;
 
 { TVSTSearchEdit }
 

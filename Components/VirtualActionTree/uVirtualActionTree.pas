@@ -127,8 +127,6 @@ type
     property TabOrder;
   end;
 
-procedure Register;
-
 implementation
 
 uses Types, ImgList;
@@ -162,10 +160,6 @@ type
     property Node : PVirtualNode read FNode write FNode;
   end;
 
-  procedure Register;
-begin
-  RegisterComponents('Virtual Controls', [TVirtualActionTree]);
-end;
 
 { TVirtualActionTree }
 

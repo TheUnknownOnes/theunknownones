@@ -53,14 +53,7 @@ type
     property CommCtrlsStyle : TilDrawStates read FStates write SetState default [ildEnabled];
   end;
 
-procedure Register;
-
 implementation
-
-procedure Register;
-begin
-  RegisterComponents('Imagelists',[TImageListProvider]);
-end;
 
 { TImageListProvider }
 

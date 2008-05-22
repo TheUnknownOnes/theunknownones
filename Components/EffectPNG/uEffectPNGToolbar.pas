@@ -44,14 +44,7 @@ type
     property ImageEffectDisabled : TPNGEffects read FImageEffectDisabled write SetImageEffectDisabled;
   end;
 
-procedure Register;
-
 implementation
-
-procedure Register;
-begin
-  RegisterComponents('PNGControls', [TEffectPNGToolButton, TEffectPNGToolBar]);
-end;
 
 constructor TEffectPNGToolButton.Create(AOwner: TComponent);
 begin

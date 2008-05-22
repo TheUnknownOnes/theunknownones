@@ -9,11 +9,13 @@
 		</Option>
 	</PersonalityInfo>
 	<Default.Personality>  <Projects>
-      <Projects Name="BaseImageList_D100.bpl">D10\BaseImageList.bdsproj</Projects>
-      <Projects Name="ImageListProvider_D100.bpl">D10\ImageListProvider.bdsproj</Projects>
-      <Projects Name="PNGImageListDesigner_D100D.bpl">D10\PNGImageListDesigner.bdsproj</Projects>
-      <Projects Name="PNGImageList_D100.bpl">D10\PNGImageList.bdsproj</Projects>
-      <Projects Name="Targets">BaseImageList_D100.bpl ImageListProvider_D100.bpl PNGImageListDesigner_D100D.bpl PNGImageList_D100.bpl</Projects>
+      <Projects Name="BaseImageList_D100R.bpl">D10\BaseImageList_D100R.bdsproj</Projects>
+      <Projects Name="ImageListProvider_D100R.bpl">D10\ImageListProvider_D100R.bdsproj</Projects>
+      <Projects Name="PNGImageList_D100R.bpl">D10\PNGImageList_D100R.bdsproj</Projects>
+      <Projects Name="ImageListProvider_D100D.bpl">D10\ImageListProvider_D100D.bdsproj</Projects>
+      <Projects Name="PNGImageList_D100D.bpl">D10\PNGImageList_D100D.bdsproj</Projects>
+      <Projects Name="PNGImageListDesigner.bpl">D10\PNGImageListDesigner.bdsproj</Projects>
+      <Projects Name="Targets">BaseImageList_D100R.bpl ImageListProvider_D100R.bpl PNGImageList_D100R.bpl ImageListProvider_D100D.bpl PNGImageList_D100D.bpl PNGImageListDesigner.bpl</Projects>
     </Projects>
     <Dependencies/>
   </Default.Personality>

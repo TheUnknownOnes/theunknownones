@@ -22,21 +22,19 @@ package PNGImageListDesigner;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'PNGImagelist D100D'}
-{$LIBSUFFIX '_D100D'}
+{$DESCRIPTION 'PNGImagelist - Design'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
   designide,
-  PNGSupport,
   GDIPlus100,
-  PNGUtils,
   vcl,
   vclx,
   DirectX9_D10,
-  PNGUtils;
+  PNGUtils_D100R,
+  PNGSupport_D100;
 
 contains
   uPNGImageList_Designers in '..\..\uPNGImageList_Designers.pas',

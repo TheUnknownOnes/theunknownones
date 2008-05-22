@@ -80,14 +80,8 @@ type
     property OnStartDrag;
   end;
 
-procedure Register;
 
 implementation
-
-procedure Register;
-begin
-  RegisterComponents('PNGControls', [TEffectPNGImage]);
-end;
 
 
 constructor TEffectPNGImage.Create(AOwner: TComponent);

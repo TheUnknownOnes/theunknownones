@@ -48,14 +48,7 @@ type
     property SearchItems: TStrings read GetItems write SetItems;
   end;
 
-procedure Register;
-
 implementation
-
-procedure Register;
-begin
-  RegisterComponents('PNGControls', [TEffectPNGEdit]);
-end;
 
 type
   TEffectWinCtl = class(TWinControl)

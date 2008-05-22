@@ -26,14 +26,7 @@ type
     property Items;
   end;
 
-procedure Register;
-
 implementation
-
-procedure Register;
-begin
-  RegisterComponents('SPP', [TSearchEdit]);
-end;
 
 { TCustomSearchEdit }
 

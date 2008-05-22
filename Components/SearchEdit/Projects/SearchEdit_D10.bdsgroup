@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <PersonalityInfo>
+    <Option>
+      <Option Name="Personality">Default.Personality</Option>
+      <Option Name="ProjectType"></Option>
+      <Option Name="Version">1.0</Option>
+      <Option Name="GUID">{F46D65CE-8FD7-4CEC-85AC-E755B1A6DF48}</Option>
+    </Option>
+  </PersonalityInfo>
+  <Default.Personality>
+    
+    <Projects>
+      <Projects Name="SearchEdit_D100R.bpl">D10\SearchEdit_D100R.bdsproj</Projects>
+      <Projects Name="SearchEdit_D100D.bpl">D10\SearchEdit_D100D.bdsproj</Projects>
+      <Projects Name="Targets">SearchEdit_D100R.bpl SearchEdit_D100D.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+  <StarTeamAssociation></StarTeamAssociation>
+  <StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>
