@@ -136,6 +136,7 @@ type
     FRootSetting : TSetting;
     FParentSettings: TCustomSettings;
     FParentMode: TParentMode;
+    FAutoSaveOnDestroy : Boolean;
 
     FComponentLinks : TCustomSettingsLinkList;
 
@@ -196,6 +197,7 @@ type
 
     property ParentSettings : TCustomSettings read FParentSettings write SetParentSettings;
     property ParentMode : TParentMode read FParentMode write FParentMode default pmAddsMissing;
+    property AutoSaveOnDestroy : Boolean read FAutoSaveOnDestroy write FAutoSaveOnDestroy default false;
 
     function Load() : Boolean;
     function Save() : Boolean;
@@ -762,6 +764,7 @@ begin
 
   FParentMode := pmAddsMissing;
   FParentSettings := nil;
+  FAutoSaveOnDestroy := false;
 
   FRootSetting := TSetting.Create();
 end;
@@ -785,11 +788,16 @@ end;
 
 destructor TCustomSettings.Destroy;
 begin
-  FComponentLinks.Free;
+  try
+    if FAutoSaveOnDestroy then
+      Save;
+  finally
+    FComponentLinks.Free;
 
-  FRootSetting.Free;
+    FRootSetting.Free;
 
-  inherited;
+    inherited;
+  end;
 end;
 
 function TCustomSettings.Exists(APath: TSettingName;
