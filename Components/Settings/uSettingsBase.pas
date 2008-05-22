@@ -1069,7 +1069,8 @@ end;
 
 procedure TCustomSettingsLink.ApplySettings;
 begin
-  DoApplySettings;
+  if not (csDesigning in Self.ComponentState) then  
+    DoApplySettings;
 end;
 
 constructor TCustomSettingsLink.Create(AOwner: TComponent);
