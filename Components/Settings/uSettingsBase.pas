@@ -1102,8 +1102,6 @@ end;
 
 destructor TCustomSettingsLink.Destroy;
 begin
-  SaveSettings;
-
   Settings := nil;
 
   inherited;
@@ -1283,11 +1281,7 @@ begin
   if Operation = opRemove then
   begin
     if AComponent = FComponent then
-    begin
-      SaveSettings;
-      
       FComponent := nil
-    end;
   end;
 end;
 
