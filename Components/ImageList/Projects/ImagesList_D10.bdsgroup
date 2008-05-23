@@ -14,8 +14,8 @@
       <Projects Name="PNGImageList_D100R.bpl">D10\PNGImageList_D100R.bdsproj</Projects>
       <Projects Name="ImageListProvider_D100D.bpl">D10\ImageListProvider_D100D.bdsproj</Projects>
       <Projects Name="PNGImageList_D100D.bpl">D10\PNGImageList_D100D.bdsproj</Projects>
-      <Projects Name="PNGImageListDesigner.bpl">D10\PNGImageListDesigner.bdsproj</Projects>
-      <Projects Name="Targets">BaseImageList_D100R.bpl ImageListProvider_D100R.bpl PNGImageList_D100R.bpl ImageListProvider_D100D.bpl PNGImageList_D100D.bpl PNGImageListDesigner.bpl</Projects>
+      <Projects Name="PNGImageListDesigner_D100D.bpl">D10\PNGImageListDesigner_D100D.bdsproj</Projects>
+      <Projects Name="Targets">BaseImageList_D100R.bpl ImageListProvider_D100R.bpl PNGImageList_D100R.bpl ImageListProvider_D100D.bpl PNGImageList_D100D.bpl PNGImageListDesigner_D100D.bpl</Projects>
     </Projects>
     <Dependencies/>
   </Default.Personality>

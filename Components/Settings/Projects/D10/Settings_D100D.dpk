@@ -28,9 +28,19 @@ package Settings_D100D;
 {$IMPLICITBUILD OFF}
 
 requires
-  rtl, Settings_d100r;
+  rtl,
+  Settings_d100r,
+  vcl,
+  designide,
+  xmlrtl,
+  vclactnband,
+  vclx,
+  XMLTools,
+  RegExp_d100;
 
 contains
-  uRegSettings in '..\..\Design\uRegSettings.pas';
+  uRegSettings in '..\..\Design\uRegSettings.pas',
+  uForm_EditSettingsComponentPropertyList in '..\..\Design\uForm_EditSettingsComponentPropertyList.pas',
+  uSettings_Designers in '..\..\Design\uSettings_Designers.pas';
 
 end.

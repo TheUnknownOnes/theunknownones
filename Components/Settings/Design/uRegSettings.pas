@@ -16,10 +16,8 @@ begin
 
   RegisterComponents(SettingsComponentGroup, [TSettingsXMLFile]);
 
-  RegisterComponents(SettingsComponentGroup, [ TSettingsLinkControl,
-                                               TSettingsLinkTabControl,
+  RegisterComponents(SettingsComponentGroup, [ TSettingsLinkComponent,
                                                TSettingsLinkForm,
-                                               TSettingsLinkPageControl,
                                                TSettingsLinkListView]);
 end;
 

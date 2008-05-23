@@ -18,10 +18,12 @@ uses
   Sysutils,
   Variants,
   WideStrings,
-  RegExpr;
+  RegExpr,
+  TypInfo,
+  Windows, Dialogs;
 
 type
-  
+
   TSetting = class;
 
   TCustomSettingsLink = class;
@@ -39,6 +41,53 @@ type
   end;
 
   TSettingNameValues = array of TSettingNameValue;
+
+
+//==============================================================================
+
+
+  TSettingsComponentProperty = record
+    Name : TSettingName;
+    Save : Boolean;
+  end;
+  PSettingsComponentProperty = ^TSettingsComponentProperty;
+
+
+//==============================================================================
+
+
+  TSettingsComponentPropertyList = class(TList)
+  private
+    function Get(Index: Integer): PSettingsComponentProperty;
+    procedure Put(Index: Integer; const Value: PSettingsComponentProperty);
+
+  protected
+    procedure Notify(Ptr: Pointer; Action: TListNotification); override;
+
+    procedure AddPropertiesFromObject(AObject : TObject;
+                                      AParentPropertyPath : TSettingName);
+
+    function GetPropertyFromObject(AObject : TObject; AIndex : Integer) : PPropInfo;
+  public
+    function Add(Item: PSettingsComponentProperty): Integer;
+    function Extract(Item: PSettingsComponentProperty): PSettingsComponentProperty;
+    function First: PSettingsComponentProperty;
+    function IndexOf(Item: PSettingsComponentProperty): Integer; overload;
+    function IndexOf(AName : TSettingName): Integer; overload;
+    procedure Insert(Index: Integer; Item: PSettingsComponentProperty);
+    function Last: PSettingsComponentProperty;
+    function Remove(Item: PSettingsComponentProperty): Integer;
+    property Items[Index: Integer]: PSettingsComponentProperty read Get write Put; default;
+
+    procedure ReadFromComponent(AComponent : TComponent);
+
+    procedure CopyFrom(AList : TSettingsComponentPropertyList);
+
+    function GetPropertiesToSaveCount : Integer;
+
+    procedure Load(AReader: TReader);
+    procedure Save(AWriter: TWriter);
+  end;
 
 
 //==============================================================================
@@ -154,6 +203,7 @@ type
     procedure InformComponentLinksAboutSave;
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -285,16 +335,24 @@ type
   protected
     FComponent: TComponent;
 
-    procedure SetComponent(const Value: TComponent); 
+    FSaveProperties: TSettingsComponentPropertyList;
+
+    procedure SetComponent(const Value: TComponent);
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
     function GenerateRootSettingName(AComponent : TComponent) : TSettingName; virtual;
 
-    property Component : TComponent read FComponent write SetComponent;
+    procedure DefineProperties(Filer: TFiler); override;
+
+    procedure DoApplySettings(const ARootSetting : TSettingName); override; 
+    procedure DoSaveSettings(const ARootSetting : TSettingName); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+
+    property Component : TComponent read FComponent write SetComponent;
+    property SaveProperties : TSettingsComponentPropertyList read FSaveProperties write FSaveProperties;
   end;
 
 
@@ -386,9 +444,11 @@ begin
     Result := WideSameText(AName, APattern);
 end;
 
-procedure CheckSettingsValueType(AVariant : Variant); 
+function CheckSettingsValueType(AVariant : Variant; ARaiseException : Boolean = true) : Boolean; 
 begin
-  if not VarIsType(AVariant, SettingsValidValueTypes) then
+  Result:=VarIsType(AVariant, SettingsValidValueTypes);
+
+  if (not Result) and ARaiseException then
     raise Exception.Create('Invalid value type');
 end;
 
@@ -790,7 +850,6 @@ begin
 
   FRootSetting := TSetting.Create();
 end;
-
 
 procedure TCustomSettings.Delete(APath: TSettingName; AIsRegEx: Boolean);
 var
@@ -1305,14 +1364,85 @@ constructor TCustomSettingsComponentLink.Create(AOwner: TComponent);
 begin
   inherited;
 
+  FSaveProperties := TSettingsComponentPropertyList.Create;
+
   FComponent := nil;
+end;
+
+procedure TCustomSettingsComponentLink.DefineProperties(Filer: TFiler);
+begin
+  inherited DefineProperties(Filer);
+
+  Filer.DefineProperty('FSaveProperties', FSaveProperties.Load, FSaveProperties.Save, FSaveProperties.Count > 0);
 end;
 
 destructor TCustomSettingsComponentLink.Destroy;
 begin
   SetComponent(nil);
 
+  FSaveProperties.Free;
+
   inherited;
+end;
+
+procedure TCustomSettingsComponentLink.DoApplySettings(
+  const ARootSetting: TSettingName);
+var
+  idx : Integer;
+  SCP : TSettingsComponentProperty;
+  PropValue : Variant;
+  Prop : PPropInfo;
+begin
+  if Assigned(FComponent) and Assigned(FSettings) then
+  begin
+    for idx := 0 to FSaveProperties.Count - 1 do
+    begin
+      SCP := FSaveProperties[idx]^;
+
+      if SCP.Save then
+      begin
+        Prop := FSaveProperties.GetPropertyFromObject(FComponent, idx);
+
+        if Assigned(Prop) then
+        begin
+          PropValue := FSettings.GetValue(ARootSetting + SCP.Name);
+          if not VarIsEmpty(PropValue) then
+            SetPropValue(FComponent, Prop, PropValue);
+        end;
+      end;
+    end;
+  end;
+
+end;
+
+procedure TCustomSettingsComponentLink.DoSaveSettings(
+  const ARootSetting: TSettingName);
+var
+  idx : Integer;
+  SCP : TSettingsComponentProperty;
+  PropValue : Variant;
+  Prop : PPropInfo;
+begin
+  if Assigned(FComponent) and Assigned(FSettings) then
+  begin
+    for idx := 0 to FSaveProperties.Count - 1 do
+    begin
+      SCP := FSaveProperties[idx]^;
+
+      if SCP.Save then
+      begin
+        Prop := FSaveProperties.GetPropertyFromObject(FComponent, idx);
+
+        if Assigned(Prop) then
+        begin
+          PropValue := GetPropValue(FComponent, Prop, false);
+
+          FSettings.SetValue(ARootSetting + SCP.Name, PropValue);
+        end;
+      end;
+    end;
+  end;
+
 end;
 
 function TCustomSettingsComponentLink.GenerateRootSettingName(
@@ -1360,7 +1490,7 @@ end;
 
 procedure TCustomSettingsComponentLink.SetComponent(const Value: TComponent);
 begin
-  if FComponent <> Value then
+  if (FComponent <> Value) and (Value <> Self) then
   begin
     if Assigned(FComponent) then
       FComponent.RemoveFreeNotification(Self);
@@ -1373,7 +1503,308 @@ begin
     if WideSameText(FDefaultRootSetting, EmptyWideStr) then
       DefaultRootSetting := GenerateRootSettingName(FComponent);
 
+    if Assigned(FComponent) then
+      FSaveProperties.ReadFromComponent(FComponent);
+
     ApplySettings;
+  end;
+end;
+
+{ TSettingsComponentPropertyList }
+
+function TSettingsComponentPropertyList.Add(
+  Item: PSettingsComponentProperty): Integer;
+begin
+  Result := inherited Add(Item);
+end;
+
+procedure TSettingsComponentPropertyList.AddPropertiesFromObject
+  (AObject : TObject; AParentPropertyPath : TSettingName);
+var
+  ObjectClassInfo : PTypeInfo;
+  TypeData : PTypeData;
+  PropertyCount : Smallint;
+  PropertyList : PPropList;
+  PropValue : Variant;
+  idx : Integer;
+  SCP : PSettingsComponentProperty;
+  Name : TSettingName;
+begin
+  if not Assigned(AObject) then
+    exit;
+
+  ObjectClassInfo := AObject.ClassInfo;
+
+  if not Assigned(ObjectClassInfo)  then
+    exit;
+
+  TypeData := GetTypeData(ObjectClassInfo);
+  PropertyCount := TypeData^.PropCount;
+
+  if PropertyCount > 0 then
+  begin
+    GetMem(PropertyList, SizeOf(PPropInfo) * PropertyCount);
+    try
+      GetPropInfos(ObjectClassInfo, PropertyList);
+
+      for idx := 0 to PropertyCount - 1 do
+      begin
+
+        VarClear(PropValue);
+        try
+          PropValue := GetPropValue(AObject, PropertyList[idx]);
+        except
+          //not the fine way ... but who knows what the components are doing? :)
+        end;
+
+        if VarIsEmpty(PropValue) or
+           ((PropertyList^[idx].PropType^.Kind = tkClass) and
+            (VarIsNull(PropValue))) or
+           (PropertyList^[idx].PropType^.Kind = tkMethod) then
+           //Todo: Check for readonly properties
+        begin
+          Continue;
+        end;
+
+        if PropertyList[idx]^.PropType^.Kind = tkClass then
+        begin
+          AddPropertiesFromObject(TObject(Integer(PropValue)),
+                                  AParentPropertyPath + SettingsPathDelimiter + PropertyList^[idx].Name);
+        end
+        else
+        if CheckSettingsValueType(PropValue, false) then
+        begin
+          Name := AParentPropertyPath + SettingsPathDelimiter + PropertyList^[idx].Name;
+
+          if IndexOf(Name) = -1 then
+          begin
+            New(SCP);
+            Add(SCP);
+            scp^.Name := Name;
+            scp^.Save := false;
+          end;
+
+        end;
+      end;
+
+    finally
+      FreeMem(PropertyList, SizeOf(PPropInfo) * PropertyCount);
+    end;
+  end;
+end;
+
+procedure TSettingsComponentPropertyList.CopyFrom(
+  AList: TSettingsComponentPropertyList);
+var
+  idx : Integer;
+  SCP : PSettingsComponentProperty;
+begin
+  Clear;
+
+  for idx := 0 to AList.Count - 1 do
+  begin
+    New(SCP);
+    Add(SCP);
+    
+    scp^.Name := AList[idx]^.Name;
+    scp^.Save := AList[idx]^.Save; 
+  end;
+end;
+
+function TSettingsComponentPropertyList.Extract(
+  Item: PSettingsComponentProperty): PSettingsComponentProperty;
+begin
+  Result := inherited Extract(Item);
+end;
+
+function TSettingsComponentPropertyList.First: PSettingsComponentProperty;
+begin
+  Result := inherited First;
+end;
+
+function TSettingsComponentPropertyList.Get(
+  Index: Integer): PSettingsComponentProperty;
+begin
+  Result := inherited Get(Index);
+end;
+
+function TSettingsComponentPropertyList.GetPropertiesToSaveCount: Integer;
+var
+  idx : Integer;
+begin
+  Result := 0;
+
+  for idx := 0 to Count - 1 do
+  begin
+    if Items[idx]^.Save then
+      Inc(Result);
+  end;
+end;
+
+function TSettingsComponentPropertyList.GetPropertyFromObject(AObject: TObject;
+  AIndex: Integer): PPropInfo;
+var
+  SCP : PSettingsComponentProperty;
+  Path : TWideStringList;
+  idx : Integer;
+  tempInfo : PPropInfo;
+  PropValue : Variant;
+begin
+  Result := nil;
+
+  SCP := Items[AIndex];
+
+  Path := TWideStringList.Create;
+  try
+    SplitPath(SCP.Name, Path);
+    if Path.Count > 0 then
+    begin
+      path.Delete(0); //the empty string before the first '/'
+
+      for idx := 0 to Path.Count - 1 do
+      begin
+        tempInfo := GetPropInfo(AObject, Path[idx]);
+
+        try
+          PropValue := GetPropValue(AObject, tempInfo);
+        except
+          //not fine ... but who knows?
+        end;
+
+        if Assigned(tempInfo) then
+        begin
+          if (tempInfo^.PropType^.Kind = tkClass) and
+             (PropValue <> 0) then
+          begin
+            AObject := TObject(Integer(PropValue));
+          end
+          else
+            Result := tempInfo; //last property found
+        end
+        else
+          break;
+
+      end;
+    end;
+  finally
+    Path.Free;
+  end;
+end;
+
+function TSettingsComponentPropertyList.IndexOf(
+  Item: PSettingsComponentProperty): Integer;
+begin
+  Result := inherited IndexOf(Item);
+end;
+
+function TSettingsComponentPropertyList.IndexOf(AName: TSettingName): Integer;
+var
+  idx : Integer;
+begin
+  Result := -1;
+
+  for idx := 0 to Count - 1 do
+  begin
+    if WideSameText(AName, Items[idx]^.Name) then
+    begin
+      Result := idx;
+      break;
+    end;
+  end;
+end;
+
+procedure TSettingsComponentPropertyList.Insert(Index: Integer;
+  Item: PSettingsComponentProperty);
+begin
+  inherited Insert(Index, Item);
+end;
+
+function TSettingsComponentPropertyList.Last: PSettingsComponentProperty;
+begin
+  Result := inherited Last;
+end;
+
+procedure TSettingsComponentPropertyList.Load(AReader: TReader);
+var
+  SCP : PSettingsComponentProperty;
+  Name : WideString;
+  idx : Integer;
+begin
+  AReader.ReadListBegin;
+  try
+    while not AReader.EndOfList do
+    begin
+      Name := AReader.ReadWideString;
+
+      idx := IndexOf(Name);
+
+      if idx = -1 then
+      begin
+        New(SCP);
+        Add(SCP);
+        SCP^.Name := Name;
+      end
+      else
+        SCP := Items[idx];
+
+      SCP.Save := true;
+    end;                           
+  finally
+    AReader.ReadListEnd;
+  end;
+end;
+
+procedure TSettingsComponentPropertyList.Notify(Ptr: Pointer;
+  Action: TListNotification);
+begin
+  inherited;
+
+  if Action = lnDeleted then
+    Dispose(PSettingsComponentProperty(Ptr));
+end;
+
+procedure TSettingsComponentPropertyList.Put(Index: Integer;
+  const Value: PSettingsComponentProperty);
+begin
+  inherited Put(Index, Value);
+end;
+
+procedure TSettingsComponentPropertyList.ReadFromComponent(
+  AComponent: TComponent);
+var
+  idx : Integer;
+begin
+  AddPropertiesFromObject(AComponent, EmptyWideStr);
+
+  //delete all which doesnt match this component
+  for idx := Count - 1 downto 0 do
+  begin
+    if not Assigned(GetPropertyFromObject(AComponent, idx)) then
+      Delete(idx);
+  end;
+end;
+
+function TSettingsComponentPropertyList.Remove(
+  Item: PSettingsComponentProperty): Integer;
+begin
+  Result := inherited Remove(Item);
+end;
+
+procedure TSettingsComponentPropertyList.Save(AWriter: TWriter);
+var
+  idx : Integer;
+  SCP : TSettingsComponentProperty;
+begin
+  AWriter.WriteListBegin;
+  try
+    for idx := 0 to Count - 1 do
+    begin
+      SCP := Items[idx]^;
+      if SCP.Save then
+        AWriter.WriteWideString(SCP.Name);
+    end;
+  finally
+    AWriter.WriteListEnd;
   end;
 end;
 

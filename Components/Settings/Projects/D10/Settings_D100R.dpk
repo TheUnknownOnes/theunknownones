@@ -28,9 +28,10 @@ package Settings_D100R;
 
 requires
   rtl,
-  RegExp,
+  RegExp_D100,
   xmltools,
-  vcl;
+  vcl,
+  DesignIDE;
 
 contains
   uSettingsBase in '..\..\uSettingsBase.pas',

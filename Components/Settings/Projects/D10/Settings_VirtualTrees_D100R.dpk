@@ -29,7 +29,14 @@ package Settings_VirtualTrees_D100R;
 requires
   rtl,
   Settings_D100R,
-  VirtualTreesD10;
+  VirtualTreesD10,
+  vcl,
+  designide,
+  xmlrtl,
+  vclactnband,
+  vclx,
+  XMLTools,
+  RegExp_d100;
 
 contains
   uSettingsLinkVirtualTrees in '..\..\uSettingsLinkVirtualTrees.pas';

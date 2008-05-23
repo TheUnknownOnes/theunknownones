@@ -17,93 +17,26 @@ uses
   Variants,
   uSettingsBase,
   Forms,
-  ComCtrls;
+  ComCtrls,
+  TypInfo;
 
 type
-  TCustomSettingsLinkControl = class(TCustomSettingsComponentLink)
-  protected
-    FSaveControlOptions : array[0..3] of Boolean;
 
-    function GetControl: TControl;
-    procedure SetControl(const Value: TControl);
-
-    function GetSaveControlOption(const Index: Integer): Boolean;
-    procedure SetSaveControlOption(const Index: Integer; const Value: Boolean);
-
-    procedure DoApplySettings(const ARootSetting : TSettingName); override;
-    procedure DoSaveSettings(const ARootSetting : TSettingName); override;
-  public
-    constructor Create(AOwner: TComponent); override;
-
-    property Control : TControl read GetControl write SetControl;
-
-    property SaveLeft : Boolean index 0 read GetSaveControlOption write SetSaveControlOption default false;
-    property SaveTop : Boolean index 1 read GetSaveControlOption write SetSaveControlOption default false;
-    property SaveWidth : Boolean index 2 read GetSaveControlOption write SetSaveControlOption default false;
-    property SaveHeight : Boolean index 3 read GetSaveControlOption write SetSaveControlOption default false;
-  end;
-
-
-//==============================================================================
-
-
-  TSettingsLinkControl = class(TCustomSettingsLinkControl)
+  TSettingsLinkComponent = class(TCustomSettingsComponentLink)
   published
     property Settings;
     property DefaultRootSetting;
     property OnNeedRootSetting;
+    property SaveProperties;
 
-    property Control;
-    property SaveLeft;
-    property SaveTop;
-    property SaveWidth;
-    property SaveHeight;
-  end;
-
-
-//==============================================================================
-
-  TCustomSettingsComponentLinkTabControl = class(TCustomSettingsLinkControl)
-  protected
-    FSaveTabIndex: Boolean;
-
-    function GetTabControl: TTabControl;
-    procedure SetTabControl(const Value: TTabControl);
-
-    procedure DoApplySettings(const ARootSetting : TSettingName); override;
-    procedure DoSaveSettings(const ARootSetting : TSettingName); override;
-  public
-    constructor Create(AOwner: TComponent); override;
-
-    property TabControl : TTabControl read GetTabControl write SetTabControl;
-
-    property SaveTabIndex : Boolean read FSaveTabIndex write FSaveTabIndex default true;
+    property Component;
   end;
 
 
 //==============================================================================
 
 
-  TSettingsLinkTabControl = class(TCustomSettingsComponentLinkTabControl)
-  published
-    property Settings;
-    property DefaultRootSetting;
-    property OnNeedRootSetting;
-
-    property SaveLeft;
-    property SaveTop;
-    property SaveWidth;
-    property SaveHeight;
-
-    property TabControl;
-    property SaveTabIndex;
-  end;
-
-
-//==============================================================================
-
-
-  TCustomSettingsComponentLinkForm = class(TCustomSettingsLinkControl)
+  TCustomSettingsComponentLinkForm = class(TCustomSettingsComponentLink)
   protected
     FSaveWindowState: Boolean;
 
@@ -124,60 +57,15 @@ type
     property Settings;
     property DefaultRootSetting;
     property OnNeedRootSetting;
-
-    property SaveLeft;
-    property SaveTop;
-    property SaveWidth;
-    property SaveHeight;
+    property SaveProperties;
 
     property SaveWindowState;
   end;
 
-
 //==============================================================================
 
 
-  TCustomSettingsComponentLinkPageControl = class(TCustomSettingsLinkControl)
-  protected
-    FSaveTabIndex: Boolean;
-
-    function GetPageControl: TPageControl;
-    procedure SetPageControl(const Value: TPageControl);
-
-    procedure DoApplySettings(const ARootSetting : TSettingName); override;
-    procedure DoSaveSettings(const ARootSetting : TSettingName); override;
-  public
-    constructor Create(AOwner: TComponent); override;
-
-    property PageControl : TPageControl read GetPageControl write SetPageControl;
-
-    property SaveTabIndex : Boolean read FSaveTabIndex write FSaveTabIndex default true;
-  end;
-
-
-//==============================================================================
-
-
-  TSettingsLinkPageControl = class(TCustomSettingsComponentLinkPageControl)
-  published
-    property Settings;
-    property DefaultRootSetting;
-    property OnNeedRootSetting;
-
-    property SaveLeft;
-    property SaveTop;
-    property SaveWidth;
-    property SaveHeight;
-
-    property PageControl;
-    property SaveTabIndex;
-  end;
-
-
-//==============================================================================
-
-
-  TCustomSettingsComponentLinkListView = class(TCustomSettingsLinkControl)
+  TCustomSettingsComponentLinkListView = class(TCustomSettingsComponentLink)
   protected
     FSaveColumnWidth : Boolean;
 
@@ -203,11 +91,7 @@ type
     property Settings;
     property DefaultRootSetting;
     property OnNeedRootSetting;
-
-    property SaveLeft;
-    property SaveTop;
-    property SaveWidth;
-    property SaveHeight;
+    property SaveProperties;
 
     property ListView;
     property SaveColumnWidth;
@@ -215,163 +99,6 @@ type
 
 implementation
 
-{ TCustomSettingsLinkControl }
-
-
-constructor TCustomSettingsLinkControl.Create(AOwner: TComponent);
-begin
-  inherited;
-
-  SaveLeft := false;
-  SaveTop := false;
-  SaveWidth := false;
-  SaveHeight := false;
-end;
-
-procedure TCustomSettingsLinkControl.DoApplySettings(const ARootSetting : TSettingName);
-var
-  Control : TControl;
-  Value : Variant;
-begin
-  if Assigned(Component) and Assigned(Settings) then
-  begin
-    Control := TControl(Component);
-
-    if SaveLeft then
-    begin
-      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'Left');
-      if not VarIsEmpty(Value) then
-        Control.Left := Value;
-    end;
-
-    if SaveTop then
-    begin
-      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'Top');
-      if not VarIsEmpty(Value) then
-        Control.Top := Value;
-    end;
-
-    if SaveWidth then
-    begin
-      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'Width');
-      if not VarIsEmpty(Value) then
-        Control.Width := Value;
-    end;
-
-    if SaveHeight then
-    begin
-      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'Height');
-      if not VarIsEmpty(Value) then
-        Control.Height := Value;
-    end;
-  end;
-end;
-
-procedure TCustomSettingsLinkControl.DoSaveSettings(const ARootSetting : TSettingName);
-var
-  Control : TControl;
-begin
-  if Assigned(Component) and Assigned(Settings) then
-  begin
-    Control := TControl(Component);
-
-    if SaveLeft then
-      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'Left', Control.Left);
-
-    if SaveTop then
-      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'Top', Control.Top);
-
-    if SaveWidth then
-      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'Width', Control.Width);
-
-    if SaveHeight then
-      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'Height', Control.Height);
-  end;
-end;
-
-function TCustomSettingsLinkControl.GetControl: TControl;
-begin
-  Result := TControl(Component);
-end;
-
-function TCustomSettingsLinkControl.GetSaveControlOption(
-  const Index: Integer): Boolean;
-begin
-  Result := FSaveControlOptions[Index];
-end;
-
-procedure TCustomSettingsLinkControl.SetControl(const Value: TControl);
-begin
-  Component := Value;
-end;
-
-procedure TCustomSettingsLinkControl.SetSaveControlOption(
-  const Index: Integer; const Value: Boolean);
-begin
-  FSaveControlOptions[Index] := Value;
-end;
-
-
-//==============================================================================
-
-
-{ TCustomSettingsComponentLinkTabControl }
-
-constructor TCustomSettingsComponentLinkTabControl.Create(AOwner: TComponent);
-begin
-  inherited;
-
-  FSaveTabIndex := true;
-end;
-
-procedure TCustomSettingsComponentLinkTabControl.DoApplySettings(const ARootSetting : TSettingName);
-var
-  Value : Variant;
-  TabControl : TTabControl;
-begin
-  inherited;
-
-  if Assigned(Component) and Assigned(Settings) then
-  begin
-    TabControl := TTabControl(Component);
-
-    if FSaveTabIndex then
-    begin
-      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'TabIndex');
-      if not VarIsEmpty(Value) then
-        TabControl.TabIndex := Value;
-    end;
-  end;
-end;
-
-procedure TCustomSettingsComponentLinkTabControl.DoSaveSettings(const ARootSetting : TSettingName);
-var
-  TabControl : TTabControl;
-begin
-  inherited;
-
-  if Assigned(Component) and Assigned(Settings) then
-  begin
-    TabControl := TTabControl(Component);
-
-    if FSaveTabIndex then
-      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'TabIndex', TabControl.TabIndex);
-  end;
-end;
-
-
-function TCustomSettingsComponentLinkTabControl.GetTabControl: TTabControl;
-begin
-  Result := TTabControl(Component);
-end;
-
-procedure TCustomSettingsComponentLinkTabControl.SetTabControl(
-  const Value: TTabControl);
-begin
-  Component := Value;
-end;
-
-//==============================================================================
 
 
 { TCustomSettingsComponentLinkForm }
@@ -424,65 +151,6 @@ begin
   end;
 end;
 
-
-//==============================================================================
-
-
-{ TCustomSettingsComponentLinkPageControl }
-
-constructor TCustomSettingsComponentLinkPageControl.Create(AOwner: TComponent);
-begin
-  inherited;
-
-  FSaveTabIndex := true;
-end;
-
-procedure TCustomSettingsComponentLinkPageControl.DoApplySettings(const ARootSetting : TSettingName);
-var
-  Value : Variant;
-  PageControl : TPageControl;
-begin
-  inherited;
-
-  if Assigned(Component) and Assigned(Settings) then
-  begin
-    PageControl := TPageControl(Component);
-
-    if FSaveTabIndex then
-    begin
-      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'TabIndex');
-      if not VarIsEmpty(Value) then
-        PageControl.TabIndex := Value;
-    end;
-  end;
-end;
-
-procedure TCustomSettingsComponentLinkPageControl.DoSaveSettings(const ARootSetting : TSettingName);
-var
-  PageControl : TPageControl;
-begin
-  inherited;
-
-  if Assigned(Component) and Assigned(Settings) then
-  begin
-    PageControl := TPageControl(Component);
-
-    if FSaveTabIndex then
-      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'TabIndex', PageControl.TabIndex);
-  end;
-end;
-
-
-function TCustomSettingsComponentLinkPageControl.GetPageControl: TPageControl;
-begin
-  Result := TPageControl(Component);
-end;
-
-procedure TCustomSettingsComponentLinkPageControl.SetPageControl(
-  const Value: TPageControl);
-begin
-  Component := Value;
-end;
 
 //==============================================================================
 

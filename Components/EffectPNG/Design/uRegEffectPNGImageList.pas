@@ -2,6 +2,8 @@ unit uRegEffectPNGImageList;
 
 interface
 
+{$R 'efficons.res'}
+
 uses
   Classes,
   uEffectPNGImageList;

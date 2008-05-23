@@ -20,9 +20,9 @@ uses
   VirtualTrees;
 
 type
-  TCustomSettingsLinkVST = class(TCustomSettingsLinkControl)
+  TCustomSettingsLinkVST = class(TCustomSettingsComponentLink)
   protected
-    FSaveVSTOptions : array[0..23] of Boolean;
+    FSaveVSTOptions : array[0..10] of Boolean;
 
     function GetTree: TVirtualStringTree;
     procedure SetTree(const Value: TVirtualStringTree);
@@ -48,21 +48,6 @@ type
     property SaveColumnVisible : Boolean index 8 read GetSaveVSTOption write SetSaveVSTOption default true;
     property SaveColumnAutoSpring : Boolean index 9 read GetSaveVSTOption write SetSaveVSTOption default true;
     property SaveColumnFixed : Boolean index 10 read GetSaveVSTOption write SetSaveVSTOption default true;
-
-    property SaveHeaderStyle : Boolean index 11 read GetSaveVSTOption write SetSaveVSTOption default true;
-
-    property SaveHeaderAutoResize : Boolean index 12 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderColumnResize : Boolean index 13 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderDblClickResize : Boolean index 14 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderDrag : Boolean index 15 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderHotTrack : Boolean index 16 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderOwnerDraw : Boolean index 17 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderRestrictDrag : Boolean index 18 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderShowHint : Boolean index 19 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderShowImages : Boolean index 20 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderShowSortGlyphs : Boolean index 21 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderVisible : Boolean index 22 read GetSaveVSTOption write SetSaveVSTOption default true;
-    property SaveHeaderAutoSpring : Boolean index 23 read GetSaveVSTOption write SetSaveVSTOption default true;
   end;
 
 
@@ -74,11 +59,7 @@ type
     property Settings;
     property DefaultRootSetting;
     property OnNeedRootSetting;
-
-    property SaveLeft;
-    property SaveTop;
-    property SaveWidth;
-    property SaveHeight;
+    property SaveProperties;
 
     property Tree;
 
@@ -93,21 +74,6 @@ type
     property SaveColumnVisible;
     property SaveColumnAutoSpring;
     property SaveColumnFixed;
-
-    property SaveHeaderStyle;
-
-    property SaveHeaderAutoResize;
-    property SaveHeaderColumnResize;
-    property SaveHeaderDblClickResize;
-    property SaveHeaderDrag;
-    property SaveHeaderHotTrack;
-    property SaveHeaderOwnerDraw;
-    property SaveHeaderRestrictDrag;
-    property SaveHeaderShowHint;
-    property SaveHeaderShowImages;
-    property SaveHeaderShowSortGlyphs;
-    property SaveHeaderVisible;
-    property SaveHeaderAutoSpring;
   end;
 
 
@@ -154,18 +120,6 @@ var
         Col.Options := Col.Options - [AOption];
     end;
   end;
-
-  procedure SetHeaderOption(AOption : TVTHeaderOption; ASettingName : TSettingName);
-  begin
-    Value := Settings.GetValue(SettingsPath + ASettingName);
-    if not VarIsEmpty(Value) then
-    begin
-      if Boolean(Value) then
-        VST.Header.Options := VST.Header.Options + [AOption]
-      else
-        VST.Header.Options := VST.Header.Options - [AOption];
-    end;
-  end;
 begin
   inherited;
 
@@ -175,52 +129,6 @@ begin
 
     VST.BeginUpdate;
     try
-
-      SettingsPath := ARootSetting + SettingsPathDelimiter +
-                      'Header' + SettingsPathDelimiter;
-
-      if SaveHeaderStyle then
-      begin
-        Value := Settings.GetValue(SettingsPath + 'Style');
-        if not VarIsEmpty(Value) then
-          VST.Header.Style := TVTHeaderStyle(Value);
-      end;
-
-      if SaveHeaderAutoResize then
-        SetHeaderOption(hoAutoResize, 'AutoResize');
-
-      if SaveHeaderColumnResize then
-        SetHeaderOption(hoColumnResize, 'ColumnResize');
-
-      if SaveHeaderDblClickResize then
-        SetHeaderOption(hoDblClickResize, 'DblClickResize');
-
-      if SaveHeaderDrag then
-        SetHeaderOption(hoDrag, 'Drag');
-        
-      if SaveHeaderHotTrack then
-        SetHeaderOption(hoHotTrack, 'HotTrack');
-
-      if SaveHeaderOwnerDraw then
-        SetHeaderOption(hoOwnerDraw, 'OwnerDraw');
-
-      if SaveHeaderRestrictDrag then
-        SetHeaderOption(hoRestrictDrag, 'RestrictDrag');
-
-      if SaveHeaderShowHint then
-        SetHeaderOption(hoShowHint, 'ShowHint');
-
-      if SaveHeaderShowImages then
-        SetHeaderOption(hoShowImages, 'ShowImages');
-
-      if SaveHeaderShowSortGlyphs then
-        SetHeaderOption(hoShowSortGlyphs, 'ShowSortGlyphs');
-
-      if SaveHeaderVisible then
-        SetHeaderOption(hoVisible, 'Visible');
-
-      if SaveHeaderAutoSpring then
-        SetHeaderOption(hoAutoSpring, 'AutoSpring');
 
       for idx := 0 to VST.Header.Columns.Count - 1 do
       begin
@@ -288,11 +196,6 @@ var
   begin
     Settings.SetValue(SettingsPath + ASettingName, AOption in Col.Options)
   end;
-
-  procedure DoWriteHeaderOption(AOption : TVTHeaderOption; ASettingName : TSettingName);
-  begin
-    Settings.SetValue(SettingsPath + ASettingName, AOption in VST.Header.Options)
-  end;
 begin
   inherited;
 
@@ -300,47 +203,7 @@ begin
   begin
     VST := TVirtualStringTree(Component);
 
-    SettingsPath := ARootSetting + SettingsPathDelimiter +
-                    'Header' + SettingsPathDelimiter;
 
-    if SaveHeaderStyle then
-      Settings.SetValue(SettingsPath + 'Style', Integer(VST.Header.Style));
-
-    if SaveHeaderAutoResize then
-      DoWriteHeaderOption(hoAutoResize, 'AutoResize');
-
-    if SaveHeaderColumnResize then
-      DoWriteHeaderOption(hoColumnResize, 'ColumnResize');
-
-    if SaveHeaderDblClickResize then
-      DoWriteHeaderOption(hoDblClickResize, 'DblClickResize');
-
-    if SaveHeaderDrag then
-      DoWriteHeaderOption(hoDrag, 'Drag');
-
-    if SaveHeaderHotTrack then
-      DoWriteHeaderOption(hoHotTrack, 'HotTrack');
-
-    if SaveHeaderOwnerDraw then
-      DoWriteHeaderOption(hoOwnerDraw, 'OwnerDraw');
-
-    if SaveHeaderRestrictDrag then
-      DoWriteHeaderOption(hoRestrictDrag, 'RestrictDrag');
-
-    if SaveHeaderShowHint then
-      DoWriteHeaderOption(hoShowHint, 'ShowHint');
-
-    if SaveHeaderShowImages then
-      DoWriteHeaderOption(hoShowImages, 'ShowImages');
-
-    if SaveHeaderShowSortGlyphs then
-      DoWriteHeaderOption(hoShowSortGlyphs, 'ShowSortGlyphs');
-
-    if SaveHeaderVisible then
-      DoWriteHeaderOption(hoVisible, 'Visible');
-
-    if SaveHeaderAutoSpring then
-      DoWriteHeaderOption(hoAutoSpring, 'AutoSpring');
 
     for idx := 0 to VST.Header.Columns.Count - 1 do
     begin

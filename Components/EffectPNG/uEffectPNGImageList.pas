@@ -7,8 +7,6 @@ unit uEffectPNGImageList;
 
 interface
 
-{$R 'efficons.res'}
-
 uses
   Classes,
   Windows,

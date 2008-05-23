@@ -34,10 +34,9 @@ requires
   vclx,
   DirectX9_D10,
   PNGUtils_D100R,
-  PNGSupport_D100;
-
-contains
-  uPNGImageList_Designers in '..\..\uPNGImageList_Designers.pas',
-  uPNGImageList_FormPNGObjectList in '..\..\uPNGImageList_FormPNGObjectList.pas';
+  PNGSupport_D100,
+  xmlrtl,
+  vclactnband,
+  PNGImageListDesigner;
 
 end.
