@@ -32,14 +32,9 @@
     <DCCReference Include="..\..\uSettingsLinksDefault.pas" />
     <DCCReference Include="..\..\uSettingsStream.pas" />
     <DCCReference Include="..\..\uSettingsXML.pas" />
-    <DCCReference Include="..\RegExp_D110R.dcp" />
-    <DCCReference Include="..\rtl.dcp" />
-    <DCCReference Include="..\vcl.dcp" />
-    <DCCReference Include="..\xmltools.dcp" />
-    <DCCReference Include="..\xmltools_.dcp" />
-    <DCCReference Include="..\xmltools_D.dcp" />
-    <DCCReference Include="..\xmltools_D1.dcp" />
-    <DCCReference Include="..\xmltools_D11.dcp" />
-    <DCCReference Include="..\xmltools_D110.dcp" />
+    <DCCReference Include="F:\Dokumente und Einstellungen\Benjamin\Eigene Dateien\RAD Studio\Projekte\mist\RegExp_D110R.dcp" />
+    <DCCReference Include="F:\Dokumente und Einstellungen\Benjamin\Eigene Dateien\RAD Studio\Projekte\mist\rtl.dcp" />
+    <DCCReference Include="F:\Dokumente und Einstellungen\Benjamin\Eigene Dateien\RAD Studio\Projekte\mist\vcl.dcp" />
+    <DCCReference Include="F:\Dokumente und Einstellungen\Benjamin\Eigene Dateien\RAD Studio\Projekte\mist\xmltools_D110R.dcp" />
   </ItemGroup>
 </Project>

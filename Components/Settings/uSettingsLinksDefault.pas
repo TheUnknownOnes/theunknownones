@@ -37,15 +37,8 @@ type
 
 
   TCustomSettingsComponentLinkForm = class(TCustomSettingsComponentLink)
-  protected
-    FSaveWindowState: Boolean;
-
-    procedure DoApplySettings(const ARootSetting : TSettingName); override;
-    procedure DoSaveSettings(const ARootSetting : TSettingName); override;
   public
     constructor Create(AOwner: TComponent); override;
-
-    property SaveWindowState : Boolean read FSaveWindowState write FSaveWindowState default true;
   end;
 
 
@@ -58,8 +51,6 @@ type
     property DefaultRootSetting;
     property OnNeedRootSetting;
     property SaveProperties;
-
-    property SaveWindowState;
   end;
 
 //==============================================================================
@@ -112,43 +103,6 @@ begin
 
   Component := TCustomForm(AOwner);
   FDefaultRootSetting := SettingsPathDelimiter + Component.Name;
-
-  SaveWindowState := true;
-end;
-
-procedure TCustomSettingsComponentLinkForm.DoApplySettings(const ARootSetting : TSettingName);
-var
-  Form : TCustomForm;
-  Value : Variant;
-begin
-  inherited;
-
-  if Assigned(Component) and Assigned(Settings) then
-  begin
-    Form := TCustomForm(Component);
-
-    if SaveWindowState then
-    begin
-      Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter + 'WindowState');
-      if not VarIsEmpty(Value) then
-        Form.WindowState := TWindowState(Value);
-    end;
-  end;
-end;
-
-procedure TCustomSettingsComponentLinkForm.DoSaveSettings(const ARootSetting : TSettingName);
-var
-  Form : TCustomForm;
-begin
-  inherited;
-
-  if Assigned(Component) and Assigned(Settings) then
-  begin
-    Form := TCustomForm(Component);
-
-    if SaveWindowState then
-      Settings.SetValue(ARootSetting + SettingsPathDelimiter + 'WindowState', Integer(Form.WindowState));
-  end;
 end;
 
 

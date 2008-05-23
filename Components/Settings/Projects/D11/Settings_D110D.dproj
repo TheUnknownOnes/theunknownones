@@ -1,4 +1,5 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{8ead2d3d-f6d1-417e-90d5-743c7459a2c3}</ProjectGuid>
     <MainSource>Settings_D110D.dpk</MainSource>
@@ -28,10 +29,17 @@
     <DelphiCompile Include="Settings_D110D.dpk">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
+    <DCCReference Include="..\..\Design\designide.dcp" />
     <DCCReference Include="..\..\Design\Images.res" />
     <DCCReference Include="..\..\Design\Images.res" />
+    <DCCReference Include="..\..\Design\rtl.dcp" />
+    <DCCReference Include="..\..\Design\Settings_D110R.dcp" />
+    <DCCReference Include="..\..\Design\uForm_EditSettingsComponentPropertyList.pas" />
     <DCCReference Include="..\..\Design\uRegSettings.pas" />
-    <DCCReference Include="..\rtl.dcp" />
-    <DCCReference Include="..\Settings_D110R.dcp" />
+    <DCCReference Include="..\..\Design\uSettings_Designers.pas" />
+    <DCCReference Include="..\..\Design\vcl.dcp" />
+    <DCCReference Include="..\..\Design\vclactnband.dcp" />
+    <DCCReference Include="..\..\Design\vclx.dcp" />
+    <DCCReference Include="..\..\Design\xmlrtl.dcp" />
   </ItemGroup>
 </Project>

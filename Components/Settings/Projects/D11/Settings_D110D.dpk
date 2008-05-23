@@ -29,9 +29,16 @@ package Settings_D110D;
 
 requires
   rtl,
-  Settings_D110R;
+  Settings_D110R,
+  vcl,
+  designide,
+  xmlrtl,
+  vclactnband,
+  vclx;
 
 contains
-  uRegSettings in '..\..\Design\uRegSettings.pas';
+  uRegSettings in '..\..\Design\uRegSettings.pas',
+  uSettings_Designers in '..\..\Design\uSettings_Designers.pas',
+  uForm_EditSettingsComponentPropertyList in '..\..\Design\uForm_EditSettingsComponentPropertyList.pas';
 
 end.

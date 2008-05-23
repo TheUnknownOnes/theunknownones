@@ -18,9 +18,9 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
   TextHeight = 13
   object lv_Properties: TListView
     Left = 0
-    Top = 25
+    Top = 0
     Width = 321
-    Height = 230
+    Height = 255
     Align = alClient
     Checkboxes = True
     Columns = <
@@ -31,10 +31,13 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
     MultiSelect = True
     ReadOnly = True
     RowSelect = True
+    PopupMenu = pum_ListView
     SortType = stText
     TabOrder = 0
     ViewStyle = vsReport
     OnMouseUp = lv_PropertiesMouseUp
+    ExplicitTop = 25
+    ExplicitHeight = 230
   end
   object pan_Bottom: TPanel
     Left = 0
@@ -54,7 +57,6 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
       Caption = 'OK'
       ModalResult = 1
       TabOrder = 0
-      ExplicitLeft = 81
     end
     object btn_Cancel: TButton
       AlignWithMargins = True
@@ -68,43 +70,20 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
       TabOrder = 1
     end
   end
-  object ToolBar1: TToolBar
-    Left = 0
-    Top = 0
-    Width = 321
-    Height = 25
-    Caption = 'ToolBar1'
-    Indent = 5
-    TabOrder = 2
-    object btn_CheckAll: TToolButton
-      Left = 5
-      Top = 0
-      Hint = 'Check all'
-      Caption = 'btn_CheckAll'
-      ImageIndex = 0
-      ParentShowHint = False
-      ShowHint = True
-      OnClick = btn_CheckAllClick
+  object pum_ListView: TPopupMenu
+    Left = 152
+    Top = 144
+    object mi_CheckAll: TMenuItem
+      Caption = 'Check all'
+      OnClick = mi_CheckAllClick
     end
-    object btn_CheckNothing: TToolButton
-      Left = 28
-      Top = 0
-      Hint = 'Check nothing'
-      Caption = 'btn_CheckNothing'
-      ImageIndex = 1
-      ParentShowHint = False
-      ShowHint = True
-      OnClick = btn_CheckNothingClick
+    object mi_UncheckAll: TMenuItem
+      Caption = 'Uncheck all'
+      OnClick = mi_UncheckAllClick
     end
-    object btn_InvertChecks: TToolButton
-      Left = 51
-      Top = 0
-      Hint = 'Invert checks'
-      Caption = 'btn_InvertChecks'
-      ImageIndex = 2
-      ParentShowHint = False
-      ShowHint = True
-      OnClick = btn_InvertChecksClick
+    object mi_InvertChecks: TMenuItem
+      Caption = 'Invert checks'
+      OnClick = mi_InvertChecksClick
     end
   end
 end
