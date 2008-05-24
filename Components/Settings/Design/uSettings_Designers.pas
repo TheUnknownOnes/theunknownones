@@ -19,7 +19,8 @@ uses
   DesignEditors,
   PropertyCategories,
   uSettingsBase,
-  TypInfo, Dialogs;
+  TypInfo,
+  uSettingsRTTI;
 
 
 procedure Register;
@@ -31,7 +32,7 @@ uses uForm_EditSettingsComponentPropertyList;
 type
   TSettingsSavePropertiesEditor = class(TPropertyEditor)
   protected
-    function GetList(out AList : TSettingsComponentPropertyList) : Boolean;
+    function GetList(out AList : TsrPropertyList) : Boolean;
   public
     procedure SetValue(const AValue : String); override;
     function GetValue : String; override;
@@ -48,7 +49,7 @@ procedure Register;
 begin
   RegisterComponentEditor(TCustomSettingsComponentLink, TCustomSettingsLinkComponentDefaultEditor);
 
-  RegisterPropertyEditor(TypeInfo(TSettingsComponentPropertyList),
+  RegisterPropertyEditor(TypeInfo(TsrPropertyList),
                          nil,
                          EmptyStr,
                          TSettingsSavePropertiesEditor);
@@ -58,12 +59,20 @@ end;
 
 procedure TSettingsSavePropertiesEditor.Edit;
 var
-  List : TSettingsComponentPropertyList;
+  List : TsrPropertyList;
+  Comp : TComponent;
 begin
   if GetList(List) then
   begin
-    if ShowComponentPropertyListEditor(List) then
-      Modified;
+    if List.Owner is TCustomSettingsComponentLink then
+    begin
+      Comp := TCustomSettingsComponentLink(List.Owner).Component;
+      if Assigned(Comp) then
+      begin
+        if ShowComponentPropertyListEditor(List, Comp) then
+          Modified;
+      end;
+    end;
   end;
 
 end;
@@ -74,22 +83,22 @@ begin
 end;
 
 function TSettingsSavePropertiesEditor.GetList(
-  out AList: TSettingsComponentPropertyList): Boolean;
+  out AList: TsrPropertyList): Boolean;
 begin
   Result := (GetPropType^.Kind = tkClass) and
             (GetOrdValue <> 0) and
-            (TObject(GetOrdValue) is TSettingsComponentPropertyList);
+            (TObject(GetOrdValue) is TsrPropertyList);
 
   if Result then
-    AList := TSettingsComponentPropertyList(GetOrdValue);
+    AList := TsrPropertyList(GetOrdValue);
 end;
 
 function TSettingsSavePropertiesEditor.GetValue: String;
 var
-  List : TSettingsComponentPropertyList;
+  List : TsrPropertyList;
 begin
   if GetList(List) then
-    Result := Format('%d Properties to save', [List.GetPropertiesToSaveCount])
+    Result := Format('%d Properties to save', [List.Count])
   else
     Result := 'Invalid value';
 end;
@@ -104,6 +113,7 @@ end;
 procedure TCustomSettingsLinkComponentDefaultEditor.EditProperty(
   const Prop: IProperty; var Continue: Boolean);
 begin
+
   if SameText(Prop.GetName, 'SaveProperties') then
   begin
     Prop.Edit;

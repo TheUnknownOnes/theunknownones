@@ -60,6 +60,7 @@ type
     property DefaultRootSetting;
     property OnNeedRootSetting;
     property SaveProperties;
+    property Active;
 
     property Tree;
 

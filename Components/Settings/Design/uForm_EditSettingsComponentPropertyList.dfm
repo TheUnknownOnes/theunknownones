@@ -35,9 +35,6 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
     SortType = stText
     TabOrder = 0
     ViewStyle = vsReport
-    OnMouseUp = lv_PropertiesMouseUp
-    ExplicitTop = 25
-    ExplicitHeight = 230
   end
   object pan_Bottom: TPanel
     Left = 0
@@ -57,6 +54,7 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
       Caption = 'OK'
       ModalResult = 1
       TabOrder = 0
+      OnClick = btn_OKClick
     end
     object btn_Cancel: TButton
       AlignWithMargins = True

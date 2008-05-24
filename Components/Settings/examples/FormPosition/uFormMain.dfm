@@ -18,10 +18,11 @@ object Form1: TForm1
   object SettingsLinkForm1: TSettingsLinkForm
     Settings = SettingsXMLFile1
     DefaultRootSetting = '/Form1'
-    SaveLeft = True
-    SaveTop = True
-    SaveWidth = True
-    SaveHeight = True
+    SaveProperties.Strings = (
+      'Height'
+      'Left'
+      'Top'
+      'Width')
     Left = 264
     Top = 64
   end

@@ -28,6 +28,7 @@ type
     property DefaultRootSetting;
     property OnNeedRootSetting;
     property SaveProperties;
+    property Active;
 
     property Component;
   end;
@@ -51,6 +52,7 @@ type
     property DefaultRootSetting;
     property OnNeedRootSetting;
     property SaveProperties;
+    property Active;
   end;
 
 //==============================================================================
@@ -83,6 +85,7 @@ type
     property DefaultRootSetting;
     property OnNeedRootSetting;
     property SaveProperties;
+    property Active;
 
     property ListView;
     property SaveColumnWidth;

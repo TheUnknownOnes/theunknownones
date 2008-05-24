@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls,
-  uSettingsBase,
+  uSettingsBase, uSettingsRTTI,
   WideStrUtils, Menus, StdCtrls, ExtCtrls;
 
 type
@@ -19,46 +19,52 @@ type
     mi_UncheckAll: TMenuItem;
     mi_InvertChecks: TMenuItem;
     procedure FormShow(Sender: TObject);
-    procedure lv_PropertiesMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
     procedure mi_CheckAllClick(Sender: TObject);
     procedure mi_UncheckAllClick(Sender: TObject);
     procedure mi_InvertChecksClick(Sender: TObject);
+    procedure btn_OKClick(Sender: TObject);
   private
     FOrigList,
-    FWorkList : TSettingsComponentPropertyList;
+    FAllProperties,
+    FWorkList : TsrPropertyList;
+    function GetToSave(APropertyPath: TSettingName): Boolean;
+    procedure SetToSave(APropertyPath: TSettingName; const Value: Boolean);
 
-
-    procedure ApplyCheckState(const AItem : TListItem);
-
+    property ToSave[APropertyPath : TSettingName] : Boolean read GetToSave write SetToSave;
   public
   
   end;
 
 
-function ShowComponentPropertyListEditor(const AList : TSettingsComponentPropertyList) : Boolean;
+function ShowComponentPropertyListEditor(const AList : TsrPropertyList;
+                                         const AComponent : TObject) : Boolean;
 
 implementation
 
 {$R *.dfm}
 
-function ShowComponentPropertyListEditor(const AList : TSettingsComponentPropertyList) : Boolean;
+function ShowComponentPropertyListEditor(const AList : TsrPropertyList;
+                                         const AComponent : TObject) : Boolean;
 var
   Form : Tform_EditComponentPropertyList;
+  idx : Integer;
 begin
   Form := Tform_EditComponentPropertyList.Create(nil);
   try
     Form.FOrigList := AList;
-    Form.FWorkList := TSettingsComponentPropertyList.Create;
+    Form.FWorkList := TsrPropertyList.Create(nil);
+    Form.FAllProperties := TsrPropertyList.Create(nil);
+    Form.FAllProperties.ReadPropertiesFromObject(AComponent);
     try
-      Form.FWorkList.CopyFrom(AList);
+      Form.FWorkList.Assign(AList);
+
       Result := IsPositiveResult(form.ShowModal);
 
       if Result then
-      begin
-        AList.CopyFrom(Form.FWorkList);
-      end;
+        AList.Assign(Form.FWorkList);
+
     finally
+      Form.FAllProperties.Free;
       Form.FWorkList.Free;
     end;
 
@@ -69,39 +75,33 @@ end;
 
 { Tform_EditComponentPropertyList }
 
-procedure Tform_EditComponentPropertyList.ApplyCheckState(
-  const AItem: TListItem);
+procedure Tform_EditComponentPropertyList.btn_OKClick(Sender: TObject);
+var
+  idx : Integer;
 begin
-  if Assigned(AItem) then
-  begin
-    PSettingsComponentProperty(AItem.Data).Save := AItem.Checked;
-  end;
+  for idx := 0 to lv_Properties.Items.Count - 1 do
+    ToSave[lv_Properties.Items[idx].SubItems[0]] := lv_Properties.Items[idx].Checked;
 end;
 
 procedure Tform_EditComponentPropertyList.FormShow(Sender: TObject);
 var
   idx : Integer;
   Li : TListItem;
-  Name : WideString;
+  PropList : TsrPropertyList;
 begin
-  for idx := 0 to FWorkList.Count - 1 do
+  for idx := 0 to FAllProperties.Count - 1 do
   begin
-    Name := WideStringReplace(FWorkList[idx]^.Name, SettingsPathDelimiter, '.', [rfReplaceAll]);
-    //remove leading dot
-    Name := Copy(Name, 2, Length(Name));
-
     LI := lv_Properties.Items.Add;
-    Li.Caption := Name;
-    Li.Checked := FWorkList[idx]^.Save;
-
-    Li.Data := FWorkList[idx];
+    Li.SubItems.Add(FAllProperties[idx]);
+    Li.Caption := WideStringReplace(FAllProperties[idx], SettingsPathDelimiter, '.', [rfReplaceAll]);
+    Li.Checked := ToSave[FAllProperties[idx]];
   end;
 end;
 
-procedure Tform_EditComponentPropertyList.lv_PropertiesMouseUp(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+function Tform_EditComponentPropertyList.GetToSave(
+  APropertyPath: TSettingName): Boolean;
 begin
-  ApplyCheckState(lv_Properties.GetItemAt(X, Y));
+  Result := FWorkList.IndexOf(APropertyPath) > -1;
 end;
 
 procedure Tform_EditComponentPropertyList.mi_CheckAllClick(Sender: TObject);
@@ -111,7 +111,6 @@ begin
   for idx := 0 to lv_Properties.Items.Count - 1 do
   begin
     lv_Properties.Items[idx].Checked := true;
-    ApplyCheckState(lv_Properties.Items[idx]);
   end;
 end;
 
@@ -122,7 +121,6 @@ begin
   for idx := 0 to lv_Properties.Items.Count - 1 do
   begin
     lv_Properties.Items[idx].Checked := lv_Properties.Items[idx].Checked xor true;
-    ApplyCheckState(lv_Properties.Items[idx]);
   end;
 end;
 
@@ -133,8 +131,27 @@ begin
   for idx := 0 to lv_Properties.Items.Count - 1 do
   begin
     lv_Properties.Items[idx].Checked := false;
-    ApplyCheckState(lv_Properties.Items[idx]);
   end;
+end;
+
+procedure Tform_EditComponentPropertyList.SetToSave(APropertyPath: TSettingName;
+  const Value: Boolean);
+var
+  idx : Integer;
+begin
+  idx := FWorkList.IndexOf(APropertyPath);
+
+  if Value then
+  begin
+    if idx = -1 then
+      FWorkList.Add(APropertyPath);
+  end
+  else
+  begin
+    if idx > -1 then
+      FWorkList.Delete(idx);                                   
+  end;
+
 end;
 
 end.
