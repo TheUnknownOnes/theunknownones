@@ -64,7 +64,6 @@ function ShowComponentPropertyListEditor(const AList : TsrPropertyList;
                                          const AComponent : TObject) : Boolean;
 var
   Form : Tform_EditComponentPropertyList;
-  idx : Integer;
 begin
   Form := Tform_EditComponentPropertyList.Create(nil);
   try
@@ -110,7 +109,6 @@ procedure Tform_EditComponentPropertyList.FormShow(Sender: TObject);
 var
   idx : Integer;
   Node : TTreeNode;
-  PropList : TsrPropertyList;
   Data : PNodeData;
 begin
   PrepareImageList;

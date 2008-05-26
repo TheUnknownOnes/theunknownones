@@ -304,6 +304,7 @@ type
 
     procedure DoApplySettings(const ARootSetting : TSettingName); override;
     procedure DoSaveSettings(const ARootSetting : TSettingName); override;
+
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
