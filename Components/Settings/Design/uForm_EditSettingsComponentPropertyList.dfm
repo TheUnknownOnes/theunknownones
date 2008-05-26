@@ -21,6 +21,7 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
     Top = 0
     Width = 321
     Height = 255
+    Hint = 'Use context menu for advanced selection'
     Align = alClient
     Checkboxes = True
     Columns = <
@@ -31,7 +32,9 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
     MultiSelect = True
     ReadOnly = True
     RowSelect = True
+    ParentShowHint = False
     PopupMenu = pum_ListView
+    ShowHint = True
     SortType = stText
     TabOrder = 0
     ViewStyle = vsReport
