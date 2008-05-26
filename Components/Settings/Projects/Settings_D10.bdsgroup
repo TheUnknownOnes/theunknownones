@@ -8,15 +8,12 @@
 			<Option Name="GUID">{805CCBE5-0F7C-4BC7-85E2-B98BA348DA4C}</Option>
 		</Option>
 	</PersonalityInfo>
-	<Default.Personality>  
-    
-    <Projects>
+	<Default.Personality>  <Projects>
       <Projects Name="Settings_D100R.bpl">D10\Settings_D100R.bdsproj</Projects>
       <Projects Name="Settings_VirtualTrees_D100R.bpl">D10\Settings_VirtualTrees_D100R.bdsproj</Projects>
       <Projects Name="Settings_D100D.bpl">D10\Settings_D100D.bdsproj</Projects>
       <Projects Name="Settings_VirtualTrees_D100D.bpl">D10\Settings_VirtualTrees_D100D.bdsproj</Projects>
-      <Projects Name="VirtualTreeHelpers_D100R.bpl">..\..\..\Libraries\VirtualTreeHelpers\projects\D10\VirtualTreeHelpers_D100R.bdsproj</Projects>
-      <Projects Name="Targets">Settings_D100R.bpl Settings_VirtualTrees_D100R.bpl Settings_D100D.bpl Settings_VirtualTrees_D100D.bpl VirtualTreeHelpers_D100R.bpl</Projects>
+      <Projects Name="Targets">Settings_D100R.bpl Settings_VirtualTrees_D100R.bpl Settings_D100D.bpl Settings_VirtualTrees_D100D.bpl</Projects>
     </Projects>
     <Dependencies/>
   </Default.Personality>
