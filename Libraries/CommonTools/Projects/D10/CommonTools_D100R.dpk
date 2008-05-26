@@ -37,7 +37,8 @@ requires
   Jcl,
   PNGSupport_D100,
   DirectX9_D10,
-  GDIPlus100;
+  GDIPlus100,
+  RegExp_D100R;
 
 contains
   sndkey32 in '..\..\sndkey32.pas',
