@@ -98,7 +98,15 @@ var
   List : TsrPropertyList;
 begin
   if GetList(List) then
-    Result := Format('%d Properties to save', [List.Count])
+  begin
+    if List.Count = 0 then
+      Result := 'No property to save'
+    else
+    if List.Count = 1 then
+      Result := '1 property to save'
+    else
+      Result := Format('%d properties to save', [List.Count])
+  end
   else
     Result := 'Invalid value';
 end;

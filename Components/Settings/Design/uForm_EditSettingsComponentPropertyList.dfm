@@ -53,13 +53,16 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
     Top = 0
     Width = 321
     Height = 255
+    Hint = 'Use context menu for advanced selecting'
     Align = alClient
     Indent = 19
     MultiSelect = True
     MultiSelectStyle = [msControlSelect, msShiftSelect]
+    ParentShowHint = False
     PopupMenu = pum_TV
     ReadOnly = True
     RowSelect = True
+    ShowHint = True
     StateImages = iml_TV
     TabOrder = 1
     OnDeletion = tv_PropertiesDeletion
