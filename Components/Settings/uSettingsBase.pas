@@ -174,14 +174,14 @@ type
 
     function GetValues(APath : TSettingName;
                        ADefault : Variant;
-                       AIsRegExPath : Boolean = true) : TSettingValues; overload;
+                       AIsRegExPath : Boolean) : TSettingValues; overload;
 
     function GetValue(APath : TSettingName;
                       AIsRegExPath : Boolean = false) : TSettingValue; overload;
 
     function GetValue(APath : TSettingName;
                       ADefault : Variant;
-                      AIsRegExPath : Boolean = false) : TSettingValue; overload;
+                      AIsRegExPath : Boolean) : TSettingValue; overload;
 
     function GetNameValues(APath : TSettingName;
                            AIsRegExPath : Boolean = true;
@@ -191,7 +191,7 @@ type
 
     function GetNameValues(APath : TSettingName;
                            ADefault : Variant;
-                           AIsRegExPath : Boolean = true;
+                           AIsRegExPath : Boolean;
                            AGetNames : Boolean = true;
                            AFullPathNames : Boolean = false;
                            AGetValues : Boolean = true) : TSettingNameValues; overload;
@@ -204,7 +204,7 @@ type
 
     function GetNameValue(APath : TSettingName;
                           ADefault : Variant;
-                          AIsRegEx : Boolean = false;
+                          AIsRegEx : Boolean;
                           AGetName : Boolean = true;
                           AFullPathName : Boolean = false;
                           AGetValues : Boolean = true) : TSettingNameValue; overload;

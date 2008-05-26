@@ -27,6 +27,8 @@ type
     procedure tv_PropertiesDeletion(Sender: TObject; Node: TTreeNode);
     procedure tv_PropertiesMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure tv_PropertiesKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     FOrigList,
     FAllProperties,
@@ -308,6 +310,25 @@ begin
     Dispose(PNodeData(Node.Data));
     Node.Data := nil;
   end;
+end;
+
+procedure Tform_EditComponentPropertyList.tv_PropertiesKeyUp(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+var
+  idx : Integer;
+  Node : TTreeNode;
+begin
+  if Key in [VK_SPACE] then
+  begin
+    for idx := 0 to tv_Properties.Items.Count - 1 do
+    begin
+      Node := tv_Properties.Items[idx];
+
+      if Node.Selected then
+        NodeChecked[Node] := NodeChecked[Node] xor true;
+    end;
+  end;
+  
 end;
 
 procedure Tform_EditComponentPropertyList.tv_PropertiesMouseUp(Sender: TObject;

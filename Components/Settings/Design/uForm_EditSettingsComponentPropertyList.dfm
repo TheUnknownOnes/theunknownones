@@ -66,6 +66,7 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
     StateImages = iml_TV
     TabOrder = 1
     OnDeletion = tv_PropertiesDeletion
+    OnKeyUp = tv_PropertiesKeyUp
     OnMouseUp = tv_PropertiesMouseUp
   end
   object pum_TV: TPopupMenu
