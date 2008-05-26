@@ -8,7 +8,9 @@
 			<Option Name="GUID">{CA80DE91-504D-4CC7-9C71-BC518338A60A}</Option>
 		</Option>
 	</PersonalityInfo>
-	<Default.Personality>  <Projects>
+	<Default.Personality>  
+    
+    <Projects>
       <Projects Name="BaseImageList_D100R.bpl">D10\BaseImageList_D100R.bdsproj</Projects>
       <Projects Name="ImageListProvider_D100R.bpl">D10\ImageListProvider_D100R.bdsproj</Projects>
       <Projects Name="PNGImageList_D100R.bpl">D10\PNGImageList_D100R.bdsproj</Projects>
