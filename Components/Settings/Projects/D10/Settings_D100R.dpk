@@ -28,8 +28,8 @@ package Settings_D100R;
 
 requires
   rtl,
-  RegExp_D100,
-  xmltools,
+  RegExp_D100R,
+  xmltools_D100R,
   vcl,
   DesignIDE;
 

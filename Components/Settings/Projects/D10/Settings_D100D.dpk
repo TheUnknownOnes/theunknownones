@@ -35,8 +35,8 @@ requires
   xmlrtl,
   vclactnband,
   vclx,
-  XMLTools,
-  RegExp_d100;
+  XMLTools_D100R,
+  RegExp_d100R;
 
 contains
   uRegSettings in '..\..\Design\uRegSettings.pas',
