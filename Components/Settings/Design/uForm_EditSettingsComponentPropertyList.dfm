@@ -16,29 +16,6 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object lv_Properties: TListView
-    Left = 0
-    Top = 0
-    Width = 321
-    Height = 255
-    Hint = 'Use context menu for advanced selection'
-    Align = alClient
-    Checkboxes = True
-    Columns = <
-      item
-        Caption = 'Propertyname'
-        Width = 250
-      end>
-    MultiSelect = True
-    ReadOnly = True
-    RowSelect = True
-    ParentShowHint = False
-    PopupMenu = pum_ListView
-    ShowHint = True
-    SortType = stText
-    TabOrder = 0
-    ViewStyle = vsReport
-  end
   object pan_Bottom: TPanel
     Left = 0
     Top = 255
@@ -46,7 +23,7 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
     Height = 31
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 1
+    TabOrder = 0
     object btn_OK: TButton
       AlignWithMargins = True
       Left = 162
@@ -71,7 +48,24 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
       TabOrder = 1
     end
   end
-  object pum_ListView: TPopupMenu
+  object tv_Properties: TTreeView
+    Left = 0
+    Top = 0
+    Width = 321
+    Height = 255
+    Align = alClient
+    Indent = 19
+    MultiSelect = True
+    MultiSelectStyle = [msControlSelect, msShiftSelect]
+    PopupMenu = pum_TV
+    ReadOnly = True
+    RowSelect = True
+    StateImages = iml_TV
+    TabOrder = 1
+    OnDeletion = tv_PropertiesDeletion
+    OnMouseUp = tv_PropertiesMouseUp
+  end
+  object pum_TV: TPopupMenu
     Left = 152
     Top = 144
     object mi_CheckAll: TMenuItem
@@ -86,5 +80,9 @@ object form_EditComponentPropertyList: Tform_EditComponentPropertyList
       Caption = 'Invert checks'
       OnClick = mi_InvertChecksClick
     end
+  end
+  object iml_TV: TImageList
+    Left = 144
+    Top = 56
   end
 end
