@@ -8,29 +8,28 @@
 			<Option Name="GUID">{3FE1F020-6F89-489F-A60A-6942C5BFF197}</Option>
 		</Option>
 	</PersonalityInfo>
-	<Default.Personality>  <Projects>
-      <Projects Name="RegExp_D100.bpl">..\Libraries\RegEx\Projects\D10\RegExp.bdsproj</Projects>
-      <Projects Name="ConsoleTools_D100.bpl">ConsoleTools\Projects\D10\ConsoleTools.bdsproj</Projects>
-      <Projects Name="PNGSupport_D100.bpl">..\Libraries\PNGSupport\Projects\D10\PNGSupport.bdsproj</Projects>
-      <Projects Name="XMLTools_D100.bpl">..\Libraries\XMLTools\Projects\D10\XMLTools.bdsproj</Projects>
+	<Default.Personality>  
+    
+    <Projects>
       <Projects Name="VSTHeaderSaver_D100.bpl">VSTHeaderSaver\Projects\D10\VSTHeaderSaver.bdsproj</Projects>
-      <Projects Name="SearchEdit_D100.bpl">SearchEdit\Projects\D10\SearchEdit.bdsproj</Projects>
-      <Projects Name="VSTSearchEdit_D100.bpl">VSTSearchEdit\Projects\D10\VSTSearchEdit.bdsproj</Projects>
-      <Projects Name="PNGUtils_D100.bpl">PNGUtils\Projects\D10\PNGUtils.bdsproj</Projects>
-      <Projects Name="BaseImageList_D100.bpl">ImageList\Projects\D10\BaseImageList.bdsproj</Projects>
-      <Projects Name="PNGImageList_D100.bpl">ImageList\Projects\D10\PNGImageList.bdsproj</Projects>
-      <Projects Name="ImageListProvider_D100.bpl">ImageList\Projects\D10\ImageListProvider.bdsproj</Projects>
-      <Projects Name="PNGImageListDesigner_D100D.bpl">ImageList\Projects\D10\PNGImageListDesigner.bdsproj</Projects>
-      <Projects Name="EffectPNG_D100.bpl">EffectPNG\Projects\D10\EffectPNG.bdsproj</Projects>
-      <Projects Name="EffectPNGImage_D100.bpl">EffectPNG\Projects\D10\EffectPNGImage.bdsproj</Projects>
-      <Projects Name="EffectPNGEdit_D100.bpl">EffectPNG\Projects\D10\EffectPNGEdit.bdsproj</Projects>
-      <Projects Name="EffectPNGImageList_D100.bpl">EffectPNG\Projects\D10\EffectPNGImageList.bdsproj</Projects>
-      <Projects Name="EffectPNGToolbar_D100.bpl">EffectPNG\Projects\D10\EffectPNGToolbar.bdsproj</Projects>
-      <Projects Name="GroupListView_D100.bpl">GroupListView\Projects\D10\GroupListView.bdsproj</Projects>
-      <Projects Name="CommonTools_D100.bpl">..\Libraries\CommonTools\Projects\D10\CommonTools.bdsproj</Projects>
-      <Projects Name="VirtualActionTree_D100.bpl">VirtualActionTree\Projects\D10\VirtualActionTree.bdsproj</Projects>
-      <Projects Name="Settings_D100.bpl">Settings\Projects\D10\Settings.bdsproj</Projects>
-      <Projects Name="Targets">RegExp_D100.bpl ConsoleTools_D100.bpl PNGSupport_D100.bpl XMLTools_D100.bpl VSTHeaderSaver_D100.bpl SearchEdit_D100.bpl VSTSearchEdit_D100.bpl PNGUtils_D100.bpl BaseImageList_D100.bpl PNGImageList_D100.bpl ImageListProvider_D100.bpl PNGImageListDesigner_D100D.bpl EffectPNG_D100.bpl EffectPNGImage_D100.bpl EffectPNGEdit_D100.bpl EffectPNGImageList_D100.bpl EffectPNGToolbar_D100.bpl GroupListView_D100.bpl CommonTools_D100.bpl VirtualActionTree_D100.bpl Settings_D100.bpl</Projects>
+      <Projects Name="ConsoleTools_D100R.bpl">ConsoleTools\Projects\D10\ConsoleTools_D100R.bdsproj</Projects>
+      <Projects Name="ConsoleTools_D100D.bpl">ConsoleTools\Projects\D10\ConsoleTools_D100D.bdsproj</Projects>
+      <Projects Name="PNGUtils_D100R.bpl">PNGUtils\Projects\D10\PNGUtils_D100R.bdsproj</Projects>
+      <Projects Name="SearchEdit_D100R.bpl">SearchEdit\Projects\D10\SearchEdit_D100R.bdsproj</Projects>
+      <Projects Name="SearchEdit_D100D.bpl">SearchEdit\Projects\D10\SearchEdit_D100D.bdsproj</Projects>
+      <Projects Name="Settings_D100R.bpl">Settings\Projects\D10\Settings_D100R.bdsproj</Projects>
+      <Projects Name="Settings_D100D.bpl">Settings\Projects\D10\Settings_D100D.bdsproj</Projects>
+      <Projects Name="Settings_VirtualTrees_D100R.bpl">Settings\Projects\D10\Settings_VirtualTrees_D100R.bdsproj</Projects>
+      <Projects Name="Settings_VirtualTrees_D100D.bpl">Settings\Projects\D10\Settings_VirtualTrees_D100D.bdsproj</Projects>
+      <Projects Name="Wiimote_D100R.bpl">Wiimote\Projects\D10\Wiimote_D100R.bdsproj</Projects>
+      <Projects Name="Wiimote_D100D.bpl">Wiimote\Projects\D10\Wiimote_D100D.bdsproj</Projects>
+      <Projects Name="BaseImageList_D100R.bpl">ImageList\Projects\D10\BaseImageList_D100R.bdsproj</Projects>
+      <Projects Name="ImageListProvider_D100R.bpl">ImageList\Projects\D10\ImageListProvider_D100R.bdsproj</Projects>
+      <Projects Name="ImageListProvider_D100D.bpl">ImageList\Projects\D10\ImageListProvider_D100D.bdsproj</Projects>
+      <Projects Name="PNGImageList_D100R.bpl">ImageList\Projects\D10\PNGImageList_D100R.bdsproj</Projects>
+      <Projects Name="PNGImageList_D100D.bpl">ImageList\Projects\D10\PNGImageList_D100D.bdsproj</Projects>
+      <Projects Name="PNGImageListDesigner_D100D.bpl">ImageList\Projects\D10\PNGImageListDesigner_D100D.bdsproj</Projects>
+      <Projects Name="Targets">VSTHeaderSaver_D100.bpl ConsoleTools_D100R.bpl ConsoleTools_D100D.bpl PNGUtils_D100R.bpl SearchEdit_D100R.bpl SearchEdit_D100D.bpl Settings_D100R.bpl Settings_D100D.bpl Settings_VirtualTrees_D100R.bpl Settings_VirtualTrees_D100D.bpl Wiimote_D100R.bpl Wiimote_D100D.bpl BaseImageList_D100R.bpl ImageListProvider_D100R.bpl ImageListProvider_D100D.bpl PNGImageList_D100R.bpl PNGImageList_D100D.bpl PNGImageListDesigner_D100D.bpl</Projects>
     </Projects>
     <Dependencies/>
   </Default.Personality>

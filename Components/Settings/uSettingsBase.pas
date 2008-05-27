@@ -968,42 +968,78 @@ function TCustomSettings.GetNameValues(APath: TSettingName; ADefault: Variant;
   AIsRegExPath, AGetNames, AFullPathNames,
   AGetValues: Boolean): TSettingNameValues;
 var
+  Setts : TSettingList;
   idx : Integer;
 begin
-  Result := GetNameValues(APath, AIsRegExPath, AGetNames, AFullPathNames, AGetValues);
+  Setts := TSettingList.Create;
+  try
+    QuerySettings(APath, AIsRegExPath, Setts, true);
 
-  if AGetValues then
-  begin
-    for idx := Low(Result) to High(Result) do
+    SetLength(Result, Setts.Count);
+
+    for idx := 0 to Setts.Count - 1 do
     begin
-      if VarIsEmpty(Result[idx].Value) then
-        Result[idx].Value := ADefault;
+      if AGetValues then
+      begin
+        if VarIsEmpty(Setts[idx].Value) then
+          Result[idx].Value := ADefault
+        else
+          Result[idx].Value := Setts[idx].Value
+      end
+      else
+        VarClear(Result[idx].Value);
+
+      if AGetNames then
+      begin
+        if AFullPathNames then
+          Result[idx].Name := Setts[idx].GetPath
+        else
+          Result[idx].Name := Setts[idx].Name
+      end
+      else
+        Result[idx].Name := EmptyWideStr;
     end;
+
+  finally
+    Setts.Free;
   end;
 end;
 
 function TCustomSettings.GetValue(APath: TSettingName; ADefault: Variant;
   AIsRegExPath: Boolean): TSettingValue;
+var
+  vals : TSettingValues;
 begin
-  Result := GetValue(APath, AIsRegExPath);
+  vals := GetValues(APath, ADefault, AIsRegExPath);
 
-  if VarIsEmpty(Result) then
-    Result := ADefault;
+  if Length(vals) > 0 then
+    Result := vals[0]
+  else
+    VarClear(Result);
 end;
 
 function TCustomSettings.GetValues(APath: TSettingName; ADefault: Variant;
   AIsRegExPath: Boolean): TSettingValues;
 var
+  Setts : TSettingList;
   idx : Integer;
 begin
-  Result := GetValues(APath, AIsRegExPath);
+  Setts := TSettingList.Create;
+  try
+    QuerySettings(APath, AIsRegExPath, Setts, true);
 
-  for idx := Low(Result) to High(Result) do
-  begin
-    if VarIsEmpty(Result[idx]) then
-      Result[idx] := ADefault;
+    SetLength(Result, Setts.Count);
+    for idx := 0 to Setts.Count - 1 do
+    begin
+      if VarIsEmpty(Setts[idx].Value) then
+        Result[idx] := ADefault
+      else
+        Result[idx] := Setts[idx].Value;
+    end;
+
+  finally
+    Setts.Free;
   end;
-
 end;
 
 procedure TCustomSettings.InformComponentLinksAboutLoad;
