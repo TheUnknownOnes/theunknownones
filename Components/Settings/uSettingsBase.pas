@@ -1015,7 +1015,7 @@ begin
   if Length(vals) > 0 then
     Result := vals[0]
   else
-    VarClear(Result);
+    Result := ADefault;
 end;
 
 function TCustomSettings.GetValues(APath: TSettingName; ADefault: Variant;
