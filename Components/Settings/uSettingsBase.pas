@@ -531,7 +531,7 @@ begin
     SettingsSplitPath(APath, Path);
 
     if not SettingsNameStringMatches(Path[0], ARoot.Name, false) then
-      raise Exception.Create('Path doesnt match the root setting');
+      raise Exception.Create('Path doesnt match the root setting. A path usally starts with "/".');
 
     PathIndex := 1;
 
@@ -568,12 +568,17 @@ begin
   if Assigned(FParent) then
     FParent.UnregisterChild(Self);
 
-  while FChildren.Count > 0 do
+
+  if Assigned(FChildren) then
   begin
-    FChildren.First.Free;
+    while FChildren.Count > 0 do
+    begin
+      FChildren.First.Free;
+    end;
+
+    FChildren.Free;
   end;
 
-  FChildren.Free;
 
   if not Assigned(FParent) then //only destroy our own index
     DestroyIndex;
