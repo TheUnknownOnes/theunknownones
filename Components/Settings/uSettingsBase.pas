@@ -258,6 +258,7 @@ type
 
     procedure SetSettings(const Value: TCustomSettings);
     procedure SetRootSetting(const Value: TSettingName);
+    procedure SetActive(const Value: Boolean);
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
@@ -270,7 +271,7 @@ type
     procedure ApplySettings;
     procedure SaveSettings;
 
-    property Active : Boolean read FActive write FActive default true;
+    property Active : Boolean read FActive write SetActive default true;
 
     property Settings : TCustomSettings read FSettings write SetSettings;
     property DefaultRootSetting : TSettingName read FDefaultRootSetting write SetRootSetting;
@@ -1238,6 +1239,16 @@ begin
       RootSetting := DefaultRootSetting;
 
     DoSaveSettings(SettingsExcludeTrailingPathDelimiter(SettingsIncludeLeadingPathDelimiter(RootSetting)));
+  end;
+end;
+
+procedure TCustomSettingsLink.SetActive(const Value: Boolean);
+begin
+  if Value <> FActive then
+  begin
+    FActive := Value;
+
+    ApplySettings;
   end;
 end;
 
