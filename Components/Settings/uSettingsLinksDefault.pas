@@ -144,7 +144,8 @@ begin
       begin
         Value := Settings.GetValue(ARootSetting + SettingsPathDelimiter +
                                     Format(ColSettingNamePattern, [idx]) +
-                                    SettingsPathDelimiter + 'Width');
+                                    SettingsPathDelimiter + 'Width',
+                                   Col.Width);
 
         if not VarIsEmpty(Value) then
           Col.Width := Value;

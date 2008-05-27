@@ -34,7 +34,9 @@ type
 
   TSettingValue = Variant;
 
-  TSettingValues = array of Variant;
+  TSettingValues = array of TSettingValue;
+
+  TSettingNames = array of TSettingName;
 
   TSettingNameValue = record
     Name : TSettingName;
@@ -170,44 +172,34 @@ type
                        AIsRegExPath : Boolean = false);
 
     function GetValues(APath : TSettingName;
-                       AIsRegExPath : Boolean = true) : TSettingValues; overload;
-
-    function GetValues(APath : TSettingName;
                        ADefault : Variant;
-                       AIsRegExPath : Boolean) : TSettingValues; overload;
-
-    function GetValue(APath : TSettingName;
-                      AIsRegExPath : Boolean = false) : TSettingValue; overload;
+                       AIsRegExPath : Boolean = false) : TSettingValues;
 
     function GetValue(APath : TSettingName;
                       ADefault : Variant;
-                      AIsRegExPath : Boolean) : TSettingValue; overload;
+                      AIsRegExPath : Boolean = false) : TSettingValue;
 
-    function GetNameValues(APath : TSettingName;
-                           AIsRegExPath : Boolean = true;
-                           AGetNames : Boolean = true;
-                           AFullPathNames : Boolean = false;
-                           AGetValues : Boolean = true) : TSettingNameValues; overload;
+    function GetNames(APath : TSettingName;
+                      AIsRegExPath : Boolean = true;
+                      AFullPathNames : Boolean = false) : TSettingNames;
 
     function GetNameValues(APath : TSettingName;
                            ADefault : Variant;
                            AIsRegExPath : Boolean;
                            AGetNames : Boolean = true;
                            AFullPathNames : Boolean = false;
-                           AGetValues : Boolean = true) : TSettingNameValues; overload;
-
-    function GetNameValue(APath : TSettingName;
-                          AIsRegEx : Boolean = false;
-                          AGetName : Boolean = true;
-                          AFullPathName : Boolean = false;
-                          AGetValues : Boolean = true) : TSettingNameValue; overload;
+                           AGetValues : Boolean = true) : TSettingNameValues;
 
     function GetNameValue(APath : TSettingName;
                           ADefault : Variant;
-                          AIsRegEx : Boolean;
+                          AIsRegEx : Boolean= false;
                           AGetName : Boolean = true;
                           AFullPathName : Boolean = false;
-                          AGetValues : Boolean = true) : TSettingNameValue; overload;
+                          AGetValues : Boolean = true) : TSettingNameValue;
+
+    function GetSubNames(APath : TSettingName;
+                         AIsRegExPath : Boolean = false;
+                         AFullPathNames : Boolean = false) : TSettingNames;
 
     function GetSubNameValues(APath : TSettingName;
                               AIsRegExPath : Boolean = false;
@@ -862,6 +854,37 @@ begin
   end;
 end;
 
+function TCustomSettings.GetSubNames(APath: TSettingName; AIsRegExPath,
+  AFullPathNames: Boolean): TSettingNames;
+var
+  Setts : TSettingList;
+  idx : Integer;
+begin
+  Setts := TSettingList.Create;
+  try
+    QuerySettings(APath, AIsRegExPath, Setts, true);
+
+    for idx := Setts.Count - 1 downto 0 do
+    begin
+      Setts.AddSettings(Setts[idx].Children);
+      Setts.Delete(idx);
+    end;
+
+    SetLength(Result, Setts.Count);
+
+    for idx := 0 to Setts.Count - 1 do
+    begin
+      if AFullPathNames then
+        Result[idx] := Setts[idx].GetPath
+      else
+        Result[idx] := Setts[idx].Name
+    end;
+
+  finally
+    Setts.Free;
+  end;
+end;
+
 function TCustomSettings.GetSubNameValues(APath: TSettingName; AIsRegExPath,
   AGetNames, AFullPathNames, AGetValues: Boolean): TSettingNameValues;
 var
@@ -903,15 +926,28 @@ begin
   end;
 end;
 
-function TCustomSettings.GetNameValue(APath: TSettingName; AIsRegEx, AGetName,
-  AFullPathName, AGetValues: Boolean): TSettingNameValue;
+function TCustomSettings.GetNames(APath: TSettingName;
+  AIsRegExPath: Boolean; AFullPathNames : Boolean): TSettingNames;
 var
-  NameValues : TSettingNameValues;
+  Setts : TSettingList;
+  idx : Integer;
 begin
-  NameValues := GetNameValues(APath, AIsRegEx, AGetName, AFullPathName, AGetValues);
+  Setts := TSettingList.Create;
+  try
+    QuerySettings(APath, AIsRegExPath, Setts, true);
 
-  if Length(NameValues) > 0 then
-    Result := NameValues[0];
+    SetLength(Result, Setts.Count);
+
+    for idx := 0 to Setts.Count - 1 do
+    begin
+      if AFullPathNames then
+        Result[idx] := Setts[idx].Name
+      else
+        Result[idx] := Setts[idx].GetPath;
+    end;
+  finally
+    Setts.Free;
+  end;
 end;
 
 function TCustomSettings.GetNameValue(APath: TSettingName; ADefault: Variant;
@@ -941,57 +977,6 @@ begin
   end;
 end;
 
-function TCustomSettings.GetNameValues(APath : TSettingName;
-                                       AIsRegExPath : Boolean;
-                                       AGetNames : Boolean;
-                                       AFullPathNames : Boolean;
-                                       AGetValues : Boolean): TSettingNameValues;
-var
-  Setts : TSettingList;
-  idx : Integer;
-begin
-  Setts := TSettingList.Create;
-  try
-    QuerySettings(APath, AIsRegExPath, Setts, true);
-
-    SetLength(Result, Setts.Count);
-
-    for idx := 0 to Setts.Count - 1 do
-    begin
-      if AGetValues then
-        Result[idx].Value := Setts[idx].Value
-      else
-        VarClear(Result[idx].Value);
-
-      if AGetNames then
-      begin
-        if AFullPathNames then
-          Result[idx].Name := Setts[idx].GetPath
-        else
-          Result[idx].Name := Setts[idx].Name
-      end
-      else
-        Result[idx].Name := EmptyWideStr;
-    end;
-
-  finally
-    Setts.Free;
-  end;
-end;
-
-  
-function TCustomSettings.GetValue(APath: TSettingName;
-  AIsRegExPath: Boolean): TSettingValue;
-var
-  vals : TSettingValues;
-begin
-  vals := GetValues(APath, AIsRegExPath);
-  if Length(vals) > 0 then
-    Result := vals[0]
-  else
-    VarClear(Result);
-end;
-
 function TCustomSettings.GetValue(APath: TSettingName; ADefault: Variant;
   AIsRegExPath: Boolean): TSettingValue;
 begin
@@ -1014,25 +999,6 @@ begin
       Result[idx] := ADefault;
   end;
 
-end;
-
-function TCustomSettings.GetValues(APath: TSettingName;
-  AIsRegExPath: Boolean): TSettingValues;
-var
-  Setts : TSettingList;
-  idx : Integer;
-begin
-  Setts := TSettingList.Create;
-  try
-    QuerySettings(APath, AIsRegExPath, Setts, true);
-
-    SetLength(Result, Setts.Count);
-    for idx := 0 to Setts.Count - 1 do
-      Result[idx] := Setts[idx].Value;
-
-  finally
-    Setts.Free;
-  end;
 end;
 
 procedure TCustomSettings.InformComponentLinksAboutLoad;
@@ -1363,9 +1329,9 @@ begin
       begin
         PropValue := FSettings.GetValue(ARootSetting +
                                         SettingsPathDelimiter +
-                                        FSaveProperties[idx]);
-        if not VarIsEmpty(PropValue) then
-          SetPropValue(FComponent, Prop, PropValue);
+                                        FSaveProperties[idx],
+                                        GetPropValue(FComponent, Prop, false));
+        SetPropValue(FComponent, Prop, PropValue);
       end;
     end;
   end;

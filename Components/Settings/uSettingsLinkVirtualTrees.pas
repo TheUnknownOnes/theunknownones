@@ -112,7 +112,7 @@ var
 
   procedure SetColumnOption(AOption : TVTColumnOption; ASettingName : TSettingName);
   begin
-    Value := Settings.GetValue(SettingsPath + ASettingName);
+    Value := Settings.GetValue(SettingsPath + ASettingName, AOption in Col.Options);
     if not VarIsEmpty(Value) then
     begin
       if Boolean(Value) then
@@ -140,14 +140,14 @@ begin
 
         if SaveColumnPos then
         begin
-          Value := Settings.GetValue(SettingsPath + 'Position');
+          Value := Settings.GetValue(SettingsPath + 'Position', Col.Position);
           if not VarIsEmpty(Value) then
             Col.Position := Value;
         end;
 
         if SaveColumnWidth then
         begin
-          Value := Settings.GetValue(SettingsPath + 'Width');
+          Value := Settings.GetValue(SettingsPath + 'Width', Col.Width);
           if not VarIsEmpty(Value) then
             Col.Width := Value;
         end;
