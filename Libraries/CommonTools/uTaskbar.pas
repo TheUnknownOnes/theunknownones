@@ -8,7 +8,7 @@ unit uTaskbar;
 interface
 
 uses
-  Classes, Windows, Messages, CommCtrl, SysUtils, Math, Controls;
+  Classes, Windows, Messages, CommCtrl, SysUtils, Math, Controls, uSysTools;
 
 
 type
@@ -101,10 +101,6 @@ implementation
 
 uses
   Graphics;
-
-{$REGION 'Windows API'}
-function PrintWindow(SourceWindow: hwnd; Destination: hdc; nFlags: cardinal): bool; stdcall; external 'user32.dll' name 'PrintWindow';
-{$ENDREGION}
 
 {$REGION 'Helper'}
 function ReasonSysError: String;
@@ -417,7 +413,7 @@ begin
   FullBitmap.Width:=Taskbar.Rect.Right-Taskbar.Rect.Left;
   FullBitmap.Height:=Taskbar.Rect.Bottom-Taskbar.Rect.Top;
 
-  PrintWindow(TTaskbar.CWindowHandle, FullBitmap.Canvas.Handle, 0);
+  PrintWindow(TTaskbar.CWindowHandle, FullBitmap);
 
   BitBlt(ADC,
          ARect.Left,
