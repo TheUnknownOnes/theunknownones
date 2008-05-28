@@ -209,6 +209,7 @@ type
 
     function Exists(APath : TSettingName; AIsRegEx : Boolean = false) : Boolean;
     procedure Delete(APath : TSettingName; AIsRegEx : Boolean = false);
+    procedure Clear;
 
     procedure RegisterComponentLink(ALink : TCustomSettingsLink);
     procedure UnRegisterComponentLink(ALink : TCustomSettingsLink);
@@ -803,6 +804,11 @@ begin
     inherited;
 end;
 
+procedure TCustomSettings.Clear;
+begin
+  FRootSetting.Clear;
+end;
+
 constructor TCustomSettings.Create(AOwner: TComponent);
 begin
   inherited;
@@ -826,7 +832,10 @@ begin
     QuerySettings(APath, AIsRegEx, Setts, false);
 
     for idx := 0 to Setts.Count - 1 do
-      Setts[idx].Free;
+    begin
+      if Setts[idx] <> FRootSetting then
+        Setts[idx].Free;
+    end;
   finally
     Setts.Free;
   end;
