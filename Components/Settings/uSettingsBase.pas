@@ -248,14 +248,16 @@ type
 
 
   TCustomSettingsLink = class(TComponent)
-  private
-
   protected
     FSettings: TCustomSettings;
     FDefaultRootSetting: TSettingName;
     FActive: Boolean;
 
     FOnNeedRootSetting: TNeedRootSettingProc;
+    FOnBeforeSaveSettings: TNotifyEvent;
+    FOnBeforeApplySettings: TNotifyEvent;
+    FOnAfterSaveSettings: TNotifyEvent;
+    FOnAfterApplySettings: TNotifyEvent;
 
     procedure SetSettings(const Value: TCustomSettings);
     procedure SetRootSetting(const Value: TSettingName);
@@ -278,6 +280,13 @@ type
     property DefaultRootSetting : TSettingName read FDefaultRootSetting write SetRootSetting;
 
     property OnNeedRootSetting : TNeedRootSettingProc read FOnNeedRootSetting write FOnNeedRootSetting;
+
+    property OnBeforeSaveSettings : TNotifyEvent read FOnBeforeSaveSettings write FOnBeforeSaveSettings;
+    property OnAfterSaveSettings : TNotifyEvent read FOnAfterSaveSettings write FOnAfterSaveSettings;
+    property OnBeforeApplySettings : TNotifyEvent read FOnBeforeApplySettings write FOnBeforeApplySettings;
+    property OnAfterApplySettings : TNotifyEvent read FOnAfterApplySettings write FOnAfterApplySettings;
+
+
   end;
 
 
@@ -1200,12 +1209,18 @@ var
 begin
   if (not (csDesigning in Self.ComponentState)) and Active then
   begin
+    if Assigned(FOnBeforeApplySettings) then
+      FOnBeforeApplySettings(Self);
+
     if Assigned(FOnNeedRootSetting) then
       FOnNeedRootSetting(Self, RootSetting)
     else
       RootSetting := DefaultRootSetting;
 
     DoApplySettings(SettingsExcludeTrailingPathDelimiter(SettingsIncludeLeadingPathDelimiter(RootSetting)));
+
+    if Assigned(FOnAfterApplySettings) then
+      FOnAfterApplySettings(Self);
   end;
 end;
 
@@ -1242,12 +1257,18 @@ var
 begin
   if (not (csDesigning in Self.ComponentState)) and Active then
   begin
+    if Assigned(FOnBeforeSaveSettings) then
+      FOnBeforeSaveSettings(Self);
+
     if Assigned(FOnNeedRootSetting) then
       FOnNeedRootSetting(Self, RootSetting)
     else
       RootSetting := DefaultRootSetting;
 
     DoSaveSettings(SettingsExcludeTrailingPathDelimiter(SettingsIncludeLeadingPathDelimiter(RootSetting)));
+
+    if Assigned(FOnAfterSaveSettings) then
+      FOnAfterSaveSettings(Self)
   end;
 end;
 

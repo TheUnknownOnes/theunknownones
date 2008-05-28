@@ -24,11 +24,15 @@ type
 
   TSettingsLinkComponent = class(TCustomSettingsComponentLink)
   published
-    property Settings;
-    property DefaultRootSetting;
-    property OnNeedRootSetting;
-    property SaveProperties;
     property Active;
+    property DefaultRootSetting;
+    property SaveProperties;
+    property Settings;
+    property OnNeedRootSetting;
+    property OnBeforeSaveSettings;
+    property OnAfterSaveSettings;
+    property OnBeforeApplySettings;
+    property OnAfterApplySettings;
 
     property Component;
   end;
@@ -48,11 +52,15 @@ type
 
   TSettingsLinkForm = class(TCustomSettingsComponentLinkForm)
   published
-    property Settings;
-    property DefaultRootSetting;
-    property OnNeedRootSetting;
-    property SaveProperties;
     property Active;
+    property DefaultRootSetting;
+    property SaveProperties;
+    property Settings;
+    property OnNeedRootSetting;
+    property OnBeforeSaveSettings;
+    property OnAfterSaveSettings;
+    property OnBeforeApplySettings;
+    property OnAfterApplySettings;
   end;
 
 //==============================================================================
@@ -81,11 +89,15 @@ type
 
   TSettingsLinkListView = class(TCustomSettingsComponentLinkListView)
   published
-    property Settings;
-    property DefaultRootSetting;
-    property OnNeedRootSetting;
-    property SaveProperties;
     property Active;
+    property DefaultRootSetting;
+    property SaveProperties;
+    property Settings;
+    property OnNeedRootSetting;
+    property OnBeforeSaveSettings;
+    property OnAfterSaveSettings;
+    property OnBeforeApplySettings;
+    property OnAfterApplySettings;
 
     property ListView;
     property SaveColumnWidth;
