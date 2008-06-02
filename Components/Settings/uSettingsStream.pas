@@ -238,15 +238,16 @@ end;
 procedure TCustomSettingsStream.ReadValue(const AStream: TStream;
   out AValue: String);
 var
-  Buffer : array of Char;
+  Buffer : PChar;
   Len : Integer;
 begin
   ReadValue(AStream, Len);
   Inc(Len);
-  SetLength(Buffer, Len);
-  FillChar(Buffer, Len, 0);
-  AStream.ReadBuffer(Buffer, Len - 1);
-  AValue := StrPas(@Buffer[0]);
+  GetMem(Buffer, Len);
+  FillChar(Buffer^, Len, 0);
+  AStream.ReadBuffer(Buffer^, Len - 1);
+  AValue := String(Buffer);
+  FreeMem(Buffer, Len);
 end;
 
 procedure TCustomSettingsStream.ReadValue(const AStream: TStream;
