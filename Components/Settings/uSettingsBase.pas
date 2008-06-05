@@ -976,11 +976,18 @@ end;
 
 function TCustomSettings.GetNameValue(APath: TSettingName; ADefault: Variant;
   AIsRegEx, AGetName, AFullPathName, AGetValues: Boolean): TSettingNameValue;
+var
+  NameValues : TSettingNameValues;
 begin
-  Result := GetNameValue(APath, AIsRegEx, AGetName, AFullPathName, AGetValues);
+  NameValues := GetNameValues(APath, ADefault, AIsRegEx, AGetName, AFullPathName, AGetValues);
 
-  if AGetValues and VarIsEmpty(Result.Value) then
+  if Length(NameValues) = 0 then
+  begin
+    Result.Name := EmptyWideStr;
     Result.Value := ADefault;
+  end
+  else
+    Result := NameValues[0]; 
 end;
 
 function TCustomSettings.GetNameValues(APath: TSettingName; ADefault: Variant;
