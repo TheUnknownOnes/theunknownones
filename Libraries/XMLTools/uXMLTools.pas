@@ -54,6 +54,8 @@ type
   function XGetXMLNodeByPath(const ADocument : IXMLDOMDocument; APath : WideString) : IXMLDOMNode;
   procedure XAddAttribute(const ANode : IXMLDOMNode; AName, AValue : WideString); overload;
   procedure XAddAttribute(const ANode : IXMLDOMNode; AName: WideString; AValue : OleVariant); overload;
+  procedure XSetAttribute(const ANode : IXMLDOMNode; AName, AValue : WideString); overload;
+  procedure XSetAttribute(const ANode : IXMLDOMNode; AName: WideString; AValue : OleVariant); overload;
   function XAddChildOrGetIfExists(const AParent : IXMLDOMNode; AChildTag : WideString) : IXMLDOMNode;
   function XReadAttribute(const ANode : IXMLDOMNode; AAtrributeName : WideString; var AAttribute : IXMLDOMNode) : Boolean;
 
@@ -126,6 +128,28 @@ begin
   XAttr:=ANode.ownerDocument.createAttribute(AName);
   XAttr.nodeValue:=AValue;
   ANode.attributes.setNamedItem(XAttr);
+end;
+
+procedure XSetAttribute(const ANode : IXMLDOMNode; AName, AValue : WideString); overload;
+var
+  XAttr : IXMLDOMAttribute;
+begin
+  XAttr := ANode.Attributes.getNamedItem(AName) as IXMLDOMAttribute;
+  if not Assigned(XAttr) then
+    XAddAttribute(ANode, AName, AValue)
+  else
+    XAttr.text := AValue;
+end;
+
+procedure XSetAttribute(const ANode : IXMLDOMNode; AName: WideString; AValue : OleVariant); overload;
+var
+  XAttr : IXMLDOMAttribute;
+begin
+  XAttr := ANode.Attributes.getNamedItem(AName) as IXMLDOMAttribute;
+  if not Assigned(XAttr) then
+    XAddAttribute(ANode, AName, AValue)
+  else
+    XAttr.text := AValue;
 end;
 
 function XReadAttribute(const ANode : IXMLDOMNode; AAtrributeName : WideString; var AAttribute : IXMLDOMNode) : Boolean;
