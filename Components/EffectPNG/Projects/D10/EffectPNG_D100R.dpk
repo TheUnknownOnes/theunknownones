@@ -29,9 +29,12 @@ package EffectPNG_D100R;
 requires
   rtl,
   vcl,
-  PNGSupport_D100;
+  PNGSupport_D100,
+  DirectX9_D10,
+  GDIPlus100;
 
 contains
-  uEffectPNG in '..\..\uEffectPNG.pas';
+  uEffectPNG in '..\..\uEffectPNG.pas',
+  uEffectPNGHelper in '..\..\uEffectPNGHelper.pas';
 
 end.

@@ -32,6 +32,7 @@ requires
   PNGSupport_D110;
 
 contains
-  uEffectPNG in '..\..\uEffectPNG.pas';
+  uEffectPNG in '..\..\uEffectPNG.pas',
+  uEffectPNGHelper in '..\..\uEffectPNGHelper.pas';
 
 end.

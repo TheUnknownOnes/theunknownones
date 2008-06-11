@@ -117,7 +117,7 @@ begin
     raise Exception.Create('This link may only be owned by a Form');
 
   Component := TCustomForm(AOwner);
-  FDefaultRootSetting := SettingsPathDelimiter + Component.Name;
+  FDefaultRootSetting := SettingsPathDelimiter + 'GUI' + SettingsPathDelimiter + Component.Name;
 end;
 
 

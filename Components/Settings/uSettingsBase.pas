@@ -1470,13 +1470,13 @@ begin
       Path.Insert(0, Compo.Name);
 
       if Compo = AComponent.Owner then
-      begin
-        Path.Insert(0, EmptyWideStr);
         break;
-      end;
 
       Compo := Compo.GetParentComponent;
     end;
+
+    Path.Insert(0, 'GUI');
+    Path.Insert(0, EmptyWideStr);
 
     Result := Path.DelimitedText;
   finally

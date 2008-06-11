@@ -1,9 +1,9 @@
-unit EffectPNGHelper;
+unit uEffectPNGHelper;
 
 interface
 
 uses
-  pngimage, EffectPNG, Classes, Graphics;
+  pngimage, uEffectPNG, Classes, Graphics;
 
   
 function PNGtoGlyph(APNG : TPNGObject;
