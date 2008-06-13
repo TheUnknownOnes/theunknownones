@@ -1,4 +1,4 @@
-package Wiimote_D100D;
+package Wiimote_D100R;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,15 +22,23 @@ package Wiimote_D100D;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'Wiimote access via wiiuse library - Design'}
-{$DESIGNONLY}
+{$DESCRIPTION 'Wiimote Support'}
+{$RUNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  Wiimote_D100r;
+  JvSystemD10R,
+  vcljpg,
+  vcl,
+  vclx,
+  Jcl,
+  JvCoreD10R,
+  vcldb,
+  dbrtl,
+  JclVcl;
 
 contains
-  uRegWiimote in '..\..\Design\uRegWiimote.pas';
+  uWiimote in '..\..\uWiimote.pas';
 
 end.
