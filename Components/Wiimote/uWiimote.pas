@@ -58,7 +58,16 @@ type
                wmiBasic     = $01,
                wmiExtended  = $03,
                wmiFull      = $05);
-  
+
+
+  TwmAccelCalibration = record
+    X0,
+    Y0,
+    Z0,
+    XG,
+    YG,
+    ZG : Byte;
+  end;
 
   TwmReport = class
   protected
@@ -293,10 +302,11 @@ type
   TwmDeviceConnection = class
   protected
     FHandle : THandle;
-    FDevicePresent: Boolean;
+
+    FOnConnected: TNotifyEvent;
+    FOnDisconnected: TNotifyEvent;
 
     function GetConnected: Boolean;
-  published
   public
     class function ListDevices(AList : TStrings) : Integer;
 
@@ -311,13 +321,149 @@ type
 
     property Connected : Boolean read GetConnected;
     property Handle : THandle read FHandle;
-    property DevicePresent : Boolean read FDevicePresent;
+
+    property OnConnected : TNotifyEvent read FOnConnected write FOnConnected;
+    property OnDisconnected : TNotifyEvent read FOnDisconnected write FOnDisconnected;
   end;
 
 
 //==============================================================================
 
 
+  TwmOnReportProc = procedure(const AReport : TwmReport) of object;
+
+
+//==============================================================================
+
+
+  TwmReportReader = class(TThread)
+  protected
+    FConnection : TwmDeviceConnection;
+    FOnNewReport : TwmOnReportProc;
+
+    FReport : TwmReport;
+
+    procedure Execute(); override;
+
+    procedure SyncDoNewReport();
+  public
+    constructor Create(const AConnection : TwmDeviceConnection;
+                       AOnNewReport : TwmOnReportProc);
+  end;
+
+
+//==============================================================================
+
+
+  TwmOnButtonProc = procedure(AButton : TwmButton) of object;
+
+
+//==============================================================================
+
+
+  TCustomWiimote = class(TComponent)
+  protected
+    FConnection : TwmDeviceConnection;
+    FReportReader : TwmReportReader;
+
+    FReadMemStack : TStringList;
+    //Identifies, which memory-block is replied in the next reports
+
+    FAccelCalibration : TwmAccelCalibration;
+    FAccels : array[0..2] of Single;
+    FButtonsDown : TwmButtons;
+    FLedsOn: TwmLEDs;
+    FRumble : Boolean;
+    FBattery : Byte;
+    FIRMode: TwmIRMode;
+    FIRPoints : array[0..3] of TPoint;
+    FIRPointSizes : array[0..3] of Byte;
+    FIRPointCount : Byte;
+
+    FOnNewReport: TwmOnReportProc;
+    FOnConnected: TNotifyEvent;
+    FOnDisconnected: TNotifyEvent;
+    FOnButtonUp: TwmOnButtonProc;
+    FOnButtonDown: TwmOnButtonProc;
+    FOnButtonIsDown: TwmOnButtonProc;
+    FOnStatus: TNotifyEvent;
+
+    procedure DoNewReport(const AReport : TwmReport); virtual;
+    procedure DoConnect(Sender : TObject); virtual;
+    procedure DoDisconnect(Sender : TObject); virtual;
+
+    procedure ReadAccelCalibration;
+
+    procedure ExtractReadMemory(AReport : TwmInputReportReadMemory);
+    procedure ExtractAccel(AReport : TwmInputReportButtonsAccel);
+    procedure ExtractButtonStates(AReport : TwmInputReportButtons);
+    procedure ExtractStatusinfos(AReport : TwmInputReportStatus);
+    procedure ExtractIRInfos(AReport : TwmInputReportButtonsAccelIR);
+
+    function GetActive: Boolean;
+    procedure SetActive(const Value: Boolean);
+    function GetCurrentAccel(const Index: Integer): Single;
+    function GetButtonsDown: TwmButtons;
+    function GetConnected: Boolean;
+    procedure SetRumble(AValue : Boolean);
+    procedure SetLedsOn(const Value: TwmLEDs);
+    procedure SetIRMode(const Value: TwmIRMode);
+    function GetIRPoint(AIndex: Integer): TPoint;
+    function GetIRPointSize(AIndex: Integer): Byte;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    function Connect(ADevicePath : String) : Boolean;
+    function Disconnect() : Boolean;
+
+    procedure RequestStatus;
+
+    property Active : Boolean read GetActive write SetActive;
+    property Connected : Boolean read GetConnected;
+
+    property Rumble : Boolean read FRumble write SetRumble;
+
+    property AccelX : Single index 0 read GetCurrentAccel;
+    property AccelY : Single index 1 read GetCurrentAccel;
+    property AccelZ : Single index 2 read GetCurrentAccel;
+
+    property ButtonsDown : TwmButtons read GetButtonsDown;
+
+    property LedsOn : TwmLEDs read FLedsOn write SetLedsOn;
+
+    property BatteryPercent : Byte read FBattery;
+
+    property IRMode : TwmIRMode read FIRMode write SetIRMode;
+    property IRPointPos[AIndex : Integer] : TPoint read GetIRPoint;
+    property IRPointSize[AIndex : Integer] : Byte read GetIRPointSize;
+    property IRPointCount : Byte read FIRPointCount;
+
+    property OnNewReport : TwmOnReportProc read FOnNewReport write FOnNewReport;
+    property OnStatus : TNotifyEvent read FOnStatus write FOnStatus;
+
+    property OnConnected : TNotifyEvent read FOnConnected write FOnConnected;
+    property OnDisconnected : TNotifyEvent read FOnDisconnected write FOnDisconnected;
+
+    property OnButtonDown : TwmOnButtonProc read FOnButtonDown write FOnButtonDown;
+    property OnButtonUp : TwmOnButtonProc read FOnButtonUp write FOnButtonUp;
+    property OnButtonIsDown : TwmOnButtonProc read FOnButtonIsDown write FOnButtonIsDown;
+  end;
+
+
+//==============================================================================
+
+  TWiimote = class(TCustomWiimote)
+  published
+    property OnNewReport;
+    property OnStatus;
+
+    property OnConnected;
+    property OnDisconnected;
+
+    property OnButtonDown;
+    property OnButtonUp;
+  end;
 
 
 
@@ -359,12 +505,14 @@ begin
 
     Result := Connected;
   end;
+
+  if Result and Assigned(FOnConnected) then
+    FOnConnected(Self);
 end;
 
 constructor TwmDeviceConnection.Create;
 begin
   FHandle := 0;
-  FDevicePresent := false;
 end;
 
 destructor TwmDeviceConnection.Destroy;
@@ -385,6 +533,9 @@ begin
     if Result then
       FHandle := 0;
   end;
+
+  if Result and Assigned(FOnDisconnected) then
+    FOnDisconnected(Self);
 end;
 
 function TwmDeviceConnection.GetConnected: Boolean;
@@ -515,19 +666,18 @@ begin
           WAIT_FAILED:
           begin
             Result := False;
-            FDevicePresent := false;
+            Disconnect;
           end;
 
           WAIT_TIMEOUT:
           begin
             CancelIo(FHandle);
             Result := false;
+            Disconnect;
           end
 
           else
           begin
-            FDevicePresent := true;
-
             Result := GetOverlappedResult(FHandle, Lappen, BytesRead, true);
             if Result then
               Result := TwmReport.CreateReport(RawReport, AReport);
@@ -640,7 +790,7 @@ function TwmReport.GetBitsInValue(AValueIndex : Integer; ABits: Byte): Boolean;
 begin
   CheckBufferIndex(AValueIndex);
 
-  Result := (FBuffer[AValueIndex] and ABits) = ABits;
+  Result := (FBuffer[AValueIndex] and ABits) <> 0;
 end;
 
 function TwmReport.GetValue(AIndex: Integer): Byte;
@@ -1103,6 +1253,426 @@ begin
       end;
     end;
   end;
+end;
+
+
+//==============================================================================
+
+
+{ TCustomWiimote }
+
+function TCustomWiimote.Connect(ADevicePath: String): Boolean;
+var
+  Rep : TwmOutputReportReporting;
+begin
+  Result := FConnection.Connect(ADevicePath);
+
+  if Result then
+  begin
+    ReadAccelCalibration;
+
+    Rep := TwmOutputReportReporting.Create;
+    try
+      Rep.ReportType := TwmInputReportButtonsAccelIR;
+      Rep.Continuous := true;
+      Rep.Rumble := FRumble;
+
+      FConnection.WriteReport(Rep);
+    finally
+      Rep.Free;
+    end;
+  end;
+
+end;
+
+constructor TCustomWiimote.Create(AOwner: TComponent);
+begin
+  inherited;
+
+  FIRPointCount := 0;
+
+  FButtonsDown := [];
+
+  FReadMemStack := TStringList.Create;
+
+  FConnection := TwmDeviceConnection.Create;
+  FConnection.OnConnected := DoConnect;
+  FConnection.OnDisconnected := DoDisconnect;
+
+  if not (csDesigning in ComponentState) then
+    FReportReader := TwmReportReader.Create(FConnection, DoNewReport)
+  else
+    FReportReader := nil;
+end;
+
+destructor TCustomWiimote.Destroy;
+begin
+  if Assigned(FReportReader) then
+    FReportReader.Terminate;
+
+  FConnection.Free;
+
+  FReadMemStack.Free;
+
+  inherited;
+end;
+
+function TCustomWiimote.Disconnect: Boolean;
+begin
+  Result := FConnection.Disconnect;
+end;
+
+function TCustomWiimote.GetActive: Boolean;
+begin
+  Result := not FReportReader.Suspended;
+end;
+
+function TCustomWiimote.GetButtonsDown: TwmButtons;
+begin
+  Result := FButtonsDown;
+end;
+
+function TCustomWiimote.GetConnected: Boolean;
+begin
+  Result := FConnection.Connected;
+end;
+
+function TCustomWiimote.GetCurrentAccel(const Index: Integer): Single;
+begin
+  Result := FAccels[Index];
+end;
+
+function TCustomWiimote.GetIRPoint(AIndex: Integer): TPoint;
+begin
+  if (AIndex >=0) and (AIndex <= IRPointCount) then
+    Result := FIRPoints[AIndex]
+  else
+    raise Exception.Create('Invalid index');
+end;
+
+function TCustomWiimote.GetIRPointSize(AIndex: Integer): Byte;
+begin
+  if (AIndex >=0) and (AIndex <= IRPointCount) then
+    Result := FIRPointSizes[AIndex]
+  else
+    raise Exception.Create('Invalid index');
+end;
+
+procedure TCustomWiimote.ReadAccelCalibration;
+var
+  OutRep : TwmOutputReportReadMemory;
+begin
+  OutRep := TwmOutputReportReadMemory.Create;
+  try
+    OutRep.Address := $0016;
+    OutRep.Size := 7;
+    OutRep.Rumble := FRumble;
+
+    if FConnection.WriteReport(OutRep) then
+      FReadMemStack.Add('AccelCalibration');
+  finally
+    OutRep.Free;
+  end;
+end;
+
+procedure TCustomWiimote.RequestStatus;
+var
+  Rep : TwmOutputReportStatus;
+begin
+  Rep := TwmOutputReportStatus.Create;
+  try
+    Rep.Rumble := FRumble;
+    FConnection.WriteReport(Rep);
+  finally
+    Rep.Free;
+  end;
+end;
+
+procedure TCustomWiimote.SetActive(const Value: Boolean);
+begin
+  FReportReader.Suspended := not Value;
+end;
+
+procedure TCustomWiimote.SetIRMode(const Value: TwmIRMode);
+var
+  RepIR : TwmOutputReportIR;
+  RepIR2 : TwmOutputReportIR2;
+  RepWriteMem : TwmOutputReportWriteMemory;
+  Data : TwmRawData;
+  Reporting : TwmOutputReportReporting;
+begin
+  RepIR := TwmOutputReportIR.Create;
+  RepIR2 := TwmOutputReportIR2.Create;
+  RepWriteMem := TwmOutputReportWriteMemory.Create;
+  try
+    RepIR.Enabled := Value <> wmiOff;
+    RepIR2.Enabled := Value <> wmiOff;
+    RepIR.Rumble := FRumble;
+    RepIR2.Rumble := FRumble;
+
+    if FConnection.WriteReport(RepIR) and
+       FConnection.WriteReport(RepIR2) then
+      FIRMode := Value;
+
+    SetLength(Data, 1); Data[0] := $08;
+    RepWriteMem.Address := WIIMOTE_MEMADDR_IR;
+    RepWriteMem.Data := Data;
+    FConnection.WriteReport(RepWriteMem);
+
+    Data[0] := Byte(Value);
+    RepWriteMem.Data := Data;
+    RepWriteMem.Address := WIIMOTE_MEMADDR_IR_MODE;
+    FConnection.WriteReport(RepWriteMem);
+
+    SetLength(Data, 9);
+    Data[0] := $00; Data[1] := $00; Data[2] := $00; Data[3] := $00;
+    Data[4] := $00; Data[5] := $00; Data[6] := $90; Data[7] := $00;
+    Data[8] := $41;
+    RepWriteMem.Data := Data;
+    RepWriteMem.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_1;
+    FConnection.WriteReport(RepWriteMem);
+
+    SetLength(Data, 2);
+    Data[0] := $40; Data[1] := $00;
+    RepWriteMem.Data := Data;
+    RepWriteMem.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_2;
+    FConnection.WriteReport(RepWriteMem);
+  finally
+    RepIR.Free;
+    RepIR2.Free;
+    RepWriteMem.Free;
+  end;
+
+  Reporting := TwmOutputReportReporting.Create;
+  try
+    Reporting.Rumble := FRumble;
+
+    if Value <> wmiOff then
+      Reporting.ReportType := TwmInputReportButtonsAccelIR
+    else
+      Reporting.ReportType := TwmInputReportButtonsAccel;
+
+    FConnection.WriteReport(Reporting);
+  finally
+    Reporting.Free;
+  end;
+end;
+
+procedure TCustomWiimote.SetLedsOn(const Value: TwmLEDs);
+var
+  RepLeds : TwmOutputReportLEDs;
+begin
+  FLedsOn := Value;
+
+  RepLeds := TwmOutputReportLEDs.Create;
+  try
+    RepLeds.LEDsOn := Value;
+    RepLeds.Rumble := FRumble;
+
+    if FConnection.WriteReport(RepLeds) then
+      RequestStatus;
+  finally
+    RepLeds.Free;
+  end;
+end;
+
+procedure TCustomWiimote.SetRumble(AValue: Boolean);
+begin
+  FRumble := AValue;
+
+  RequestStatus;
+end;
+
+procedure TCustomWiimote.DoConnect(Sender: TObject);
+begin
+  if Assigned(FOnConnected) then
+    FOnConnected(Self);
+end;
+
+procedure TCustomWiimote.DoDisconnect(Sender: TObject);
+begin
+  if Assigned(FOnDisconnected) then
+    FOnDisconnected(Self);
+end;
+
+procedure TCustomWiimote.DoNewReport(const AReport: TwmReport);
+begin
+  if Assigned(FOnNewReport) then
+    FOnNewReport(AReport);
+
+  if AReport is TwmInputReportReadMemory then
+    ExtractReadMemory(TwmInputReportReadMemory(AReport));
+
+  if AReport is TwmInputReportButtonsAccel then
+    ExtractAccel(TwmInputReportButtonsAccel(AReport));
+
+  if AReport is TwmInputReportButtons then
+    ExtractButtonStates(TwmInputReportButtons(AReport));
+
+  if AReport is TwmInputReportButtonsAccelIR then
+    ExtractIRInfos(TwmInputReportButtonsAccelIR(AReport));
+
+  if AReport is TwmInputReportStatus then
+  begin
+    ExtractStatusinfos(TwmInputReportStatus(AReport));
+
+    if Assigned(FOnStatus) then
+      FOnStatus(Self);
+  end;
+end;
+
+procedure TCustomWiimote.ExtractAccel(AReport: TwmInputReportButtonsAccel);
+var
+  Raw,
+  Calib0,
+  CalibG : Single;
+begin
+  Raw := AReport.XAccl;
+  Calib0 := FAccelCalibration.X0;
+  CalibG := FAccelCalibration.XG;
+  if (CalibG - Calib0) <> 0 then
+    FAccels[0] := (Raw - Calib0) / (CalibG - Calib0)
+  else
+    FAccels[0] := 0;
+
+  Raw := AReport.YAccl;
+  Calib0 := FAccelCalibration.Y0;
+  CalibG := FAccelCalibration.YG;
+  if (CalibG - Calib0) <> 0 then
+    FAccels[1] := (Raw - Calib0) / (CalibG - Calib0)
+  else
+    FAccels[1] := 0;
+
+  Raw := AReport.ZAccl;
+  Calib0 := FAccelCalibration.Z0;
+  CalibG := FAccelCalibration.ZG;
+  if (CalibG - Calib0) <> 0 then
+    FAccels[2] := (Raw - Calib0) / (CalibG - Calib0)
+  else
+    FAccels[1] := 0;
+end;
+
+procedure TCustomWiimote.ExtractButtonStates(AReport: TwmInputReportButtons);
+var
+  Button : TwmButton;
+  ReportButtons : TwmButtons;
+begin
+  ReportButtons := AReport.ButtonsDown;
+
+  for Button := Low(TwmButton) to High(TwmButton) do
+  begin
+
+    if (not (Button in FButtonsDown)) and (Button in ReportButtons) then
+    begin
+      if Assigned(FOnButtonDown) then
+        FOnButtonDown(Button)
+    end
+    else
+    if (Button in FButtonsDown) and (not (Button in ReportButtons)) then
+    begin
+      if Assigned(FOnButtonUp) then
+        FOnButtonUp(Button)
+    end
+    else
+    if (Button in FButtonsDown) and (Button in ReportButtons) then
+    begin
+      if Assigned(FOnButtonIsDown) then
+        FOnButtonIsDown(Button)
+    end;
+  end;
+
+  FButtonsDown := ReportButtons;
+end;
+
+procedure TCustomWiimote.ExtractIRInfos(AReport: TwmInputReportButtonsAccelIR);
+var
+  idx : Integer;
+begin
+  AReport.IRMode := FIRMode;
+
+  FIRPointCount := AReport.IRPointCount;
+
+  for idx := 0 to FIRPointCount - 1 do
+    FIRPoints[idx] := AReport.IRPoint[idx];
+
+  for idx := 0 to FIRPointCount - 1 do
+    FIRPointSizes[idx] := AReport.IRPointSize[idx];
+end;
+
+procedure TCustomWiimote.ExtractStatusInfos(AReport: TwmInputReportStatus);
+begin
+  FLedsOn := AReport.LedsOn;
+  FBattery := AReport.BatterLevel;
+end;
+
+procedure TCustomWiimote.ExtractReadMemory(AReport: TwmInputReportReadMemory);
+var
+  Data : TwmRawData;
+begin
+  Data := AReport.Data;
+
+  if FReadMemStack.Count > 0 then
+  begin
+  
+    if SameText(FReadMemStack[0], 'AccelCalibration') then
+    begin
+      FAccelCalibration.X0 := Data[0];
+      FAccelCalibration.Y0 := Data[1];
+      FAccelCalibration.Z0 := Data[2];
+      FAccelCalibration.XG := Data[4];
+      FAccelCalibration.YG := Data[5];
+      FAccelCalibration.ZG := Data[6];
+    end;
+
+    FReadMemStack.Delete(0);
+    
+  end;
+end;
+
+//==============================================================================
+
+
+{ TwmReportReader }
+
+constructor TwmReportReader.Create(const AConnection: TwmDeviceConnection;
+  AOnNewReport: TwmOnReportProc);
+begin
+  inherited Create(true);
+
+  FConnection := AConnection;
+  FOnNewReport := AOnNewReport;
+
+  FreeOnTerminate := true;
+
+  Resume;
+end;
+
+procedure TwmReportReader.Execute;
+begin
+  while not Terminated do
+  begin
+
+    if (not Suspended) and FConnection.Connected then
+    begin
+      if FConnection.ReadReport(FReport) then
+      begin
+        try
+          Synchronize(SyncDoNewReport);
+        except
+        end;
+
+        FReport.Free;
+      end;
+    end;
+
+    sleep(1);
+  end;
+end;
+
+procedure TwmReportReader.SyncDoNewReport;
+begin
+  if Assigned(FOnNewReport) then
+    FOnNewReport(FReport);
 end;
 
 initialization
