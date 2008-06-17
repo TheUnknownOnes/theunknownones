@@ -30,6 +30,7 @@ type
   TCustomSettingsLink = class;
   TCustomSettingsLinkList = class;
 
+  { - use the following types whenever possible}
   TSettingName = WideString;
 
   TSettingValue = Variant;
@@ -49,8 +50,9 @@ type
 //==============================================================================
 
 
-  //Just a list for holding settings (for internal use)
   TSettingList = class(TList)
+  { - just a list of TSetting-Objects
+    - for internal use only}
   protected
     function GetItem(Index: Integer): TSetting;
     procedure SetItem(Index: Integer; const Value: TSetting);
@@ -75,6 +77,9 @@ type
 
 
   TSetting = class
+  { - represents one setting
+    - cares about its parent and children
+    - for internal use only}
   protected
     FParent : TSetting;
     FName : TSettingName;
@@ -137,6 +142,9 @@ type
 
 
   TCustomSettings = class(TComponent)
+  { - the mother of all all TSetting-Components
+    - provides routines for setting/getting/deleting settings
+    - should be the base for implementing new features}
   protected
     FRootSetting : TSetting;
     FParentSettings: TCustomSettings;
@@ -227,6 +235,8 @@ type
 
 
   TCustomSettingsLinkList = class(TList)
+  { - a list for Settings-Links
+    - for internal use only}
   protected
     function GetItem(Index: Integer): TCustomSettingsLink;
     procedure SetItem(Index: Integer; const Value: TCustomSettingsLink);
@@ -248,6 +258,8 @@ type
 
 
   TCustomSettingsLink = class(TComponent)
+  { - a Settings-Link connects something (a component, ...) with a
+      Settings-Cbject in order to store/restore Settings of the "something"}
   protected
     FSettings: TCustomSettings;
     FDefaultRootSetting: TSettingName;
