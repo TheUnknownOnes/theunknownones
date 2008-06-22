@@ -59,6 +59,12 @@ type
                wmiExtended  = $03,
                wmiFull      = $05);
 
+  TwmIRSensitivity = (wmiSense1,
+                      wmiSense2,
+                      wmiSense3,
+                      wmiSense4,
+                      wmiSense5);
+
 
   TwmAccelCalibration = record
     X0,
@@ -376,6 +382,7 @@ type
     FRumble : Boolean;
     FBattery : Byte;
     FIRMode: TwmIRMode;
+    FIRSense: TwmIRSensitivity;
     FIRPoints : array[0..3] of TPoint;
     FIRPointSizes : array[0..3] of Byte;
     FIRPointCount : Byte;
@@ -387,6 +394,9 @@ type
     FOnButtonDown: TwmOnButtonProc;
     FOnButtonIsDown: TwmOnButtonProc;
     FOnStatus: TNotifyEvent;
+
+    function GetData1ForIRSense(ASensitivity : TwmIRSensitivity) : TwmRawData;
+    function GetData2ForIRSense(ASensitivity : TwmIRSensitivity) : TwmRawData;
 
     procedure DoNewReport(const AReport : TwmReport); virtual;
     procedure DoConnect(Sender : TObject); virtual;
@@ -410,6 +420,7 @@ type
     procedure SetIRMode(const Value: TwmIRMode);
     function GetIRPoint(AIndex: Integer): TPoint;
     function GetIRPointSize(AIndex: Integer): Byte;
+    procedure SetIRSense(const Value: TwmIRSensitivity);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -435,6 +446,7 @@ type
     property BatteryPercent : Byte read FBattery;
 
     property IRMode : TwmIRMode read FIRMode write SetIRMode;
+    property IRSensitivity : TwmIRSensitivity read FIRSense write SetIRSense;
     property IRPointPos[AIndex : Integer] : TPoint read GetIRPoint;
     property IRPointSize[AIndex : Integer] : Byte read GetIRPointSize;
     property IRPointCount : Byte read FIRPointCount;
@@ -1243,6 +1255,10 @@ begin
   Result := 0;
 
   case FIRMode of
+    wmiBasic:
+    begin
+      Result := 15;
+    end;
     wmiExtended:
     begin
       case AIndex of
@@ -1342,6 +1358,69 @@ begin
   Result := FAccels[Index];
 end;
 
+function TCustomWiimote.GetData1ForIRSense(
+  ASensitivity: TwmIRSensitivity): TwmRawData;
+begin
+  SetLength(Result, 9);
+
+  //Defaults
+  Result[0] := $02; Result[1] := $00; Result[2] := $00; Result[3] := $71;
+  Result[4] := $01; Result[5] := $00; Result[6] := $64; Result[7] := $00;
+  Result[8] := $FE;
+
+  case ASensitivity of
+    wmiSense1:
+    begin
+      //Default is Sensitivity1
+    end;
+    wmiSense2:
+    begin
+      Result[6] := $96; Result[8] := $B4;
+    end;
+    wmiSense3:
+    begin
+      Result[6] := $AA; Result[8] := $64;
+    end;
+    wmiSense4:
+    begin
+      Result[6] := $C8; Result[8] := $36;
+    end;
+    wmiSense5:
+    begin
+      Result[0] := $07; Result[6] := $72; Result[8] := $20;
+    end;
+  end;
+end;
+
+function TCustomWiimote.GetData2ForIRSense(
+  ASensitivity: TwmIRSensitivity): TwmRawData;
+begin
+  SetLength(Result, 2);
+
+  case ASensitivity of
+    wmiSense1:
+    begin
+      Result[0] := $FD; Result[1] := $05;
+    end;
+    wmiSense2:
+    begin
+      Result[0] := $B3; Result[1] := $04;
+    end;
+    wmiSense3:
+    begin
+      Result[0] := $63; Result[1] := $03;
+    end;
+    wmiSense4:
+    begin
+      Result[0] := $35; Result[1] := $03;
+    end;
+    wmiSense5:
+    begin
+      Result[0] := $1F; Result[1] := $03;
+    end;
+  end;
+end;
+
 function TCustomWiimote.GetIRPoint(AIndex: Integer): TPoint;
 begin
   if (AIndex >=0) and (AIndex <= IRPointCount) then
@@ -1423,20 +1502,6 @@ begin
     RepWriteMem.Data := Data;
     RepWriteMem.Address := WIIMOTE_MEMADDR_IR_MODE;
     FConnection.WriteReport(RepWriteMem);
-
-    SetLength(Data, 9);
-    Data[0] := $00; Data[1] := $00; Data[2] := $00; Data[3] := $00;
-    Data[4] := $00; Data[5] := $00; Data[6] := $90; Data[7] := $00;
-    Data[8] := $41;
-    RepWriteMem.Data := Data;
-    RepWriteMem.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_1;
-    FConnection.WriteReport(RepWriteMem);
-
-    SetLength(Data, 2);
-    Data[0] := $40; Data[1] := $00;
-    RepWriteMem.Data := Data;
-    RepWriteMem.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_2;
-    FConnection.WriteReport(RepWriteMem);
   finally
     RepIR.Free;
     RepIR2.Free;
@@ -1455,6 +1520,32 @@ begin
     FConnection.WriteReport(Reporting);
   finally
     Reporting.Free;
+  end;
+end;
+
+procedure TCustomWiimote.SetIRSense(const Value: TwmIRSensitivity);
+var
+  RepWriteMem1,
+  RepWriteMem2 : TwmOutputReportWriteMemory;
+begin
+  RepWriteMem1 := TwmOutputReportWriteMemory.Create;
+  RepWriteMem2 := TwmOutputReportWriteMemory.Create;
+  try
+    RepWriteMem1.Rumble := FRumble;
+    RepWriteMem2.Rumble := FRumble;
+
+    RepWriteMem1.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_1;
+    RepWriteMem1.Data := GetData1ForIRSense(Value);
+
+    RepWriteMem2.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_2;
+    RepWriteMem2.Data := GetData2ForIRSense(Value);
+
+    if FConnection.WriteReport(RepWriteMem1) and
+       FConnection.WriteReport(RepWriteMem2) then
+      FIRSense := Value;
+  finally
+    RepWriteMem1.Free;
+    RepWriteMem2.Free;
   end;
 end;
 
@@ -1531,7 +1622,7 @@ begin
   Calib0 := FAccelCalibration.X0;
   CalibG := FAccelCalibration.XG;
   if (CalibG - Calib0) <> 0 then
-    FAccels[0] := (Raw - Calib0) / (CalibG - Calib0)
+    FAccels[0] := ((Raw - Calib0) / (CalibG - Calib0))
   else
     FAccels[0] := 0;
 
@@ -1539,7 +1630,7 @@ begin
   Calib0 := FAccelCalibration.Y0;
   CalibG := FAccelCalibration.YG;
   if (CalibG - Calib0) <> 0 then
-    FAccels[1] := (Raw - Calib0) / (CalibG - Calib0)
+    FAccels[1] := ((Raw - Calib0) / (CalibG - Calib0))
   else
     FAccels[1] := 0;
 
@@ -1547,9 +1638,9 @@ begin
   Calib0 := FAccelCalibration.Z0;
   CalibG := FAccelCalibration.ZG;
   if (CalibG - Calib0) <> 0 then
-    FAccels[2] := (Raw - Calib0) / (CalibG - Calib0)
+    FAccels[2] := ((Raw - Calib0) / (CalibG - Calib0))
   else
-    FAccels[1] := 0;
+    FAccels[2] := 0;
 end;
 
 procedure TCustomWiimote.ExtractButtonStates(AReport: TwmInputReportButtons);

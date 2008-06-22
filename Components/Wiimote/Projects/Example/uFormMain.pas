@@ -5,16 +5,17 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, uWiimote, StdCtrls, ExtCtrls, pngimage, uEffectPNGImage, uEffectPNG,
-  ComCtrls;
+  ComCtrls, TeEngine, Series, TeeProcs, Chart;
 
 type
   TForm1 = class(TForm)
     ListBox1: TListBox;
     btn_Connnect: TButton;
     Wiimote1: TWiimote;
-    ed_AccelX: TEdit;
-    ed_AccelY: TEdit;
-    ed_AccelZ: TEdit;
+    pb_Battery: TProgressBar;
+    tm_Battery: TTimer;
+    tm_Leds: TTimer;
+    GroupBox1: TGroupBox;
     Image1: TImage;
     img_ButtonA: TEffectPNGImage;
     img_ButtonMinus: TEffectPNGImage;
@@ -27,23 +28,28 @@ type
     img_CrossUp: TEffectPNGImage;
     img_CrossRight: TEffectPNGImage;
     img_CrossCenter: TEffectPNGImage;
-    pb_Battery: TProgressBar;
-    tm_Battery: TTimer;
     pan_Led1: TPanel;
     pan_Led2: TPanel;
     pan_Led3: TPanel;
     pan_Led4: TPanel;
-    tm_Leds: TTimer;
+    pb_IRPoints: TProgressBar;
+    Edit1: TEdit;
+    Edit2: TEdit;
+    Edit3: TEdit;
+    Edit4: TEdit;
+    Edit5: TEdit;
+    Edit6: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure btn_ConnnectClick(Sender: TObject);
     procedure Wiimote1Connected(Sender: TObject);
     procedure Wiimote1Disconnected(Sender: TObject);
-    procedure Wiimote1NewReport(const AReport: TwmReport);
     procedure Wiimote1ButtonDown(AButton: TwmButton);
     procedure Wiimote1ButtonUp(AButton: TwmButton);
     procedure tm_BatteryTimer(Sender: TObject);
     procedure Wiimote1Status(Sender: TObject);
     procedure tm_LedsTimer(Sender: TObject);
+    procedure FormClick(Sender: TObject);
+    procedure Wiimote1NewReport(const AReport: TwmReport);
   private
   public
     { Public-Deklarationen }
@@ -61,18 +67,30 @@ begin
   if Wiimote1.Connected then
     Wiimote1.Disconnect
   else
+  begin
     Wiimote1.Connect(ListBox1.Items[ListBox1.ItemIndex]);
+    Wiimote1.IRSensitivity := wmiSense5;
+    Wiimote1.IRMode := wmiExtended;
+  end;
+
+end;
+
+procedure TForm1.FormClick(Sender: TObject);
+begin
+  Wiimote1.IRMode := wmiOff;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  Randomize;                                               
+  Randomize;
 
   ReportMemoryLeaksOnShutdown := true;
 
   TwmDeviceConnection.ListDevices(ListBox1.Items);
 
   ListBox1.ItemIndex := 0;
+
+  
 end;
 
 procedure TForm1.tm_BatteryTimer(Sender: TObject);
@@ -164,10 +182,28 @@ begin
 end;
 
 procedure TForm1.Wiimote1NewReport(const AReport: TwmReport);
+var
+  CP : Tpoint;
 begin
-  ed_AccelX.Text := FloatToStr(Wiimote1.AccelX);
-  ed_AccelY.Text := FloatToStr(Wiimote1.AccelY);
-  ed_AccelZ.Text := FloatToStr(Wiimote1.AccelZ);
+  pb_IRPoints.Position := Wiimote1.IRPointCount;
+
+  {GetCursorPos(CP);
+  if Abs(Wiimote1.AccelX) > 0.3 then
+    cp.X := cp.X + Round(Wiimote1.AccelX * 10);
+  if Abs(Wiimote1.AccelZ) > 0.3 then
+  cp.Y := cp.Y + Round(Wiimote1.AccelZ * 10);
+  SetCursorPos(CP.X, cp.Y);}
+
+  Edit1.Text := FloatToStr(Wiimote1.AccelX);
+  Edit2.Text := FloatToStr(Wiimote1.AccelY);
+  Edit3.Text := FloatToStr(Wiimote1.AccelZ);
+
+  if StrToFloat(Edit1.Text)> StrToFloatDef(Edit4.Text, 0) then
+    Edit4.Text := Edit1.Text;
+  if StrToFloat(Edit2.Text)> StrToFloatDef(Edit5.Text, 0) then
+    Edit5.Text := Edit2.Text;
+  if StrToFloat(Edit3.Text)> StrToFloatDef(Edit6.Text, 0) then
+    Edit6.Text := Edit3.Text;
 end;
 
 procedure TForm1.Wiimote1Status(Sender: TObject);
