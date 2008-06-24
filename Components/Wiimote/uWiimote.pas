@@ -23,7 +23,7 @@ const
 
   WIIMOTE_REPORT_LEN = 22;
 
-  WIIMOTE_MEMADDR_IR				= $04b00030;
+  WIIMOTE_MEMADDR_IR				= $04B00030;
   WIIMOTE_MEMADDR_IR_SENSITIVITY_1	= $04B00000;
   WIIMOTE_MEMADDR_IR_SENSITIVITY_2	= $04B0001A;
   WIIMOTE_MEMADDR_IR_MODE			= $04B00033;
@@ -377,6 +377,8 @@ type
 
     FAccelCalibration : TwmAccelCalibration;
     FAccels : array[0..2] of Single;
+    FRawAccels : array[0..2] of Byte;
+    
     FButtonsDown : TwmButtons;
     FLedsOn: TwmLEDs;
     FRumble : Boolean;
@@ -420,7 +422,6 @@ type
     procedure SetIRMode(const Value: TwmIRMode);
     function GetIRPoint(AIndex: Integer): TPoint;
     function GetIRPointSize(AIndex: Integer): Byte;
-    procedure SetIRSense(const Value: TwmIRSensitivity);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -429,6 +430,10 @@ type
     function Disconnect() : Boolean;
 
     procedure RequestStatus;
+
+    procedure CalibrateAccelXNow;
+    procedure CalibrateAccelYNow;
+    procedure CalibrateAccelZNow;
 
     property Active : Boolean read GetActive write SetActive;
     property Connected : Boolean read GetConnected;
@@ -446,7 +451,7 @@ type
     property BatteryPercent : Byte read FBattery;
 
     property IRMode : TwmIRMode read FIRMode write SetIRMode;
-    property IRSensitivity : TwmIRSensitivity read FIRSense write SetIRSense;
+    property IRSensitivity : TwmIRSensitivity read FIRSense write FIRSense;
     property IRPointPos[AIndex : Integer] : TPoint read GetIRPoint;
     property IRPointSize[AIndex : Integer] : Byte read GetIRPointSize;
     property IRPointCount : Byte read FIRPointCount;
@@ -1184,7 +1189,7 @@ begin
     0:
     begin
       Result.X := FBuffer[6] or ((FBuffer[8] shr 4) and $03) shl 8;
-      Result.Y := FBuffer[7] or ((FBuffer[8] shr 4) and $03) shl 8;
+      Result.Y := FBuffer[7] or ((FBuffer[8] shr 6) and $03) shl 8;
     end;
 
     1:
@@ -1277,6 +1282,63 @@ end;
 
 { TCustomWiimote }
 
+procedure TCustomWiimote.CalibrateAccelXNow;
+var
+  Rep : TwmOutputReportWriteMemory;
+  Data : TwmRawData;
+begin
+  Rep := TwmOutputReportWriteMemory.Create;
+  Rep.Address := $0016;
+  SetLength(Data, 1);
+  Data[0] := FRawAccels[0];
+  Rep.Data := Data;
+  Rep.Rumble := FRumble;
+
+  FConnection.WriteReport(Rep);
+
+  Rep.Free;
+
+  ReadAccelCalibration;
+end;
+
+procedure TCustomWiimote.CalibrateAccelYNow;
+var
+  Rep : TwmOutputReportWriteMemory;
+  Data : TwmRawData;
+begin
+  Rep := TwmOutputReportWriteMemory.Create;
+  Rep.Address := $0017;
+  SetLength(Data, 1);
+  Data[0] := FRawAccels[1];
+  Rep.Data := Data;
+  Rep.Rumble := FRumble;
+
+  FConnection.WriteReport(Rep);
+
+  Rep.Free;
+
+  ReadAccelCalibration;
+end;
+
+procedure TCustomWiimote.CalibrateAccelZNow;
+var
+  Rep : TwmOutputReportWriteMemory;
+  Data : TwmRawData;
+begin
+  Rep := TwmOutputReportWriteMemory.Create;
+  Rep.Address := $0018;
+  SetLength(Data, 1);
+  Data[0] := FRawAccels[2];
+  Rep.Data := Data;
+  Rep.Rumble := FRumble;
+
+  FConnection.WriteReport(Rep);
+
+  Rep.Free;
+
+  ReadAccelCalibration;
+end;
+
 function TCustomWiimote.Connect(ADevicePath: String): Boolean;
 var
   Rep : TwmOutputReportReporting;
@@ -1285,6 +1347,8 @@ begin
 
   if Result then
   begin
+    IRMode := wmiOff;
+
     ReadAccelCalibration;
 
     Rep := TwmOutputReportReporting.Create;
@@ -1305,11 +1369,15 @@ constructor TCustomWiimote.Create(AOwner: TComponent);
 begin
   inherited;
 
+  FIRSense := wmiSense1;
+
   FIRPointCount := 0;
 
   FButtonsDown := [];
 
   FReadMemStack := TStringList.Create;
+
+  FillChar(FAccelCalibration, SizeOf(FAccelCalibration), 0);
 
   FConnection := TwmDeviceConnection.Create;
   FConnection.OnConnected := DoConnect;
@@ -1484,10 +1552,12 @@ begin
   RepIR2 := TwmOutputReportIR2.Create;
   RepWriteMem := TwmOutputReportWriteMemory.Create;
   try
-    RepIR.Enabled := Value <> wmiOff;
-    RepIR2.Enabled := Value <> wmiOff;
     RepIR.Rumble := FRumble;
     RepIR2.Rumble := FRumble;
+    RepWriteMem.Rumble := FRumble;
+
+    RepIR.Enabled := Value <> wmiOff;
+    RepIR2.Enabled := Value <> wmiOff;
 
     if FConnection.WriteReport(RepIR) and
        FConnection.WriteReport(RepIR2) then
@@ -1498,9 +1568,32 @@ begin
     RepWriteMem.Data := Data;
     FConnection.WriteReport(RepWriteMem);
 
-    Data[0] := Byte(Value);
+    Sleep(50);
+
+    Data := GetData1ForIRSense(FIRSense);
+    RepWriteMem.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_1;
+    RepWriteMem.Data := Data;
+    FConnection.WriteReport(RepWriteMem);
+
+    Sleep(50);
+
+    Data := GetData2ForIRSense(FIRSense);
+    RepWriteMem.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_2;
+    RepWriteMem.Data := Data;
+    FConnection.WriteReport(RepWriteMem);
+
+    Sleep(50);
+
+    SetLength(Data, 1); Data[0] := Byte(Value);
     RepWriteMem.Data := Data;
     RepWriteMem.Address := WIIMOTE_MEMADDR_IR_MODE;
+    FConnection.WriteReport(RepWriteMem);
+
+    Sleep(50);
+
+    SetLength(Data, 1); Data[0] := $08;
+    RepWriteMem.Address := WIIMOTE_MEMADDR_IR;
+    RepWriteMem.Data := Data;
     FConnection.WriteReport(RepWriteMem);
   finally
     RepIR.Free;
@@ -1520,32 +1613,6 @@ begin
     FConnection.WriteReport(Reporting);
   finally
     Reporting.Free;
-  end;
-end;
-
-procedure TCustomWiimote.SetIRSense(const Value: TwmIRSensitivity);
-var
-  RepWriteMem1,
-  RepWriteMem2 : TwmOutputReportWriteMemory;
-begin
-  RepWriteMem1 := TwmOutputReportWriteMemory.Create;
-  RepWriteMem2 := TwmOutputReportWriteMemory.Create;
-  try
-    RepWriteMem1.Rumble := FRumble;
-    RepWriteMem2.Rumble := FRumble;
-
-    RepWriteMem1.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_1;
-    RepWriteMem1.Data := GetData1ForIRSense(Value);
-
-    RepWriteMem2.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_2;
-    RepWriteMem2.Data := GetData2ForIRSense(Value);
-
-    if FConnection.WriteReport(RepWriteMem1) and
-       FConnection.WriteReport(RepWriteMem2) then
-      FIRSense := Value;
-  finally
-    RepWriteMem1.Free;
-    RepWriteMem2.Free;
   end;
 end;
 
@@ -1614,31 +1681,42 @@ end;
 
 procedure TCustomWiimote.ExtractAccel(AReport: TwmInputReportButtonsAccel);
 var
-  Raw,
   Calib0,
   CalibG : Single;
 begin
-  Raw := AReport.XAccl;
+  //If no calibration exists, read it
+  if (FAccelCalibration.X0 = 0) and
+     (FAccelCalibration.Y0 = 0) and
+     (FAccelCalibration.Z0 = 0) and
+     (FAccelCalibration.XG = 0) and
+     (FAccelCalibration.YG = 0) and
+     (FAccelCalibration.ZG = 0) then
+    ReadAccelCalibration;
+  
+
+
+  FRawAccels[0] := AReport.XAccl;
+  FRawAccels[1] := AReport.YAccl;
+  FRawAccels[2] := AReport.ZAccl;
+
   Calib0 := FAccelCalibration.X0;
   CalibG := FAccelCalibration.XG;
   if (CalibG - Calib0) <> 0 then
-    FAccels[0] := ((Raw - Calib0) / (CalibG - Calib0))
+    FAccels[0] := ((FRawAccels[0] - Calib0) / (CalibG - Calib0))
   else
     FAccels[0] := 0;
 
-  Raw := AReport.YAccl;
   Calib0 := FAccelCalibration.Y0;
   CalibG := FAccelCalibration.YG;
   if (CalibG - Calib0) <> 0 then
-    FAccels[1] := ((Raw - Calib0) / (CalibG - Calib0))
+    FAccels[1] := ((FRawAccels[1] - Calib0) / (CalibG - Calib0))
   else
     FAccels[1] := 0;
 
-  Raw := AReport.ZAccl;
   Calib0 := FAccelCalibration.Z0;
   CalibG := FAccelCalibration.ZG;
   if (CalibG - Calib0) <> 0 then
-    FAccels[2] := ((Raw - Calib0) / (CalibG - Calib0))
+    FAccels[2] := ((FRawAccels[2] - Calib0) / (CalibG - Calib0))
   else
     FAccels[2] := 0;
 end;
@@ -1715,8 +1793,9 @@ begin
       FAccelCalibration.ZG := Data[6];
     end;
 
+
+
     FReadMemStack.Delete(0);
-    
   end;
 end;
 
