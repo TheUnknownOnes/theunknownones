@@ -70,7 +70,7 @@ begin
   else
   begin
     Wiimote1.Connect(ListBox1.Items[ListBox1.ItemIndex]);
-    Wiimote1.IRSensitivity := wmiSense1;
+    Wiimote1.IRSensitivity := wmiSense5;
     Wiimote1.IRMode := wmiExtended;
   end;
 end;
@@ -88,14 +88,14 @@ end;
 
 procedure TForm1.SetCP;
 var
-  CP : TPoint;
+  CP, NP : TPoint;
   Middle : TPoint;
   P1, P2 : TPoint;
+  Dist : Integer;
 const
-  SensorBarBelow = true;
   ScreenFactor = 1.25;
 begin
-  if Wiimote1.IRPointCount = 2 then
+  if Wiimote1.IRPointCount > 1 then
   begin
     P1 := Wiimote1.IRPointPos[0];
     P2 := Wiimote1.IRPointPos[1];
@@ -110,13 +110,15 @@ begin
 
   Middle.X := 1024 - Middle.X;
 
-  if not SensorBarBelow then
-    Middle.Y := 768 - Middle.Y;
+  NP.X := Round(((Middle.X * (Screen.Width * ScreenFactor)) / 1024) - (Screen.Width * ((ScreenFactor - 1) / 2)));
+  NP.Y := Round(((Middle.Y * (Screen.Height * ScreenFactor)) / 768) - (Screen.Height * ((ScreenFactor - 1) / 2)));
 
-  Cp.X := Round(((Middle.X * (Screen.Width * ScreenFactor)) / 1024) - (Screen.Width * ((ScreenFactor - 1) / 2)));
-  Cp.Y := Round(((Middle.Y * (Screen.Height * ScreenFactor)) / 768) - (Screen.Height * ((ScreenFactor - 1) / 2)));
+  GetCursorPos(CP);
 
-  SetCursorPos(Cp.X, CP.Y);
+  Dist := Round(Sqrt(IntPower(Np.X - CP.X, 2) + IntPower(Np.Y - CP.Y, 2)));
+
+  if Dist > 5 then
+    SetCursorPos(NP.X, NP.Y);
 
 end;
 
