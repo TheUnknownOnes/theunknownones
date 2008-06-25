@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'EffectPNG-Test'
-  ClientHeight = 318
+  ClientHeight = 467
   ClientWidth = 722
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,8 +21,8 @@ object Form1: TForm1
     Caption = 'Alpha'
   end
   object Label2: TLabel
-    Left = 431
-    Top = 65
+    Left = 174
+    Top = 439
     Width = 69
     Height = 13
     Caption = 'Effect Percent'
@@ -694,8 +694,8 @@ object Form1: TForm1
     OnChange = tb_AlphaChange
   end
   object rg_EffectFrom: TRadioGroup
-    Left = 319
-    Top = 65
+    Left = 249
+    Top = 321
     Width = 106
     Height = 105
     Caption = 'Effect from ...'
@@ -724,8 +724,8 @@ object Form1: TForm1
     OnClick = rg_MirrorClick
   end
   object tb_EffectPercent: TTrackBar
-    Left = 431
-    Top = 84
+    Left = 249
+    Top = 432
     Width = 283
     Height = 29
     Max = 100
