@@ -23,6 +23,7 @@ package ConsoleTools_D100R;
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'ConsoleTools - Runtime'}
+{$RUNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
