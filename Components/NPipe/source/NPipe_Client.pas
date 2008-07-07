@@ -330,8 +330,30 @@ var
   Written,
   BytesToSend : Cardinal;
   Buffer      : TNPBuffer;
+
+  SecDesc     : TSecurityDescriptor;
+  PSecAttrib  : PSecurityAttributes;
+  SecAttrib   : TSecurityAttributes;
+
   Mode        : DWORD;
 begin
+  if not InitializeSecurityDescriptor(@SecDesc,SECURITY_DESCRIPTOR_REVISION) then
+  begin
+    FLastException:=ENP_InitSecurityDescriptor.Create(ENP_MSG_InitSecurityDescriptor);
+    Synchronize(DoError);
+  end;
+
+  if not  SetSecurityDescriptorDacl(@SecDesc,True, Nil, False) then
+  begin
+    FLastException:=ENP_SetSecurityDescriptor.Create(ENP_MSG_SetSecurityDescriptor);
+    Synchronize(DoError);
+  end;
+
+  SecAttrib.nLength := sizeof(SECURITY_ATTRIBUTES);
+  SecAttrib.lpSecurityDescriptor := @SecDesc;
+  SecAttrib.bInheritHandle := FALSE;
+  PSecAttrib:=@SecAttrib;
+
   Mode:=PIPE_READMODE_MESSAGE;
   if (not WaitNamedPipe(PChar('\\'+FPipeServer+'\pipe\'+FPipeName),
             FSendTimeout)) then
@@ -346,7 +368,7 @@ begin
                       GENERIC_WRITE or
                       FILE_FLAG_OVERLAPPED,
                       0,
-                      nil,
+                      PSecAttrib,
                       OPEN_EXISTING,
                       0,
                       0);
