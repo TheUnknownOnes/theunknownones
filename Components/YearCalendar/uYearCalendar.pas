@@ -6,6 +6,25 @@ uses
   Dialogs, ExtCtrls, GDIPOBJ, GDIPAPI, dateutils, SysConst;
 
 type
+  TYearCalendarDay = class(TCollectionItem)
+  private
+    FDate: TDate;
+    FColor: TColor;
+  published
+    property Date : TDate read FDate write FDate;
+    property Color : TColor read FColor write FColor;
+
+    constructor Create(Collection: TCollection); override;
+  end;
+
+  TYearCalendarDays = class(TCollection)
+  public
+    function Add: TYearCalendarDay;
+    function QueryByMonth(AYear, AMonth: Integer): TYearCalendarDays;
+  end;
+
+  THoverDayEvent = procedure(Sender: TObject; ADay : TDate) of object;
+
   TYearCalendar = class(TCustomControl)
   private
     FGraphics : TGPGraphics;
@@ -13,11 +32,15 @@ type
 
     FBrushSolidBlack : TGPSolidBrush;
     FBrushSolidWhite : TGPSolidBrush;
+    FBrushSolidVariable : TGPSolidBrush;
     FBrushSolidMonthTitle : TGPSolidBrush;
     FBrushSolidMonthBack : TGPSolidBrush;
     FBrushSolidWeekBack : TGPSolidBrush;
 
+    FBrushTranslucentHoverDay : TGPSolidBrush;
+
     FPenLineSolidBlack : TGPPen;
+    FPenLineSolidBlue  : TGPPen;
     FPenLineWeekdayUnderline : TGPPen;
 
     FFontDayTitle : TGPFont;
@@ -25,24 +48,43 @@ type
     FFontMonthTitle : TGPFont;
 
     FYear : Integer;
+    FSelectedDay : TDate;
+    FHoveredDay : TDate;
+    FDays: TYearCalendarDays;
+
+    FOnHoverDay : THoverDayEvent;
+
     procedure SetYear(const Value: Integer);
+    procedure SetDays(const Value: TYearCalendarDays);
   protected
     procedure InitGraph(ACanvas : HDC);
     procedure CloseGraph;
     procedure DrawMonth(AYear: Integer; AMonth: Word; ARect : TRect);
     procedure Draw(AYear: Integer; ACanvas : HDC; ARect : TRect);
 
+    procedure DoHoverDay(ADay : TDate);
+
     procedure Paint; override;
+    procedure Click; override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
-  published
-    property Year : Integer read FYear write SetYear;
+  public
+    property SelectedDate : TDate read FSelectedDay;
 
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  published
+    property Year : Integer read FYear write SetYear;
+    property Days : TYearCalendarDays read FDays write SetDays;
+                      
+    property OnHoverDay : THoverDayEvent read FOnHoverDay write FOnHoverDay;
+    property OnClick;      
   end;
 
 procedure Register;
 
 implementation
+
+uses Types;
 
 procedure Register;
 begin
@@ -55,7 +97,20 @@ constructor TYearCalendar.Create(AOwner: TComponent);
 begin
   inherited;
   FYear:=YearOf(now);
+  FDays:=TYearCalendarDays.Create(TYearCalendarDay);
   Self.DoubleBuffered:=True;
+end;
+
+destructor TYearCalendar.Destroy;
+begin
+  FDays.Free;
+  inherited;
+end;
+
+procedure TYearCalendar.DoHoverDay(ADay : TDate);
+begin
+  if Assigned(FOnHoverDay) then
+    FOnHoverDay(self, ADay);
 end;
 
 procedure TYearCalendar.Draw(AYear: Integer; ACanvas : HDC; ARect : TRect);
@@ -101,7 +156,10 @@ const
   HeightDays : Single = 140;
 var
   TransformX,
-  TransformY : single;
+  TransformY : Single;
+  MousePosX,
+  MousePosy  : Single;
+  MousePos   : TPoint;
   idx : integer;
   day : TDateTime;
   WeekOMon : Word;
@@ -109,12 +167,36 @@ var
   FirstDayIs : Word;
   WeekOYear : Word;
   OldWeek : Word;
+  DateTriangle : array[0..2] of TGPPointF;
+
+  Dates : TYearCalendarDays;
+
+  function MouseInDay(x, y : single): Boolean;
+  begin
+    Result:=(MousePosX >= x) and (MousePosY >= y) and
+            (MousePosX <= x + WidthDays) and
+            (MousePosY <= y + HeightDays);
+  end;
+
 begin
-  TransformX:=(ARect.Right-ARect.Left) / 1000;
-  TransformY:=(ARect.Bottom-ARect.Top) / 1000;
+  Dates:=Self.FDays.QueryByMonth(AYear, AMonth);
+
+  TransformX := (ARect.Right-ARect.Left) / 1000;
+  TransformY := (ARect.Bottom-ARect.Top) / 1000;
+
+  MousePosX := -1;
+  MousePosY := -1;
+  MousePos := ScreenToClient(Mouse.CursorPos);
+
+  if (MousePos.X >= ARect.Left) and (MousePos.X <= ARect.Right) then
+    MousePosX := (MousePos.X - ARect.Left) / TransformX;
+
+  if (MousePos.Y >= ARect.Top) and (MousePos.Y <= ARect.Bottom) then
+    MousePosY := ( MousePos.Y - ARect.Top) / TransformY;
 
   FGraphics.ScaleTransform(TransformX, TransformY);
   FGraphics.TranslateTransform(ARect.Left, ARect.Top, MatrixOrderAppend);
+
 
   FGraphics.FillRectangle(FBrushSolidMonthTitle, 0, 0, 1000, 143);
   FGraphics.FillRectangle(FBrushSolidMonthBack, 0, 143, 1000, 1000);
@@ -156,11 +238,47 @@ begin
                                            (WeekOMon * HeightDays) + YIndentDays),
                          FBrushSolidBlack);
 
+    if MouseInDay((DayOWeek * WidthDays) + XIndentDays,
+                  (WeekOMon * HeightDays) + YIndentDays) then
+    begin
+      FGraphics.FillRectangle(FBrushTranslucentHoverDay, (DayOWeek * WidthDays) + XIndentDays,
+                  (WeekOMon * HeightDays) + YIndentDays, WidthDays, HeightDays);
+      if FHoveredDay<>day then
+      begin
+        FHoveredDay:=day;
+        DoHoverDay(FHoveredDay);
+      end;
+    end;
+
+    for idx := 0 to Dates.Count - 1 do
+    begin
+      if SameDate(day,TYearCalendarDay(Dates.Items[idx]).Date) then
+      begin
+        DateTriangle[0].X:=(DayOWeek * WidthDays) + XIndentDays + WidthDays;
+        DateTriangle[0].Y:=(WeekOMon * HeightDays) + YIndentDays;
+        DateTriangle[1].X:=(DayOWeek * WidthDays) + XIndentDays;
+        DateTriangle[1].Y:=(WeekOMon * HeightDays) + YIndentDays + HeightDays;
+        DateTriangle[2].X:=(DayOWeek * WidthDays) + XIndentDays + WidthDays;
+        DateTriangle[2].Y:=(WeekOMon * HeightDays) + YIndentDays + HeightDays;
+
+        FBrushSolidVariable.SetColor(MakeColor(GetRed(TYearCalendarDay(Dates.Items[idx]).Color),
+                                               GetGreen(TYearCalendarDay(Dates.Items[idx]).Color),
+                                               GetBlue(TYearCalendarDay(Dates.Items[idx]).Color)));
+        FGraphics.FillPolygon(FBrushSolidVariable, PGPPointF(@DateTriangle[0]), 3);
+        Dates.Delete(idx);
+        break;
+      end;
+    end;
+
+    if day=FSelectedDay then
+      FGraphics.DrawRectangle(FPenLineSolidBlue, (DayOWeek * WidthDays) + XIndentDays,
+                  (WeekOMon * HeightDays) + YIndentDays, WidthDays, HeightDays);
+
     day:=IncDay(day);
   until MonthOf(day)<>AMonth;
 
-
   FGraphics.ResetTransform;
+  Dates.Free;
 end;
 
 procedure TYearCalendar.InitGraph(ACanvas : HDC);
@@ -170,10 +288,15 @@ begin
 
   FBrushSolidBlack:=TGPSolidBrush.Create(MakeColor(0,0,0));
   FBrushSolidWhite:=TGPSolidBrush.Create(MakeColor(255,255,255));
+  FBrushSolidVariable:=TGPSolidBrush.Create(MakeColor(0,0,0));
   FBrushSolidMonthTitle:=TGPSolidBrush.Create(MakeColor(128,128,128));
   FBrushSolidMonthBack:=TGPSolidBrush.Create(MakeColor(255,255,255));
   FBrushSolidWeekBack:=TGPSolidBrush.Create(MakeColor(250, 250, 250));
+
+  FBrushTranslucentHoverDay:=TGPSolidBrush.Create(MakeColor(128, 200, 200, 255));
+
   FPenLineSolidBlack:=TGPPen.Create(FBrushSolidBlack, 1);
+  FPenLineSolidBlue:=TGPPen.Create(MakeColor(0,0,255));
   FPenLineWeekdayUnderline:=TGPPen.Create(MakeColor(250,250,250));
 
   FFontDayTitle:=TGPFont.Create('Tahoma', 40, FontStyleBold);
@@ -193,6 +316,11 @@ begin
   Draw(FYear, Self.Canvas.Handle, self.ClientRect);
 end;
 
+procedure TYearCalendar.SetDays(const Value: TYearCalendarDays);
+begin
+  FDays.Assign(Value);
+end;
+
 procedure TYearCalendar.SetYear(const Value: Integer);
 begin
   if Value=0 then
@@ -202,19 +330,60 @@ begin
   Invalidate;
 end;
 
+procedure TYearCalendar.Click;
+begin
+  FSelectedDay:=FHoveredDay;
+  inherited;
+end;
+
 procedure TYearCalendar.CloseGraph;
 begin
   FFontDay.Free;
   FFontDayTitle.Free;
   FFontMonthTitle.Free;
+  FBrushSolidVariable.Free;
   FBrushSolidMonthTitle.Free;
   FBrushSolidWeekBack.Free;
   FBrushSolidMonthBack.Free;
   FBrushSolidWhite.Free;
+  FBrushTranslucentHoverDay.Free;
   FBrushSolidBlack.Free;
   FPenLineSolidBlack.Free;
+  FPenLineSolidBlue.Free;
   FPenLineWeekdayUnderline.Free;
   FGraphics.Free;
+end;
+
+{ TYearCalendarDays }
+
+function TYearCalendarDays.Add: TYearCalendarDay;
+begin
+  Result:=TYearCalendarDay(inherited Add);
+end;
+
+function TYearCalendarDays.QueryByMonth(AYear,
+  AMonth: Integer): TYearCalendarDays;
+var
+  idx : Integer;
+begin
+  Result:=TYearCalendarDays.Create(ItemClass);
+
+  for idx := 0 to self.Count - 1 do
+    if (YearOf(TYearCalendarDay(self.Items[idx]).Date)=AYear) and
+       (MonthOf(TYearCalendarDay(self.Items[idx]).Date)=AMonth) then
+      with result.Add do
+      begin
+        Date:=TYearCalendarDay(self.Items[idx]).Date;
+        Color:=TYearCalendarDay(self.Items[idx]).Color;
+      end;
+end;
+
+{ TYearCalendarDay }
+
+constructor TYearCalendarDay.Create(Collection: TCollection);
+begin
+  inherited;
+  FColor:=clLime;
 end;
 
 end.
