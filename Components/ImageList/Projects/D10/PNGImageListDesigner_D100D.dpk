@@ -33,6 +33,13 @@ requires
   vcl,
   vclx,
   PNGUtils_D100R,
-  PNGSupport_D100;
+  PNGSupport_D100,
+  xmlrtl,
+  vclactnband,
+  DirectX9_D10;
+
+contains
+  uPNGImageList_Designers in '..\..\Design\uPNGImageList_Designers.pas',
+  uPNGImageList_FormPNGObjectList in '..\..\Design\uPNGImageList_FormPNGObjectList.pas';
 
 end.
