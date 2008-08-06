@@ -155,28 +155,28 @@ begin
         if SaveColumnAllowClick then
           SetColumnOption(coAllowClick, 'AllowClick');
 
-        if SaveColumnAllowClick then
+        if SaveColumnDraggable then
           SetColumnOption(coDraggable, 'Draggable');
 
-        if SaveColumnAllowClick then
+        if SaveColumnEnabled then
           SetColumnOption(coEnabled, 'Enabled');
 
-        if SaveColumnAllowClick then
+        if SaveColumnParentColor then
           SetColumnOption(coParentColor, 'ParentColor');
 
-        if SaveColumnAllowClick then
+        if SaveColumnResizable then
           SetColumnOption(coResizable, 'Resizable');
 
-        if SaveColumnAllowClick then
+        if SaveColumnShowDropMark then
           SetColumnOption(coShowDropMark, 'ShowDropMark');
 
-        if SaveColumnAllowClick then
+        if SaveColumnVisible then
           SetColumnOption(coVisible, 'Visible');
 
-        if SaveColumnAllowClick then
+        if SaveColumnAutoSpring then
           SetColumnOption(coAutoSpring, 'AutoSpring');
 
-        if SaveColumnAllowClick then
+        if SaveColumnFixed then
           SetColumnOption(coFixed, 'Fixed');
       end;
 
@@ -222,28 +222,28 @@ begin
       if SaveColumnAllowClick then
           DoWriteColumnOption(coAllowClick, 'AllowClick');
 
-      if SaveColumnAllowClick then
+      if SaveColumnDraggable then
         DoWriteColumnOption(coDraggable, 'Draggable');
 
-      if SaveColumnAllowClick then
+      if SaveColumnEnabled then
         DoWriteColumnOption(coEnabled, 'Enabled');
 
-      if SaveColumnAllowClick then
+      if SaveColumnParentColor then
         DoWriteColumnOption(coParentColor, 'ParentColor');
 
-      if SaveColumnAllowClick then
+      if SaveColumnResizable then
         DoWriteColumnOption(coResizable, 'Resizable');
 
-      if SaveColumnAllowClick then
+      if SaveColumnShowDropMark then
         DoWriteColumnOption(coShowDropMark, 'ShowDropMark');
 
-      if SaveColumnAllowClick then
+      if SaveColumnVisible then
         DoWriteColumnOption(coVisible, 'Visible');
 
-      if SaveColumnAllowClick then
+      if SaveColumnAutoSpring then
         DoWriteColumnOption(coAutoSpring, 'AutoSpring');
 
-      if SaveColumnAllowClick then
+      if SaveColumnFixed then
         DoWriteColumnOption(coFixed, 'Fixed');
     end;    
   end;
