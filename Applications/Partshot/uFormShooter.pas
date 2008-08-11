@@ -9,7 +9,6 @@ uses
 type
   Tform_Shooter = class(TForm)
     lbl_Size: TLabel;
-    tm_Aligner: TTimer;
     lbl_Bottom: TLabel;
     lbl_Client: TLabel;
     pum_Shooter: TPopupMenu;
@@ -22,9 +21,9 @@ type
     procedure FormResize(Sender: TObject);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-    procedure tm_AlignerTimer(Sender: TObject);
     procedure mi_EndShootingClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormMouseLeave(Sender: TObject);
   private
     procedure AlignWindowUnderMouse;
 
@@ -73,6 +72,11 @@ begin
   end;
 end;
 
+procedure Tform_Shooter.FormMouseLeave(Sender: TObject);
+begin
+  AlignWindowUnderMouse;
+end;
+
 procedure Tform_Shooter.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 begin
@@ -95,7 +99,8 @@ end;
 
 procedure Tform_Shooter.FormResize(Sender: TObject);
 begin
-  lbl_Size.Caption := Format('%d x %d', [Width, Height]);
+  lbl_Size.Caption := Format('%d x %d', [Width, Height]) +
+                      ' | Next file: ' + form_Main.GenNextFileName;
 end;
 
 procedure Tform_Shooter.FormShow(Sender: TObject);
@@ -111,14 +116,6 @@ end;
 procedure Tform_Shooter.OnClickTransp(Sender: TObject);
 begin
   AlphaBlendValue := Byte(TMenuItem(Sender).Tag);
-end;
-
-procedure Tform_Shooter.tm_AlignerTimer(Sender: TObject);
-begin
-  if Visible then
-  begin
-    AlignWindowUnderMouse;
-  end;
 end;
 
 end.

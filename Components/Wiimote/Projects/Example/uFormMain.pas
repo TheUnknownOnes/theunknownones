@@ -70,7 +70,7 @@ begin
   else
   begin
     Wiimote1.Connect(ListBox1.Items[ListBox1.ItemIndex]);
-    Wiimote1.IRSensitivity := wmiSense5;
+    Wiimote1.IRSensitivity := wmiSense1;
     Wiimote1.IRMode := wmiExtended;
   end;
 end;
@@ -216,6 +216,9 @@ begin
   pb_IRPoints.Position := Wiimote1.IRPointCount;
 
 
+  Edit1.Text := FloatToStr(Wiimote1.AccelX);
+  Edit2.Text := FloatToStr(Wiimote1.AccelY);
+  Edit3.Text := FloatToStr(Wiimote1.AccelZ);
 end;
 
 procedure TForm1.Wiimote1Status(Sender: TObject);

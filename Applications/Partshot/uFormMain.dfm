@@ -49,6 +49,13 @@ object form_Main: Tform_Main
         Height = 13
         Caption = 'Counter:'
       end
+      object Label9: TLabel
+        Left = 263
+        Top = 43
+        Width = 22
+        Height = 13
+        Caption = '.png'
+      end
       object ed_SaveToFolder: TJvDirectoryEdit
         Left = 72
         Top = 13
@@ -60,7 +67,7 @@ object form_Main: Tform_Main
       object ed_Format: TEdit
         Left = 72
         Top = 40
-        Width = 209
+        Width = 185
         Height = 21
         TabOrder = 1
       end

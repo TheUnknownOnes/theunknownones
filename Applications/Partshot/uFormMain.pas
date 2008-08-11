@@ -54,6 +54,7 @@ type
     cl_Shooter: TJvColorButton;
     Label8: TLabel;
     SettingsLinkComponent10: TSettingsLinkComponent;
+    Label9: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure TrayClick(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -74,12 +75,17 @@ type
   public
     procedure DoShot;
 
+    function GenNextFileName : String;
+
     procedure PerformMouseWheel(ADelta : Integer; Shift : TShiftState);
     procedure SetShooterHeightAccordingToRatio; 
   end;
 
 var
   form_Main: Tform_Main;
+
+const
+  FileNameFormat = 'Partshot_%.4d';
 
 implementation
 
@@ -119,7 +125,7 @@ begin
   PNg.Assign(BMP);
   BMP.Free;
 
-  PNG.SaveToFile(IncludeTrailingPathDelimiter(ed_SaveToFolder.Directory) + Format(ed_Format.Text, [ed_Counter.Value]));
+  PNG.SaveToFile(IncludeTrailingPathDelimiter(ed_SaveToFolder.Directory) + GenNextFileName);
 
   PNG.Free;
 
@@ -132,7 +138,7 @@ end;
 procedure Tform_Main.FormCreate(Sender: TObject);
 begin
   ed_SaveToFolder.Directory := GetShellFolder($27);
-  ed_Format.Text := 'Partshot_%.4d.png';
+  ed_Format.Text := FileNameFormat;
 
   FShooter := Tform_Shooter.Create(Self);
 
@@ -142,6 +148,16 @@ end;
 procedure Tform_Main.FormDestroy(Sender: TObject);
 begin
   SaveSettings;
+end;
+
+function Tform_Main.GenNextFileName: String;
+begin
+  try
+    Result := Format(ed_Format.Text, [ed_Counter.Value]) + '.png'
+  except
+    ed_Format.Text := FileNameFormat;
+    Result := GenNextFileName;
+  end;
 end;
 
 procedure Tform_Main.LoadSettings;
@@ -195,6 +211,9 @@ begin
     else
       FShooter.Height := FShooter.Height + (ADelta div abs(ADelta)) * Fact;
   end;
+
+  ed_FixSizeWidth.Value := FShooter.Width;
+  ed_FixSizeHeight.Value := FShooter.Height;
 end;
 
 procedure Tform_Main.rb_SaveToFileClick(Sender: TObject);

@@ -15,6 +15,7 @@ object form_Shooter: Tform_Shooter
   OldCreateOrder = False
   PopupMenu = pum_Shooter
   OnCreate = FormCreate
+  OnMouseLeave = FormMouseLeave
   OnMouseMove = FormMouseMove
   OnMouseUp = FormMouseUp
   OnMouseWheel = FormMouseWheel
@@ -34,15 +35,14 @@ object form_Shooter: Tform_Shooter
   object lbl_Bottom: TLabel
     AlignWithMargins = True
     Left = 3
-    Top = 326
+    Top = 304
     Width = 593
-    Height = 13
+    Height = 35
     Align = alBottom
     Alignment = taCenter
+    AutoSize = False
     Layout = tlCenter
     WordWrap = True
-    ExplicitTop = 312
-    ExplicitWidth = 3
   end
   object lbl_Client: TLabel
     AlignWithMargins = True
@@ -55,12 +55,6 @@ object form_Shooter: Tform_Shooter
     Caption = 'Left click to shoot / Right click  for menu'
     Layout = tlCenter
     ExplicitWidth = 190
-  end
-  object tm_Aligner: TTimer
-    Interval = 300
-    OnTimer = tm_AlignerTimer
-    Left = 456
-    Top = 80
   end
   object pum_Shooter: TPopupMenu
     Left = 312
