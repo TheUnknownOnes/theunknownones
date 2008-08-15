@@ -1,3 +1,13 @@
+{-----------------------------------------------------------------------------
+ Project: Settings_VirtualTrees
+ Purpose: Register components
+ Created: 12.08.2008 08:22:26
+ 
+ (c) by TheUnknownOnes
+ see http://www.TheUnknownOnes.net
+-----------------------------------------------------------------------------}
+
+
 unit uRegSettingsVST;
 
 interface

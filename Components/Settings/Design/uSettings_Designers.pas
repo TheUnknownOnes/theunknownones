@@ -1,5 +1,5 @@
 {-----------------------------------------------------------------------------
- Project: Settings_Designers_D100D
+ Project: Settings_Designers
  Purpose: Holds the declarations of the designers for Settings
  Created: 23.05.2008 07:06:26
  

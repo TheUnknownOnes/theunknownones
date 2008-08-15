@@ -1,3 +1,12 @@
+{----------------------------------------------------------------------------- 
+ Project: Settings
+ Purpose: Contains the form for selecting the properties to save 
+ Created: 12.08.2008 08:18:50
+ 
+ (c) by TheUnknownOnes
+ see http://www.TheUnknownOnes.net
+-----------------------------------------------------------------------------}
+
 unit uForm_EditSettingsComponentPropertyList;
 
 interface
@@ -12,7 +21,7 @@ type
   Tform_EditComponentPropertyList = class(TForm)
     pan_Bottom: TPanel;
     btn_OK: TButton;
-    btn_Cancel: TButton;
+    btn_Cancel: TButton;   
     pum_TV: TPopupMenu;
     mi_CheckAll: TMenuItem;
     mi_UncheckAll: TMenuItem;
@@ -226,7 +235,7 @@ procedure Tform_EditComponentPropertyList.PrepareImageList;
 var
   BMP : TBitmap;
 const
-  UNCHECKED : array[0..2] of Byte = ($65, $66, $00);
+  UNCHECKED : array[0..1] of Byte = ($65, $66);
   CHECKED : array[0..2] of Byte = ($65, $66, $62);
   x = 2;
   y = 2;
@@ -251,7 +260,6 @@ begin
 
     BMP.Canvas.TextOut(x, y, Chr(UNCHECKED[0]));
     BMP.Canvas.TextOut(x, y, Chr(UNCHECKED[1]));
-    BMP.Canvas.TextOut(x, y, Chr(UNCHECKED[2]));
 
     iml_TV.AddMasked(BMP, clFuchsia);
 
