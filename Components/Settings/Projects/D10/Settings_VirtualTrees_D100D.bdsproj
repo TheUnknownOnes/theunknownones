@@ -173,7 +173,6 @@
 		</VersionInfoKeys>  <Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\eltreeD10.bpl">EldoS Visual Components</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\qrpt100.bpl">QuickReport Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\VirtualTreesD10.bpl">Virtual Treeview runtime package</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\Jcl100.bpl">JEDI Code Library RTL package</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvCmpD10R.bpl">JVCL Non-Visual Components Runtime Package</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvCoreD10R.bpl">JVCL Core Components Runtime Package</Excluded_Packages>
@@ -200,14 +199,24 @@
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvDotNetCtrlsD10R.bpl">JVCL DotNet Controls Runtime Package</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvEDID10R.bpl">JVCL EDI Components Runtime Package</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvRuntimeDesignD10R.bpl">JVCL Runtime Design Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvPageCompsD10R.bpl">JVCL Page Style Components Runtime Package</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvDBD10R.bpl">JVCL Database Components Runtime Package</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvDlgsD10R.bpl">JVCL Dialog Components Runtime Package</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvBDED10R.bpl">JVCL BDE Components Runtime Package</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvInterpreterD10R.bpl">JVCL Interpreter Components Runtime Package</Excluded_Packages>
+      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvPageCompsD10R.bpl">JVCL Page Style Components Runtime Package</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvPluginD10R.bpl">JVCL Plugin Components Runtime Package</Excluded_Packages>
       <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\TntUnicodeVcl100.bpl">TntWare Unicode Controls - Runtime</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\Etikettendruck_D100.bpl">(Unbenannt)</Excluded_Packages>
+      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\ConsoleTools_D100R.bpl">ConsoleTools - Runtime</Excluded_Packages>
+      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\ConsoleTools_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\ConsoleTools_D100.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\GroupListView_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\GroupListView_D100.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\SearchEdit_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\SearchEdit_D100.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\BaseImageList_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\BaseImageList_D100.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\XMLTools_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\XMLTools_D100.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\VirtualActionTree_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\VirtualActionTree_D100.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\VirtualTreeHelpers_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\VirtualTreeHelpers_D100.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\RegExp_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\RegExp_D100.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\VSTSearchEdit_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\VSTSearchEdit_D100.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\VSTHeaderSaver_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\VSTHeaderSaver_D100.bpl nicht gefunden</Excluded_Packages>
     </Excluded_Packages>
   </Delphi.Personality>
 	<CompactFramework_Emulator></CompactFramework_Emulator>

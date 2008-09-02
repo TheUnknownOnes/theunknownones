@@ -28,7 +28,8 @@ package Settings_VirtualTrees_D100D;
 {$IMPLICITBUILD OFF}
 
 requires
-  rtl, settings_virtualtrees_d100R;
+  rtl,
+  settings_virtualtrees_d100R;
 
 contains
   uRegSettingsVST in '..\..\Design\uRegSettingsVST.pas';

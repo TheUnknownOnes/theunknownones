@@ -12,6 +12,8 @@ uses
 
 {$REGION 'VirtualStringTree Helpers'}
 procedure VST_ScanEditorKeys(var AVKey: Word; ATree: TVirtualStringTree);
+procedure VST_ExpandAll(ATree: TVirtualStringTree);
+procedure VST_CollapseAll(ATree: TVirtualStringTree);
 {$ENDREGION}
 
 implementation
@@ -67,6 +69,30 @@ begin
           AVKey:=0;
         end;
     end;
+  end;
+end;
+
+procedure VST_ExpandAll(ATree: TVirtualStringTree);
+var
+  Node : PVirtualNode;
+begin
+  Node:=ATree.GetFirst;
+  while Assigned(Node) do
+  begin
+    ATree.Expanded[Node]:=True;
+    Node:=ATree.GetNext(Node);
+  end;
+end;
+
+procedure VST_CollapseAll(ATree: TVirtualStringTree);
+var
+  Node : PVirtualNode;
+begin
+  Node:=ATree.GetFirst;
+  while Assigned(Node) do
+  begin
+    ATree.Expanded[Node]:=False;
+    Node:=ATree.GetNext(Node);
   end;
 end;
 {$ENDREGION}
