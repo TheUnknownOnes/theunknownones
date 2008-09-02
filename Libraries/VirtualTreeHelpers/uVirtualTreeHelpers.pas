@@ -9,7 +9,7 @@ unit uVirtualTreeHelpers;
 interface
 
 uses
-  VirtualTrees;
+  VirtualTrees, Windows, SysUtils, SndKey32;
 
 type
   TBaseVirtualTreeHelper = class helper for TBaseVirtualTree
@@ -22,12 +22,41 @@ type
     property VisibleRecursive[Node: PVirtualNode]: Boolean read GetVisibleRecursive write SetVisibleRecursive;
 
     function GetCheckedChildrenCountRecursive(Node: PVirtualNode; VisibleOnly : Boolean = false): Integer;
+
+    procedure ScanEditorKeys(var AKey : Word);
+
+    procedure ExpandAll;
+    procedure CollapseAll;
   end;
 
 
 implementation
 
 { TBaseVirtualTreeHelper }
+
+procedure TBaseVirtualTreeHelper.CollapseAll;
+var
+  Node : PVirtualNode;
+begin
+  Node:=GetFirst;
+  while Assigned(Node) do
+  begin
+    Expanded[Node]:=False;
+    Node:=GetNext(Node);
+  end;
+end;
+
+procedure TBaseVirtualTreeHelper.ExpandAll;
+var
+  Node : PVirtualNode;
+begin
+  Node:=GetFirst;
+  while Assigned(Node) do
+  begin
+    Expanded[Node]:=True;
+    Node:=GetNext(Node);
+  end;
+end;
 
 function TBaseVirtualTreeHelper.GetCheckedChildrenCountRecursive(
   Node: PVirtualNode; VisibleOnly : Boolean): Integer;
@@ -69,6 +98,56 @@ begin
   begin
     Node := Node.Parent;
     Result := (vsVisible in Node.States);
+  end;
+end;
+
+procedure TBaseVirtualTreeHelper.ScanEditorKeys(var AKey: Word);
+//Beim Tastendruck auf einem VST wird automatisch ein Editor geöffnet
+// Aufruf im OnKeyDown Event
+var
+  InputStr : String;
+
+  {$REGION 'VirtualKey in Char übersetzen'}
+ 
+  function GetCharFromVirtualKey(Key: Word): string;
+  var
+     keyboardState: TKeyboardState;
+     asciiResult: Integer;
+  begin
+     GetKeyboardState(keyboardState) ;
+
+     SetLength(Result, 2) ;
+     asciiResult := ToAscii(key, MapVirtualKey(key, 0), keyboardState, @Result[1], 0) ;
+     case asciiResult of
+       0: Result := '';
+       1: SetLength(Result, 1) ;
+       2:;
+       else
+         Result := '';
+     end;
+  end;
+  {$ENDREGION}
+begin
+  if not IsEditing then
+  begin
+    if AKey=VK_RETURN then
+    begin
+      AKey:=0;
+      EditNode(FocusedNode, FocusedColumn);
+    end
+    else
+    begin
+      InputStr:=GetCharFromVirtualKey(AKey);
+      If Length(InputStr)>0 then
+        if Copy(InputStr,1,1)[1]>=#32 then
+        begin
+          if EditNode(FocusedNode, FocusedColumn) and
+             (Length(trim(InputStr))>0) then
+            SendKeys(PChar(Copy(InputStr,1,1)), True);
+
+          AKey:=0;
+        end;
+    end;
   end;
 end;
 

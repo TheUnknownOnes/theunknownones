@@ -44,7 +44,6 @@ contains
   sndkey32 in '..\..\sndkey32.pas',
   uCanvasClassHelper in '..\..\uCanvasClassHelper.pas',
   uCommonTypes in '..\..\uCommonTypes.pas',
-  uComponentHelpers in '..\..\uComponentHelpers.pas',
   uControlTools in '..\..\uControlTools.pas',
   uDateTools in '..\..\uDateTools.pas',
   uGraphicalTools in '..\..\uGraphicalTools.pas',

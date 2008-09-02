@@ -31,7 +31,8 @@ requires
   vcl,
   TntUnicodeVcl,
   VirtualTreesD10,
-  vclx;
+  vclx,
+  CommonTools_D100R;
 
 contains
   uVirtualTreeHelpers in '..\..\uVirtualTreeHelpers.pas';
