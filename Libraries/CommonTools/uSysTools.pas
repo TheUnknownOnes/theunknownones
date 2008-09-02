@@ -9,7 +9,7 @@ interface
 
 uses
   Windows, Messages, Classes, SysUtils, StrUtils, RegExpr, DB, Graphics, Forms,
-  Dialogs, ActiveX, ShlObj, ComObj;
+  Dialogs, ActiveX, ShlObj, ComObj, Variants;
 
 {$REGION 'FileSearching'}
 
@@ -54,6 +54,8 @@ function MakeFileName(ADesiredFName : String): String;
 
 {$REGION 'Variant operations'}
 function VarRecToVariant (AValue : TVarRec) : Variant;
+function VariantToVarRec(const Item: Variant): TVarRec;
+procedure FinalizeVarRec(var Item: TVarRec);
 {$ENDREGION}
 
 {$REGION 'WideString operations'}
@@ -444,6 +446,81 @@ begin
   end;
 end;
 
+function VariantToVarRec(const Item: Variant): TVarRec;
+var
+  W: WideString;
+begin
+  case TVarData(Item).VType of
+    varInteger, varSmallint, varShortInt, varByte, varWord, varLongWord:
+      begin
+        Result.VType:=vtInteger;
+        Result.VInteger:=Item;
+      end;
+    varNull, varUnknown, varEmpty:
+      begin
+        Result.VType:=vtInteger;
+        Result.VInteger:=0;
+      end;
+    varBoolean:
+      begin
+        Result.VType:=vtBoolean;
+        Result.VBoolean:=Item;
+      end;
+    varDouble, varSingle:
+      begin
+        Result.VType:=vtExtended;
+        New(Result.VExtended);
+        Result.VExtended^ := Item;
+      end;
+    varString:
+      begin
+        Result.VType:=vtString;
+        New(Result.VString);
+        Result.VString^ := Item;
+      end;
+    varCurrency:
+      begin
+        Result.VType:=vtCurrency;
+        New(Result.VCurrency);
+        Result.VCurrency^ := Item;
+      end;
+    varVariant:
+      begin
+        Result.VType:=vtVariant;
+        New(Result.VVariant);
+        Result.VVariant^ := Item;
+      end;
+    varOleStr:
+      begin
+        Result.VType:=vtWideString;
+        Result.VWideString := nil;
+        WideString(Result.VWideString) := WideString(Item);
+      end;
+    varInt64:
+      begin
+        Result.VType:=vtInt64;
+        New(Result.VInt64);
+        Result.VInt64^ := Item;
+      end;
+  end;
+end;
+
+procedure FinalizeVarRec(var Item: TVarRec);
+begin
+  case Item.VType of
+    vtExtended: Dispose(Item.VExtended);
+    vtString: Dispose(Item.VString);
+    vtPChar: StrDispose(Item.VPChar);
+    vtPWideChar: FreeMem(Item.VPWideChar);
+    vtAnsiString: AnsiString(Item.VAnsiString) := '';
+    vtCurrency: Dispose(Item.VCurrency);
+    vtVariant: Dispose(Item.VVariant);
+    vtInterface: IInterface(Item.VInterface) := nil;
+    vtWideString: WideString(Item.VWideString) := '';
+    vtInt64: Dispose(Item.VInt64);
+  end;
+  Item.VInteger := 0;
+end;
 
 {$ENDREGION}
 
