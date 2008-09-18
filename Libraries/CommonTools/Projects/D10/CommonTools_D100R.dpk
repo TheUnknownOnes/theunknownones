@@ -57,6 +57,7 @@ contains
   uTaskbar in '..\..\uTaskbar.pas',
   uWinNT in '..\..\uWinNT.pas',
   wm_helper in '..\..\wm_helper.pas',
-  uNTServiceControl in '..\..\uNTServiceControl.pas';
+  uNTServiceControl in '..\..\uNTServiceControl.pas',
+  uVirtualEarth in '..\..\uVirtualEarth.pas';
 
 end.

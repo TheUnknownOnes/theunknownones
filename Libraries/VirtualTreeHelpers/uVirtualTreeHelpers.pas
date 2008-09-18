@@ -27,6 +27,8 @@ type
 
     procedure ExpandAll;
     procedure CollapseAll;
+
+    function GetNodeByData(AData : Pointer; out ANode : PVirtualNode) : Boolean;
   end;
 
 
@@ -81,6 +83,30 @@ begin
     Inc(Result, GetCheckedChildrenCountRecursive(Child, VisibleOnly));
 
     Child := GetNextSibling(Child);
+  end;
+end;
+
+function TBaseVirtualTreeHelper.GetNodeByData(AData: Pointer;
+  out ANode: PVirtualNode): Boolean;
+var
+  Node : PVirtualNode;
+  Data : Pointer;
+begin
+  Result := false;
+
+  Node := GetFirst;
+  while Assigned(Node) do
+  begin
+    Data := GetNodeData(Node);
+
+    if Data = AData then
+    begin
+      Result := true;
+      ANode := Node;
+      break;
+    end;
+    
+    Node := GetNext(Node);
   end;
 end;
 
