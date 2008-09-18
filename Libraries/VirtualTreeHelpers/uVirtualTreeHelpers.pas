@@ -28,7 +28,8 @@ type
     procedure ExpandAll;
     procedure CollapseAll;
 
-    function GetNodeByData(AData : Pointer; out ANode : PVirtualNode) : Boolean;
+    function GetFirstNodeByData(AData : Pointer; out ANode : PVirtualNode) : Boolean;
+    function GetNextNodeByData(AStartAtNode : PVirtualNode; AData : Pointer; out ANode : PVirtualNode) : Boolean;
   end;
 
 
@@ -86,7 +87,7 @@ begin
   end;
 end;
 
-function TBaseVirtualTreeHelper.GetNodeByData(AData: Pointer;
+function TBaseVirtualTreeHelper.GetFirstNodeByData(AData: Pointer;
   out ANode: PVirtualNode): Boolean;
 var
   Node : PVirtualNode;
@@ -105,7 +106,31 @@ begin
       ANode := Node;
       break;
     end;
-    
+
+    Node := GetNext(Node);
+  end;
+end;
+
+function TBaseVirtualTreeHelper.GetNextNodeByData(AStartAtNode: PVirtualNode;
+  AData: Pointer; out ANode: PVirtualNode): Boolean;
+var
+  Node : PVirtualNode;
+  Data : Pointer;
+begin
+  Result := false;
+
+  Node := GetNext(AStartAtNode);
+  while Assigned(Node) do
+  begin
+    Data := GetNodeData(Node);
+
+    if Data = AData then
+    begin
+      Result := true;
+      ANode := Node;
+      break;
+    end;
+
     Node := GetNext(Node);
   end;
 end;
