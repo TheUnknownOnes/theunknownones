@@ -12,6 +12,8 @@ uses
   VirtualTrees, Windows, SysUtils, SndKey32;
 
 type
+  TCheckStates = set of TCheckState;
+
   TBaseVirtualTreeHelper = class helper for TBaseVirtualTree
   private
     function GetVisibleRecursive(Node: PVirtualNode): Boolean;
@@ -23,7 +25,7 @@ type
 
     function GetCheckedChildrenCountRecursive(Node: PVirtualNode; VisibleOnly : Boolean = false): Integer; deprecated;
     function GetCheckedChildrenCount(ANode : PVirtualNode;
-                                     ACheckState : TCheckState = csCheckedNormal;
+                                     ACheckStates : TCheckStates = [csCheckedNormal];
                                      AVisibleOnly : Boolean = false;
                                      ARecursive : Boolean = false) : Cardinal;
 
@@ -66,7 +68,7 @@ begin
 end;
 
 function TBaseVirtualTreeHelper.GetCheckedChildrenCount(ANode: PVirtualNode;
-  ACheckState: TCheckState; AVisibleOnly, ARecursive: Boolean): Cardinal;
+  ACheckStates: TCheckStates; AVisibleOnly, ARecursive: Boolean): Cardinal;
 var
   Node : PVirtualNode;
 begin
@@ -77,11 +79,11 @@ begin
   begin
     if not (AVisibleOnly and (not IsVisible[Node])) then
     begin
-      if CheckState[Node] = ACheckState then
+      if CheckState[Node] in ACheckStates then
         Inc(Result);
 
       if ARecursive then
-        Inc(Result, GetCheckedChildrenCount(Node, ACheckState, AVisibleOnly, ARecursive));
+        Inc(Result, GetCheckedChildrenCount(Node, ACheckStates, AVisibleOnly, ARecursive));
     end;
 
     Node := GetNextSibling(Node);
