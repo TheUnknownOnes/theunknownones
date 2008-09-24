@@ -21,7 +21,11 @@ type
   public
     property VisibleRecursive[Node: PVirtualNode]: Boolean read GetVisibleRecursive write SetVisibleRecursive;
 
-    function GetCheckedChildrenCountRecursive(Node: PVirtualNode; VisibleOnly : Boolean = false): Integer;
+    function GetCheckedChildrenCountRecursive(Node: PVirtualNode; VisibleOnly : Boolean = false): Integer; deprecated;
+    function GetCheckedChildrenCount(ANode : PVirtualNode;
+                                     ACheckState : TCheckState = csCheckedNormal;
+                                     AVisibleOnly : Boolean = false;
+                                     ARecursive : Boolean = false) : Cardinal;
 
     procedure ScanEditorKeys(var AKey : Word);
 
@@ -58,6 +62,29 @@ begin
   begin
     Expanded[Node]:=True;
     Node:=GetNext(Node);
+  end;
+end;
+
+function TBaseVirtualTreeHelper.GetCheckedChildrenCount(ANode: PVirtualNode;
+  ACheckState: TCheckState; AVisibleOnly, ARecursive: Boolean): Cardinal;
+var
+  Node : PVirtualNode;
+begin
+  Result := 0;
+
+  Node := GetFirstChild(ANode);
+  while Assigned(Node) do
+  begin
+    if not (AVisibleOnly and (not IsVisible[Node])) then
+    begin
+      if CheckState[Node] = ACheckState then
+        Inc(Result);
+
+      if ARecursive then
+        Inc(Result, GetCheckedChildrenCount(Node, ACheckState, AVisibleOnly, ARecursive));
+    end;
+
+    Node := GetNextSibling(Node);
   end;
 end;
 

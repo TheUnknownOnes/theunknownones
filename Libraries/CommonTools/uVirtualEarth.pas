@@ -37,7 +37,7 @@ const
   veEarthRadius = 6378137;
   veEarthCircum = veEarthRadius * 2 * Pi;
   veEarthHalfCircum = veEarthCircum / 2;
-  veURL = 'http://%1s%1d.ortho.tiles.virtualearth.net/tiles/%s?g=22';
+  veURL = 'http://%1s%1d.ortho.tiles.virtualearth.net/tiles/%s?g=45';
 
 function veHourMinSecToDeg(AHour, AMinute : Integer; ASecond : Extended) : Extended;
 begin
