@@ -139,6 +139,7 @@ begin
         for idx := Low(Positions) to High(Positions) do
           Positions[idx] := MaxInt;
 
+        //Save the colum indices to the Positions-array
         for idx := 0 to VST.Header.Columns.Count - 1 do
         begin
           Col := VST.Header.Columns[idx];
@@ -157,6 +158,7 @@ begin
           end;
         end;
 
+        //apply the positons
         for idx := Low(Positions) to High(Positions) do
         begin
           if Positions[idx] <> MaxInt then
