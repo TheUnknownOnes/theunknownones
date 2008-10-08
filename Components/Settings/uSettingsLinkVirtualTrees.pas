@@ -109,6 +109,7 @@ var
   idx : Integer;
   Col : TVirtualTreeColumn;
   SettingsPath : TSettingName;
+  Positions : array of Integer;
 
   procedure SetColumnOption(AOption : TVTColumnOption; ASettingName : TSettingName);
   begin
@@ -131,19 +132,45 @@ begin
     VST.BeginUpdate;
     try
 
+      if SaveColumnPos then
+      begin
+        {$REGION 'Set positions'}
+        SetLength(Positions, VST.Header.Columns.Count);
+        for idx := Low(Positions) to High(Positions) do
+          Positions[idx] := MaxInt;
+
+        for idx := 0 to VST.Header.Columns.Count - 1 do
+        begin
+          Col := VST.Header.Columns[idx];
+
+          SettingsPath := ARootSetting + SettingsPathDelimiter +
+                               Format(ColSettingNamePattern, [Col.Index]) + SettingsPathDelimiter;
+
+
+          Value := Settings.GetValue(SettingsPath + 'Position', Col.Position);
+
+          if not VarIsEmpty(Value) then
+          begin
+            if (Integer(Value) >= Low(Positions)) and
+               (Integer(Value) <= High(Positions)) then
+            Positions[Integer(Value)] := idx;
+          end;
+        end;
+
+        for idx := Low(Positions) to High(Positions) do
+        begin
+          if Positions[idx] <> MaxInt then
+            Vst.Header.Columns[Positions[idx]].Position := idx;
+        end;
+        {$ENDREGION}
+      end;
+
       for idx := 0 to VST.Header.Columns.Count - 1 do
       begin
         Col := VST.Header.Columns[idx];
 
         SettingsPath := ARootSetting + SettingsPathDelimiter +
                              Format(ColSettingNamePattern, [Col.Index]) + SettingsPathDelimiter;
-
-        if SaveColumnPos then
-        begin
-          Value := Settings.GetValue(SettingsPath + 'Position', Col.Position);
-          if not VarIsEmpty(Value) then
-            Col.Position := Value;
-        end;
 
         if SaveColumnWidth then
         begin
@@ -180,8 +207,10 @@ begin
           SetColumnOption(coFixed, 'Fixed');
       end;
 
+
     finally
       VST.EndUpdate;
+      SetLength(Positions, 0);
     end;
   end;
 end;
