@@ -36,12 +36,23 @@ type
 
     function GetFirstNodeByData(AData : Pointer; out ANode : PVirtualNode) : Boolean;
     function GetNextNodeByData(AStartAtNode : PVirtualNode; AData : Pointer; out ANode : PVirtualNode) : Boolean;
+
+    function AddFakeChild(ANode : PVirtualNode) : PVirtualNode;
+    function HasFakeChild(ANode : PVirtualNode; out AFakeChild : PVirtualNode) : Boolean;
   end;
 
 
 implementation
 
+var
+  FFakeData : Pointer;
+
 { TBaseVirtualTreeHelper }
+
+function TBaseVirtualTreeHelper.AddFakeChild(ANode: PVirtualNode): PVirtualNode;
+begin
+  Result := AddChild(ANode, FFakeData);
+end;
 
 procedure TBaseVirtualTreeHelper.CollapseAll;
 var
@@ -181,6 +192,28 @@ begin
   end;
 end;
 
+function TBaseVirtualTreeHelper.HasFakeChild(ANode: PVirtualNode;
+  out AFakeChild: PVirtualNode): Boolean;
+var
+  Node : PVirtualNode;
+begin
+  Result := false;
+  
+  Node := GetFirstChild(ANode);
+
+  while Assigned(Node) do
+  begin
+    if Pointer(GetNodeData(Node)^) = FFakeData then
+    begin
+      Result := true;
+      AFakeChild := Node;
+      break;
+    end;
+
+    Node := GetNextSibling(Node);
+  end;
+end;
+
 procedure TBaseVirtualTreeHelper.ScanEditorKeys(var AKey: Word);
 //Beim Tastendruck auf einem VST wird automatisch ein Editor geöffnet
 // Aufruf im OnKeyDown Event
@@ -248,5 +281,11 @@ begin
       Break;
   until False;
 end;
+
+initialization
+  GetMem(FFakeData, 4);
+
+finalization
+  FreeMem(FFakeData, 4);
 
 end.

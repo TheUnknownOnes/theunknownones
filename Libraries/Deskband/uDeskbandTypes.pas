@@ -8,7 +8,8 @@ unit uDeskbandTypes;
 interface
 
 uses
-  Windows, Messages, Classes, ActiveX, ComServ, ComObj, ShlObj, SHDocVw,
+  Windows, Messages, Classes, ActiveX, ComServ, ComObj, ShlObj,
+  SHDocVw,
   Graphics, Forms, Contnrs, Sysutils, Registry;
 
 type
