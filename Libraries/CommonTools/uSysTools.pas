@@ -9,7 +9,7 @@ interface
 
 uses
   Windows, Messages, Classes, SysUtils, StrUtils, RegExpr, DB, Graphics, Forms,
-  Dialogs, ActiveX, ShlObj, ComObj, Variants;
+  Dialogs, ActiveX, ShlObj, ComObj, Variants, WideStrings, WideStrUtils;
 
 {$REGION 'FileSearching'}
 
@@ -61,6 +61,12 @@ procedure FinalizeVarRec(var Item: TVarRec);
 {$REGION 'WideString operations'}
 function GetWindowText(wnd: HWND): WideString;
 procedure SetWindowText(wnd: HWND; txt: WideString);
+
+function MultipleWideStringReplace(AString: WideString;
+                               AOldPatterns,
+                               ANewPatterns: array of WideString;
+                               AFlags: TReplaceFlags
+                              ): WideString;
 {$ENDREGION}
 
 {$REGION 'Key Checking'}
@@ -546,6 +552,23 @@ end;
 procedure SetWindowText(wnd: HWND; txt: WideString);
 begin
   SendMessage(wnd, WM_SETTEXT, 0, lParam(PWideChar(WideString(txt))));
+end;
+
+function MultipleWideStringReplace(AString: WideString;
+                               AOldPatterns,
+                               ANewPatterns: array of WideString;
+                               AFlags: TReplaceFlags
+                              ): WideString;
+var
+  idx : Integer;
+begin
+  Result:=AString;
+
+  if Length(AOldPatterns)<>Length(ANewPatterns) then
+    raise Exception.Create('Patternlengths not equal');
+
+  for idx:=Low(AOldPatterns) to High(AOldPatterns) do
+    Result:=WideStringReplace(Result,AOldPatterns[idx],ANewPatterns[idx],AFlags);
 end;
 
 {$ENDREGION}
