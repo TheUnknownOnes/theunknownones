@@ -2,17 +2,23 @@ unit uYearCalendar;
 
 interface
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, GDIPOBJ, GDIPAPI, dateutils, SysConst;
+  Windows, Messages, SysUtils, Variants, Classes, Controls, Forms,
+  Dialogs, ExtCtrls, GDIPOBJ, GDIPAPI, dateutils, SysConst, Graphics;
 
 type
+  TYearCalenderDayFillStyle = (dfsFull, dfsLowerRight);
+
   TYearCalendarDay = class(TCollectionItem)
   private
     FDate: TDate;
     FColor: TColor;
+    FText: String;
+    FFillStyle: TYearCalenderDayFillStyle;
   published
     property Date : TDate read FDate write FDate;
     property Color : TColor read FColor write FColor;
+    property Text : String read FText write FText;
+    property FillStyle : TYearCalenderDayFillStyle read FFillStyle write FFillStyle;
 
     constructor Create(Collection: TCollection); override;
   end;
@@ -45,6 +51,7 @@ type
 
     FFontDayTitle : TGPFont;
     FFontDay : TGPFont;
+    FFontTxt : TGPFont;
     FFontMonthTitle : TGPFont;
 
     FYear : Integer;
@@ -75,6 +82,9 @@ type
   published
     property Year : Integer read FYear write SetYear;
     property Days : TYearCalendarDays read FDays write SetDays;
+
+    property Align;
+    property Anchors;
                       
     property OnHoverDay : THoverDayEvent read FOnHoverDay write FOnHoverDay;
     property OnClick;      
@@ -170,6 +180,7 @@ var
   DateTriangle : array[0..2] of TGPPointF;
 
   Dates : TYearCalendarDays;
+  rgbval : Integer;
 
   function MouseInDay(x, y : single): Boolean;
   begin
@@ -196,7 +207,6 @@ begin
 
   FGraphics.ScaleTransform(TransformX, TransformY);
   FGraphics.TranslateTransform(ARect.Left, ARect.Top, MatrixOrderAppend);
-
 
   FGraphics.FillRectangle(FBrushSolidMonthTitle, 0, 0, 1000, 143);
   FGraphics.FillRectangle(FBrushSolidMonthBack, 0, 143, 1000, 1000);
@@ -232,12 +242,6 @@ begin
       OldWeek:=WeekOYear;
     end;
 
-    FGraphics.DrawString(IntToStr(DayOfTheMonth(day)), Length(IntToStr(DayOfTheMonth(day))),
-                         FFontDay,
-                         GDIPAPI.MakePoint((DayOWeek * WidthDays) + XIndentDays,
-                                           (WeekOMon * HeightDays) + YIndentDays),
-                         FBrushSolidBlack);
-
     if MouseInDay((DayOWeek * WidthDays) + XIndentDays,
                   (WeekOMon * HeightDays) + YIndentDays) then
     begin
@@ -252,19 +256,40 @@ begin
 
     for idx := 0 to Dates.Count - 1 do
     begin
+      rgbval:=ColorToRGB(TYearCalendarDay(Dates.Items[idx]).Color);
+      FBrushSolidVariable.SetColor(MakeColor(GetRed(rgbval),
+                                             GetGreen(rgbval),
+                                             GetBlue(rgbval)));
+
       if SameDate(day,TYearCalendarDay(Dates.Items[idx]).Date) then
       begin
-        DateTriangle[0].X:=(DayOWeek * WidthDays) + XIndentDays + WidthDays;
-        DateTriangle[0].Y:=(WeekOMon * HeightDays) + YIndentDays;
-        DateTriangle[1].X:=(DayOWeek * WidthDays) + XIndentDays;
-        DateTriangle[1].Y:=(WeekOMon * HeightDays) + YIndentDays + HeightDays;
-        DateTriangle[2].X:=(DayOWeek * WidthDays) + XIndentDays + WidthDays;
-        DateTriangle[2].Y:=(WeekOMon * HeightDays) + YIndentDays + HeightDays;
+        case TYearCalendarDay(Dates.Items[idx]).FillStyle of
+          dfsFull :
+              FGraphics.FillRectangle(FBrushSolidVariable,
+                                      (DayOWeek * WidthDays) + XIndentDays,
+                                      (WeekOMon * HeightDays) + YIndentDays,
+                                      WidthDays,
+                                      HeightDays);
+          dfsLowerRight :
+              begin
+                DateTriangle[0].X:=(DayOWeek * WidthDays) + XIndentDays + WidthDays;
+                DateTriangle[0].Y:=(WeekOMon * HeightDays) + YIndentDays;
+                DateTriangle[1].X:=(DayOWeek * WidthDays) + XIndentDays;
+                DateTriangle[1].Y:=(WeekOMon * HeightDays) + YIndentDays + HeightDays;
+                DateTriangle[2].X:=(DayOWeek * WidthDays) + XIndentDays + WidthDays;
+                DateTriangle[2].Y:=(WeekOMon * HeightDays) + YIndentDays + HeightDays;
 
-        FBrushSolidVariable.SetColor(MakeColor(GetRed(TYearCalendarDay(Dates.Items[idx]).Color),
-                                               GetGreen(TYearCalendarDay(Dates.Items[idx]).Color),
-                                               GetBlue(TYearCalendarDay(Dates.Items[idx]).Color)));
-        FGraphics.FillPolygon(FBrushSolidVariable, PGPPointF(@DateTriangle[0]), 3);
+                FGraphics.FillPolygon(FBrushSolidVariable, PGPPointF(@DateTriangle[0]), 3);
+              end;
+        end;            
+
+        FGraphics.DrawString(TYearCalendarDay(Dates.Items[idx]).Text,
+                             Length(TYearCalendarDay(Dates.Items[idx]).Text),
+                             FFontTxt,
+                             GDIPAPI.MakePoint((DayOWeek * WidthDays) + XIndentDays + (WidthDays / 2),
+                                               (WeekOMon * HeightDays) + YIndentDays + (HeightDays / 2)),
+                                               FBrushSolidBlack);
+
         Dates.Delete(idx);
         break;
       end;
@@ -273,6 +298,12 @@ begin
     if day=FSelectedDay then
       FGraphics.DrawRectangle(FPenLineSolidBlue, (DayOWeek * WidthDays) + XIndentDays,
                   (WeekOMon * HeightDays) + YIndentDays, WidthDays, HeightDays);
+
+    FGraphics.DrawString(IntToStr(DayOfTheMonth(day)), Length(IntToStr(DayOfTheMonth(day))),
+                         FFontDay,
+                         GDIPAPI.MakePoint((DayOWeek * WidthDays) + XIndentDays,
+                                           (WeekOMon * HeightDays) + YIndentDays),
+                         FBrushSolidBlack);
 
     day:=IncDay(day);
   until MonthOf(day)<>AMonth;
@@ -300,6 +331,7 @@ begin
   FPenLineWeekdayUnderline:=TGPPen.Create(MakeColor(250,250,250));
 
   FFontDayTitle:=TGPFont.Create('Tahoma', 40, FontStyleBold);
+  FFontTxt:=TGPFont.Create('Tahoma', 30, FontStyleItalic);
   FFontDay:=TGPFont.Create('Tahoma', 40, FontStyleRegular);
   FFontMonthTitle:=TGPFont.Create('Tahoma', 80, FontStyleBold);
 end;
@@ -340,6 +372,7 @@ procedure TYearCalendar.CloseGraph;
 begin
   FFontDay.Free;
   FFontDayTitle.Free;
+  FFontTxt.Free;
   FFontMonthTitle.Free;
   FBrushSolidVariable.Free;
   FBrushSolidMonthTitle.Free;
@@ -375,6 +408,8 @@ begin
       begin
         Date:=TYearCalendarDay(self.Items[idx]).Date;
         Color:=TYearCalendarDay(self.Items[idx]).Color;
+        Text:=TYearCalendarDay(self.Items[idx]).Text;
+        FillStyle:=TYearCalendarDay(self.Items[idx]).FillStyle;
       end;
 end;
 
@@ -384,6 +419,7 @@ constructor TYearCalendarDay.Create(Collection: TCollection);
 begin
   inherited;
   FColor:=clLime;
+  FText:='';
 end;
 
 end.
