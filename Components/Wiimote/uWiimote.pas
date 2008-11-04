@@ -63,7 +63,8 @@ type
                       wmiSense2,
                       wmiSense3,
                       wmiSense4,
-                      wmiSense5);
+                      wmiSense5,
+                      wmiSenseMax);
 
 
   TwmAccelCalibration = record
@@ -1457,6 +1458,10 @@ begin
     begin
       Result[0] := $07; Result[6] := $72; Result[8] := $20;
     end;
+    wmiSenseMax:
+    begin
+      Result[6] := $90; Result[8] := $41;
+    end;
   end;
 end;
 
@@ -1484,7 +1489,11 @@ begin
     end;
     wmiSense5:
     begin
-      Result[0] := $1F; Result[1] := $03;
+      Result[0] := $01; Result[1] := $03;
+    end;
+    wmiSenseMax:
+    begin
+      Result[0] := $40; Result[1] := $00;
     end;
   end;
 end;
@@ -1561,40 +1570,38 @@ begin
 
     if FConnection.WriteReport(RepIR) and
        FConnection.WriteReport(RepIR2) then
+    begin
       FIRMode := Value;
 
-    SetLength(Data, 1); Data[0] := $08;
-    RepWriteMem.Address := WIIMOTE_MEMADDR_IR;
-    RepWriteMem.Data := Data;
-    FConnection.WriteReport(RepWriteMem);
+      if Value <> wmiOff then
+      begin
+        SetLength(Data, 1); Data[0] := $08;
+        RepWriteMem.Address := WIIMOTE_MEMADDR_IR;
+        RepWriteMem.Data := Data;
+        FConnection.WriteReport(RepWriteMem);
 
-    Sleep(50);
+        Data := GetData1ForIRSense(FIRSense);
+        RepWriteMem.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_1;
+        RepWriteMem.Data := Data;
+        FConnection.WriteReport(RepWriteMem);
 
-    Data := GetData1ForIRSense(FIRSense);
-    RepWriteMem.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_1;
-    RepWriteMem.Data := Data;
-    FConnection.WriteReport(RepWriteMem);
+        Data := GetData2ForIRSense(FIRSense);
+        RepWriteMem.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_2;
+        RepWriteMem.Data := Data;
+        FConnection.WriteReport(RepWriteMem);
 
-    Sleep(50);
+        SetLength(Data, 1); Data[0] := Byte(Value);
+        RepWriteMem.Data := Data;
+        RepWriteMem.Address := WIIMOTE_MEMADDR_IR_MODE;
+        FConnection.WriteReport(RepWriteMem);
 
-    Data := GetData2ForIRSense(FIRSense);
-    RepWriteMem.Address := WIIMOTE_MEMADDR_IR_SENSITIVITY_2;
-    RepWriteMem.Data := Data;
-    FConnection.WriteReport(RepWriteMem);
-
-    Sleep(50);
-
-    SetLength(Data, 1); Data[0] := Byte(Value);
-    RepWriteMem.Data := Data;
-    RepWriteMem.Address := WIIMOTE_MEMADDR_IR_MODE;
-    FConnection.WriteReport(RepWriteMem);
-
-    Sleep(50);
-
-    SetLength(Data, 1); Data[0] := $08;
-    RepWriteMem.Address := WIIMOTE_MEMADDR_IR;
-    RepWriteMem.Data := Data;
-    FConnection.WriteReport(RepWriteMem);
+        SetLength(Data, 1); Data[0] := $08;
+        RepWriteMem.Address := WIIMOTE_MEMADDR_IR;
+        RepWriteMem.Data := Data;
+        FConnection.WriteReport(RepWriteMem);
+      end;
+    end;
+    
   finally
     RepIR.Free;
     RepIR2.Free;

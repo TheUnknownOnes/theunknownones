@@ -70,8 +70,7 @@ begin
   else
   begin
     Wiimote1.Connect(ListBox1.Items[ListBox1.ItemIndex]);
-    Wiimote1.IRSensitivity := wmiSense1;
-    Wiimote1.IRMode := wmiExtended;
+    Wiimote1.IRMode := wmiOff;
   end;
 end;
 
