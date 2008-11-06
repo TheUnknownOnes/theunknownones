@@ -15,40 +15,51 @@ uses
   TypInfo,
   Classes,
   SysUtils,
-  Variants;
-  
+  Variants,
+  WideStrings;
+
 
 function rttihGetPropertiesList(AInstance : TObject;
-                                const AList : TStrings;
+                                const AList : TWideStrings;
                                 ARecursive : Boolean = false;
-                                ATypeKinds : TTypeKinds = [];
+                                AIncludeTypeKinds : TTypeKinds = [];
+                                AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
-                                APrefix : String = '') : Integer; overload;
+                                APrefix : WideString = '';
+                                ADelimiter : WideChar = '.') : Integer; overload;
 function rttihGetPropertiesList(AClassInfo : Pointer;
-                                const AList : TStrings;
+                                const AList : TWideStrings;
                                 ARecursive : Boolean = false;
-                                ATypeKinds : TTypeKinds = [];
+                                AIncludeTypeKinds : TTypeKinds = [];
+                                AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
-                                APrefix : String = '') : Integer; overload;
+                                APrefix : WideString = '';
+                                ADelimiter : WideChar = '.') : Integer; overload;
 function rttihGetPropertiesList(AClass : TClass;
-                                const AList : TStrings;
+                                const AList : TWideStrings;
                                 ARecursive : Boolean = false;
-                                ATypeKinds : TTypeKinds = [];
+                                AIncludeTypeKinds : TTypeKinds = [];
+                                AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
-                                APrefix : String = '') : Integer; overload;
+                                APrefix : WideString = '';
+                                ADelimiter : WideChar = '.') : Integer; overload;
 //Lists all properties in the format "PropertyName[.SubPropertyName]"
 // if ATypeKinds = [] then all properties a returned
+// AIncludeTypeKinds has the priority before AExcludeTypeKinds
 
 
 //==============================================================================
 
 
 function rttihGetPropertyByName(AInstance : TObject;
-                                APropertyName : String) : PPropInfo; overload;
+                                APropertyName : WideString;
+                                ADelimiter : WideChar = '.') : PPropInfo; overload;
 function rttihGetPropertyByName(AClass : TClass;
-                                APropertyName : String) : PPropInfo; overload;
+                                APropertyName : WideString;
+                                ADelimiter : WideChar = '.') : PPropInfo; overload;
 function rttihGetPropertyByName(AClassInfo : Pointer;
-                                APropertyName : String) : PPropInfo; overload;
+                                APropertyName : WideString;
+                                ADelimiter : WideChar = '.') : PPropInfo; overload;
 //Returns the property if existing, otherwise nil
 //Example: rttihGetPropertyByName(Memo1, 'Font.Name');
 
@@ -57,40 +68,71 @@ function rttihGetPropertyByName(AClassInfo : Pointer;
 
 
 function rttihGetPropertyValue(AInstance : TObject;
-                               APropertyName : String) : Variant;
+                               APropertyName : WideString;
+                               ADelimiter : WideChar = '.') : Variant;
 //returns the current value of the property or null if something went wrong
+//Example: v := rttihGetPropertyValue(Button1, 'Font.Name');
+
+
+//==============================================================================
+
+procedure rttihSetPropertyValue(AInstance : TObject;
+                                APropertyName : WideString;
+                                AValue : Variant;
+                                ADelimiter : WideChar = '.');
+//sets the value to the specified property
 
 
 implementation
 
 function rttihGetPropertiesList(AInstance : TObject;
-                                const AList : TStrings;
+                                const AList : TWideStrings;
                                 ARecursive : Boolean = false;
-                                ATypeKinds : TTypeKinds = [];
+                                AIncludeTypeKinds : TTypeKinds = [];
+                                AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
-                                APrefix : String = '') : Integer;
+                                APrefix : WideString = '';
+                                ADelimiter : WideChar = '.') : Integer;
 begin
   Assert(Assigned(AInstance), 'Invalid object');
-  Result := rttihGetPropertiesList(AInstance.ClassInfo, AList, ARecursive, ATypeKinds, ASkipExceptions);
+  Result := rttihGetPropertiesList(AInstance.ClassInfo,
+                                   AList,
+                                   ARecursive,
+                                   AIncludeTypeKinds,
+                                   AExcludeTypeKinds,
+                                   ASkipExceptions,
+                                   APrefix,
+                                   ADelimiter);
 end;
 
 function rttihGetPropertiesList(AClass : TClass;
-                                const AList : TStrings;
+                                const AList : TWideStrings;
                                 ARecursive : Boolean = false;
-                                ATypeKinds : TTypeKinds = [];
+                                AIncludeTypeKinds : TTypeKinds = [];
+                                AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
-                                APrefix : String = '') : Integer; overload;
+                                APrefix : WideString = '';
+                                ADelimiter : WideChar = '.') : Integer; overload;
 begin
   Assert(Assigned(AClass), 'Invalid class');
-  Result := rttihGetPropertiesList(AClass.ClassInfo, AList, ARecursive, ATypeKinds, ASkipExceptions);
+  Result := rttihGetPropertiesList(AClass.ClassInfo,
+                                   AList,
+                                   ARecursive,
+                                   AIncludeTypeKinds,
+                                   AExcludeTypeKinds,
+                                   ASkipExceptions,
+                                   APrefix,
+                                   ADelimiter);
 end;
 
 function rttihGetPropertiesList(AClassInfo : Pointer;
-                                const AList : TStrings;
+                                const AList : TWideStrings;
                                 ARecursive : Boolean = false;  
-                                ATypeKinds : TTypeKinds = [];
+                                AIncludeTypeKinds : TTypeKinds = [];
+                                AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
-                                APrefix : String = '') : Integer;
+                                APrefix : WideString = '';
+                                ADelimiter : WideChar = '.') : Integer;
 var
   TypeData : PTypeData;
   PropInfoList : PPropList;
@@ -107,7 +149,9 @@ begin
     for idx := 0 to TypeData.PropCount - 1 do
     begin
       try
-        if (ATypeKinds = []) or (PropInfoList[idx].PropType^.Kind in ATypeKinds) then
+        if (AIncludeTypeKinds = []) and (AExcludeTypeKinds = []) or
+           ((PropInfoList[idx].PropType^.Kind in AIncludeTypeKinds) and (AIncludeTypeKinds <> [])) or
+           ((not (PropInfoList[idx].PropType^.Kind in AExcludeTypeKinds)) and (AExcludeTypeKinds <> [])) then
           AList.Add(APrefix + PropInfoList[idx].Name);
 
         if ARecursive and (PropInfoList[idx].PropType^.Kind = tkClass) then
@@ -115,9 +159,11 @@ begin
           rttihGetPropertiesList(PropInfoList[idx].PropType^,
                                  AList,
                                  ARecursive,
-                                 ATypeKinds,
+                                 AIncludeTypeKinds,
+                                 AExcludeTypeKinds,
                                  ASkipExceptions,
-                                 APrefix + PropInfoList[idx].Name + '.');
+                                 APrefix + PropInfoList[idx].Name + ADelimiter,
+                                 ADelimiter);
         end;
         
       except
@@ -139,42 +185,46 @@ end;
 
 
 function rttihGetPropertyByName(AInstance : TObject;
-                                APropertyName : String) : PPropInfo;
+                                APropertyName : WideString;
+                                ADelimiter : WideChar = '.') : PPropInfo;
 begin
   Assert(Assigned(AInstance), 'Invalid object');
-  Result := rttihGetPropertyByName(AInstance.ClassInfo, APropertyName);
+  Result := rttihGetPropertyByName(AInstance.ClassInfo, APropertyName, ADelimiter);
 end;
 
 function rttihGetPropertyByName(AClass : TClass;
-                                APropertyName : String) : PPropInfo; overload;
+                                APropertyName : WideString;
+                                ADelimiter : WideChar = '.') : PPropInfo; overload;
 begin
   Assert(Assigned(AClass), 'Invalid class');
-  Result := rttihGetPropertyByName(AClass.ClassInfo, APropertyName);
+  Result := rttihGetPropertyByName(AClass.ClassInfo, APropertyName, ADelimiter);
 end;
 
 function rttihGetPropertyByName(AClassInfo : Pointer;
-                                APropertyName : String) : PPropInfo;
+                                APropertyName : WideString;
+                                ADelimiter : WideChar = '.') : PPropInfo;
 var
-  PosOfPoint : Integer;
-  PropName : String;
+  PosOfDelim : Integer;
+  PropName : WideString;
 begin
   Result := nil;
-
-  PosOfPoint := Pos('.', APropertyName);
-  if PosOfPoint = 0 then
-    PosOfPoint := Length(APropertyName) + 1;
   
 
-  if PosOfPoint > 0 then
+  PosOfDelim := Pos(ADelimiter, APropertyName);
+  if PosOfDelim = 0 then
+    PosOfDelim := Length(APropertyName) + 1;
+
+
+  if PosOfDelim > 0 then
   begin
-    PropName := Copy(APropertyName, 1, PosOfPoint - 1);
+    PropName := Copy(APropertyName, 1, PosOfDelim - 1);
     Result := GetPropInfo(AClassInfo, PropName);
 
     if Assigned(Result) and
        (Result.PropType^.Kind = tkClass) and
-       (PosOfPoint < Length(APropertyName)) then
+       (PosOfDelim < Length(APropertyName)) then
     begin
-      Result := rttihGetPropertyByName(AClassInfo, Copy(APropertyName, PosOfPoint + 1, Length(APropertyName)));
+      Result := rttihGetPropertyByName(Result.PropType^, Copy(APropertyName, PosOfDelim + 1, Length(APropertyName)));
     end;
 
   end;
@@ -185,31 +235,76 @@ end;
 
 
 function rttihGetPropertyValue(AInstance : TObject;
-                               APropertyName : String) : Variant;
+                               APropertyName : WideString;
+                               ADelimiter : WideChar = '.') : Variant;
 var
-  PosOfPoint : Integer;
-  PropName : String;
+  PosOfDelim : Integer;
+  PropName : WideString;
   PropInfo : PPropInfo;
 begin
   Result := null;
 
-  PosOfPoint := Pos('.', APropertyName);
-  if PosOfPoint = 0 then
-    PosOfPoint := Length(APropertyName) + 1;
+  PosOfDelim := Pos(ADelimiter, APropertyName);
+  if PosOfDelim = 0 then
+    PosOfDelim := Length(APropertyName) + 1;
 
 
-  if PosOfPoint > 0 then
+  if PosOfDelim > 0 then
   begin
-    PropName := Copy(APropertyName, 1, PosOfPoint - 1);
+    PropName := Copy(APropertyName, 1, PosOfDelim - 1);
     Result := GetPropValue(AInstance, PropName, false);
     PropInfo := GetPropInfo(AInstance, PropName);
 
     if (not VarIsNull(Result)) and
        (PropInfo.PropType^.Kind = tkClass) and
-       (PosOfPoint < Length(APropertyName)) then
+       (PosOfDelim < Length(APropertyName)) then
     begin
-      Result := rttihGetPropertyValue(TObject(Integer(Result)), Copy(APropertyName, PosOfPoint + 1, Length(APropertyName)));
+      Result := rttihGetPropertyValue(TObject(Integer(Result)),
+                                      Copy(APropertyName, PosOfDelim + 1, Length(APropertyName)));
     end
+
+  end;
+end;
+
+
+//==============================================================================
+
+
+procedure rttihSetPropertyValue(AInstance : TObject;
+                                APropertyName : WideString;
+                                AValue : Variant;
+                                ADelimiter : WideChar = '.');
+var
+  PosOfDelim : Integer;
+  PropName : WideString;
+  PropInfo : PPropInfo;
+  PropValue : Variant;
+begin
+  PosOfDelim := Pos(ADelimiter, APropertyName);
+  if PosOfDelim = 0 then
+    PosOfDelim := Length(APropertyName) + 1;
+
+
+  if PosOfDelim > 0 then
+  begin
+    PropName := Copy(APropertyName, 1, PosOfDelim - 1);
+    PropValue := GetPropValue(AInstance, PropName, false);
+    PropInfo := GetPropInfo(AInstance, PropName);
+
+    if (not VarIsNull(PropValue)) and
+       (PropInfo.PropType^.Kind = tkClass) and
+       (PosOfDelim < Length(APropertyName)) then
+    begin
+      rttihSetPropertyValue(TObject(Integer(PropValue)),
+                            Copy(APropertyName,PosOfDelim + 1, Length(APropertyName)),
+                            AValue,
+                            ADelimiter);
+    end
+    else
+    if PosOfDelim > Length(APropertyName) then
+    begin
+      SetPropValue(AInstance, PropInfo, AValue);
+    end;
 
   end;
 end;

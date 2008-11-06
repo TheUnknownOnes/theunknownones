@@ -31,7 +31,8 @@ requires
   RegExp_D100R,
   xmltools_D100R,
   vcl,
-  DesignIDE;
+  DesignIDE,
+  RTTIHelper_D100R;
 
 contains
   uSettingsBase in '..\..\uSettingsBase.pas',

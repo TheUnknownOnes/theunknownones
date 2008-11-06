@@ -19,9 +19,9 @@ uses
   Variants,
   WideStrings,
   RegExpr,
-  TypInfo,
   Windows,
-  uSettingsRTTI;
+  uSettingsRTTI,
+  uRTTIHelper;
 
 type
 
@@ -1418,22 +1418,16 @@ procedure TCustomSettingsComponentLink.DoApplySettings(
 var
   idx : Integer;
   PropValue : Variant;
-  Prop : PPropInfo;
 begin
   if Assigned(FComponent) and Assigned(FSettings) then
   begin
     for idx := 0 to FSaveProperties.Count - 1 do
     begin
-      Prop := FSaveProperties.GetPropertyFromObject(idx, FComponent);
-
-      if Assigned(Prop) then
-      begin
-        PropValue := FSettings.GetValue(ARootSetting +
-                                        SettingsPathDelimiter +
-                                        FSaveProperties[idx],
-                                        GetPropValue(FComponent, Prop, false));
-        SetPropValue(FComponent, Prop, PropValue);
-      end;
+      PropValue := FSettings.GetValue(ARootSetting +
+                                      SettingsPathDelimiter +
+                                      FSaveProperties[idx],
+                                      rttihGetPropertyValue(FComponent, FSaveProperties[idx], SettingsPathDelimiter));
+      rttihSetPropertyValue(FComponent, FSaveProperties[idx], PropValue, SettingsPathDelimiter);
     end;
   end;
 
@@ -1443,23 +1437,14 @@ procedure TCustomSettingsComponentLink.DoSaveSettings(
   const ARootSetting: TSettingName);
 var
   idx : Integer;
-  PropValue : Variant;
-  Prop : PPropInfo;
 begin
   if Assigned(FComponent) and Assigned(FSettings) then
   begin
     for idx := 0 to FSaveProperties.Count - 1 do
     begin
-      Prop := FSaveProperties.GetPropertyFromObject(idx, FComponent);
-
-      if Assigned(Prop) then
-      begin
-        PropValue := GetPropValue(FComponent, Prop, false);
-
         FSettings.SetValue(ARootSetting +
                            SettingsPathDelimiter +
-                           FSaveProperties[idx], PropValue);
-      end;
+                           FSaveProperties[idx], rttihGetPropertyValue(FComponent, FSaveProperties[idx], SettingsPathDelimiter));
     end;
   end;
 
