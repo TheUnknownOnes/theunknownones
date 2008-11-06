@@ -60,6 +60,7 @@ type
     FDays: TYearCalendarDays;
 
     FOnHoverDay : THoverDayEvent;
+    FHotTrack: Boolean;
 
     procedure SetYear(const Value: Integer);
     procedure SetDays(const Value: TYearCalendarDays);
@@ -82,6 +83,7 @@ type
   published
     property Year : Integer read FYear write SetYear;
     property Days : TYearCalendarDays read FDays write SetDays;
+    property HotTrack : Boolean read FHotTrack write FHotTrack;
 
     property Align;
     property Anchors;
@@ -339,7 +341,8 @@ end;
 procedure TYearCalendar.MouseMove(Shift: TShiftState; X, Y: Integer);
 begin
   inherited;
-  Invalidate;
+  if FHotTrack then
+    Invalidate;
 end;
 
 procedure TYearCalendar.Paint;
@@ -364,8 +367,14 @@ end;
 
 procedure TYearCalendar.Click;
 begin
+  Invalidate;
   FSelectedDay:=FHoveredDay;
+
   inherited;
+
+  Application.ProcessMessages;
+
+  Invalidate;
 end;
 
 procedure TYearCalendar.CloseGraph;
