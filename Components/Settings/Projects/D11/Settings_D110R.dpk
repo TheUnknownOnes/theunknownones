@@ -30,7 +30,8 @@ requires
   rtl,
   RegExp_D110R,
   xmltools_D110R,
-  vcl;
+  vcl,
+  RTTIHelper_D110R;
 
 contains
   uSettingsBase in '..\..\uSettingsBase.pas',
