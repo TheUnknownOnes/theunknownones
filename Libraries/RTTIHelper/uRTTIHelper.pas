@@ -16,7 +16,8 @@ uses
   Classes,
   SysUtils,
   Variants,
-  WideStrings;
+  WideStrings,
+  StrUtils;
 
 
 function rttihGetPropertiesList(AInstance : TObject;
@@ -26,7 +27,8 @@ function rttihGetPropertiesList(AInstance : TObject;
                                 AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
                                 APrefix : WideString = '';
-                                ADelimiter : WideChar = '.') : Integer; overload;
+                                ADelimiter : WideChar = '.';
+                                AIgnoreClasses : TList = nil) : Integer; overload;
 function rttihGetPropertiesList(AClassInfo : Pointer;
                                 const AList : TWideStrings;
                                 ARecursive : Boolean = false;
@@ -34,7 +36,8 @@ function rttihGetPropertiesList(AClassInfo : Pointer;
                                 AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
                                 APrefix : WideString = '';
-                                ADelimiter : WideChar = '.') : Integer; overload;
+                                ADelimiter : WideChar = '.';
+                                AIgnoreClasses : TList = nil) : Integer; overload;
 function rttihGetPropertiesList(AClass : TClass;
                                 const AList : TWideStrings;
                                 ARecursive : Boolean = false;
@@ -42,7 +45,8 @@ function rttihGetPropertiesList(AClass : TClass;
                                 AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
                                 APrefix : WideString = '';
-                                ADelimiter : WideChar = '.') : Integer; overload;
+                                ADelimiter : WideChar = '.';
+                                AIgnoreClasses : TList = nil) : Integer; overload;
 //Lists all properties in the format "PropertyName[.SubPropertyName]"
 // if ATypeKinds = [] then all properties a returned
 // AIncludeTypeKinds has the priority before AExcludeTypeKinds
@@ -76,11 +80,24 @@ function rttihGetPropertyValue(AInstance : TObject;
 
 //==============================================================================
 
+
 procedure rttihSetPropertyValue(AInstance : TObject;
                                 APropertyName : WideString;
                                 AValue : Variant;
                                 ADelimiter : WideChar = '.');
 //sets the value to the specified property
+//Example: rttihSetPropertyValue(Button1, 'Font.Name', 'Webdings');
+
+
+//==============================================================================
+
+
+function rttihGetInheritancePath(AClassInfo : Pointer;
+                                 ADelimiter : WideChar = '.') : WideString; overload;
+function rttihGetInheritancePath(AClass : TClass;
+                                 ADelimiter : WideChar = '.') : WideString; overload;
+function rttihGetInheritancePath(AInstance : TObject;
+                                 ADelimiter : WideChar = '.') : WideString; overload;
 
 
 implementation
@@ -92,7 +109,8 @@ function rttihGetPropertiesList(AInstance : TObject;
                                 AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
                                 APrefix : WideString = '';
-                                ADelimiter : WideChar = '.') : Integer;
+                                ADelimiter : WideChar = '.';
+                                AIgnoreClasses : TList = nil) : Integer;
 begin
   Assert(Assigned(AInstance), 'Invalid object');
   Result := rttihGetPropertiesList(AInstance.ClassInfo,
@@ -102,7 +120,8 @@ begin
                                    AExcludeTypeKinds,
                                    ASkipExceptions,
                                    APrefix,
-                                   ADelimiter);
+                                   ADelimiter,
+                                   AIgnoreClasses);
 end;
 
 function rttihGetPropertiesList(AClass : TClass;
@@ -112,7 +131,8 @@ function rttihGetPropertiesList(AClass : TClass;
                                 AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
                                 APrefix : WideString = '';
-                                ADelimiter : WideChar = '.') : Integer; overload;
+                                ADelimiter : WideChar = '.';
+                                AIgnoreClasses : TList = nil) : Integer; overload;
 begin
   Assert(Assigned(AClass), 'Invalid class');
   Result := rttihGetPropertiesList(AClass.ClassInfo,
@@ -122,7 +142,8 @@ begin
                                    AExcludeTypeKinds,
                                    ASkipExceptions,
                                    APrefix,
-                                   ADelimiter);
+                                   ADelimiter,
+                                   AIgnoreClasses);
 end;
 
 function rttihGetPropertiesList(AClassInfo : Pointer;
@@ -132,11 +153,13 @@ function rttihGetPropertiesList(AClassInfo : Pointer;
                                 AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
                                 APrefix : WideString = '';
-                                ADelimiter : WideChar = '.') : Integer;
+                                ADelimiter : WideChar = '.';
+                                AIgnoreClasses : TList = nil) : Integer;
 var
   TypeData : PTypeData;
   PropInfoList : PPropList;
   idx : Integer;
+  FreeIgnoreClasses : Boolean;
 begin
   Assert(Assigned(AClassInfo), 'Invalid classinfo');
 
@@ -156,14 +179,38 @@ begin
 
         if ARecursive and (PropInfoList[idx].PropType^.Kind = tkClass) then
         begin
-          rttihGetPropertiesList(PropInfoList[idx].PropType^,
-                                 AList,
-                                 ARecursive,
-                                 AIncludeTypeKinds,
-                                 AExcludeTypeKinds,
-                                 ASkipExceptions,
-                                 APrefix + PropInfoList[idx].Name + ADelimiter,
-                                 ADelimiter);
+          if not Assigned(AIgnoreClasses) then
+          begin
+            AIgnoreClasses := TList.Create;
+            FreeIgnoreClasses := true;
+          end
+          else
+            FreeIgnoreClasses := false;
+
+          try
+
+            if AIgnoreClasses.IndexOf(AIgnoreClasses) = -1 then
+            begin
+              AIgnoreClasses.Add(AIgnoreClasses);
+
+              rttihGetPropertiesList(PropInfoList[idx].PropType^,
+                                     AList,
+                                     ARecursive,
+                                     AIncludeTypeKinds,
+                                     AExcludeTypeKinds,
+                                     ASkipExceptions,
+                                     APrefix + PropInfoList[idx].Name + ADelimiter,
+                                     ADelimiter,
+                                     AIgnoreClasses);
+            end;
+
+          finally
+            if FreeIgnoreClasses then
+            begin
+              AIgnoreClasses.Free;
+              AIgnoreClasses := nil;
+            end;
+          end;
         end;
         
       except
@@ -307,6 +354,44 @@ begin
     end;
 
   end;
+end;
+
+
+//==============================================================================
+
+
+function rttihGetInheritancePath(AClass : TClass;
+                                 ADelimiter : WideChar = '.') : WideString;
+begin
+  Result := rttihGetInheritancePath(AClass.ClassInfo,
+                                    ADelimiter);
+end;
+
+function rttihGetInheritancePath(AInstance : TObject;
+                                 ADelimiter : WideChar = '.') : WideString;
+begin
+  Result := rttihGetInheritancePath(AInstance.ClassInfo,
+                                    ADelimiter);
+end;
+
+function rttihGetInheritancePath(AClassInfo : Pointer;
+                                 ADelimiter : WideChar = '.') : WideString;
+var
+  TypeData : PTypeData;
+begin
+  Assert(Assigned(AClassInfo), 'Invalid classinfo');
+
+  repeat
+    Result := PTypeInfo(AClassInfo).Name + ADelimiter + Result;
+
+    TypeData := GetTypeData(AClassInfo);
+    AClassInfo := Typedata.ParentInfo;
+    if Assigned(AClassInfo) then
+      AClassInfo := PPTypeInfo(AClassInfo)^;
+  until not Assigned(AClassInfo);
+
+  Result := LeftStr(Result, Length(Result) - 1); //cut the last delimiter
+
 end;
 
 end.
