@@ -71,33 +71,6 @@ object Form1: TForm1
     TabOrder = 6
     Text = 'Edit1'
   end
-  object btn_CalibX: TButton
-    Left = 151
-    Top = 132
-    Width = 75
-    Height = 21
-    Caption = 'CalibX'
-    TabOrder = 7
-    OnClick = btn_CalibXClick
-  end
-  object btn_CalibY: TButton
-    Left = 151
-    Top = 158
-    Width = 75
-    Height = 21
-    Caption = 'CalibY'
-    TabOrder = 8
-    OnClick = btn_CalibYClick
-  end
-  object btn_CalibZ: TButton
-    Left = 151
-    Top = 185
-    Width = 75
-    Height = 21
-    Caption = 'CalibZ'
-    TabOrder = 9
-    OnClick = btn_CalibZClick
-  end
   object Wiimote1: TWiimote
     OnNewReport = Wiimote1NewReport
     OnStatus = Wiimote1Status
@@ -105,6 +78,7 @@ object Form1: TForm1
     OnDisconnected = Wiimote1Disconnected
     OnButtonDown = Wiimote1ButtonDown
     OnButtonUp = Wiimote1ButtonUp
+    OnButtonIsDown = Wiimote1ButtonIsDown
     Left = 64
     Top = 32
   end

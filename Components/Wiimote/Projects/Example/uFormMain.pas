@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, uWiimote, StdCtrls, ExtCtrls, pngimage, uEffectPNGImage, uEffectPNG,
-  ComCtrls, TeEngine, Series, TeeProcs, Math;
+  ComCtrls, Math, DateUtils;
 
 type
   TForm1 = class(TForm)
@@ -19,9 +19,6 @@ type
     Edit1: TEdit;
     Edit2: TEdit;
     Edit3: TEdit;
-    btn_CalibX: TButton;
-    btn_CalibY: TButton;
-    btn_CalibZ: TButton;
     procedure FormCreate(Sender: TObject);
     procedure btn_ConnnectClick(Sender: TObject);
     procedure Wiimote1Connected(Sender: TObject);
@@ -30,12 +27,13 @@ type
     procedure Wiimote1Status(Sender: TObject);
     procedure tm_LedsTimer(Sender: TObject);
     procedure Wiimote1NewReport(const AReport: TwmReport);
-    procedure btn_CalibXClick(Sender: TObject);
-    procedure btn_CalibYClick(Sender: TObject);
-    procedure btn_CalibZClick(Sender: TObject);
     procedure Wiimote1ButtonDown(AButton: TwmButton);
     procedure Wiimote1ButtonUp(AButton: TwmButton);
+    procedure Wiimote1ButtonIsDown(AButton: TwmButton);
   private
+    FMouseSpeed : Integer;
+    FLastMouseMove : TDateTime;
+
     procedure SetCP;
   public
     { Public-Deklarationen }
@@ -48,21 +46,6 @@ implementation
 
 {$R *.dfm}
 
-procedure TForm1.btn_CalibXClick(Sender: TObject);
-begin
-  Wiimote1.CalibrateAccelXNow;
-end;
-
-procedure TForm1.btn_CalibYClick(Sender: TObject);
-begin
-  Wiimote1.CalibrateAccelYNow;
-end;
-
-procedure TForm1.btn_CalibZClick(Sender: TObject);
-begin
-  Wiimote1.CalibrateAccelZNow;
-end;
-
 procedure TForm1.btn_ConnnectClick(Sender: TObject);
 begin
   if Wiimote1.Connected then
@@ -70,13 +53,15 @@ begin
   else
   begin
     Wiimote1.Connect(ListBox1.Items[ListBox1.ItemIndex]);
-    Wiimote1.IRMode := wmiOff;
+    Wiimote1.IRMode := wmiBasic;
   end;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   Randomize;
+
+  FMouseSpeed := 1;
 
   ReportMemoryLeaksOnShutdown := true;
 
@@ -156,8 +141,8 @@ begin
   Event := 0;
 
   case AButton of
-    wmbA: Event := MOUSEEVENTF_LEFTDOWN;
-    wmbB: Event := MOUSEEVENTF_RIGHTDOWN;
+    wmbA: Event := MOUSEEVENTF_RIGHTDOWN;
+    wmbB: Event := MOUSEEVENTF_LEFTDOWN;
     wmbPlus: ;
     wmbMinus: ;
     wmbHome: ;
@@ -169,8 +154,61 @@ begin
     wmbRight: ;
   end;
 
-  if Event <> 0 then  
+  if Event <> 0 then
     mouse_event(Event, 0, 0, 0, 0);
+end;
+
+procedure TForm1.Wiimote1ButtonIsDown(AButton: TwmButton);
+var
+  Event : Cardinal;
+  x,y : Integer;
+begin
+  if (MilliSecondsBetween(FLastMouseMove, Now)<50) then
+    exit
+  else
+  if FMouseSpeed < (Screen.Width div 20) then
+    Inc(FMouseSpeed, FMouseSpeed);
+  
+
+  Event := 0;
+  x := 0;
+  y := 0;
+
+  case AButton of
+    wmbA:;
+    wmbB:;
+    wmbPlus: ;
+    wmbMinus: ;
+    wmbHome: ;
+    wmbOne: ;
+    wmbTwo: ;
+    wmbUp:
+    begin
+      Dec(y, FMouseSpeed);
+      Event := MOUSEEVENTF_MOVE;
+    end;
+    wmbDown:
+    begin
+      Inc(y, FMouseSpeed);
+      Event := MOUSEEVENTF_MOVE;
+    end;
+    wmbLeft:
+    begin
+      Dec(x, FMouseSpeed);
+      Event := MOUSEEVENTF_MOVE;
+    end;
+    wmbRight:
+    begin
+      Inc(x, FMouseSpeed);
+      Event := MOUSEEVENTF_MOVE;
+    end;
+  end;
+
+  if Event <> 0 then
+  begin
+    FLastMouseMove := now;
+    mouse_event(Event, x, y, 0, 0);
+  end;
 end;
 
 procedure TForm1.Wiimote1ButtonUp(AButton: TwmButton);
@@ -178,10 +216,11 @@ var
   Event : Cardinal;
 begin
   Event := 0;
+  FMouseSpeed := 1;
 
   case AButton of
-    wmbA: Event := MOUSEEVENTF_LEFTUP;
-    wmbB: Event := MOUSEEVENTF_RIGHTUP;
+    wmbA: Event := MOUSEEVENTF_RIGHTUP;
+    wmbB: Event := MOUSEEVENTF_LEFTUP;
     wmbPlus: ;
     wmbMinus: ;
     wmbHome: ;

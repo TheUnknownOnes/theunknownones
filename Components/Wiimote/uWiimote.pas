@@ -432,10 +432,6 @@ type
 
     procedure RequestStatus;
 
-    procedure CalibrateAccelXNow;
-    procedure CalibrateAccelYNow;
-    procedure CalibrateAccelZNow;
-
     property Active : Boolean read GetActive write SetActive;
     property Connected : Boolean read GetConnected;
 
@@ -481,6 +477,7 @@ type
 
     property OnButtonDown;
     property OnButtonUp;
+    property OnButtonIsDown;
   end;
 
 
@@ -684,14 +681,14 @@ begin
           WAIT_FAILED:
           begin
             Result := False;
-            Disconnect;
+            //Disconnect;
           end;
 
           WAIT_TIMEOUT:
           begin
             CancelIo(FHandle);
             Result := false;
-            Disconnect;
+            //Disconnect;
           end
 
           else
@@ -1283,63 +1280,6 @@ end;
 
 { TCustomWiimote }
 
-procedure TCustomWiimote.CalibrateAccelXNow;
-var
-  Rep : TwmOutputReportWriteMemory;
-  Data : TwmRawData;
-begin
-  Rep := TwmOutputReportWriteMemory.Create;
-  Rep.Address := $0016;
-  SetLength(Data, 1);
-  Data[0] := FRawAccels[0];
-  Rep.Data := Data;
-  Rep.Rumble := FRumble;
-
-  FConnection.WriteReport(Rep);
-
-  Rep.Free;
-
-  ReadAccelCalibration;
-end;
-
-procedure TCustomWiimote.CalibrateAccelYNow;
-var
-  Rep : TwmOutputReportWriteMemory;
-  Data : TwmRawData;
-begin
-  Rep := TwmOutputReportWriteMemory.Create;
-  Rep.Address := $0017;
-  SetLength(Data, 1);
-  Data[0] := FRawAccels[1];
-  Rep.Data := Data;
-  Rep.Rumble := FRumble;
-
-  FConnection.WriteReport(Rep);
-
-  Rep.Free;
-
-  ReadAccelCalibration;
-end;
-
-procedure TCustomWiimote.CalibrateAccelZNow;
-var
-  Rep : TwmOutputReportWriteMemory;
-  Data : TwmRawData;
-begin
-  Rep := TwmOutputReportWriteMemory.Create;
-  Rep.Address := $0018;
-  SetLength(Data, 1);
-  Data[0] := FRawAccels[2];
-  Rep.Data := Data;
-  Rep.Rumble := FRumble;
-
-  FConnection.WriteReport(Rep);
-
-  Rep.Free;
-
-  ReadAccelCalibration;
-end;
-
 function TCustomWiimote.Connect(ADevicePath: String): Boolean;
 var
   Rep : TwmOutputReportReporting;
@@ -1698,34 +1638,36 @@ begin
      (FAccelCalibration.XG = 0) and
      (FAccelCalibration.YG = 0) and
      (FAccelCalibration.ZG = 0) then
+  begin
     ReadAccelCalibration;
-  
-
-
-  FRawAccels[0] := AReport.XAccl;
-  FRawAccels[1] := AReport.YAccl;
-  FRawAccels[2] := AReport.ZAccl;
-
-  Calib0 := FAccelCalibration.X0;
-  CalibG := FAccelCalibration.XG;
-  if (CalibG - Calib0) <> 0 then
-    FAccels[0] := ((FRawAccels[0] - Calib0) / (CalibG - Calib0))
+  end
   else
-    FAccels[0] := 0;
+  begin
+    FRawAccels[0] := AReport.XAccl;
+    FRawAccels[1] := AReport.YAccl;
+    FRawAccels[2] := AReport.ZAccl;
 
-  Calib0 := FAccelCalibration.Y0;
-  CalibG := FAccelCalibration.YG;
-  if (CalibG - Calib0) <> 0 then
-    FAccels[1] := ((FRawAccels[1] - Calib0) / (CalibG - Calib0))
-  else
-    FAccels[1] := 0;
+    Calib0 := FAccelCalibration.X0;
+    CalibG := FAccelCalibration.XG;
+    if (CalibG - Calib0) <> 0 then
+      FAccels[0] := ((FRawAccels[0] - Calib0) / (CalibG - Calib0))
+    else
+      FAccels[0] := 0;
 
-  Calib0 := FAccelCalibration.Z0;
-  CalibG := FAccelCalibration.ZG;
-  if (CalibG - Calib0) <> 0 then
-    FAccels[2] := ((FRawAccels[2] - Calib0) / (CalibG - Calib0))
-  else
-    FAccels[2] := 0;
+    Calib0 := FAccelCalibration.Y0;
+    CalibG := FAccelCalibration.YG;
+    if (CalibG - Calib0) <> 0 then
+      FAccels[1] := ((FRawAccels[1] - Calib0) / (CalibG - Calib0))
+    else
+      FAccels[1] := 0;
+
+    Calib0 := FAccelCalibration.Z0;
+    CalibG := FAccelCalibration.ZG;
+    if (CalibG - Calib0) <> 0 then
+      FAccels[2] := ((FRawAccels[2] - Calib0) / (CalibG - Calib0))
+    else
+      FAccels[2] := 0;
+  end;
 end;
 
 procedure TCustomWiimote.ExtractButtonStates(AReport: TwmInputReportButtons);
@@ -1789,7 +1731,7 @@ begin
 
   if FReadMemStack.Count > 0 then
   begin
-  
+
     if SameText(FReadMemStack[0], 'AccelCalibration') then
     begin
       FAccelCalibration.X0 := Data[0];
