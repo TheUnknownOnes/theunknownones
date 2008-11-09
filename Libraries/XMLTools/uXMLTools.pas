@@ -58,6 +58,7 @@ type
   procedure XSetAttribute(const ANode : IXMLDOMNode; AName: WideString; AValue : OleVariant); overload;
   function XAddChildOrGetIfExists(const AParent : IXMLDOMNode; AChildTag : WideString) : IXMLDOMNode;
   function XReadAttribute(const ANode : IXMLDOMNode; AAtrributeName : WideString; var AAttribute : IXMLDOMNode) : Boolean;
+  function XGetText(const ANode : IXMLDOMNode) : WideString;
 
   function CreateMSXMLV1Document : IXMLDOMDocument;
   function CreateMSXMLV2Document : IXMLDOMDocument2;
@@ -72,6 +73,23 @@ end;
 function CreateMSXMLV2Document : IXMLDOMDocument2;
 begin
   Result:=CreateOleObject('MSXML2.DOMDocument.4.0') as IXMLDOMDocument2;
+end;
+
+function XGetText(const ANode : IXMLDOMNode) : WideString;
+var
+  idx : Integer;
+begin
+  if ANode.nodeType = NODE_TEXT then
+    Result := ANode.text
+  else
+  if ANode.nodeType = NODE_ELEMENT then
+  begin
+    for idx := 0 to ANode.childNodes.length  - 1 do
+    begin
+      if ANode.childNodes.item[idx].nodeType = NODE_TEXT then
+        Result := XGetText(ANode.childNodes.item[idx]);
+    end;
+  end;
 end;
 
 function XAddChildOrGetIfExists(const AParent : IXMLDOMNode; AChildTag : WideString) : IXMLDOMNode;

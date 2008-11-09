@@ -1,4 +1,4 @@
-package PNGSupport_D110;
+package RTTIHelper_D110R;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,19 +22,13 @@ package PNGSupport_D110;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'PNGSupport'}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
-  rtl,
-  vcl,
-  GDIPlusSupport_D110;
+  rtl;
 
 contains
-  pngextra in '..\..\pngextra.pas',
-  pngimage in '..\..\pngimage.pas',
-  pnglang in '..\..\pnglang.pas',
-  zlibpas in '..\..\zlibpas.pas';
+  uRTTIHelper in '..\..\uRTTIHelper.pas';
 
 end.

@@ -9,8 +9,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, pngImage, gdipapi, gdipobj, ActiveX, ImgList, ShellAPI,
-  gifimage;
+  Dialogs, StdCtrls, pngImage, gdipapi, gdipobj, ActiveX, ImgList, ShellAPI;
 
   function PNGtoIcon(const APNG : TGPBitmap;
                       ACursor : Boolean = false;

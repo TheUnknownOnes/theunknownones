@@ -218,6 +218,10 @@ type
     function Exists(APath : TSettingName; AIsRegEx : Boolean = false) : Boolean;
     procedure Delete(APath : TSettingName; AIsRegEx : Boolean = false);
     procedure Clear;
+    function Move(ANewParent : TSettingName;
+                  APath : TSettingName;
+                  AIsRegExPath : Boolean = false;
+                  AFullPathNames : Boolean = false) : TSettingNames;
 
     procedure RegisterComponentLink(ALink : TCustomSettingsLink);
     procedure UnRegisterComponentLink(ALink : TCustomSettingsLink);
@@ -977,9 +981,9 @@ begin
     for idx := 0 to Setts.Count - 1 do
     begin
       if AFullPathNames then
-        Result[idx] := Setts[idx].Name
+        Result[idx] := Setts[idx].GetPath
       else
-        Result[idx] := Setts[idx].GetPath;
+        Result[idx] := Setts[idx].Name;
     end;
   finally
     Setts.Free;
@@ -1105,6 +1109,42 @@ begin
 
   if Result then
     InformComponentLinksAboutLoad;
+end;
+
+function TCustomSettings.Move(ANewParent : TSettingName;
+                                APath : TSettingName;
+                                AIsRegExPath : Boolean = false;
+                                AFullPathNames : Boolean = false) : TSettingNames;
+var
+  Setts,
+  NewParent : TSettingList;
+  idx : Integer;
+begin
+  Setts := TSettingList.Create;
+  NewParent := TSettingList.Create;
+  try
+    QuerySettings(ANewParent, false, NewParent, true);
+    
+    if NewParent.Count = 0 then
+      NewParent.Add(TSetting.Create(FRootSetting, ANewParent, true));
+
+    QuerySettings(APath, AIsRegExPath, Setts, true);
+
+    SetLength(Result, Setts.Count);
+
+    for idx := 0 to Setts.Count - 1 do
+    begin
+      Setts[idx].Parent := NewParent.First;
+
+      if AFullPathNames then
+        Result[idx] := Setts[idx].GetPath
+      else
+        Result[idx] := Setts[idx].Name;
+    end;
+  finally
+    Setts.Free;
+    NewParent.Free;
+  end;
 end;
 
 procedure TCustomSettings.Notification(AComponent: TComponent;

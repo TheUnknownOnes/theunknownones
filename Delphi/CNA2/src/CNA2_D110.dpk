@@ -1,4 +1,4 @@
-package PNGSupport_D110;
+package CNA2_D110;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,19 +22,25 @@ package PNGSupport_D110;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'PNGSupport'}
-{$RUNONLY}
+{$DESCRIPTION 'CNA2 - Component Naming Assistant V.2 by TUO'}
+{$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
+  designide,
+  Settings_D110R,
+  CommonTools_D110R,
   vcl,
-  GDIPlusSupport_D110;
+  xmlrtl,
+  vclactnband,
+  vclx,
+  RTTIHelper_D110R;
 
 contains
-  pngextra in '..\..\pngextra.pas',
-  pngimage in '..\..\pngimage.pas',
-  pnglang in '..\..\pnglang.pas',
-  zlibpas in '..\..\zlibpas.pas';
+  uCNA2Settings in 'uCNA2Settings.pas',
+  uCNA2Main in 'uCNA2Main.pas',
+  uCNA2Visualizers in 'uCNA2Visualizers.pas',
+  uCNA2ConfigDialog in 'uCNA2ConfigDialog.pas' {CNA2ConfigDialog};
 
 end.

@@ -86,67 +86,67 @@ begin
     varNull     : AValue := null;
     varSmallint :
     begin
-      tempSmallInt:=StrToInt(AXMLNode.text);
+      tempSmallInt:=StrToInt(XGetText(AXMLNode));
       AValue := tempSmallInt;
     end;
     varInteger  :
     begin
-      tempInteger:=StrToInt(AXMLNode.text);
+      tempInteger:=StrToInt(XGetText(AXMLNode));
       AValue := tempInteger;
     end;
     varSingle   :
     begin
-      tempSingle:=StrToFloat(AXMLNode.text);
+      tempSingle:=StrToFloat(XGetText(AXMLNode));
       AValue := tempSingle;
     end;
     varDouble   :
     begin
-      tempDouble:=StrToFloat(AXMLNode.text);
+      tempDouble:=StrToFloat(XGetText(AXMLNode));
       AValue := tempDouble;
     end;
     varDate     :
     begin
-      tempDate:=StrToDateTime(AXMLNode.text);
+      tempDate:=StrToDateTime(XGetText(AXMLNode));
       AValue := tempDate;
     end;
     varOleStr   :
     begin
-      tempOleStr:=AXMLNode.text;
+      tempOleStr:=XGetText(AXMLNode);
       AValue := tempOleStr;
     end;
     varBoolean  :
     begin
-      tempBoolean := StrToBool(AXMLNode.text);
+      tempBoolean := StrToBool(XGetText(AXMLNode));
       AValue := tempBoolean;
     end;
     varShortInt :
     begin
-      tempShortInt:=StrToInt(AXMLNode.text);
+      tempShortInt:=StrToInt(XGetText(AXMLNode));
       AValue := tempShortInt;
     end;
     varByte     :
     begin
-      tempByte:=StrToInt(AXMLNode.text);
+      tempByte:=StrToInt(XGetText(AXMLNode));
       AValue := tempByte;
     end;
     varWord     :
     begin
-      tempWord:=StrToInt(AXMLNode.text);
+      tempWord:=StrToInt(XGetText(AXMLNode));
       AValue := tempWord;
     end;
     varLongWord :
     begin
-      tempLongWord:=StrToInt(AXMLNode.text);
+      tempLongWord:=StrToInt(XGetText(AXMLNode));
       AValue := tempLongWord;
     end;
     varInt64    :
     begin
-      tempInt64:=StrToInt64(AXMLNode.text);
+      tempInt64:=StrToInt64(XGetText(AXMLNode));
       AValue := tempInt64;
     end;
     varString   :
     begin
-      tempString:=AXMLNode.text;
+      tempString:=XGetText(AXMLNode);
       AValue := tempString;
     end;
   end;

@@ -29,7 +29,7 @@ function rttihGetPropertiesList(AInstance : TObject;
                                 APrefix : WideString = '';
                                 ADelimiter : WideChar = '.';
                                 AIgnoreClasses : TList = nil) : Integer; overload;
-function rttihGetPropertiesList(AClassInfo : Pointer;
+function rttihGetPropertiesList(AClassInfo : PTypeInfo;
                                 const AList : TWideStrings;
                                 ARecursive : Boolean = false;
                                 AIncludeTypeKinds : TTypeKinds = [];
@@ -61,7 +61,7 @@ function rttihGetPropertyByName(AInstance : TObject;
 function rttihGetPropertyByName(AClass : TClass;
                                 APropertyName : WideString;
                                 ADelimiter : WideChar = '.') : PPropInfo; overload;
-function rttihGetPropertyByName(AClassInfo : Pointer;
+function rttihGetPropertyByName(AClassInfo : PTypeInfo;
                                 APropertyName : WideString;
                                 ADelimiter : WideChar = '.') : PPropInfo; overload;
 //Returns the property if existing, otherwise nil
@@ -92,13 +92,22 @@ procedure rttihSetPropertyValue(AInstance : TObject;
 //==============================================================================
 
 
-function rttihGetInheritancePath(AClassInfo : Pointer;
+function rttihGetInheritancePath(AClassInfo : PTypeInfo;
                                  ADelimiter : WideChar = '.') : WideString; overload;
 function rttihGetInheritancePath(AClass : TClass;
                                  ADelimiter : WideChar = '.') : WideString; overload;
 function rttihGetInheritancePath(AInstance : TObject;
                                  ADelimiter : WideChar = '.') : WideString; overload;
+//returns the inheritance path og a class
+//Example: rttihGetInheritancePath(Button1) returns 'TObject.TPersistent.TComponent.TControl.TWinControl.TButtonControl.TButton'
 
+
+//==============================================================================
+
+
+function rttihGetUnit(AClassInfo : PTypeInfo) : WideString; overload;
+function rttihGetUnit(AClass : TClass) : WideString; overload;
+function rttihGetUnit(AInstance : TObject) : WideString; overload;
 
 implementation
 
@@ -146,7 +155,7 @@ begin
                                    AIgnoreClasses);
 end;
 
-function rttihGetPropertiesList(AClassInfo : Pointer;
+function rttihGetPropertiesList(AClassInfo : PTypeInfo;
                                 const AList : TWideStrings;
                                 ARecursive : Boolean = false;  
                                 AIncludeTypeKinds : TTypeKinds = [];
@@ -161,7 +170,7 @@ var
   idx : Integer;
   FreeIgnoreClasses : Boolean;
 begin
-  Assert(Assigned(AClassInfo), 'Invalid classinfo');
+  Assert(Assigned(AClassInfo) and (AClassinfo.Kind = tkClass), 'Invalid classinfo');
 
   TypeData := GetTypeData(AClassInfo);
 
@@ -247,15 +256,16 @@ begin
   Result := rttihGetPropertyByName(AClass.ClassInfo, APropertyName, ADelimiter);
 end;
 
-function rttihGetPropertyByName(AClassInfo : Pointer;
+function rttihGetPropertyByName(AClassInfo : PTypeInfo;
                                 APropertyName : WideString;
                                 ADelimiter : WideChar = '.') : PPropInfo;
 var
   PosOfDelim : Integer;
   PropName : WideString;
 begin
+  Assert(Assigned(AClassInfo) and (AClassinfo.Kind = tkClass), 'Invalid classinfo');
+
   Result := nil;
-  
 
   PosOfDelim := Pos(ADelimiter, APropertyName);
   if PosOfDelim = 0 then
@@ -374,24 +384,55 @@ begin
                                     ADelimiter);
 end;
 
-function rttihGetInheritancePath(AClassInfo : Pointer;
+function rttihGetInheritancePath(AClassInfo : PTypeInfo;
                                  ADelimiter : WideChar = '.') : WideString;
 var
   TypeData : PTypeData;
 begin
-  Assert(Assigned(AClassInfo), 'Invalid classinfo');
+  Assert(Assigned(AClassInfo) and (AClassinfo.Kind = tkClass), 'Invalid classinfo');
 
   repeat
     Result := PTypeInfo(AClassInfo).Name + ADelimiter + Result;
 
     TypeData := GetTypeData(AClassInfo);
-    AClassInfo := Typedata.ParentInfo;
-    if Assigned(AClassInfo) then
-      AClassInfo := PPTypeInfo(AClassInfo)^;
+    if Assigned(TypeData.ParentInfo) then
+      AClassInfo := TypeData.ParentInfo^
+    else
+      AClassInfo := nil;
   until not Assigned(AClassInfo);
 
   Result := LeftStr(Result, Length(Result) - 1); //cut the last delimiter
 
+end;
+
+
+//==============================================================================
+
+
+function rttihGetUnit(AClassInfo : PTypeInfo) : WideString;
+var
+  TypeData : PTypeData;
+begin
+  Assert(Assigned(AClassInfo) and (AClassinfo.Kind = tkClass), 'Invalid classinfo');
+
+  TypeData := GetTypeData(AClassInfo);
+
+  if Assigned(TypeData) then
+    Result := TypeData.UnitName
+  else
+    Result := EmptyWideStr;
+end;
+
+function rttihGetUnit(AClass : TClass) : WideString;
+begin
+  Assert(Assigned(AClass), 'Invalid class');
+  Result := rttihGetUnit(AClass.ClassInfo);
+end;
+
+function rttihGetUnit(AInstance : TObject) : WideString;
+begin
+  Assert(Assigned(AInstance), 'Invalid object');
+  Result := rttihGetUnit(AInstance.ClassInfo);
 end;
 
 end.
