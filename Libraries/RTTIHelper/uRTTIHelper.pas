@@ -17,7 +17,8 @@ uses
   SysUtils,
   Variants,
   WideStrings,
-  StrUtils;
+  StrUtils,
+  Math;
 
 
 function rttihGetPropertiesList(AInstance : TObject;
@@ -98,7 +99,7 @@ function rttihGetInheritancePath(AClass : TClass;
                                  ADelimiter : WideChar = '.') : WideString; overload;
 function rttihGetInheritancePath(AInstance : TObject;
                                  ADelimiter : WideChar = '.') : WideString; overload;
-//returns the inheritance path og a class
+//returns the inheritance path of a class
 //Example: rttihGetInheritancePath(Button1) returns 'TObject.TPersistent.TComponent.TControl.TWinControl.TButtonControl.TButton'
 
 
@@ -108,6 +109,17 @@ function rttihGetInheritancePath(AInstance : TObject;
 function rttihGetUnit(AClassInfo : PTypeInfo) : WideString; overload;
 function rttihGetUnit(AClass : TClass) : WideString; overload;
 function rttihGetUnit(AInstance : TObject) : WideString; overload;
+//returns the name of the unit where the class is defined
+
+
+//==============================================================================
+
+
+function rttihOrdinalToString(ATypeInfo : PTypeInfo; Value : Integer) : WideString;
+function rttihSetToList(ATypeInfo : PTypeInfo; const AList : TWideStrings) : Integer;
+function rttihEnumToList(ATypeInfo : PTypeInfo; const AList : TWideStrings) : Integer;
+
+
 
 implementation
 
@@ -172,6 +184,8 @@ var
 begin
   Assert(Assigned(AClassInfo) and (AClassinfo.Kind = tkClass), 'Invalid classinfo');
 
+  Result := 0;
+
   TypeData := GetTypeData(AClassInfo);
 
   GetMem(PropInfoList, TypeData.PropCount * SizeOf(PPropInfo));
@@ -184,7 +198,11 @@ begin
         if (AIncludeTypeKinds = []) and (AExcludeTypeKinds = []) or
            ((PropInfoList[idx].PropType^.Kind in AIncludeTypeKinds) and (AIncludeTypeKinds <> [])) or
            ((not (PropInfoList[idx].PropType^.Kind in AExcludeTypeKinds)) and (AExcludeTypeKinds <> [])) then
+        begin
           AList.Add(APrefix + PropInfoList[idx].Name);
+
+          Inc(Result);
+        end;
 
         if ARecursive and (PropInfoList[idx].PropType^.Kind = tkClass) then
         begin
@@ -232,8 +250,6 @@ begin
   finally
     FreeMem(PropInfoList, TypeData.PropCount * SizeOf(PPropInfo));
   end;
-
-  Result := AList.Count;
 end;
 
 
@@ -348,7 +364,7 @@ begin
     PropValue := GetPropValue(AInstance, PropName, false);
     PropInfo := GetPropInfo(AInstance, PropName);
 
-    if (not VarIsNull(PropValue)) and
+    if (not (Integer(PropValue) = 0)) and
        (PropInfo.PropType^.Kind = tkClass) and
        (PosOfDelim < Length(APropertyName)) then
     begin
@@ -433,6 +449,79 @@ function rttihGetUnit(AInstance : TObject) : WideString;
 begin
   Assert(Assigned(AInstance), 'Invalid object');
   Result := rttihGetUnit(AInstance.ClassInfo);
+end;
+
+
+//==============================================================================
+
+
+function rttihOrdinalToString(ATypeInfo : PTypeInfo; Value : Integer) : WideString;
+const
+  AsciiChars = [32..127];
+begin
+  Assert(Assigned(ATypeInfo) and
+        (ATypeInfo.Kind in [tkInteger, tkInt64, tkChar, tkWChar, tkEnumeration]), 'Invalid TypeInfo');
+
+  case ATypeInfo.Kind of
+    tkInteger, tkInt64: Result := IntToStr(Value);
+    tkChar, tkWChar:
+    begin
+      if Value in AsciiChars then
+        Result := '''' + Chr(Value) + ''''
+      else
+        Result := WideFormat('#%d', [Value]);
+    end;
+    tkEnumeration:
+    begin
+      Result := GetEnumName(ATypeInfo, Value);
+    end;
+
+  end;
+end;
+
+function rttihSetToList(ATypeInfo : PTypeInfo; const AList : TWideStrings) : Integer;
+var
+  TypeInfoComp : PTypeInfo;
+  TypeData,
+  TypeDataComp : PTypeData;
+  Element : 0..255; //May be adapted to future changes
+begin
+  Assert(Assigned(ATypeInfo) and (ATypeInfo.Kind = tkSet), 'Invalid TypeInfo');
+
+  Result := 0;
+
+  TypeData := GetTypeData(ATypeInfo);
+  TypeInfoComp := TypeData.CompType^;
+  TypeDataComp := GetTypeData(TypeInfoComp);
+
+  for Element := TypeDataComp.MinValue to TypeDataComp.MaxValue do
+  begin
+    AList.Add(WideFormat('%s%s%d', [rttihOrdinalToString(TypeInfoComp, Element),
+                                    AList.NameValueSeparator,
+                                    Trunc(Power(2, Element))]));
+    Inc(Result);
+  end;
+end;
+
+function rttihEnumToList(ATypeInfo : PTypeInfo; const AList : TWideStrings) : Integer;
+var
+  TypeData : PTypeData;
+  Element : 0..255; //May be adapted to future changes
+begin
+  Assert(Assigned(ATypeInfo) and (ATypeInfo.Kind = tkEnumeration), 'Invalid TypeInfo');
+
+  TypeData := GetTypeData(ATypeInfo);
+
+  Result := 0;
+
+  for Element := TypeData.MinValue to TypeData.MaxValue do
+  begin
+    AList.Add(WideFormat('%s%s%d', [rttihOrdinalToString(ATypeInfo, Element),
+                                    AList.NameValueSeparator,
+                                    Trunc(Power(2, Element))]));
+    Inc(Result);
+  end;
+    
 end;
 
 end.

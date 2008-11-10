@@ -40,6 +40,7 @@ contains
   uCNA2Settings in 'uCNA2Settings.pas',
   uCNA2Main in 'uCNA2Main.pas',
   uCNA2Visualizers in 'uCNA2Visualizers.pas',
-  uCNA2ConfigDialog in 'uCNA2ConfigDialog.pas' {CNA2ConfigDialog};
+  uCNA2ConfigDialog in 'uCNA2ConfigDialog.pas' {CNA2ConfigDialog},
+  uCNA2Profiles in 'uCNA2Profiles.pas';
 
 end.

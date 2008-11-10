@@ -9,19 +9,15 @@ uses
   uRTTIHelper,
   uCNA2Settings,
   uSettingsBase, ImgList,
-  WideStrUtils, ToolWin;
+  WideStrUtils, ToolWin,
+  WideStrings,
+  TypInfo,
+  uCNA2Profiles, Menus;
 
 type
-  TNodeType = (ntProfile, ntGroup, ntComponent);
-  TNodeData = record
-    NodeType : TNodeType;
-    Setting : TSettingName;
-  end;
-  PNodeData = ^TNodeData;
-
   TCNA2ConfigDialog = class(TForm)
     PC: TPageControl;
-    ts_Rules: TTabSheet;
+    ts_ProfilesActions: TTabSheet;
     gb_PGC: TGroupBox;
     lv_Components: TListView;
     tv_Profiles: TTreeView;
@@ -33,33 +29,41 @@ type
     iml_TB: TImageList;
     btn_AddGroup: TToolButton;
     btn_Delete: TToolButton;
-    gb_Rules: TGroupBox;
+    gb_Actions: TGroupBox;
+    lv_Actions: TListView;
+    pum_Profiles: TPopupMenu;
+    mi_CurrentProfile: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure lv_ComponentsColumnClick(Sender: TObject; Column: TListColumn);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure btn_AddProfileClick(Sender: TObject);
-    procedure tv_ProfilesEdited(Sender: TObject; Node: TTreeNode;
-      var S: string);
-    procedure tv_ProfilesEditing(Sender: TObject; Node: TTreeNode;
-      var AllowEdit: Boolean);
     procedure tv_ProfilesKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure tv_ProfilesDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
-    procedure btn_AddGroupClick(Sender: TObject);
-    procedure btn_DeleteClick(Sender: TObject);
     procedure tv_ProfilesDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure tv_ProfilesEditing(Sender: TObject; Node: TTreeNode;
+      var AllowEdit: Boolean);
+    procedure tv_ProfilesEdited(Sender: TObject; Node: TTreeNode;
+      var S: string);
+    procedure btn_DeleteClick(Sender: TObject);
+    procedure btn_AddProfileClick(Sender: TObject);
+    procedure btn_AddGroupClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure mi_CurrentProfileClick(Sender: TObject);
+    procedure pum_ProfilesPopup(Sender: TObject);
   private
-    function FindNodeBySetting(ASettingPath : TSettingName; out ANode : TTreeNode) : Boolean;
-    function GetNodeData(ANode : TTreeNode) : PNodeData;
-    function AddProfileNode(AProfilePath : TSettingName) : TTreeNode;
-    function AddGroupNode(AProfileNode : TTreeNode; AGroupPath : TSettingName) : TTreeNode;
-    function AddComponentNode(AGroupNode : TTreeNode; AComponentPath : TSettingName) : TTreeNode;
-
     procedure LoadComponents;
     procedure InitProfileTree;
 
-    procedure FreeNodeData(ANode : TTreeNode);
+    procedure UpdateCurrentMarker;
+
+    function FindNode(AData : TObject; out ANode : TTreeNode) : Boolean;
+
+    function AddProfileNode(AProfile : Tcna2Profile) : TTreeNode;
+    function AddGroupNode(AGroup : Tcna2Group) : TTreeNode;
+    function AddComponentNode(AComponent : Tcna2Component) : TTreeNode;
+
+    procedure AddAllComponents(AProfile : Tcna2Profile); overload;
+    procedure AddAllComponents(AGroup : Tcna2Group); overload;
   public
     class procedure Execute;
   end;
@@ -87,105 +91,111 @@ begin
     Result := -Result;
 end;
 
-function TCNA2ConfigDialog.AddComponentNode(AGroupNode: TTreeNode;
-  AComponentPath: TSettingName): TTreeNode;
+procedure TCNA2ConfigDialog.AddAllComponents(AProfile: Tcna2Profile);
 var
-  NData : PNodeData;
+  idxComponent,
+  idxGroup : Integer;
 begin
-  if not FindNodeBySetting(AComponentPath, Result) then
+  for idxGroup := 0 to AProfile.Groups.Count - 1 do
   begin
-    Result := tv_Profiles.Items.AddChild(AGroupNode, cna2Settings.GetValue(AComponentPath, ''));
+    for idxComponent := 0 to AProfile.Groups[idxGroup].Components.Count - 1 do
+    begin
+      AddComponentNode(AProfile.Groups[idxGroup].Components[idxComponent]);
+    end;
+  end;
+end;
+
+
+procedure TCNA2ConfigDialog.AddAllComponents(AGroup: Tcna2Group);
+var
+  idxComponent: Integer;
+begin
+  for idxComponent := 0 to AGroup.Components.Count - 1 do
+  begin
+    AddComponentNode(AGroup.Components[idxComponent]);
+  end;
+end;
+
+function TCNA2ConfigDialog.AddComponentNode(
+  AComponent: Tcna2Component): TTreeNode;
+begin
+  if not FindNode(AComponent, Result) then
+  begin
+    Result := tv_Profiles.Items.AddChild(AddGroupNode(AComponent.Group), AComponent.ComponentClass.ClassName);
+    Result.Data := AComponent;
+    Result.ImageIndex := 3;
+    Result.SelectedIndex := Result.ImageIndex;
+  end;
+end;
+
+function TCNA2ConfigDialog.AddGroupNode(AGroup: Tcna2Group): TTreeNode;
+begin
+  if not FindNode(AGroup, Result) then
+  begin
+    Result := tv_Profiles.Items.AddChild(AddProfileNode(AGroup.Profile), AGroup.Name);
+    Result.Data := AGroup;
     Result.ImageIndex := 2;
-    Result.SelectedIndex := 2;
-    NData := GetNodeData(Result);
-    NData.NodeType := ntComponent;
-    NData.Setting := AComponentPath;
+    Result.SelectedIndex := Result.ImageIndex;
   end;
 end;
 
-function TCNA2ConfigDialog.AddGroupNode(AProfileNode: TTreeNode;
-  AGroupPath: TSettingName): TTreeNode;
-var
-  NData : PNodeData;
+function TCNA2ConfigDialog.AddProfileNode(AProfile: Tcna2Profile): TTreeNode;
 begin
-  if not FindNodeBySetting(AGroupPath, Result) then
+  if not FindNode(AProfile, Result) then
   begin
-    Result := tv_Profiles.Items.AddChild(AProfileNode, cna2Settings.GetValue(AGroupPath, ''));
-    Result.ImageIndex := 1;
-    Result.SelectedIndex := 1;
-    NData := GetNodeData(Result);
-    NData.NodeType := ntGroup;
-    NData.Setting := AGroupPath;
-  end;
-end;
-
-function TCNA2ConfigDialog.AddProfileNode(
-  AProfilePath: TSettingName): TTreeNode;
-var
-  NData : PNodeData;
-begin
-  if not FindNodeBySetting(AProfilePath, Result) then
-  begin
-    Result := tv_Profiles.Items.AddChild(nil, cna2Settings.GetValue(AProfilePath, ''));
+    Result := tv_Profiles.Items.AddChild(nil, AProfile.Name);
+    Result.Data := AProfile;
     Result.ImageIndex := 0;
-    Result.StateIndex := 0;
-    NData := GetNodeData(Result);
-    NData.NodeType := ntProfile;
-    NData.Setting := AProfilePath;
+    Result.SelectedIndex := Result.ImageIndex;
   end;
+
+  UpdateCurrentMarker;
 end;
 
 procedure TCNA2ConfigDialog.btn_AddGroupClick(Sender: TObject);
 var
-  NData : PNodeData;
-  ProfileNode : TTreeNode;
+  Sel : TObject;
+  P : Tcna2Profile;
 begin
-  ProfileNode := nil;
+  P := nil;
 
   if Assigned(tv_Profiles.Selected) then
   begin
-    NData := GetNodeData(tv_Profiles.Selected);
+    Sel := TObject(tv_Profiles.Selected.Data);
 
-    case NData.NodeType of
-      ntProfile :
-        ProfileNode := tv_Profiles.Selected;
-      ntGroup :
-        ProfileNode := tv_Profiles.Selected.Parent;
-      ntComponent :
-        ProfileNode := tv_Profiles.Selected.Parent.Parent;
-    end;
-  end
+    if Sel is Tcna2Profile then
+      P := Tcna2Profile(Sel)
+    else
+    if Sel is Tcna2Group then
+      P := Tcna2Group(Sel).Profile
+    else
+    if Sel is Tcna2Component then
+      P := Tcna2Component(Sel).Group.Profile
+  end;
+
+  if Assigned(P) then
+    AddGroupNode(P.AddGroup('New Group')).EditText
   else
-    FindNodeBySetting(cna2Settings.CurrentProfile, ProfileNode);
-
-  if not Assigned(ProfileNode) then
-    ProfileNode := AddProfileNode(cna2Settings.AddProfile('NewProfile'));
-
-  NData := GetNodeData(ProfileNode);
-  
-  tv_Profiles.Selected := AddGroupNode(ProfileNode, cna2Settings.AddGroup(Ndata.Setting, 'NewGroup'));
+    MessageDlg('Please choose a Profile first!', mtWarning, [mbOK], 0);
 end;
 
 procedure TCNA2ConfigDialog.btn_AddProfileClick(Sender: TObject);
 begin
-  tv_Profiles.Selected := AddProfileNode(cna2Settings.AddProfile('NewProfile'));
+  AddProfileNode(cna2Profiles.AddProfile('New profile')).EditText;
 end;
 
 procedure TCNA2ConfigDialog.btn_DeleteClick(Sender: TObject);
-var
-  NData : PNodeData;
 begin
   if Assigned(tv_Profiles.Selected) then
   begin
-    if (MessageBox(0, 'Do you really want to delete this item?', 'Delete item', MB_ICONWARNING or MB_YESNO) = ID_YES) then
+    if (MessageBox(0, 'Do you really want to delete this item?', 'Delete item', MB_ICONQUESTION or MB_YESNO) = idYes) then
     begin
-      NData := GetNodeData(tv_Profiles.Selected);
-      cna2Settings.Delete(NData.Setting);
-      FreeNodeData(tv_Profiles.Selected);
+      TObject(tv_Profiles.Selected.Data).Free;
       tv_Profiles.Items.Delete(tv_Profiles.Selected);
     end;
-
   end;
+
+  UpdateCurrentMarker;
 end;
 
 class procedure TCNA2ConfigDialog.Execute;
@@ -200,7 +210,8 @@ begin
   end;
 end;
 
-function TCNA2ConfigDialog.FindNodeBySetting(ASettingPath: TSettingName;
+
+function TCNA2ConfigDialog.FindNode(AData: TObject;
   out ANode: TTreeNode): Boolean;
 var
   idx : Integer;
@@ -209,26 +220,19 @@ begin
 
   for idx := 0 to tv_Profiles.Items.Count - 1 do
   begin
-    if WideSameText(GetNodeData(tv_Profiles.Items[idx]).Setting, ASettingPath) then
+    if tv_Profiles.Items[idx].Data = AData then
     begin
       Result := true;
       ANode := tv_Profiles.Items[idx];
       break;
-    end;    
+    end;
   end;
 end;
 
-procedure TCNA2ConfigDialog.FormCloseQuery(Sender: TObject;
-  var CanClose: Boolean);
-var
-  idx : Integer;
+procedure TCNA2ConfigDialog.FormClose(Sender: TObject;
+  var Action: TCloseAction);
 begin
-  CanClose := true;
-
-  for idx := 0 to tv_Profiles.Items.Count - 1 do
-  begin
-    FreeNodeData(tv_Profiles.Items[idx]);
-  end;
+  cna2Profiles.Save;
 end;
 
 procedure TCNA2ConfigDialog.FormCreate(Sender: TObject);
@@ -240,57 +244,32 @@ begin
   FLastSortWasAsc := false;
 end;
 
-procedure TCNA2ConfigDialog.FreeNodeData(ANode: TTreeNode);
-begin
-  Dispose(PNodeData(ANode.Data));
-end;
-
-function TCNA2ConfigDialog.GetNodeData(ANode: TTreeNode): PNodeData;
-begin
-  if not Assigned(ANode.Data) then
-  begin
-    New(Result);
-    ANode.Data := Result;
-  end
-  else
-    Result := PNodeData(ANode.Data);
-end;
-
 procedure TCNA2ConfigDialog.InitProfileTree;
 var
-  Profiles,
-  Groups,
-  Components : TSettingNames;
-  nodeProfile,
-  nodeGroup,
-  nodeComponent : TTreeNode;
   idxProfile,
   idxGroup,
   idxComponent : Integer;
+  Profile : Tcna2Profile;
+  Group : Tcna2Group;
+  Compo : Tcna2Component;
 begin
-  Profiles := cna2Settings.GetProfiles;
-
-  for idxProfile := Low(Profiles) to High(Profiles) do
+  for idxProfile := 0 to cna2Profiles.Profiles.Count - 1 do
   begin
-    nodeProfile := AddProfileNode(Profiles[idxProfile]);
-    Groups := cna2Settings.GetGroups(Profiles[idxProfile]);
+    Profile := cna2Profiles.Profiles[idxProfile];
+    AddProfileNode(Profile);
 
-    for idxGroup := Low(Groups) to High(Groups) do
+    for idxGroup := 0 to Profile.Groups.Count - 1 do
     begin
-      nodeGroup := AddGroupNode(nodeProfile, Groups[idxGroup]);
-      Components := cna2Settings.GetComponents(Groups[idxGroup]);
+      Group := Profile.Groups[idxGroup];
 
-      for idxComponent := Low(Components) to High(Components) do
+      AddGroupNode(Group);
+      for idxComponent := 0 to Group.Components.Count - 1 do
       begin
-        nodeComponent := AddComponentNode(nodeGroup, Components[idxComponent]);
+        Compo := Group.Components[idxComponent];
+        AddComponentNode(Compo);
       end;
-
     end;
-
   end;
-
-  if tv_Profiles.Items.Count > 0 then
-    tv_Profiles.Selected := tv_Profiles.Items[0]
 end;
 
 procedure TCNA2ConfigDialog.LoadComponents;
@@ -311,11 +290,7 @@ begin
         for idxComponent := 0 to Ps.ComponentCount[idxPackage] - 1 do
         begin
           ComponentClassName := PS.ComponentNames[idxPackage, idxComponent];
-          try
-            ComponentClass := FindClass(ComponentClassName);
-          except
-            ComponentClass := nil;
-          end;
+          ComponentClass := GetClass(ComponentClassName);
 
           if Assigned(ComponentClass) then
           begin
@@ -346,63 +321,196 @@ begin
   lv_Components.CustomSort(@CompareItems, Column.Index);
 end;
 
+
+procedure TCNA2ConfigDialog.mi_CurrentProfileClick(Sender: TObject);
+begin
+  cna2Profiles.CurrentProfile := Tcna2Profile(tv_Profiles.Selected.Data);
+  UpdateCurrentMarker;
+end;
+
+procedure TCNA2ConfigDialog.pum_ProfilesPopup(Sender: TObject);
+begin
+  mi_CurrentProfile.Enabled := Assigned(tv_Profiles.Selected) and (TObject(tv_Profiles.Selected.Data) is Tcna2Profile);
+end;
+
 procedure TCNA2ConfigDialog.tv_ProfilesDragDrop(Sender, Source: TObject; X,
   Y: Integer);
 var
-  TargetNode : TTreeNode;
-  NDataTarget: PNodeData;
+  Node : TTreeNode;
+  TargetObject : TObject;
+  SourceObject : TObject;
+  ComponentClass : TClass;
+  P : Tcna2Profile;
+  G : Tcna2Group;
+  C : Tcna2Component;
 begin
-  TargetNode := tv_Profiles.GetNodeAt(X,Y);
-  if Assigned(TargetNode) then
-  begin
-    NDataTarget := GetNodeData(TargetNode);
+   Node := tv_Profiles.GetNodeAt(X,Y);
+  if Assigned(Node) then
+    TargetObject := TObject(Node.Data)
+  else
+    TargetObject := nil;
 
-    if (Source = lv_Components) and (Assigned(lv_Components.Selected))then
+  if (Source = lv_Components) and Assigned(lv_Components.Selected) then
+    SourceObject := lv_Components.Selected
+  else
+  if (Source = tv_Profiles) and Assigned(tv_Profiles.Selected) then
+    SourceObject := TObject(tv_Profiles.Selected.Data)
+  else
+    SourceObject := nil;
+
+  if SourceObject is TListItem then
+  begin
+    ComponentClass := TClass(TListItem(SourceObject).Data);
+    
+    if TargetObject is Tcna2Group then
     begin
-      tv_Profiles.Selected := AddComponentNode(TargetNode, cna2Settings.AddComponent(NDataTarget.Setting, TClass(lv_Components.Selected.Data)))
+      G := Tcna2Group(TargetObject);
+      C := G.AddComponent(ComponentClass);
+      tv_Profiles.Selected := AddComponentNode(C)
+    end
+    else
+    if TargetObject is Tcna2Profile then
+    begin
+      P := Tcna2Profile(TargetObject);
+      G := P.AddGroup(TListItem(SourceObject).SubItems[0]);
+      C := G.AddComponent(ComponentClass);
+      tv_Profiles.Selected := AddComponentNode(C);
+    end
+    else
+    if TargetObject = nil then
+    begin
+      P := cna2Profiles.AddProfile(TListItem(SourceObject).SubItems[1]);
+      G := P.AddGroup(TListItem(SourceObject).SubItems[0]);
+      C := G.AddComponent(ComponentClass);
+      tv_Profiles.Selected := AddComponentNode(C);
+    end;
+  end
+  else
+  if SourceObject is Tcna2Profile then
+  begin
+    P :=cna2Profiles.AddProfile(Tcna2Profile(SourceObject).Name);
+    P.CopyContent(Tcna2Profile(SourceObject));
+    AddAllComponents(P);
+    tv_Profiles.Selected := AddProfileNode(P);
+  end
+  else
+  if SourceObject is Tcna2Group then
+  begin
+    G := Tcna2Group(SourceObject);
+
+    if TargetObject is Tcna2Profile then
+      P := Tcna2Profile(TargetObject)
+    else
+    if TargetObject = nil then
+      P := cna2Profiles.AddProfile(G.Profile.Name);
+
+    G := P.AddGroup(Tcna2Group(SourceObject).Name);
+    G.CopyContent(Tcna2Group(SourceObject));
+    AddAllComponents(G);
+    tv_Profiles.Selected := AddGroupNode(G);
+
+  end
+  else
+  if SourceObject is Tcna2Component then
+  begin
+    C := Tcna2Component(SourceObject);
+
+    if TargetObject is Tcna2Group then
+    begin
+      G := Tcna2Group(TargetObject);
+      C := G.AddComponent(C.ComponentClass);
+      tv_Profiles.Selected := AddComponentNode(C);
+    end
+    else
+    if TargetObject is Tcna2Profile then
+    begin
+      P := Tcna2Profile(TargetObject);
+      G := P.AddGroup(C.Group.Name);
+      C := G.AddComponent(C.ComponentClass);
+      tv_Profiles.Selected := AddComponentNode(C);
+    end
+    else
+    if TargetObject = nil then
+    begin
+      P := cna2Profiles.AddProfile('New Profile');
+      G := P.AddGroup('New Group');
+      C := G.AddComponent(C.ComponentClass);
+      tv_Profiles.Selected := AddComponentNode(C);
     end;
   end;
+  
+  
+  
 end;
 
 procedure TCNA2ConfigDialog.tv_ProfilesDragOver(Sender, Source: TObject; X,
   Y: Integer; State: TDragState; var Accept: Boolean);
 var
-  TargetNode : TTreeNode;
-  NDataTarget: PNodeData;
+  Node : TTreeNode;
+  TargetObject : TObject;
+  SourceObject : TObject;
 begin
   Accept := false;
 
-  TargetNode := tv_Profiles.GetNodeAt(X,Y);
-  if Assigned(TargetNode) then
-  begin
-    NDataTarget := GetNodeData(TargetNode);
+  Node := tv_Profiles.GetNodeAt(X,Y);
+  if Assigned(Node) then
+    TargetObject := TObject(Node.Data)
+  else
+    TargetObject := nil;
 
-    if (Source = lv_Components) and (Assigned(lv_Components.Selected))then
-    begin
-      Accept := NDataTarget.NodeType = ntGroup;
-    end;
+  if (Source = lv_Components) and Assigned(lv_Components.Selected) then
+    SourceObject := lv_Components.Selected
+  else
+  if (Source = tv_Profiles) and Assigned(tv_Profiles.Selected) then
+    SourceObject := TObject(tv_Profiles.Selected.Data)
+  else
+    SourceObject := nil;
+
+  if SourceObject is TListItem then
+  begin
+    Accept := (TargetObject = nil) or
+              (TargetObject is Tcna2Profile) or
+              (TargetObject is Tcna2Group);
+  end
+  else
+  if SourceObject is Tcna2Profile then
+  begin
+    Accept := TargetObject = nil;
+  end
+  else
+  if SourceObject is Tcna2Group then
+  begin
+    Accept := (TargetObject = nil) or
+              (TargetObject is Tcna2Profile);
+
+  end
+  else
+  if SourceObject is Tcna2Component then
+  begin
+    Accept := (TargetObject = nil) or
+              (TargetObject is Tcna2Profile) or
+              (TargetObject is Tcna2Group);
   end;
+  
+  
+  
 end;
 
 procedure TCNA2ConfigDialog.tv_ProfilesEdited(Sender: TObject; Node: TTreeNode;
   var S: string);
-var
-  NData : PNodeData;
 begin
-  NData := GetNodeData(Node);
-
-  cna2Settings.SetValue(NData.Setting, S);
-  
+  if TObject(Node.Data) is Tcna2Profile then
+    Tcna2Profile(Node.Data).Name := s
+  else
+  if TObject(Node.Data) is Tcna2Group then
+    Tcna2Group(Node.Data).Name := s;
 end;
 
 procedure TCNA2ConfigDialog.tv_ProfilesEditing(Sender: TObject; Node: TTreeNode;
   var AllowEdit: Boolean);
-var
-  NData : PNodeData;
 begin
-  NData := GetNodeData(Node);
-
-  AllowEdit := NData.NodeType in [ntProfile, ntGroup];
+  AllowEdit := (TObject(Node.Data) is Tcna2Profile) or
+               (TObject(Node.Data) is Tcna2Group);
 end;
 
 procedure TCNA2ConfigDialog.tv_ProfilesKeyUp(Sender: TObject; var Key: Word;
@@ -410,6 +518,31 @@ procedure TCNA2ConfigDialog.tv_ProfilesKeyUp(Sender: TObject; var Key: Word;
 begin
   if Key = VK_F2 then
     tv_Profiles.Selected.EditText;
+end;
+
+procedure TCNA2ConfigDialog.UpdateCurrentMarker;
+var
+  P : Tcna2Profile;
+  idx : Integer;
+begin
+  for idx := 0 to tv_Profiles.Items.Count - 1 do
+  begin
+    if TObject(tv_Profiles.Items[idx].Data) is Tcna2Profile then
+    begin
+      P := Tcna2Profile(tv_Profiles.Items[idx].Data);
+      if P = cna2Profiles.CurrentProfile then
+      begin
+        tv_Profiles.Items[idx].ImageIndex := 1;
+        tv_Profiles.Items[idx].SelectedIndex := tv_Profiles.Items[idx].ImageIndex;
+      end
+      else
+      begin
+        tv_Profiles.Items[idx].ImageIndex := 0;
+        tv_Profiles.Items[idx].SelectedIndex := tv_Profiles.Items[idx].ImageIndex;
+      end;
+    end;
+    
+  end;
 end;
 
 end.

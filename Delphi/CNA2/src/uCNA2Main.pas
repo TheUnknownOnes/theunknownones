@@ -1,3 +1,8 @@
+//**********************************************************
+// Developed by TheUnkownOnes.net
+// 
+// for more information look at www.TheUnknownOnes.net
+//**********************************************************
 unit uCNA2Main;
 
 {$R 'CNA2Resources.res'}
@@ -10,7 +15,8 @@ uses
   Classes,
   Dialogs,
   uCNA2Settings,
-  uCNA2Visualizers;
+  uCNA2Visualizers,
+  uCNA2Profiles;
 
 type
   Tcna2Wizard = class(TInterfacedObject,
@@ -40,7 +46,7 @@ procedure Register;
 implementation
 
 procedure Register;
-begin
+begin       
   RegisterPackageWizard(Tcna2Wizard.Create);
 end;
 
@@ -51,6 +57,7 @@ begin
   inherited;
 
   cna2Settings := Tcna2Settings.Create(nil);
+  cna2Profiles := Tcna2Profiles.Create;
   StartVisualizers;
 end;
 
@@ -62,6 +69,12 @@ end;
 procedure Tcna2Wizard.BeforeDestruction;
 begin
   StopVisualizers;
+
+  if Assigned(cna2Profiles) then
+  begin
+    cna2Profiles.Free;
+    cna2Profiles := nil;
+  end;
 
   if Assigned(cna2Settings) then
   begin
@@ -84,7 +97,7 @@ end;
 
 procedure Tcna2Wizard.Execute;
 begin
-  MessageDlg('IOTAWizard.Execute', mtWarning, [mbOK], 0);
+  
 end;
 
 function Tcna2Wizard.GetIDString: string;
