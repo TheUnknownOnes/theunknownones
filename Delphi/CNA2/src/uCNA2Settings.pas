@@ -28,6 +28,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+
+    procedure SaveNow;
   end;
 
 var
@@ -61,22 +63,29 @@ end;
 
 destructor Tcna2Settings.Destroy;
 begin
-  try
-    MakeSureDirectoryPathExists(PChar(ExtractFilePath(FileName)));
-    if not Save then
-      raise Exception.Create(EmptyStr); 
-  except
-    MessageDlg('CNA2-Settings could not be saved!', mtWarning, [mbOK], 0);
-  end;
-  
+  SaveNow;
 
   inherited;
 end;
 
 
+procedure Tcna2Settings.SaveNow;
+begin
+  try
+    MakeSureDirectoryPathExists(PChar(ExtractFilePath(FileName)));
+    if not Save then
+      raise Exception.Create(EmptyStr);
+  except
+    MessageDlg('CNA2-Settings could not be saved!', mtWarning, [mbOK], 0);
+  end;
+end;
+
+initialization
+  cna2Settings := nil;
+
 end.
 
-{
+(*
 Profiles
   Profile1 = 'Default'
   Profile2 = 'MyProfile'
@@ -84,12 +93,12 @@ Profiles
     Group2 = 'Group2'
       Components
         ClassName1 = 'Displayname'
-      Properties
-        Align = 'setvalue'
-          Value = 0
-        Font.Color = 'showdialog'
+      Actions
+        Property1 = 'Font.Color'
+          Provider = '{23D9CF83-AE93-44A7-8993-5ABF1BE61B0A}'
+          ActionData
+            ActionData1 = 'foobar'
+            ActionDataX = '...'
+CurrentProfile = '/Profiles/Profile2'
 
-
-CurrentProfile = '/Profiles/Profile2'      
-      
-}
+*)

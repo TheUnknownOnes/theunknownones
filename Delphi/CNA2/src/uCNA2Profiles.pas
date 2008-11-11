@@ -1,6 +1,6 @@
 //**********************************************************
 // Developed by TheUnkownOnes.net
-// 
+//
 // for more information look at www.TheUnknownOnes.net
 //**********************************************************
 unit uCNA2Profiles;
@@ -14,9 +14,11 @@ uses
   WideStrings,
   WideStrUtils,
   uCNA2Settings,
+  uCNA2Actions,
   uSettingsBase,
   StdCtrls,
-  Dialogs;
+  Dialogs,
+  TypInfo;
 
 type
   Tcna2Profiles = class;
@@ -59,8 +61,11 @@ type
     FName: String;
     FComponents: Tcna2ComponentList;
     FProfile : Tcna2Profile;
+    FActions,
     FProperties: TWideStringList;
     procedure SetProfile(const Value: Tcna2Profile);
+
+    procedure BuildPropertiesList;
   public
     constructor Create(AProfile : Tcna2Profile);
     destructor Destroy; override;
@@ -78,10 +83,15 @@ type
 
     function AddComponent(AClass : TClass) : Tcna2Component;
 
+    function AddAction(AProperty : WideString; const AProvider : TCNA2ActionProvider) : TCNA2Action;
+    procedure DeleteAction(AProperty : WideString);
+    function GetAction(AProperty : WideString; out AAction : TCNA2Action) : Boolean;
+
     property Name : String read FName write FName;
     property Components : Tcna2ComponentList read FComponents;
     property Profile : Tcna2Profile read FProfile write SetProfile;
     property Properties : TWideStringList read FProperties;
+    property Actions : TWideStringList read FActions;
   end;
 
   Tcna2GroupList = class(Tlist)
@@ -211,13 +221,12 @@ procedure Tcna2Profiles.EnsureMinimalContent;
 var
   P : Tcna2Profile;
   G : Tcna2Group;
-  C : Tcna2Component;
 begin
   if Profiles.Count = 0 then
   begin
     P := AddProfile('Default Profile');
     G := P.AddGroup('Buttons');
-    C := G.AddComponent(TButton);
+    G.AddComponent(TButton);
   end;
 end;
 
@@ -260,6 +269,8 @@ begin
     if Profiles[idx] = CurrentProfile then
       cna2Settings.SetValue('/CurrentProfile', Path);
   end;
+
+  cna2Settings.SaveNow;
 end;
 
 procedure Tcna2Profiles.UnregisterProfile(AProfile: Tcna2Profile);
@@ -418,12 +429,80 @@ end;
 
 { Tcna2Group }
 
+function Tcna2Group.AddAction(AProperty: WideString;
+  const AProvider: TCNA2ActionProvider): TCNA2Action;
+begin
+  DeleteAction(AProperty);
+
+  Result := AProvider.CreateAction;
+
+  FActions.AddObject(AProperty, Result);
+end;
+
 function Tcna2Group.AddComponent(AClass: TClass): Tcna2Component;
 begin
   if not FindComponent(AClass, Result) then
   begin
-    Result := Tcna2Component.Create(Self);
+    Result := Tcna2Component.Create(nil);
     Result.ComponentClass := AClass;
+    Result.Group := Self;
+  end;
+end;
+
+procedure Tcna2Group.BuildPropertiesList;
+var
+  Props : TWideStringList;
+  idxComponent,
+  idxList,
+  idx : Integer;
+  TypeInfo : PTypeInfo;
+begin
+  FProperties.Clear;
+
+  if Components.Count > 0 then
+  begin
+    rttihGetPropertiesList(Components.First.ComponentClass, FProperties, true, [], [tkMethod]);
+
+    for idxList := 0 to FProperties.Count - 1 do
+    begin
+      TypeInfo := rttihGetPropertyByName(Components.First.ComponentClass, FProperties[idxList]).PropType^;
+      FProperties.Objects[idxList] := TObject(TypeInfo);
+    end;
+
+    Props := TWideStringList.Create;
+    try
+      for idxComponent := 1 to Components.Count - 1 do
+      begin
+        Props.Clear;
+        
+        rttihGetPropertiesList(Components[idxComponent].ComponentClass, Props, true, [], [tkMethod]);
+
+        for idxList := FProperties.Count - 1 downto 0 do
+        begin
+          idx := Props.IndexOf(FProperties[idxList]);
+          if idx = -1 then
+            FProperties.Delete(idxList)
+          else
+          begin
+            TypeInfo := rttihGetPropertyByName(Components[idxComponent].ComponentClass, Props[idx]).PropType^;
+            if FProperties.Objects[idxList] <> TObject(TypeInfo) then
+              FProperties.Delete(idxList);
+          end;
+        end;
+      end;
+
+    finally
+      Props.Free;
+    end;
+  end;
+
+  for idxList := FActions.Count - 1 downto 0 do
+  begin
+    idx := FProperties.IndexOf(FActions[idxList]);
+    if idx = -1 then
+    begin
+      FActions.Delete(idxList);
+    end;
   end;
 end;
 
@@ -451,9 +530,22 @@ end;
 constructor Tcna2Group.Create(AProfile: Tcna2Profile);
 begin
   FProperties := TWideStringList.Create;
+  FActions := TWideStringList.Create;
   FProfile := nil;
   Profile := AProfile;
   FComponents := Tcna2ComponentList.Create;
+end;
+
+procedure Tcna2Group.DeleteAction(AProperty: WideString);
+var
+  idx : Integer;
+begin
+  idx := FActions.IndexOf(AProperty);
+  if idx > -1 then
+  begin
+    FActions.Objects[idx].Free;
+    FActions.Delete(idx);
+  end;
 end;
 
 destructor Tcna2Group.Destroy;
@@ -465,6 +557,7 @@ begin
   Profile := nil;
   
   FProperties.Free;
+  FActions.Free;
 
   inherited;
 end;
@@ -487,10 +580,24 @@ begin
   end;
 end;
 
+function Tcna2Group.GetAction(AProperty: WideString;
+  out AAction: TCNA2Action): Boolean;
+var
+  idx : Integer;
+begin
+  idx := FActions.IndexOf(AProperty);
+  Result := idx > -1;
+  if Result then
+    AAction := TCNA2Action(FActions.Objects[idx]);
+end;
+
 procedure Tcna2Group.LoadFromSettings(APath: TSettingName);
 var
   Setts : TSettingNames;
   idx : Integer;
+  PropName : WideString;
+  ProviderID : WideString;
+  Provider : TCNA2ActionProvider;
 begin
   Name := cna2Settings.GetValue(APath, Name);
 
@@ -500,7 +607,26 @@ begin
 
   for idx := Low(Setts) to High(Setts) do
   begin
-    Tcna2Component.Create(Self).LoadFromSettings(Setts[idx]);
+    with Tcna2Component.Create(nil) do
+    begin
+      LoadFromSettings(Setts[idx]);
+      Group := Self;
+    end;
+  end;
+
+  Setts := cna2Settings.GetSubNames(APath + '/Actions', false, true);
+  for idx := Low(Setts) to High(Setts) do
+  begin
+    PropName := cna2Settings.GetValue(Setts[idx], EmptyWideStr);
+    ProviderID := cna2Settings.GetValue(Setts[idx] + '/Provider', EmptyWideStr);
+
+    if (PropName <> EmptyWideStr) and
+       (ProviderID <> EmptyWideStr) and
+       cna2ActionManager.GetItemByID(StringToGUID(ProviderID), Provider) then
+    begin
+      AddAction(PropName, Provider).LoadFromSettings(Setts[idx] + '/ActionData');      
+    end;
+    
   end;
 
 end;
@@ -510,13 +636,16 @@ var
   Compo : Tcna2Component;
 begin
   if not FindComponent(AComponent.ComponentClass, Compo) then
+  begin
     Components.Add(AComponent);
-
+    BuildPropertiesList;
+  end;
 end;
 
 procedure Tcna2Group.SaveToSettings(APath: TSettingName);
 var
   idx : Integer;
+  Path : TSettingName;
 begin
   cna2Settings.SetValue(APath, Name);
 
@@ -524,6 +653,14 @@ begin
   begin
     if Assigned(Components[idx].ComponentClass) then
       Components[idx].SaveToSettings(APath + '/Components/' + Components[idx].ComponentClass.ClassName);
+  end;
+
+  for idx := 0 to FActions.Count - 1 do
+  begin
+    Path := APath + '/Actions/Property' + IntToStr(idx);
+    cna2Settings.SetValue(Path, FActions[idx]);
+    cna2Settings.SetValue(Path + '/Provider', GUIDToString(TCNA2Action(FActions.Objects[idx]).Provider.ID));
+    TCNA2Action(FActions.Objects[idx]).SaveToSettings(Path + '/ActionData');
   end;
 end;
 
@@ -544,7 +681,10 @@ end;
 procedure Tcna2Group.UnregisterComponent(AComponent: Tcna2Component);
 begin
   if FindComponent(AComponent.ComponentClass, AComponent) then
+  begin
     Components.Extract(AComponent);
+    BuildPropertiesList;
+  end;
 end;
 
 { Tcna2Profile }
@@ -661,9 +801,6 @@ end;
 
 destructor Tcna2Component.Destroy;
 begin
-  if Assigned(FGroup) then
-    FGroup.Components.Extract(Self);
-
   Group := nil;
     
   inherited;
@@ -694,5 +831,8 @@ begin
     FGroup := Value;
   end;
 end;
+
+initialization
+  cna2Profiles := nil;
 
 end.

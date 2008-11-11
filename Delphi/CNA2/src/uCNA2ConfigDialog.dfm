@@ -49,62 +49,10 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
           Left = 2
           Top = 226
           Width = 354
-          Height = 3
+          Height = 5
           Cursor = crVSplit
           Align = alTop
           Beveled = True
-          ExplicitLeft = 1
-          ExplicitTop = 183
-          ExplicitWidth = 266
-        end
-        object Label1: TLabel
-          Left = 2
-          Top = 229
-          Width = 354
-          Height = 13
-          Align = alTop
-          Caption = 'Available components: (drag into the list above)'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = [fsBold]
-          ParentFont = False
-          ExplicitWidth = 272
-        end
-        object lv_Components: TListView
-          Left = 2
-          Top = 242
-          Width = 354
-          Height = 154
-          Align = alClient
-          Columns = <
-            item
-              AutoSize = True
-              Caption = 'Classname'
-            end
-            item
-              Caption = 'Unit'
-              Width = 100
-            end
-            item
-              Caption = 'Package'
-              Width = 100
-            end>
-          DragMode = dmAutomatic
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          HideSelection = False
-          ReadOnly = True
-          RowSelect = True
-          ParentFont = False
-          SortType = stText
-          TabOrder = 0
-          ViewStyle = vsReport
-          OnColumnClick = lv_ComponentsColumnClick
         end
         object tv_Profiles: TTreeView
           Left = 2
@@ -125,7 +73,8 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
           PopupMenu = pum_Profiles
           RightClickSelect = True
           SortType = stText
-          TabOrder = 1
+          TabOrder = 0
+          OnChange = tv_ProfilesChange
           OnDragDrop = tv_ProfilesDragDrop
           OnDragOver = tv_ProfilesDragOver
           OnEdited = tv_ProfilesEdited
@@ -142,7 +91,7 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
           Caption = 'TB'
           Images = iml_TB
           Indent = 3
-          TabOrder = 2
+          TabOrder = 1
           object btn_AddProfile: TToolButton
             Left = 3
             Top = 0
@@ -174,6 +123,55 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
             OnClick = btn_DeleteClick
           end
         end
+        object gb_Components: TGroupBox
+          Left = 2
+          Top = 231
+          Width = 354
+          Height = 165
+          Align = alClient
+          Caption = 'Available components (Drag into the list above)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+          object lv_Components: TListView
+            Left = 2
+            Top = 15
+            Width = 350
+            Height = 148
+            Align = alClient
+            Columns = <
+              item
+                AutoSize = True
+                Caption = 'Classname'
+              end
+              item
+                Caption = 'Unit'
+                Width = 100
+              end
+              item
+                Caption = 'Package'
+                Width = 100
+              end>
+            DragMode = dmAutomatic
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            HideSelection = False
+            ReadOnly = True
+            RowSelect = True
+            ParentFont = False
+            SortType = stText
+            TabOrder = 0
+            ViewStyle = vsReport
+            OnColumnClick = lv_ComponentsColumnClick
+          end
+        end
       end
       object gb_Actions: TGroupBox
         Left = 367
@@ -189,11 +187,21 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 1
+        object Splitter2: TSplitter
+          Left = 2
+          Top = 239
+          Width = 336
+          Height = 5
+          Cursor = crVSplit
+          Align = alBottom
+          Beveled = True
+          ExplicitTop = 241
+        end
         object lv_Actions: TListView
           Left = 2
           Top = 15
           Width = 336
-          Height = 379
+          Height = 224
           Align = alClient
           Columns = <
             item
@@ -202,11 +210,7 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
             end
             item
               Caption = 'Action'
-              Width = 70
-            end
-            item
-              Caption = 'Value'
-              Width = 70
+              Width = 130
             end>
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -220,6 +224,59 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
           SortType = stText
           TabOrder = 0
           ViewStyle = vsReport
+          OnClick = lv_ActionsClick
+        end
+        object rg_ActionProvider: TRadioGroup
+          Left = 2
+          Top = 244
+          Width = 336
+          Height = 115
+          Align = alBottom
+          Caption = 'Available Actions'
+          Columns = 2
+          Ctl3D = True
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ItemIndex = 0
+          Items.Strings = (
+            'Do nothing')
+          ParentCtl3D = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = rg_ActionProviderClick
+        end
+        object pan_ConfigAction: TPanel
+          Left = 2
+          Top = 359
+          Width = 336
+          Height = 35
+          Align = alBottom
+          BevelOuter = bvNone
+          TabOrder = 2
+          DesignSize = (
+            336
+            35)
+          object btn_ConfigAction: TButton
+            Left = 192
+            Top = 6
+            Width = 137
+            Height = 25
+            Anchors = [akTop, akRight]
+            Caption = 'Configure Action ...'
+            Enabled = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 0
+            OnClick = btn_ConfigActionClick
+          end
         end
       end
     end

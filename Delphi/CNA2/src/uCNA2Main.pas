@@ -16,7 +16,9 @@ uses
   Dialogs,
   uCNA2Settings,
   uCNA2Visualizers,
-  uCNA2Profiles;
+  uCNA2Profiles,
+  uCNA2Actions,
+  uCNA2ValueEditor;
 
 type
   Tcna2Wizard = class(TInterfacedObject,
@@ -57,8 +59,11 @@ begin
   inherited;
 
   cna2Settings := Tcna2Settings.Create(nil);
+  InitActions;
   cna2Profiles := Tcna2Profiles.Create;
   StartVisualizers;
+  cna2ValueEditor := TCNA2ValueEditor.Create;
+
 end;
 
 procedure Tcna2Wizard.AfterSave;
@@ -68,6 +73,12 @@ end;
 
 procedure Tcna2Wizard.BeforeDestruction;
 begin
+  if Assigned(cna2ValueEditor) then
+  begin
+    cna2ValueEditor.Free;
+    cna2ValueEditor := nil;
+  end;
+
   StopVisualizers;
 
   if Assigned(cna2Profiles) then
@@ -75,6 +86,8 @@ begin
     cna2Profiles.Free;
     cna2Profiles := nil;
   end;
+
+  FreeActions;
 
   if Assigned(cna2Settings) then
   begin
