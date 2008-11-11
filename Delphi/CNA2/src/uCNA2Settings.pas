@@ -95,7 +95,7 @@ Profiles
         ClassName1 = 'Displayname'
       Actions
         Property1 = 'Font.Color'
-          Provider = '{23D9CF83-AE93-44A7-8993-5ABF1BE61B0A}'
+          Class = 'Tcna2ActionSetValue'
           ActionData
             ActionData1 = 'foobar'
             ActionDataX = '...'

@@ -83,10 +83,6 @@ type
 
     function AddComponent(AClass : TClass) : Tcna2Component;
 
-    function AddAction(AProperty : WideString; const AProvider : TCNA2ActionProvider) : TCNA2Action;
-    procedure DeleteAction(AProperty : WideString);
-    function GetAction(AProperty : WideString; out AAction : TCNA2Action) : Boolean;
-
     property Name : String read FName write FName;
     property Components : Tcna2ComponentList read FComponents;
     property Profile : Tcna2Profile read FProfile write SetProfile;
@@ -429,16 +425,6 @@ end;
 
 { Tcna2Group }
 
-function Tcna2Group.AddAction(AProperty: WideString;
-  const AProvider: TCNA2ActionProvider): TCNA2Action;
-begin
-  DeleteAction(AProperty);
-
-  Result := AProvider.CreateAction;
-
-  FActions.AddObject(AProperty, Result);
-end;
-
 function Tcna2Group.AddComponent(AClass: TClass): Tcna2Component;
 begin
   if not FindComponent(AClass, Result) then
@@ -536,18 +522,6 @@ begin
   FComponents := Tcna2ComponentList.Create;
 end;
 
-procedure Tcna2Group.DeleteAction(AProperty: WideString);
-var
-  idx : Integer;
-begin
-  idx := FActions.IndexOf(AProperty);
-  if idx > -1 then
-  begin
-    FActions.Objects[idx].Free;
-    FActions.Delete(idx);
-  end;
-end;
-
 destructor Tcna2Group.Destroy;
 begin
   Clear;
@@ -580,24 +554,12 @@ begin
   end;
 end;
 
-function Tcna2Group.GetAction(AProperty: WideString;
-  out AAction: TCNA2Action): Boolean;
-var
-  idx : Integer;
-begin
-  idx := FActions.IndexOf(AProperty);
-  Result := idx > -1;
-  if Result then
-    AAction := TCNA2Action(FActions.Objects[idx]);
-end;
-
 procedure Tcna2Group.LoadFromSettings(APath: TSettingName);
 var
   Setts : TSettingNames;
   idx : Integer;
   PropName : WideString;
   ProviderID : WideString;
-  Provider : TCNA2ActionProvider;
 begin
   Name := cna2Settings.GetValue(APath, Name);
 
@@ -612,21 +574,6 @@ begin
       LoadFromSettings(Setts[idx]);
       Group := Self;
     end;
-  end;
-
-  Setts := cna2Settings.GetSubNames(APath + '/Actions', false, true);
-  for idx := Low(Setts) to High(Setts) do
-  begin
-    PropName := cna2Settings.GetValue(Setts[idx], EmptyWideStr);
-    ProviderID := cna2Settings.GetValue(Setts[idx] + '/Provider', EmptyWideStr);
-
-    if (PropName <> EmptyWideStr) and
-       (ProviderID <> EmptyWideStr) and
-       cna2ActionManager.GetItemByID(StringToGUID(ProviderID), Provider) then
-    begin
-      AddAction(PropName, Provider).LoadFromSettings(Setts[idx] + '/ActionData');      
-    end;
-    
   end;
 
 end;
@@ -653,14 +600,6 @@ begin
   begin
     if Assigned(Components[idx].ComponentClass) then
       Components[idx].SaveToSettings(APath + '/Components/' + Components[idx].ComponentClass.ClassName);
-  end;
-
-  for idx := 0 to FActions.Count - 1 do
-  begin
-    Path := APath + '/Actions/Property' + IntToStr(idx);
-    cna2Settings.SetValue(Path, FActions[idx]);
-    cna2Settings.SetValue(Path + '/Provider', GUIDToString(TCNA2Action(FActions.Objects[idx]).Provider.ID));
-    TCNA2Action(FActions.Objects[idx]).SaveToSettings(Path + '/ActionData');
   end;
 end;
 

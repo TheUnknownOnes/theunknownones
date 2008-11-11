@@ -33,6 +33,12 @@
       
       
       
+      
+      
+      
+      
+      
+      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Microsoft Office XP Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
     </Excluded_Packages></Delphi.Personality></BorlandProject></BorlandProject>
@@ -43,18 +49,28 @@
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
     <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\CommonTools_D110R.dcp" />
+    <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\dbrtl.dcp" />
     <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\designide.dcp" />
+    <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\GDIPlusSupport_D110.dcp" />
+    <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\Jcl.dcp" />
+    <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\PNGSupport_D110.dcp" />
+    <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\RegExp_D110R.dcp" />
     <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\rtl.dcp" />
     <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\RTTIHelper_D110R.dcp" />
     <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\Settings_D110R.dcp" />
     <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\vcl.dcp" />
     <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\vclactnband.dcp" />
+    <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\vcldb.dcp" />
     <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\vclx.dcp" />
+    <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\VirtualTreesD11.dcp" />
     <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\xmlrtl.dcp" />
+    <DCCReference Include="F:\Programme\CodeGear\RAD Studio\5.0\bin\XMLTools_D110R.dcp" />
+    <DCCReference Include="uCNA2Actions.pas" />
     <DCCReference Include="uCNA2ConfigDialog.pas">
       <Form>CNA2ConfigDialog</Form>
     </DCCReference>
     <DCCReference Include="uCNA2Main.pas" />
+    <DCCReference Include="uCNA2Profiles.pas" />
     <DCCReference Include="uCNA2Settings.pas" />
     <DCCReference Include="uCNA2Visualizers.pas" />
   </ItemGroup>

@@ -38,6 +38,9 @@ type
     Splitter2: TSplitter;
     pan_ConfigAction: TPanel;
     btn_ConfigAction: TButton;
+    pan_Buttons: TPanel;
+    btn_OK: TButton;
+    btn_Cancel: TButton;
     procedure FormCreate(Sender: TObject);
     procedure lv_ComponentsColumnClick(Sender: TObject; Column: TListColumn);
     procedure tv_ProfilesKeyUp(Sender: TObject; var Key: Word;
@@ -52,13 +55,9 @@ type
     procedure btn_DeleteClick(Sender: TObject);
     procedure btn_AddProfileClick(Sender: TObject);
     procedure btn_AddGroupClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure mi_CurrentProfileClick(Sender: TObject);
     procedure pum_ProfilesPopup(Sender: TObject);
     procedure tv_ProfilesChange(Sender: TObject; Node: TTreeNode);
-    procedure lv_ActionsClick(Sender: TObject);
-    procedure rg_ActionProviderClick(Sender: TObject);
-    procedure btn_ConfigActionClick(Sender: TObject);
   private
     procedure LoadComponents;
     procedure InitProfileTree;
@@ -75,8 +74,6 @@ type
     procedure AddAllComponents(AGroup : Tcna2Group); overload;
 
     procedure GroupSelected(AGroup : Tcna2Group);
-    procedure DrawActionsAvailable;
-    procedure UpdateActionString(AGroup : Tcna2Group; AItem : TListItem);
   public
     class procedure Execute;
   end;
@@ -197,16 +194,6 @@ begin
   AddProfileNode(cna2Profiles.AddProfile('New profile')).EditText;
 end;
 
-procedure TCNA2ConfigDialog.btn_ConfigActionClick(Sender: TObject);
-var
-  Group : Tcna2Group;
-  Action : TCNA2Action;
-begin
-  Group := Tcna2Group(tv_Profiles.Selected.Data);
-  if Group.GetAction(lv_Actions.Selected.Caption, Action) then
-    Action.Configure(lv_Actions.Selected.Data);
-end;
-
 procedure TCNA2ConfigDialog.btn_DeleteClick(Sender: TObject);
 begin
   if Assigned(tv_Profiles.Selected) then
@@ -221,52 +208,16 @@ begin
   UpdateCurrentMarker;
 end;
 
-procedure TCNA2ConfigDialog.DrawActionsAvailable;
-var
-  idx,
-  idxProvider : Integer;
-  TypeInfo : PTypeInfo;
-  Group : Tcna2Group;
-  Action : TCNA2Action;
-begin
-  while rg_ActionProvider.Items.Count > 1 do
-    rg_ActionProvider.Items.Delete(1);
-
-  if Assigned(lv_Actions.Selected) then
-  begin
-    Group := Tcna2Group(tv_Profiles.Selected.Data);
-    if not Group.GetAction(lv_Actions.Selected.Caption, Action) then
-      Action := nil;
-
-    rg_ActionProvider.Enabled := true;
-
-    TypeInfo := lv_Actions.Selected.Data;
-
-    for idx := 0 to cna2ActionManager.Count - 1 do
-    begin
-      if cna2ActionManager[idx].Handles(TypeInfo) then
-      begin
-        idxProvider := rg_ActionProvider.Items.AddObject(cna2ActionManager[idx].Name, cna2ActionManager[idx]);
-        
-        if Assigned(Action) and (Action.Provider = cna2ActionManager[idx]) then
-          rg_ActionProvider.ItemIndex := idxProvider;
-      end;
-    end;
-  end
-  else
-  begin
-    rg_ActionProvider.Enabled := false;
-    btn_ConfigAction.Enabled := false;
-  end;
-end;
-
 class procedure TCNA2ConfigDialog.Execute;
 var
   Form : TCNA2ConfigDialog;
 begin
   Form := TCNA2ConfigDialog.Create(nil);
   try
-    Form.ShowModal;
+    if Form.ShowModal = mrOk then
+      cna2Profiles.Save
+    else
+      cna2Profiles.Load;
   finally
     Form.Free;
   end;
@@ -289,12 +240,6 @@ begin
       break;
     end;
   end;
-end;
-
-procedure TCNA2ConfigDialog.FormClose(Sender: TObject;
-  var Action: TCloseAction);
-begin
-  cna2Profiles.Save;
 end;
 
 procedure TCNA2ConfigDialog.FormCreate(Sender: TObject);
@@ -323,15 +268,11 @@ begin
       Li.Caption := AGroup.Properties[idx];
       li.SubItems.Add(EmptyStr);
       Li.Data := AGroup.Properties.Objects[idx];
-
-      UpdateActionString(AGroup, Li);
     end;
 
     if lv_Actions.Items.Count > 0 then
       lv_Actions.Selected := lv_Actions.Items[0];
   end;
-
-  DrawActionsAvailable;
 end;
 
 procedure TCNA2ConfigDialog.InitProfileTree;
@@ -400,11 +341,6 @@ begin
   
 end;
 
-procedure TCNA2ConfigDialog.lv_ActionsClick(Sender: TObject);
-begin
-  DrawActionsAvailable;
-end;
-
 procedure TCNA2ConfigDialog.lv_ComponentsColumnClick(Sender: TObject;
   Column: TListColumn);
 begin
@@ -426,40 +362,6 @@ end;
 procedure TCNA2ConfigDialog.pum_ProfilesPopup(Sender: TObject);
 begin
   mi_CurrentProfile.Enabled := Assigned(tv_Profiles.Selected) and (TObject(tv_Profiles.Selected.Data) is Tcna2Profile);
-end;
-
-procedure TCNA2ConfigDialog.rg_ActionProviderClick(Sender: TObject);
-var
-  Provider : TCNA2ActionProvider;
-  Group : Tcna2Group;
-  Action : TCNA2Action;
-begin
-  Group := Tcna2Group(tv_Profiles.Selected.Data);
-
-  if rg_ActionProvider.ItemIndex = 0 then
-  begin
-    Group.DeleteAction(lv_Actions.Selected.Caption);
-    btn_ConfigAction.Enabled := false;
-    UpdateActionString(Group, lv_Actions.Selected);
-  end
-  else
-  begin
-    Provider := TCNA2ActionProvider(rg_ActionProvider.Items.Objects[rg_ActionProvider.ItemIndex]);
-
-    Action := nil;
-
-    if Group.GetAction(lv_Actions.Selected.Caption, Action) and
-       (Action.Provider <> Provider) then
-    begin
-      Group.DeleteAction(lv_Actions.Selected.Caption);
-      Action := nil;
-    end;
-
-    if not Assigned(Action) then
-      Action := Group.AddAction(lv_Actions.Selected.Caption, Provider);
-      
-    btn_ConfigAction.Enabled := Action.CanBeConfigured;
-  end;
 end;
 
 procedure TCNA2ConfigDialog.tv_ProfilesChange(Sender: TObject; Node: TTreeNode);
@@ -655,16 +557,6 @@ procedure TCNA2ConfigDialog.tv_ProfilesKeyUp(Sender: TObject; var Key: Word;
 begin
   if Key = VK_F2 then
     tv_Profiles.Selected.EditText;
-end;
-
-procedure TCNA2ConfigDialog.UpdateActionString(AGroup : Tcna2Group; AItem: TListItem);
-var
-  Action : TCNA2Action;
-begin
-  if AGroup.GetAction(AItem.Caption, Action) then
-    AItem.SubItems[0] := Action.AsString
-  else
-    AItem.SubItems[0] := EmptyStr;
 end;
 
 procedure TCNA2ConfigDialog.UpdateCurrentMarker;
