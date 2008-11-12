@@ -22,11 +22,24 @@ uses
 
 type
   Tcna2Action = class
+  protected
+    FTypeInfo : PTypeInfo;
+  public
+    constructor Create(ATypeInfo : PTypeInfo); reintroduce; virtual;
 
+    procedure LoadFromSettings(APath : TSettingName); virtual; abstract;
+    procedure SaveToSettings(APath : TSettingName); virtual; abstract;
+
+    function AsString() : WideString; virtual; abstract;
+    procedure Configure(ATypeInfo : PTypeInfo); virtual; abstract;
+
+    class function GetDisplayName : WideString; virtual; abstract;
+    class function CanHandle(ATypeInfo : PTypeInfo) : Boolean; virtual; abstract;
+    class function HasConfigDialog : Boolean; virtual; abstract;
   end;
   
   Tcna2ActionClass = class of Tcna2Action;
-
+                                                             
   Tcna2Actions = class(TList)
   private
     function Get(Index: Integer): Tcna2ActionClass;
@@ -40,13 +53,36 @@ type
     function Last: Tcna2ActionClass;
     function Remove(Item: Tcna2ActionClass): Integer;
     property Items[Index: Integer]: Tcna2ActionClass read Get write Put; default;
+
+    function FindByClassName(AClassName : WideString; out AActionClass : Tcna2ActionClass) : Boolean;
   end;
 
 var
   cna2Actions : Tcna2Actions;
 
+procedure InitActions;
+procedure FreeActions;
+
 implementation
 
+uses uCNA2ActSetValue;
+
+procedure InitActions;
+begin
+  cna2Actions := Tcna2Actions.Create;
+
+  //Register available actions
+  cna2Actions.Add(Tcna2ActSetValue);
+end;
+
+procedure FreeActions;
+begin
+  if Assigned(cna2Actions) then
+  begin
+    cna2Actions.Free;
+    cna2Actions := nil;
+  end;
+end;
 
 { Tcna2Actions }
 
@@ -58,6 +94,24 @@ end;
 function Tcna2Actions.Extract(Item: Tcna2ActionClass): Tcna2ActionClass;
 begin
   Result := inherited Extract(Item);
+end;
+
+function Tcna2Actions.FindByClassName(AClassName: WideString;
+  out AActionClass: Tcna2ActionClass): Boolean;
+var
+  idx : Integer;
+begin
+  Result := false;
+
+  for idx := 0 to Count - 1 do
+  begin
+    if WideSameText(Items[idx].ClassName, AClassName) then
+    begin
+      Result := true;
+      AActionClass := Items[idx];
+      break;
+    end;
+  end;
 end;
 
 function Tcna2Actions.First: Tcna2ActionClass;
@@ -95,9 +149,17 @@ begin
   Result := inherited Remove(Item);
 end;
 
+{ Tcna2Action }
+
+constructor Tcna2Action.Create(ATypeInfo: PTypeInfo);
+begin
+  FTypeInfo := ATypeInfo;
+end;
+
 initialization
   cna2Actions := nil
 
 finalization
+  FreeActions;
 
 end.

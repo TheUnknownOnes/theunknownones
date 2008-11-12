@@ -34,7 +34,8 @@ requires
   vcl,
   xmlrtl,
   vclactnband,
-  vclx;
+  vclx,
+  RTTIHelper_D100R;
 
 contains
   uCNA2Settings in 'uCNA2Settings.pas',
@@ -43,9 +44,17 @@ contains
   uCNA2ConfigDialog in 'uCNA2ConfigDialog.pas' {CNA2ConfigDialog},
   uCNA2Profiles in 'uCNA2Profiles.pas',
   uCNA2Actions in 'uCNA2Actions.pas',
-  uCNA2FrameValueEditorBase in 'ValueEditors\uCNA2FrameValueEditorBase.pas' {frame_ValueEditorBase: TFrame},
-  uCNA2ValueEditor in 'uCNA2ValueEditor.pas',
-  uCNA2FrameValueEditorString in 'ValueEditors\uCNA2FrameValueEditorString.pas' {frame_ValueEditorString: TFrame},
-  uCNA2ActionSetValue in 'Actions\uCNA2ActionSetValue.pas' {form_ActionSetValueConfig};
+  uCNA2ActSetValue in 'Actions\uCNA2ActSetValue.pas',
+  uCNA2ActSetValueConfig in 'Actions\uCNA2ActSetValueConfig.pas' {form_ConfigSetValue},
+  uCNA2ValueEditors in 'uCNA2ValueEditors.pas' {cna2ValueEditor: TFrame},
+  uCNA2ValueEditorString in 'ValueEditors\uCNA2ValueEditorString.pas' {cna2ValueEditorString: TFrame},
+  uCNA2ValueEditorChar in 'ValueEditors\uCNA2ValueEditorChar.pas' {cna2ValueEditorChar: TFrame},
+  uCNA2ValueEditorInteger in 'ValueEditors\uCNA2ValueEditorInteger.pas' {cna2ValueEditorInteger: TFrame},
+  uCNA2ValueEditorInt64 in 'ValueEditors\uCNA2ValueEditorInt64.pas' {cna2ValueEditorInt64: TFrame},
+  uCNA2ValueEditorFloat in 'ValueEditors\uCNA2ValueEditorFloat.pas' {cna2ValueEditorFloat: TFrame},
+  uCNA2ValueEditorEnum in 'ValueEditors\uCNA2ValueEditorEnum.pas' {cna2ValueEditorEnum: TFrame},
+  uCNA2ValueEditorSet in 'ValueEditors\uCNA2ValueEditorSet.pas' {cna2ValueEditorSet: TFrame},
+  uCNA2FormEditorHooks in 'uCNA2FormEditorHooks.pas',
+  uCNA2IDENotifier in 'uCNA2IDENotifier.pas';
 
 end.

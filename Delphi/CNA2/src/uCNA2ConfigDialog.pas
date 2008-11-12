@@ -32,7 +32,7 @@ type
     lv_Actions: TListView;
     pum_Profiles: TPopupMenu;
     mi_CurrentProfile: TMenuItem;
-    rg_ActionProvider: TRadioGroup;
+    rg_ActionClasses: TRadioGroup;
     gb_Components: TGroupBox;
     lv_Components: TListView;
     Splitter2: TSplitter;
@@ -58,6 +58,10 @@ type
     procedure mi_CurrentProfileClick(Sender: TObject);
     procedure pum_ProfilesPopup(Sender: TObject);
     procedure tv_ProfilesChange(Sender: TObject; Node: TTreeNode);
+    procedure lv_ActionsSelectItem(Sender: TObject; Item: TListItem;
+      Selected: Boolean);
+    procedure rg_ActionClassesClick(Sender: TObject);
+    procedure btn_ConfigActionClick(Sender: TObject);
   private
     procedure LoadComponents;
     procedure InitProfileTree;
@@ -74,6 +78,13 @@ type
     procedure AddAllComponents(AGroup : Tcna2Group); overload;
 
     procedure GroupSelected(AGroup : Tcna2Group);
+    procedure PropertySelected(AGroup : Tcna2Group; AProperty : TListItem);
+    procedure ActionSelected(AGroup : Tcna2Group;
+                             AProperty : TListItem;
+                             AActionClass : Tcna2ActionClass);
+    procedure UpdateActionString(AGroup : Tcna2Group; AProperty : TListItem);
+
+    function GetCurrentGroup : Tcna2Group;
   public
     class procedure Execute;
   end;
@@ -115,6 +126,42 @@ begin
   end;
 end;
 
+
+procedure TCNA2ConfigDialog.ActionSelected(AGroup: Tcna2Group;
+  AProperty: TListItem; AActionClass: Tcna2ActionClass);
+var
+  Action : Tcna2Action;
+begin
+  if Assigned(AGroup) and
+     Assigned(AProperty) and
+     Assigned(AActionClass) then
+  begin
+    Action := nil;
+
+    if AGroup.GetAction(AProperty.Caption, Action) and
+      (Action.ClassType <> AActionClass) then
+      AGroup.RemoveAction(AProperty.Caption);
+
+    if not Assigned(Action) then
+    begin
+      AGroup.AddAction(AProperty.Caption, AActionClass);
+    end;
+
+    btn_ConfigAction.Enabled := AActionClass.HasConfigDialog;
+    UpdateActionString(AGroup, AProperty);
+  end
+  else
+  if Assigned(AGroup) and
+     Assigned(AProperty) then
+  begin
+    AGroup.RemoveAction(AProperty.Caption);
+    UpdateActionString(AGroup, AProperty);
+    btn_ConfigAction.Enabled := false;
+  end
+  else
+    btn_ConfigAction.Enabled := false;
+
+end;
 
 procedure TCNA2ConfigDialog.AddAllComponents(AGroup: Tcna2Group);
 var
@@ -194,6 +241,25 @@ begin
   AddProfileNode(cna2Profiles.AddProfile('New profile')).EditText;
 end;
 
+procedure TCNA2ConfigDialog.btn_ConfigActionClick(Sender: TObject);
+var
+  Group : Tcna2Group;
+  Prop : TListItem;
+  Action : Tcna2Action;
+begin
+  Group := GetCurrentGroup;
+  Prop := lv_Actions.Selected;
+
+  if Assigned(Group) and
+     Assigned(Prop) and
+     Group.GetAction(Prop.Caption, Action) and
+     Action.HasConfigDialog then
+  begin
+    Action.Configure(PTypeInfo(Prop.Data));
+    UpdateActionString(Group, Prop);
+  end;
+end;
+
 procedure TCNA2ConfigDialog.btn_DeleteClick(Sender: TObject);
 begin
   if Assigned(tv_Profiles.Selected) then
@@ -251,6 +317,15 @@ begin
   FLastSortWasAsc := false;
 end;
 
+function TCNA2ConfigDialog.GetCurrentGroup: Tcna2Group;
+begin
+  if Assigned(tv_Profiles.Selected) and
+     (TObject(tv_Profiles.Selected.Data) is Tcna2Group) then
+    Result := Tcna2Group(tv_Profiles.Selected.Data)
+  else
+    Result := nil;
+end;
+
 procedure TCNA2ConfigDialog.GroupSelected(AGroup: Tcna2Group);
 var
   idx : Integer;
@@ -268,6 +343,8 @@ begin
       Li.Caption := AGroup.Properties[idx];
       li.SubItems.Add(EmptyStr);
       Li.Data := AGroup.Properties.Objects[idx];
+
+      UpdateActionString(AGroup, Li);
     end;
 
     if lv_Actions.Items.Count > 0 then
@@ -341,6 +418,18 @@ begin
   
 end;
 
+procedure TCNA2ConfigDialog.lv_ActionsSelectItem(Sender: TObject;
+  Item: TListItem; Selected: Boolean);
+begin
+  if Selected then
+  begin
+    if GetCurrentGroup <> nil then
+    begin
+      PropertySelected(GetCurrentGroup, Item);
+    end;
+  end;
+end;
+
 procedure TCNA2ConfigDialog.lv_ComponentsColumnClick(Sender: TObject;
   Column: TListColumn);
 begin
@@ -359,17 +448,60 @@ begin
   UpdateCurrentMarker;
 end;
 
+procedure TCNA2ConfigDialog.PropertySelected(AGroup: Tcna2Group;
+  AProperty: TListItem);
+var
+  idxItem,
+  idx : Integer;
+  Action : Tcna2Action;
+begin
+  while rg_ActionClasses.Items.Count > 1 do
+    rg_ActionClasses.Items.Delete(1);
+
+  rg_ActionClasses.Enabled := Assigned(AGroup) and Assigned(AProperty);
+
+  if Assigned(AGroup) and Assigned(AProperty) then
+  begin
+    for idx := 0 to cna2Actions.Count - 1 do
+    begin
+      if cna2Actions[idx].CanHandle(AProperty.Data) then
+      begin
+        idxItem := rg_ActionClasses.Items.AddObject(cna2Actions[idx].GetDisplayName, TObject(cna2Actions[idx]));
+
+        if AGroup.GetAction(AProperty.Caption, Action) and
+           (Action.ClassType = cna2Actions[idx]) then
+        begin
+          rg_ActionClasses.ItemIndex := idxItem;
+          ActionSelected(AGroup, AProperty, cna2Actions[idx]);
+        end;
+      end;
+    end;
+  end;
+end;
+
 procedure TCNA2ConfigDialog.pum_ProfilesPopup(Sender: TObject);
 begin
   mi_CurrentProfile.Enabled := Assigned(tv_Profiles.Selected) and (TObject(tv_Profiles.Selected.Data) is Tcna2Profile);
 end;
 
+procedure TCNA2ConfigDialog.rg_ActionClassesClick(Sender: TObject);
+var
+  Group : Tcna2Group;
+begin
+  if GetCurrentGroup <> nil then
+  begin
+    Group := GetCurrentGroup;
+
+    if rg_ActionClasses.ItemIndex = 0 then
+      ActionSelected(Group, lv_Actions.Selected, nil)
+    else
+      ActionSelected(Group, lv_Actions.Selected, Tcna2ActionClass(rg_ActionClasses.Items.Objects[rg_ActionClasses.ItemIndex]));
+  end;
+end;
+
 procedure TCNA2ConfigDialog.tv_ProfilesChange(Sender: TObject; Node: TTreeNode);
 begin
-  if Assigned(Node) and (TObject(Node.Data) is Tcna2Group) then
-    GroupSelected(Tcna2Group(tv_Profiles.Selected.Data))
-  else
-    GroupSelected(nil);
+  GroupSelected(GetCurrentGroup);
 end;
 
 procedure TCNA2ConfigDialog.tv_ProfilesDragDrop(Sender, Source: TObject; X,
@@ -557,6 +689,16 @@ procedure TCNA2ConfigDialog.tv_ProfilesKeyUp(Sender: TObject; var Key: Word;
 begin
   if Key = VK_F2 then
     tv_Profiles.Selected.EditText;
+end;
+
+procedure TCNA2ConfigDialog.UpdateActionString(AGroup : Tcna2Group; AProperty: TListItem);
+var
+  Action : Tcna2Action;
+begin
+  if AGroup.GetAction(AProperty.Caption, Action) then
+    AProperty.SubItems[0] := Action.AsString
+  else
+    AProperty.SubItems[0] := EmptyWideStr;
 end;
 
 procedure TCNA2ConfigDialog.UpdateCurrentMarker;

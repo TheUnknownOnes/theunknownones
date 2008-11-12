@@ -83,6 +83,10 @@ type
 
     function AddComponent(AClass : TClass) : Tcna2Component;
 
+    function AddAction(AProperty : WideString; AActionClass : Tcna2ActionClass) : Tcna2Action;
+    procedure RemoveAction(AProperty : WideString);
+    function GetAction(AProperty : WideString; out AAction : Tcna2Action) : Boolean;
+
     property Name : String read FName write FName;
     property Components : Tcna2ComponentList read FComponents;
     property Profile : Tcna2Profile read FProfile write SetProfile;
@@ -198,8 +202,6 @@ begin
   FCurrentProfile := nil;
 
   Load;
-
-  EnsureMinimalContent;
 end;
 
 destructor Tcna2Profiles.Destroy;
@@ -223,6 +225,7 @@ begin
     P := AddProfile('Default Profile');
     G := P.AddGroup('Buttons');
     G.AddComponent(TButton);
+    CurrentProfile := P;
   end;
 end;
 
@@ -232,6 +235,8 @@ var
   Setts : TSettingNames;
   idx : Integer;
 begin
+  Clear;
+
   Setts := cna2Settings.GetSubNames('/Profiles', false, true);
   for idx := Low(Setts) to High(Setts) do
   begin
@@ -241,6 +246,8 @@ begin
     if WideSameText(Setts[idx], cna2Settings.GetValue('/CurrentProfile', '')) then
       CurrentProfile := P;
   end;
+
+  EnsureMinimalContent;
 end;
 
 procedure Tcna2Profiles.RegisterProfile(AProfile: Tcna2Profile);
@@ -425,6 +432,22 @@ end;
 
 { Tcna2Group }
 
+function Tcna2Group.AddAction(AProperty: WideString; AActionClass : Tcna2ActionClass) : Tcna2Action;
+var
+  idx : Integer;
+begin
+  RemoveAction(AProperty);
+
+  idx := FProperties.IndexOf(AProperty);
+  if idx = -1 then
+    Result := nil
+  else
+  begin
+    Result := AActionClass.Create(PTypeInfo(FProperties.Objects[idx]));
+    FActions.AddObject(AProperty, Result);
+  end;
+end;
+
 function Tcna2Group.AddComponent(AClass: TClass): Tcna2Component;
 begin
   if not FindComponent(AClass, Result) then
@@ -486,9 +509,7 @@ begin
   begin
     idx := FProperties.IndexOf(FActions[idxList]);
     if idx = -1 then
-    begin
-      FActions.Delete(idxList);
-    end;
+      RemoveAction(FActions[idxList]);
   end;
 end;
 
@@ -531,6 +552,9 @@ begin
   Profile := nil;
   
   FProperties.Free;
+
+  while FActions.Count > 0 do
+    RemoveAction(FActions[0]);
   FActions.Free;
 
   inherited;
@@ -554,12 +578,34 @@ begin
   end;
 end;
 
+function Tcna2Group.GetAction(AProperty: WideString;
+  out AAction: Tcna2Action): Boolean;
+var
+  idx : Integer;
+begin
+  Result := false;
+
+  for idx := 0 to FActions.Count - 1 do
+  begin
+    if WideSameText(FActions[idx], AProperty) then
+    begin
+      Result := true;
+      AAction := Tcna2Action(FActions.Objects[idx]);
+      break;
+    end;
+  end;
+end;
+
 procedure Tcna2Group.LoadFromSettings(APath: TSettingName);
 var
   Setts : TSettingNames;
-  idx : Integer;
+  idx,
+  idxList : Integer;
   PropName : WideString;
-  ProviderID : WideString;
+  TypeInfo : PTypeInfo;
+  ActionClassName : WideString;
+  ActionClass : Tcna2ActionClass;
+  Action : Tcna2Action;
 begin
   Name := cna2Settings.GetValue(APath, Name);
 
@@ -576,6 +622,28 @@ begin
     end;
   end;
 
+  Setts := cna2Settings.GetSubNames(APath + '/Actions', false, true);
+
+  for idx := Low(Setts) to High(Setts) do
+  begin
+    PropName := cna2Settings.GetValue(Setts[idx], '');
+    idxList := Properties.IndexOf(PropName);
+    if idxList > -1 then
+    begin
+      TypeInfo := PTypeInfo(Properties.Objects[idxList]);
+      ActionClassName := cna2Settings.GetValue(Setts[idx] + '/Class', '');
+
+      if cna2Actions.FindByClassName(ActionClassName, ActionClass) and
+         ActionClass.CanHandle(TypeInfo) then
+      begin
+        Action := AddAction(PropName, ActionClass);
+        if Assigned(Action) then
+          Action.LoadFromSettings(Setts[idx] + '/ActionData');
+      end;
+    end;
+  end;
+
+
 end;
 
 procedure Tcna2Group.RegisterComponent(AComponent: Tcna2Component);
@@ -589,10 +657,24 @@ begin
   end;
 end;
 
+procedure Tcna2Group.RemoveAction(AProperty: WideString);
+var
+  idx : Integer;
+begin
+  idx := FActions.IndexOf(AProperty);
+
+  if idx > -1 then
+  begin
+    Tcna2Action(FActions.Objects[idx]).Free;
+    FActions.Delete(idx);
+  end;
+end;
+
 procedure Tcna2Group.SaveToSettings(APath: TSettingName);
 var
   idx : Integer;
   Path : TSettingName;
+  Action : Tcna2Action;
 begin
   cna2Settings.SetValue(APath, Name);
 
@@ -600,6 +682,18 @@ begin
   begin
     if Assigned(Components[idx].ComponentClass) then
       Components[idx].SaveToSettings(APath + '/Components/' + Components[idx].ComponentClass.ClassName);
+  end;
+
+  for idx := 0 to Actions.Count - 1 do
+  begin
+    if GetAction(Actions[idx], Action) then
+    begin
+      Path := APath + '/Actions/Property' + IntToStr(idx);
+
+      cna2Settings.SetValue(Path, Actions[idx]);
+      cna2Settings.SetValue(Path + '/Class', Action.ClassName);
+      Action.SaveToSettings(Path + '/ActionData');
+    end;
   end;
 end;
 

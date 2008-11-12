@@ -3,8 +3,8 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
   Top = 0
   BorderStyle = bsSizeToolWin
   Caption = 'CNA2-Config'
-  ClientHeight = 433
-  ClientWidth = 716
+  ClientHeight = 445
+  ClientWidth = 733
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,24 +19,22 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
   object PC: TPageControl
     Left = 0
     Top = 0
-    Width = 716
-    Height = 398
+    Width = 733
+    Height = 410
     ActivePage = ts_ProfilesActions
     Align = alClient
     Style = tsFlatButtons
     TabOrder = 0
-    ExplicitHeight = 433
     object ts_ProfilesActions: TTabSheet
       Caption = 'Profiles && Actions'
-      ExplicitHeight = 402
       DesignSize = (
-        708
-        367)
+        725
+        379)
       object gb_PGC: TGroupBox
         Left = 3
         Top = 3
         Width = 358
-        Height = 363
+        Height = 375
         Anchors = [akLeft, akTop, akBottom]
         Caption = 'Profiles (click right for select active profile)'
         Font.Charset = DEFAULT_CHARSET
@@ -46,7 +44,6 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 0
-        ExplicitHeight = 398
         object Splitter1: TSplitter
           Left = 2
           Top = 226
@@ -129,7 +126,7 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
           Left = 2
           Top = 231
           Width = 354
-          Height = 130
+          Height = 142
           Align = alClient
           Caption = 'Available components (Drag into the list above)'
           Font.Charset = DEFAULT_CHARSET
@@ -139,12 +136,11 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
           Font.Style = []
           ParentFont = False
           TabOrder = 2
-          ExplicitHeight = 165
           object lv_Components: TListView
             Left = 2
             Top = 15
             Width = 350
-            Height = 113
+            Height = 125
             Align = alClient
             Columns = <
               item
@@ -173,15 +169,14 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
             TabOrder = 0
             ViewStyle = vsReport
             OnColumnClick = lv_ComponentsColumnClick
-            ExplicitHeight = 148
           end
         end
       end
       object gb_Actions: TGroupBox
         Left = 367
         Top = 3
-        Width = 340
-        Height = 361
+        Width = 357
+        Height = 373
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = 'Actions (Select a group in the tree)'
         Font.Charset = DEFAULT_CHARSET
@@ -191,22 +186,22 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 1
-        ExplicitHeight = 396
         object Splitter2: TSplitter
           Left = 2
-          Top = 204
-          Width = 336
+          Top = 253
+          Width = 353
           Height = 5
           Cursor = crVSplit
           Align = alBottom
           Beveled = True
           ExplicitTop = 241
+          ExplicitWidth = 336
         end
         object lv_Actions: TListView
           Left = 2
           Top = 15
-          Width = 336
-          Height = 189
+          Width = 353
+          Height = 238
           Align = alClient
           Columns = <
             item
@@ -215,7 +210,7 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
             end
             item
               Caption = 'Action'
-              Width = 130
+              Width = 150
             end>
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -229,13 +224,13 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
           SortType = stText
           TabOrder = 0
           ViewStyle = vsReport
-          ExplicitHeight = 224
+          OnSelectItem = lv_ActionsSelectItem
         end
-        object rg_ActionProvider: TRadioGroup
+        object rg_ActionClasses: TRadioGroup
           Left = 2
-          Top = 209
-          Width = 336
-          Height = 115
+          Top = 258
+          Width = 353
+          Height = 78
           Align = alBottom
           Caption = 'Available Actions'
           Columns = 2
@@ -252,22 +247,21 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
           ParentCtl3D = False
           ParentFont = False
           TabOrder = 1
-          ExplicitTop = 244
+          OnClick = rg_ActionClassesClick
         end
         object pan_ConfigAction: TPanel
           Left = 2
-          Top = 324
-          Width = 336
+          Top = 336
+          Width = 353
           Height = 35
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 2
-          ExplicitTop = 359
           DesignSize = (
-            336
+            353
             35)
           object btn_ConfigAction: TButton
-            Left = 192
+            Left = 209
             Top = 6
             Width = 137
             Height = 25
@@ -281,6 +275,7 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
             Font.Style = []
             ParentFont = False
             TabOrder = 0
+            OnClick = btn_ConfigActionClick
           end
         end
       end
@@ -288,26 +283,31 @@ object CNA2ConfigDialog: TCNA2ConfigDialog
   end
   object pan_Buttons: TPanel
     Left = 0
-    Top = 398
-    Width = 716
+    Top = 410
+    Width = 733
     Height = 35
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
+    DesignSize = (
+      733
+      35)
     object btn_OK: TButton
-      Left = 555
+      Left = 570
       Top = 6
       Width = 75
       Height = 25
+      Anchors = [akTop, akRight]
       Caption = 'OK'
       ModalResult = 1
       TabOrder = 0
     end
     object btn_Cancel: TButton
-      Left = 636
+      Left = 651
       Top = 6
       Width = 75
       Height = 25
+      Anchors = [akTop, akRight]
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 1

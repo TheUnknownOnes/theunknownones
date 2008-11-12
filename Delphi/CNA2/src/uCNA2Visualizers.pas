@@ -39,8 +39,8 @@ type
     destructor Destroy(); override;
   end;
 
-procedure StartVisualizers;
-procedure StopVisualizers;
+procedure InitVisualizers;
+procedure FreeVisualizers;
 
 implementation
 
@@ -51,7 +51,7 @@ var
   actShowDialog : TCNA2ShowDialogAction;
   vizMainMenuEntry : Tcna2MainMenuEntry;
 
-procedure StartVisualizers;
+procedure InitVisualizers;
 var
   il : TImageList;
   ico : TIcon;
@@ -79,7 +79,7 @@ begin
   vizMainMenuEntry := Tcna2MainMenuEntry.Create;
 end;
 
-procedure StopVisualizers;
+procedure FreeVisualizers;
 begin
   if Assigned(vizMainMenuEntry) then
   begin
@@ -215,6 +215,6 @@ initialization
   iiCNA2 := -1;
 
 finalization
-  StopVisualizers;
+  FreeVisualizers;
 
 end.

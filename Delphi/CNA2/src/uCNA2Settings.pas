@@ -76,7 +76,7 @@ begin
     if not Save then
       raise Exception.Create(EmptyStr);
   except
-    MessageDlg('CNA2-Settings could not be saved!', mtWarning, [mbOK], 0);
+    MessageDlg('CNA2-Settings could not be saved!', mtError, [mbOK], 0);
   end;
 end;
 
@@ -95,7 +95,7 @@ Profiles
         ClassName1 = 'Displayname'
       Actions
         Property1 = 'Font.Color'
-          Class = 'Tcna2ActionSetValue'
+          Class = 'Tcna2ActSetValue'
           ActionData
             ActionData1 = 'foobar'
             ActionDataX = '...'
