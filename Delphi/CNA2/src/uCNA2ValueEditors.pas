@@ -1,3 +1,8 @@
+//**********************************************************
+// Developed by TheUnkownOnes.net
+//
+// for more information look at www.TheUnknownOnes.net
+//**********************************************************
 unit uCNA2ValueEditors;
 
 interface
@@ -56,7 +61,7 @@ implementation
 
 uses uCNA2ValueEditorString, uCNA2ValueEditorChar, uCNA2ValueEditorInteger,
   uCNA2ValueEditorInt64, uCNA2ValueEditorFloat, uCNA2ValueEditorEnum,
-  uCNA2ValueEditorSet;
+  uCNA2ValueEditorSet, uCNA2ValueEditorColor;
 
 procedure InitValueEditors;
 begin
@@ -65,6 +70,8 @@ begin
   //register ValueEditors here
   cna2ValueEditors.Add(Tcna2ValueEditorString);
   cna2ValueEditors.Add(Tcna2ValueEditorChar);
+  //Color is a special integer ... register it before the generic integer editor
+  cna2ValueEditors.Add(Tcna2ValueEditorColor);
   cna2ValueEditors.Add(Tcna2ValueEditorInteger);
   cna2ValueEditors.Add(Tcna2ValueEditorInt64);
   cna2ValueEditors.Add(Tcna2ValueEditorFloat);

@@ -1,3 +1,8 @@
+//**********************************************************
+// Developed by TheUnkownOnes.net
+//
+// for more information look at www.TheUnknownOnes.net
+//**********************************************************
 unit uCNA2IDENotifier;
 
 interface
@@ -6,13 +11,15 @@ uses
   ToolsAPI,
   Classes,
   SysUtils,
-  uCNA2FormEditorHooks;
+  uCNA2FormEditorHooks,
+  Dialogs;
 
 type
   Tcna2IDENotifier = class(TInterfacedObject,
                            IOTAIDENotifier,
                            IOTANotifier)
   private
+    FNotifierIndex : Integer;
 
     //IOTANotifier
     procedure AfterSave;
@@ -25,9 +32,19 @@ type
       const FileName: string; var Cancel: Boolean);
     procedure BeforeCompile(const Project: IOTAProject; var Cancel: Boolean); overload;
     procedure AfterCompile(Succeeded: Boolean); overload;
+  public
+    constructor Create();
+    destructor Destroy(); override;
+
+    procedure Unregister;
   end;
 
+var
+  cna2IDENotifier : Tcna2IDENotifier;
+
 implementation
+
+uses uCNA2Settings;
 
 { Tcna2IDENotifier }
 
@@ -50,6 +67,25 @@ end;
 procedure Tcna2IDENotifier.BeforeSave;
 begin
 
+end;
+
+constructor Tcna2IDENotifier.Create;
+var
+  Serv : IOTAServices;
+begin
+  inherited;
+  
+  if Supports(BorlandIDEServices, IOTAServices, Serv) then
+    FNotifierIndex := Serv.AddNotifier(Self);
+end;
+
+destructor Tcna2IDENotifier.Destroy;
+begin
+  Unregister;
+  
+  cna2IDENotifier := nil;
+
+  inherited;
 end;
 
 procedure Tcna2IDENotifier.Destroyed;
@@ -95,8 +131,21 @@ begin
 
 end;
 
+procedure Tcna2IDENotifier.Unregister;
+var
+  Serv : IOTAServices;
+begin
+  if FNotifierIndex <> -1 then
+
+  if Supports(BorlandIDEServices, IOTAServices, Serv) then
+  begin
+    Serv.RemoveNotifier(FNotifierIndex);
+    FNotifierIndex := -1;
+  end;
+end;
+
 initialization
- 
+  cna2IDENotifier := nil; 
 
 finalization
 

@@ -31,7 +31,11 @@ type
     procedure SaveToSettings(APath : TSettingName); virtual; abstract;
 
     function AsString() : WideString; virtual; abstract;
-    procedure Configure(ATypeInfo : PTypeInfo); virtual; abstract;
+    procedure Configure(); virtual; abstract;
+
+    procedure Execute(AEditor : IOTAFormEditor;
+                      AComponent : IOTAComponent;
+                      AProperty : WideString); virtual; abstract;
 
     class function GetDisplayName : WideString; virtual; abstract;
     class function CanHandle(ATypeInfo : PTypeInfo) : Boolean; virtual; abstract;
@@ -65,7 +69,7 @@ procedure FreeActions;
 
 implementation
 
-uses uCNA2ActSetValue;
+uses uCNA2ActSetValue, uCNA2ActCreateObject;
 
 procedure InitActions;
 begin
@@ -73,6 +77,7 @@ begin
 
   //Register available actions
   cna2Actions.Add(Tcna2ActSetValue);
+  cna2Actions.Add(Tcna2ActCreateObject);
 end;
 
 procedure FreeActions;

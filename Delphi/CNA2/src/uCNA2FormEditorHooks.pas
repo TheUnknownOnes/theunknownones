@@ -1,3 +1,8 @@
+//**********************************************************
+// Developed by TheUnkownOnes.net
+//
+// for more information look at www.TheUnknownOnes.net
+//**********************************************************
 unit uCNA2FormEditorHooks;
 
 interface
@@ -58,6 +63,8 @@ var
 
 implementation
 
+uses uCNA2Worker, uCNA2Settings;
+
 { Tcna2FormEditorHook }
 
 procedure Tcna2FormEditorHook.AfterSave;
@@ -73,7 +80,11 @@ end;
 procedure Tcna2FormEditorHook.ComponentRenamed(ComponentHandle: TOTAHandle;
   const OldName, NewName: string);
 begin
-
+  if (OldName = EmptyStr) and
+     (NewName <> EmptyStr) and
+     (cna2Settings.ExpertActive) then
+     
+    cna2Worker.ProcessComponent(FEditor, ComponentHandle);
 end;
 
 constructor Tcna2FormEditorHook.Create(const AEditor: IOTAFormEditor);

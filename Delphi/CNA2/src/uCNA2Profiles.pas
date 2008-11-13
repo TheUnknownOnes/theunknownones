@@ -179,6 +179,8 @@ var
 
 implementation
 
+uses uCNA2ActSetValue;
+
 { Tcna2Profiles }
 
 function Tcna2Profiles.AddProfile(AName: WideString): Tcna2Profile;
@@ -219,12 +221,15 @@ procedure Tcna2Profiles.EnsureMinimalContent;
 var
   P : Tcna2Profile;
   G : Tcna2Group;
+  A : Tcna2ActSetValue;
 begin
   if Profiles.Count = 0 then
   begin
     P := AddProfile('Default Profile');
     G := P.AddGroup('Buttons');
     G.AddComponent(TButton);
+    A := Tcna2ActSetValue(G.AddAction('Name', Tcna2ActSetValue));
+    A.Init('btn_|', true);
     CurrentProfile := P;
   end;
 end;

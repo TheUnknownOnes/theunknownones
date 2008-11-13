@@ -41,6 +41,11 @@ type
     pan_Buttons: TPanel;
     btn_OK: TButton;
     btn_Cancel: TButton;
+    btn_MoveUp: TToolButton;
+    btn_MoveDown: TToolButton;
+    ToolButton3: TToolButton;
+    ts_Misc: TTabSheet;
+    cb_ExpertActive: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure lv_ComponentsColumnClick(Sender: TObject; Column: TListColumn);
     procedure tv_ProfilesKeyUp(Sender: TObject; var Key: Word;
@@ -62,6 +67,9 @@ type
       Selected: Boolean);
     procedure rg_ActionClassesClick(Sender: TObject);
     procedure btn_ConfigActionClick(Sender: TObject);
+    procedure btn_MoveUpClick(Sender: TObject);
+    procedure btn_MoveDownClick(Sender: TObject);
+    procedure cb_ExpertActiveClick(Sender: TObject);
   private
     procedure LoadComponents;
     procedure InitProfileTree;
@@ -74,8 +82,8 @@ type
     function AddGroupNode(AGroup : Tcna2Group) : TTreeNode;
     function AddComponentNode(AComponent : Tcna2Component) : TTreeNode;
 
-    procedure AddAllComponents(AProfile : Tcna2Profile); overload;
-    procedure AddAllComponents(AGroup : Tcna2Group); overload;
+    procedure AddAll(AProfile : Tcna2Profile); overload;
+    procedure AddAll(AGroup : Tcna2Group); overload;
 
     procedure GroupSelected(AGroup : Tcna2Group);
     procedure PropertySelected(AGroup : Tcna2Group; AProperty : TListItem);
@@ -85,6 +93,8 @@ type
     procedure UpdateActionString(AGroup : Tcna2Group; AProperty : TListItem);
 
     function GetCurrentGroup : Tcna2Group;
+
+    procedure MoveCurrentGroup(AUp : Boolean);
   public
     class procedure Execute;
   end;
@@ -112,17 +122,16 @@ begin
     Result := -Result;
 end;
 
-procedure TCNA2ConfigDialog.AddAllComponents(AProfile: Tcna2Profile);
+procedure TCNA2ConfigDialog.AddAll(AProfile: Tcna2Profile);
 var
-  idxComponent,
   idxGroup : Integer;
+  NodeGroup : TTreeNode;
 begin
   for idxGroup := 0 to AProfile.Groups.Count - 1 do
   begin
-    for idxComponent := 0 to AProfile.Groups[idxGroup].Components.Count - 1 do
-    begin
-      AddComponentNode(AProfile.Groups[idxGroup].Components[idxComponent]);
-    end;
+    NodeGroup := AddGroupNode(AProfile.Groups[idxGroup]);
+
+    AddAll(AProfile.Groups[idxGroup]);
   end;
 end;
 
@@ -163,7 +172,7 @@ begin
 
 end;
 
-procedure TCNA2ConfigDialog.AddAllComponents(AGroup: Tcna2Group);
+procedure TCNA2ConfigDialog.AddAll(AGroup: Tcna2Group);
 var
   idxComponent: Integer;
 begin
@@ -255,7 +264,7 @@ begin
      Group.GetAction(Prop.Caption, Action) and
      Action.HasConfigDialog then
   begin
-    Action.Configure(PTypeInfo(Prop.Data));
+    Action.Configure();
     UpdateActionString(Group, Prop);
   end;
 end;
@@ -272,6 +281,21 @@ begin
   end;
 
   UpdateCurrentMarker;
+end;
+
+procedure TCNA2ConfigDialog.btn_MoveDownClick(Sender: TObject);
+begin
+  MoveCurrentGroup(false);
+end;
+
+procedure TCNA2ConfigDialog.btn_MoveUpClick(Sender: TObject);
+begin
+  MoveCurrentGroup(true);
+end;
+
+procedure TCNA2ConfigDialog.cb_ExpertActiveClick(Sender: TObject);
+begin
+  cna2Settings.ExpertActive := cb_ExpertActive.Checked;
 end;
 
 class procedure TCNA2ConfigDialog.Execute;
@@ -315,6 +339,8 @@ begin
 
   FLastSortCol := -1;
   FLastSortWasAsc := false;
+
+  cb_ExpertActive.Checked := cna2Settings.ExpertActive;
 end;
 
 function TCNA2ConfigDialog.GetCurrentGroup: Tcna2Group;
@@ -448,6 +474,36 @@ begin
   UpdateCurrentMarker;
 end;
 
+procedure TCNA2ConfigDialog.MoveCurrentGroup(AUp: Boolean);
+var
+  Group : Tcna2Group;
+  NewIndex,
+  idx : Integer;
+  Node : TTreeNode;
+begin
+  Group := GetCurrentGroup;
+  idx := Group.Profile.Groups.IndexOf(Group);
+
+  if AUp then
+    NewIndex := idx - 1
+  else
+    NewIndex := idx + 1;
+
+  if (AUp and (idx > 0)) or ((not AUp) and (idx < Group.Profile.Groups.Count - 1)) then
+    Group.Profile.Groups.Move(idx, NewIndex);
+
+  if FindNode(Group.Profile, Node) then
+  begin
+    Node.DeleteChildren;
+    AddAll(Group.Profile);
+
+    Node.Expanded := true;
+
+    if FindNode(Group, Node) then
+      tv_Profiles.Selected := Node;
+  end;
+end;
+
 procedure TCNA2ConfigDialog.PropertySelected(AGroup: Tcna2Group;
   AProperty: TListItem);
 var
@@ -501,6 +557,9 @@ end;
 
 procedure TCNA2ConfigDialog.tv_ProfilesChange(Sender: TObject; Node: TTreeNode);
 begin
+  btn_MoveUp.Enabled := Assigned(Node) and (TObject(Node.Data) is Tcna2Group);
+  btn_MoveDown.Enabled := btn_MoveUp.Enabled;
+  
   GroupSelected(GetCurrentGroup);
 end;
 
@@ -561,7 +620,7 @@ begin
   begin
     P :=cna2Profiles.AddProfile(Tcna2Profile(SourceObject).Name);
     P.CopyContent(Tcna2Profile(SourceObject));
-    AddAllComponents(P);
+    AddAll(P);
     tv_Profiles.Selected := AddProfileNode(P);
   end
   else
@@ -577,7 +636,7 @@ begin
 
     G := P.AddGroup(Tcna2Group(SourceObject).Name);
     G.CopyContent(Tcna2Group(SourceObject));
-    AddAllComponents(G);
+    AddAll(G);
     tv_Profiles.Selected := AddGroupNode(G);
 
   end
@@ -688,7 +747,10 @@ procedure TCNA2ConfigDialog.tv_ProfilesKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_F2 then
-    tv_Profiles.Selected.EditText;
+    tv_Profiles.Selected.EditText
+  else
+  if Key = VK_DELETE then
+    btn_Delete.Click;
 end;
 
 procedure TCNA2ConfigDialog.UpdateActionString(AGroup : Tcna2Group; AProperty: TListItem);

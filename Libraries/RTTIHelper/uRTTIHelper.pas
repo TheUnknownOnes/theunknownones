@@ -364,8 +364,8 @@ begin
     PropValue := GetPropValue(AInstance, PropName, false);
     PropInfo := GetPropInfo(AInstance, PropName);
 
-    if (not (Integer(PropValue) = 0)) and
-       (PropInfo.PropType^.Kind = tkClass) and
+    if (PropInfo.PropType^.Kind = tkClass) and
+       (Integer(PropValue) <> 0) and
        (PosOfDelim < Length(APropertyName)) then
     begin
       rttihSetPropertyValue(TObject(Integer(PropValue)),
@@ -496,9 +496,10 @@ begin
 
   for Element := TypeDataComp.MinValue to TypeDataComp.MaxValue do
   begin
-    AList.Add(WideFormat('%s%s%d', [rttihOrdinalToString(TypeInfoComp, Element),
-                                    AList.NameValueSeparator,
-                                    Trunc(Power(2, Element))]));
+    AList.AddObject(WideFormat('%s%s%d', [rttihOrdinalToString(TypeInfoComp, Element),
+                                          AList.NameValueSeparator,
+                                          Trunc(Power(2, Element))]),
+                    TObject(Trunc(Power(2, Element))));
     Inc(Result);
   end;
 end;
@@ -516,9 +517,10 @@ begin
 
   for Element := TypeData.MinValue to TypeData.MaxValue do
   begin
-    AList.Add(WideFormat('%s%s%d', [rttihOrdinalToString(ATypeInfo, Element),
-                                    AList.NameValueSeparator,
-                                    Trunc(Power(2, Element))]));
+    AList.AddObject(WideFormat('%s%s%d', [rttihOrdinalToString(ATypeInfo, Element),
+                                          AList.NameValueSeparator,
+                                          Element]),
+                   TObject(Element));
     Inc(Result);
   end;
     

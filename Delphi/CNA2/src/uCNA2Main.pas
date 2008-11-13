@@ -17,15 +17,14 @@ uses
   uCNA2Settings,
   uCNA2Visualizers,
   uCNA2Profiles,
-  uCNA2Actions;
+  uCNA2Actions,
+  Graphics;
 
 type
   Tcna2Wizard = class(TInterfacedObject,
                       IOTAWizard,
                       IOTANotifier)
   private
-    FIDENotifierIndex : Integer;
-
     //IOTAWizard
     function GetIDString: string;
     function GetName: string;
@@ -47,7 +46,7 @@ procedure Register;
 
 implementation
 
-uses uCNA2ValueEditors, uCNA2FormEditorHooks, uCNA2IDENotifier;
+uses uCNA2ValueEditors, uCNA2FormEditorHooks, uCNA2IDENotifier, uCNA2Worker;
 
 procedure Register;
 begin       
@@ -58,23 +57,35 @@ end;
 
 procedure Tcna2Wizard.AfterConstruction;
 var
-  Serv : IOTAServices;
+  bmp : TBitmap;
 begin
   inherited;
 
-  cna2FormEditorHooks := Tcna2FormEditorHooks.Create;
+  bmp := TBitmap.Create;
+  try
+    bmp.LoadFromResourceName(HInstance, 'CNA2');
+    
+    SplashScreenServices.AddPluginBitmap('CNA 2',
+                                         bmp.Handle,
+                                         false,
+                                         'Freeware without any warranty',
+                                         ' by TheUnknownOnes.net');
+    
+    cna2Worker := Tcna2Worker.Create;
 
-  FIDENotifierIndex := -1;
+    cna2FormEditorHooks := Tcna2FormEditorHooks.Create;
 
-  if Supports(BorlandIDEServices, IOTAServices, Serv) then
-    FIDENotifierIndex := Serv.AddNotifier(Tcna2IDENotifier.Create);
+    cna2IDENotifier := Tcna2IDENotifier.Create;
 
-  InitValueEditors;
+    InitValueEditors;
 
-  cna2Settings := Tcna2Settings.Create(nil);
-  InitActions;
-  cna2Profiles := Tcna2Profiles.Create;
-  InitVisualizers;
+    cna2Settings := Tcna2Settings.Create(nil);
+    InitActions;
+    cna2Profiles := Tcna2Profiles.Create;
+    InitVisualizers;
+  finally
+    bmp.Free;
+  end;
 end;
 
 procedure Tcna2Wizard.AfterSave;
@@ -83,17 +94,20 @@ begin
 end;
 
 procedure Tcna2Wizard.BeforeDestruction;
-var
-  Serv : IOTAServices;
 begin
-  if (FIDENotifierIndex > -1) and
-     Supports(BorlandIDEServices, IOTAServices, Serv) then
-    Serv.RemoveNotifier(FIDENotifierIndex);
+  if Assigned(cna2IDENotifier) then
+    cna2IDENotifier.Unregister;
 
   if Assigned(cna2FormEditorHooks) then
   begin
     cna2FormEditorHooks.Free;
     cna2FormEditorHooks := nil;
+  end;
+
+  if Assigned(cna2Worker) then
+  begin
+    cna2Worker.Free;
+    cna2Worker := nil;
   end;
 
   FreeVisualizers;

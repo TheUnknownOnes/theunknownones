@@ -152,24 +152,18 @@ begin
 
   if Supports(BorlandIDEServices, INTAServices, NTA) then
   begin
-    NTA.MenuBeginUpdate;
-    try
-      ToolsMenu := FindToolsMenu;
+    ToolsMenu := FindToolsMenu;
 
-      if Assigned(ToolsMenu) then
-      begin
-        FMenuItem := TMenuItem.Create(ToolsMenu);
-        FMenuItem.Action := actShowDialog;
-        ToolsMenu.Add(FMenuItem);
-      end
-      else
-      begin
-        FMenuItem := nil;
-        FTimer.Enabled := true;
-      end;
-
-    finally
-      NTA.MenuEndUpdate;
+    if Assigned(ToolsMenu) then
+    begin
+      FMenuItem := TMenuItem.Create(ToolsMenu);
+      FMenuItem.Action := actShowDialog;
+      ToolsMenu.Add(FMenuItem);
+    end
+    else
+    begin
+      FMenuItem := nil;
+      FTimer.Enabled := true;
     end;
   end;
 end;

@@ -55,6 +55,9 @@ contains
   uCNA2ValueEditorEnum in 'ValueEditors\uCNA2ValueEditorEnum.pas' {cna2ValueEditorEnum: TFrame},
   uCNA2ValueEditorSet in 'ValueEditors\uCNA2ValueEditorSet.pas' {cna2ValueEditorSet: TFrame},
   uCNA2FormEditorHooks in 'uCNA2FormEditorHooks.pas',
-  uCNA2IDENotifier in 'uCNA2IDENotifier.pas';
+  uCNA2IDENotifier in 'uCNA2IDENotifier.pas',
+  uCNA2Worker in 'uCNA2Worker.pas',
+  uCNA2ValueEditorColor in 'ValueEditors\uCNA2ValueEditorColor.pas' {cna2ValueEditorColor: TFrame},
+  uCNA2ActCreateObject in 'Actions\uCNA2ActCreateObject.pas';
 
 end.

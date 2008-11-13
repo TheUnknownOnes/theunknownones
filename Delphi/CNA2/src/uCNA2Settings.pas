@@ -25,11 +25,17 @@ uses
 
 type
   Tcna2Settings = class(TSettingsXMLFile)
+  private
+    function GetActive: Boolean;
+    procedure SetActive(const Value: Boolean);
+  published
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     procedure SaveNow;
+
+    property ExpertActive : Boolean read GetActive write SetActive;
   end;
 
 var
@@ -69,6 +75,11 @@ begin
 end;
 
 
+function Tcna2Settings.GetActive: Boolean;
+begin
+  Result := GetValue('/ExpertActive', true);
+end;
+
 procedure Tcna2Settings.SaveNow;
 begin
   try
@@ -78,6 +89,11 @@ begin
   except
     MessageDlg('CNA2-Settings could not be saved!', mtError, [mbOK], 0);
   end;
+end;
+
+procedure Tcna2Settings.SetActive(const Value: Boolean);
+begin
+  SetValue('/ExpertActive', Value);
 end;
 
 initialization
@@ -100,5 +116,5 @@ Profiles
             ActionData1 = 'foobar'
             ActionDataX = '...'
 CurrentProfile = '/Profiles/Profile2'
-
+ExpertActive = 'true'
 *)

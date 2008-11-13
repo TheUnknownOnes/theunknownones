@@ -18,18 +18,18 @@ object form_ConfigSetValue: Tform_ConfigSetValue
   TextHeight = 13
   object pan_Buttons: TPanel
     Left = 0
-    Top = 210
+    Top = 206
     Width = 372
-    Height = 30
+    Height = 34
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
       372
-      30)
+      34)
     object btn_OK: TButton
       Left = 210
-      Top = 0
+      Top = 4
       Width = 75
       Height = 25
       Anchors = [akTop, akRight]
@@ -40,7 +40,7 @@ object form_ConfigSetValue: Tform_ConfigSetValue
     end
     object btn_Cancel: TButton
       Left = 291
-      Top = 0
+      Top = 4
       Width = 75
       Height = 25
       Anchors = [akTop, akRight]
@@ -48,6 +48,14 @@ object form_ConfigSetValue: Tform_ConfigSetValue
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 1
+    end
+    object cb_ShowDialog: TCheckBox
+      Left = 4
+      Top = 8
+      Width = 196
+      Height = 17
+      Caption = 'Show dialog on component drop'
+      TabOrder = 2
     end
   end
 end
