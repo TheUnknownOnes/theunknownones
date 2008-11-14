@@ -16,13 +16,14 @@ uses
 type
   Tcna2ValueEditorString = class(Tcna2ValueEditor)
     ed_Value: TEdit;
-    Label1: TLabel;
-    procedure ed_ValueEnter(Sender: TObject);
+    mem_Hint: TMemo;
   private
     { Private-Deklarationen }
 
   protected
     function GetValue : Variant; override;
+
+    procedure ApplyExpressions;
   public
     function GetDesiredHeight : Integer; override;
 
@@ -39,6 +40,42 @@ implementation
 
 { Tcna2ValueString }
 
+procedure Tcna2ValueEditorString.ApplyExpressions;
+var
+  p1, p2 : Integer;
+  s : WideString;
+begin
+  p2 := 0;
+
+  s := ed_Value.Text;
+
+  p1 := PosEx('|', s);
+
+  if p1 > 0 then
+  begin
+    Delete(s, p1, 1);
+    Dec(p1);
+
+    p2 := PosEx('|', s, p1 + 1);
+
+    if p2 > 0 then
+    begin
+      Delete(s, p2, 1);
+      Dec(p2);
+    end;
+  end;
+
+  ed_Value.Text := s;
+
+  if p1 > 0 then
+  begin
+    ed_Value.SelStart := p1;
+
+    if p2 > 0 then
+      ed_Value.SelLength := p2 - p1;
+  end;
+end;
+
 class function Tcna2ValueEditorString.CanHandle(ATypeInfo: PTypeInfo): Boolean;
 begin
   Result := ATypeInfo.Kind in [tkString,
@@ -46,52 +83,12 @@ begin
                                tkWString];
 end;
 
-procedure Tcna2ValueEditorString.ed_ValueEnter(Sender: TObject);
-var
-  p1, p2 : Integer;
-  s : WideString;
-begin
-  if FExpressionEvaluation then
-  begin
-    p2 := 0;
-
-    s := ed_Value.Text;
-
-    p1 := PosEx('|', s);
-
-    if p1 > 0 then
-    begin
-      Delete(s, p1, 1);
-      Dec(p1);
-
-      p2 := PosEx('|', s, p1 + 1);
-
-      if p2 > 0 then
-      begin
-        Delete(s, p2, 1);
-        Dec(p2);
-      end;
-    end;
-
-    ed_Value.Text := s;
-
-    if p1 > 0 then
-    begin
-      ed_Value.SelStart := p1;
-
-      if p2 > 0 then
-        ed_Value.SelLength := p2 - p1;
-    end;
-  end
-  else
-    ed_Value.SelectAll;
-end;
 
 function Tcna2ValueEditorString.GetDesiredHeight: Integer;
 begin
   Result := ed_Value.Height;
-  if not FExpressionEvaluation then
-    Inc(Result, Label1.Height);
+  if mem_Hint.Visible then
+    Inc(Result, mem_Hint.Height);
 end;
 
 function Tcna2ValueEditorString.GetValue: Variant;
@@ -105,9 +102,13 @@ procedure Tcna2ValueEditorString.Init(ATypeInfo: PTypeInfo;
 begin
   inherited;
 
-  Label1.Visible := not AExpressionEvaluation;
+  mem_Hint.Visible := not AExpressionEvaluation;
 
   ed_Value.Text := AValue;
+  if AExpressionEvaluation  then
+    ApplyExpressions
+  else
+    ed_Value.SelectAll;
 end;
 
 end.

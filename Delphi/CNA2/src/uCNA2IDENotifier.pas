@@ -104,26 +104,31 @@ var
 begin
   Cancel := false;
 
-  if Supports(BorlandIDEServices, IOTAModuleServices, ModServ) then
+  if NotifyCode in [ofnFileOpened, ofnFileClosing] then
   begin
-    Module := ModServ.FindModule(FileName);
-    if Assigned(Module) then
+    if Supports(BorlandIDEServices, IOTAModuleServices, ModServ) then
     begin
-      Editor := Module.ModuleFileEditors[1];
-
-      if Supports(Editor, IOTAFormEditor, FormEditor) then
+      Module := ModServ.FindModule(FileName);
+      if Assigned(Module) then
       begin
-        case NotifyCode of
-          ofnFileOpened: Tcna2FormEditorHook.Create(FormEditor);
-          ofnFileClosing:
-          begin
-            if cna2FormEditorHooks.FindByEditor(FormEditor, Hook) then
-              Hook.Unregister;
+        Editor := Module.ModuleFileEditors[1];
+
+        if Supports(Editor, IOTAFormEditor, FormEditor) then
+        begin
+          case NotifyCode of
+            ofnFileOpened: Tcna2FormEditorHook.Create(FormEditor);
+            ofnFileClosing:
+            begin
+              if cna2FormEditorHooks.FindByEditor(FormEditor, Hook) then
+                Hook.Unregister;
+            end;
           end;
         end;
       end;
     end;
   end;
+
+
 end;
 
 procedure Tcna2IDENotifier.Modified;

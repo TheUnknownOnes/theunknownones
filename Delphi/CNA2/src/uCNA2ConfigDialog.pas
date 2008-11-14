@@ -411,9 +411,9 @@ var
   PS : IOTAPackageServices;
   idxPackage,
   idxComponent : Integer;
-  Li : TListItem;
   ComponentClassName : String;
   ComponentClass : TPersistentClass;
+  Li : TListItem;
 begin
   Screen.Cursor := crHourGlass;
   try
@@ -425,24 +425,22 @@ begin
         begin
           ComponentClassName := PS.ComponentNames[idxPackage, idxComponent];
           ComponentClass := GetClass(ComponentClassName);
-
           if Assigned(ComponentClass) then
           begin
-            Li := lv_Components.Items.Add;
+            LI := lv_Components.Items.Add;
             Li.Caption := ComponentClassName;
             Li.SubItems.Add(rttihGetUnit(ComponentClass));
             Li.SubItems.Add(ps.PackageNames[idxPackage]);
             Li.Data := ComponentClass;
           end;
-          
         end;
       end;
     end;
   finally
     Screen.Cursor := crDefault;
   end;
-  
 end;
+
 
 procedure TCNA2ConfigDialog.lv_ActionsSelectItem(Sender: TObject;
   Item: TListItem; Selected: Boolean);
@@ -573,6 +571,7 @@ var
   P : Tcna2Profile;
   G : Tcna2Group;
   C : Tcna2Component;
+  Li : TListItem;
 begin
    Node := tv_Profiles.GetNodeAt(X,Y);
   if Assigned(Node) then
@@ -590,28 +589,29 @@ begin
 
   if SourceObject is TListItem then
   begin
-    ComponentClass := TClass(TListItem(SourceObject).Data);
-    
+    Li := TListItem(SourceObject);
+    ComponentClass := TClass(Li.Data);
+
     if TargetObject is Tcna2Group then
     begin
       G := Tcna2Group(TargetObject);
-      C := G.AddComponent(ComponentClass);
+      C := G.AddComponent(ComponentClass, Li.SubItems[1]);
       tv_Profiles.Selected := AddComponentNode(C)
     end
     else
     if TargetObject is Tcna2Profile then
     begin
       P := Tcna2Profile(TargetObject);
-      G := P.AddGroup(TListItem(SourceObject).SubItems[0]);
-      C := G.AddComponent(ComponentClass);
+      G := P.AddGroup(Li.SubItems[0]);
+      C := G.AddComponent(ComponentClass, Li.SubItems[1]);
       tv_Profiles.Selected := AddComponentNode(C);
     end
     else
     if TargetObject = nil then
     begin
-      P := cna2Profiles.AddProfile(TListItem(SourceObject).SubItems[1]);
-      G := P.AddGroup(TListItem(SourceObject).SubItems[0]);
-      C := G.AddComponent(ComponentClass);
+      P := cna2Profiles.AddProfile(Li.SubItems[1]);
+      G := P.AddGroup(Li.SubItems[0]);
+      C := G.AddComponent(ComponentClass, Li.SubItems[1]);
       tv_Profiles.Selected := AddComponentNode(C);
     end;
   end
@@ -648,7 +648,7 @@ begin
     if TargetObject is Tcna2Group then
     begin
       G := Tcna2Group(TargetObject);
-      C := G.AddComponent(C.ComponentClass);
+      C := G.AddComponent(C.ComponentClass, C.SourcePackage);
       tv_Profiles.Selected := AddComponentNode(C);
     end
     else
@@ -656,7 +656,7 @@ begin
     begin
       P := Tcna2Profile(TargetObject);
       G := P.AddGroup(C.Group.Name);
-      C := G.AddComponent(C.ComponentClass);
+      C := G.AddComponent(C.ComponentClass, C.SourcePackage);
       tv_Profiles.Selected := AddComponentNode(C);
     end
     else
@@ -664,7 +664,7 @@ begin
     begin
       P := cna2Profiles.AddProfile('New Profile');
       G := P.AddGroup('New Group');
-      C := G.AddComponent(C.ComponentClass);
+      C := G.AddComponent(C.ComponentClass, C.SourcePackage);
       tv_Profiles.Selected := AddComponentNode(C);
     end;
   end;
@@ -749,8 +749,10 @@ begin
   if Key = VK_F2 then
     tv_Profiles.Selected.EditText
   else
-  if Key = VK_DELETE then
+  if (Key = VK_DELETE) and (not tv_Profiles.IsEditing) then
+  begin
     btn_Delete.Click;
+  end;
 end;
 
 procedure TCNA2ConfigDialog.UpdateActionString(AGroup : Tcna2Group; AProperty: TListItem);

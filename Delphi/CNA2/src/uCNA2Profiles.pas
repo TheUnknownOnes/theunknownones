@@ -29,6 +29,7 @@ type
   private
     FClass: TClass;
     FGroup : Tcna2Group;
+    FSourcePackage: WideString;
     procedure SetGroup(const Value: Tcna2Group);
   public
     constructor Create(AGroup : Tcna2Group);
@@ -39,6 +40,7 @@ type
 
     property Group : Tcna2Group read FGroup write SetGroup;
     property ComponentClass : TClass read FClass write FClass;
+    property SourcePackage : WideString read FSourcePackage write FSourcePackage; 
   end;
 
   Tcna2ComponentList = class(TList)
@@ -81,7 +83,7 @@ type
 
     function FindComponent(AClass : TClass; out AComponent : Tcna2Component) : Boolean;
 
-    function AddComponent(AClass : TClass) : Tcna2Component;
+    function AddComponent(AClass : TClass; APackage : WideString) : Tcna2Component;
 
     function AddAction(AProperty : WideString; AActionClass : Tcna2ActionClass) : Tcna2Action;
     procedure RemoveAction(AProperty : WideString);
@@ -226,10 +228,6 @@ begin
   if Profiles.Count = 0 then
   begin
     P := AddProfile('Default Profile');
-    G := P.AddGroup('Buttons');
-    G.AddComponent(TButton);
-    A := Tcna2ActSetValue(G.AddAction('Name', Tcna2ActSetValue));
-    A.Init('btn_|', true);
     CurrentProfile := P;
   end;
 end;
@@ -453,12 +451,13 @@ begin
   end;
 end;
 
-function Tcna2Group.AddComponent(AClass: TClass): Tcna2Component;
+function Tcna2Group.AddComponent(AClass: TClass; APackage : WideString): Tcna2Component;
 begin
   if not FindComponent(AClass, Result) then
   begin
     Result := Tcna2Component.Create(nil);
     Result.ComponentClass := AClass;
+    Result.SourcePackage := APackage;
     Result.Group := Self;
   end;
 end;
@@ -534,7 +533,7 @@ begin
 
     for idx := 0 to ASource.Components.Count - 1 do
     begin
-      AddComponent(ASource.Components[idx].ComponentClass);
+      AddComponent(ASource.Components[idx].ComponentClass, ASource.Components[idx].SourcePackage);
     end;
   end;
 end;
@@ -834,6 +833,8 @@ end;
 constructor Tcna2Component.Create(AGroup: Tcna2Group);
 begin
   FGroup := nil;
+  FSourcePackage := EmptyWideStr;
+
   Group := AGroup;
 end;
 
@@ -846,14 +847,25 @@ end;
 
 procedure Tcna2Component.LoadFromSettings(APath: TSettingName);
 begin
-  FClass := GetClass(cna2Settings.GetValue(APath, ''));
+  FClass := nil;
+  
+  FSourcePackage := cna2Settings.GetValue(APath + '/Package', EmptyWideStr);
+
+  if FSourcePackage <> EmptyWideStr then
+  begin
+    LoadPackage(FSourcePackage);
+
+    FClass := GetClass(cna2Settings.GetValue(APath, ''));
+  end;
+
   if not Assigned(FClass) then
-    Free;
+      Free;
 end;
 
 procedure Tcna2Component.SaveToSettings(APath: TSettingName);
 begin
   cna2Settings.SetValue(APath, FClass.ClassName);
+  cna2Settings.SetValue(APath + '/Package', FSourcePackage);
 end;
 
 procedure Tcna2Component.SetGroup(const Value: Tcna2Group);

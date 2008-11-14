@@ -69,8 +69,18 @@ procedure Tcna2ActCreateObject.Execute(AEditor: IOTAFormEditor;
   AComponent: IOTAComponent; AProperty: WideString);
 var
   NewObj : IOTAComponent;
+  Obj : TObject;
 begin
-  NewObj := AEditor.CreateComponent(AComponent, FTypeInfo.Name, 0, 0, 0, 0);
+  Obj := TObject(AComponent.GetComponentHandle);
+  NewObj := AEditor.CreateComponent(AComponent.GetParent, FTypeInfo.Name, 0, 0, 0, 0);
+
+  if Assigned(NewObj) then
+  begin
+    rttihSetPropertyValue(Obj, AProperty, Integer(NewObj.GetComponentHandle));
+
+    NewObj.Select(true);
+    AComponent.Select(true);
+  end;
 end;
 
 class function Tcna2ActCreateObject.GetDisplayName: WideString;

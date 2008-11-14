@@ -103,7 +103,7 @@ begin
   FTimer := TTimer.Create(nil);
   FTimer.Interval := 1000;
   FTimer.OnTimer := OnTimer;
-  FTimer.Enabled := true;
+  OnTimer(nil);
 end;
 
 destructor Tcna2MainMenuEntry.Destroy;
@@ -163,9 +163,11 @@ begin
     else
     begin
       FMenuItem := nil;
-      FTimer.Enabled := true;
     end;
   end;
+
+  if not Assigned(FMenuItem) then
+    FTimer.Enabled := true;
 end;
 
 { TCNA2ShowDialogAction }

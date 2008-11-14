@@ -376,7 +376,11 @@ begin
     else
     if PosOfDelim > Length(APropertyName) then
     begin
-      SetPropValue(AInstance, PropInfo, AValue);
+      case PropInfo.PropType^.Kind of
+        tkClass: SetOrdProp(AInstance, PropInfo, AValue);
+        else
+          SetPropValue(AInstance, PropInfo, AValue);
+      end;
     end;
 
   end;
