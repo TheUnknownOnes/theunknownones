@@ -30,10 +30,8 @@ type
 
   Tcna2MainMenuEntry = class
   private
-    FTimer : TTimer;
     FMenuItem : TMenuItem;
     function FindToolsMenu : TMenuItem;
-    procedure OnTimer(Sender : TObject);
   public
     constructor Create();
     destructor Destroy(); override;
@@ -97,13 +95,28 @@ end;
 { Tcna2MainMenuEntry }
 
 constructor Tcna2MainMenuEntry.Create;
+var
+  NTA : INTAServices;
+  ToolsMenu : TMenuItem;
 begin
-  FMenuItem := nil;
-  
-  FTimer := TTimer.Create(nil);
-  FTimer.Interval := 1000;
-  FTimer.OnTimer := OnTimer;
-  OnTimer(nil);
+  if Supports(BorlandIDEServices, INTAServices, NTA) then
+  begin
+    ToolsMenu := FindToolsMenu;
+
+    if Assigned(ToolsMenu) then
+    begin
+      FMenuItem := TMenuItem.Create(NTA.MainMenu);
+      FMenuItem.Action := actShowDialog;
+
+      NTA.MenuBeginUpdate;
+      try
+        ToolsMenu.Insert(3, FMenuItem);
+      finally
+        NTA.MenuEndUpdate;
+      end;
+      
+    end;
+  end;
 end;
 
 destructor Tcna2MainMenuEntry.Destroy;
@@ -116,8 +129,6 @@ begin
     FMenuItem.Free;
     FMenuItem := nil;
   end;
-
-  FTimer.Free;
 
   inherited;
 end;
@@ -141,33 +152,6 @@ begin
     end;
   end;
 
-end;
-
-procedure Tcna2MainMenuEntry.OnTimer(Sender: TObject);
-var
-  NTA : INTAServices;
-  ToolsMenu : TMenuItem;
-begin
-  FTimer.Enabled := false;
-
-  if Supports(BorlandIDEServices, INTAServices, NTA) then
-  begin
-    ToolsMenu := FindToolsMenu;
-
-    if Assigned(ToolsMenu) then
-    begin
-      FMenuItem := TMenuItem.Create(ToolsMenu);
-      FMenuItem.Action := actShowDialog;
-      ToolsMenu.Add(FMenuItem);
-    end
-    else
-    begin
-      FMenuItem := nil;
-    end;
-  end;
-
-  if not Assigned(FMenuItem) then
-    FTimer.Enabled := true;
 end;
 
 { TCNA2ShowDialogAction }
