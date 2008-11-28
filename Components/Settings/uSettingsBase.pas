@@ -372,6 +372,7 @@ function SettingsNameStringMatches(AName, APattern : TSettingName; AIsRegEx : Bo
 function SettingsCheckValueType(AVariant : Variant; ARaiseException : Boolean = true) : Boolean;
 
 procedure SettingsApplyAllLinks(AParentComponent: TComponent);
+procedure SettingsSaveAllLinks(AParentComponent: TComponent);
 
 implementation
 
@@ -390,6 +391,22 @@ begin
       TCustomSettingsLink(compo).ApplySettings;
 
     SettingsApplyAllLinks(compo);
+  end;
+end;
+
+procedure SettingsSaveAllLinks(AParentComponent: TComponent);
+var
+  idx : Integer;
+  compo : TComponent;
+begin
+  for idx := 0 to AParentComponent.ComponentCount - 1 do
+  begin
+    compo := AParentComponent.Components[idx];
+
+    if compo is TCustomSettingsLink then
+      TCustomSettingsLink(compo).SaveSettings;
+
+    SettingsSaveAllLinks(compo);
   end;
 end;
 
