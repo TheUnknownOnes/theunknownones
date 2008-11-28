@@ -371,9 +371,27 @@ procedure SettingsInitRegEx(const ARegEx : TRegExpr);
 function SettingsNameStringMatches(AName, APattern : TSettingName; AIsRegEx : Boolean) : Boolean;
 function SettingsCheckValueType(AVariant : Variant; ARaiseException : Boolean = true) : Boolean;
 
+procedure SettingsApplyAllLinks(AParentComponent: TComponent);
+
 implementation
 
 { Helper }
+
+procedure SettingsApplyAllLinks(AParentComponent: TComponent);
+var
+  idx : Integer;
+  compo : TComponent;
+begin
+  for idx := 0 to AParentComponent.ComponentCount - 1 do
+  begin
+    compo := AParentComponent.Components[idx];
+
+    if compo is TCustomSettingsLink then
+      TCustomSettingsLink(compo).ApplySettings;
+
+    SettingsApplyAllLinks(compo);
+  end;
+end;
 
 function SettingsExcludeTrailingPathDelimiter(APath : TSettingName) : TSettingName;
 begin
