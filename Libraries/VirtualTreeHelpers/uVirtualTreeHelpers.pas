@@ -39,6 +39,7 @@ type
 
     function AddFakeChild(ANode : PVirtualNode) : PVirtualNode;
     function HasFakeChild(ANode : PVirtualNode; out AFakeChild : PVirtualNode) : Boolean;
+    function IsFakeNode(ANode : PVirtualNode) : Boolean;
   end;
 
 
@@ -203,7 +204,7 @@ begin
 
   while Assigned(Node) do
   begin
-    if Pointer(GetNodeData(Node)^) = FFakeData then
+    if IsFakeNode(Node) then
     begin
       Result := true;
       AFakeChild := Node;
@@ -212,6 +213,11 @@ begin
 
     Node := GetNextSibling(Node);
   end;
+end;
+
+function TBaseVirtualTreeHelper.IsFakeNode(ANode: PVirtualNode): Boolean;
+begin
+  Result:= Pointer(GetNodeData(ANode)^) = FFakeData;
 end;
 
 procedure TBaseVirtualTreeHelper.ScanEditorKeys(var AKey: Word);
