@@ -370,6 +370,9 @@ begin
   Invalidate;
   FSelectedDay:=FHoveredDay;
 
+  if not Focused then
+    Windows.SetFocus(Handle);
+
   inherited;
 
   Application.ProcessMessages;
