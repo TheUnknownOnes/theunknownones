@@ -14,11 +14,13 @@ type
     FColor: TColor;
     FText: String;
     FFillStyle: TYearCalenderDayFillStyle;
+    FData: TObject;
   published
     property Date : TDate read FDate write FDate;
     property Color : TColor read FColor write FColor;
     property Text : String read FText write FText;
     property FillStyle : TYearCalenderDayFillStyle read FFillStyle write FFillStyle;
+    property Data : TObject read FData write FData;
 
     constructor Create(Collection: TCollection); override;
   end;
@@ -27,6 +29,7 @@ type
   public
     function Add: TYearCalendarDay;
     function QueryByMonth(AYear, AMonth: Integer): TYearCalendarDays;
+    function QueryByDay(ADate : TDate): TYearCalendarDays;
   end;
 
   THoverDayEvent = procedure(Sender: TObject; ADay : TDate) of object;
@@ -77,7 +80,7 @@ type
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
   public
     property SelectedDate : TDate read FSelectedDay;
-
+    
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   published
@@ -87,9 +90,9 @@ type
 
     property Align;
     property Anchors;
-                      
+
     property OnHoverDay : THoverDayEvent read FOnHoverDay write FOnHoverDay;
-    property OnClick;      
+    property OnClick;
   end;
 
 procedure Register;
@@ -406,6 +409,24 @@ begin
   Result:=TYearCalendarDay(inherited Add);
 end;
 
+function TYearCalendarDays.QueryByDay(ADate: TDate): TYearCalendarDays;
+var
+  idx : Integer;
+begin
+  Result:=TYearCalendarDays.Create(ItemClass);
+
+  for idx := 0 to self.Count - 1 do
+    if IsSameDay(TYearCalendarDay(self.Items[idx]).Date, ADate) then
+      with result.Add do
+      begin
+        Date:=TYearCalendarDay(self.Items[idx]).Date;
+        Color:=TYearCalendarDay(self.Items[idx]).Color;
+        Text:=TYearCalendarDay(self.Items[idx]).Text;
+        FillStyle:=TYearCalendarDay(self.Items[idx]).FillStyle;
+        Data:=TYearCalendarDay(self.Items[idx]).Data;
+      end;
+end;
+
 function TYearCalendarDays.QueryByMonth(AYear,
   AMonth: Integer): TYearCalendarDays;
 var
@@ -422,6 +443,7 @@ begin
         Color:=TYearCalendarDay(self.Items[idx]).Color;
         Text:=TYearCalendarDay(self.Items[idx]).Text;
         FillStyle:=TYearCalendarDay(self.Items[idx]).FillStyle;
+        Data:=TYearCalendarDay(self.Items[idx]).Data;
       end;
 end;
 
