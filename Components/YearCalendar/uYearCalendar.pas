@@ -320,7 +320,8 @@ end;
 procedure TYearCalendar.InitGraph(ACanvas : HDC);
 begin
   FGraphics:=TGPGraphics.Create(ACanvas);
-  FGraphics.SetSmoothingMode(CompositingQualityHighQuality);
+  FGraphics.SetCompositingQuality(CompositingQualityHighSpeed);
+  FGraphics.SetSmoothingMode(SmoothingModeHighSpeed);
 
   FBrushSolidBlack:=TGPSolidBrush.Create(MakeColor(0,0,0));
   FBrushSolidWhite:=TGPSolidBrush.Create(MakeColor(255,255,255));
