@@ -12,7 +12,7 @@ uses Windows, Classes, SysUtils, Contnrs, unitResourceElement, AxCtrls;
 type
 TXPManifestResourceElement = class (TAnsiResourceElement)
 public
-  class function GetBaseType : string; override;
+  class function GetBaseType : AnsiString; override;
   procedure InitNew; override;
 end;
 
@@ -48,7 +48,7 @@ const
 '    </dependentAssembly>'#13#10+
 '</dependency>'#13#10+
 '</assembly>';   }
-  manifest : string =
+  manifest : AnsiString =
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
     '<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">'+
     '  <assemblyIdentity version="1.0.0.0"'+
@@ -72,7 +72,7 @@ const
     '  </dependency>' +
     '</assembly>';
 
-class function TXPManifestResourceElement.GetBaseType: string;
+class function TXPManifestResourceElement.GetBaseType: AnsiString;
 begin
   result := IntToStr (Integer (RT_XPMANIFEST));
 end;
@@ -80,7 +80,7 @@ end;
 procedure TXPManifestResourceElement.InitNew;
 begin
   Data.Clear;
-  Data.Write(PChar (manifest)^, Length (manifest))
+  Data.Write(PAnsiChar (manifest)^, Length (manifest))
 end;
 
 initialization

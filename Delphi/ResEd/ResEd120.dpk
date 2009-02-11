@@ -68,7 +68,7 @@
         unitExIcon
 }     
 
-package ResEd100;
+package ResEd120;
 
 {$R *.res}
 {$ALIGN 8}
@@ -98,16 +98,12 @@ package ResEd100;
 
 requires
   designide,
-  vcljpg,
   rtl,
   vcl,
-  tuoscript100,
-  VirtualTreesD10,
-  TntUnicodeVcl,
-  vclactnband,
+  tuoscript120,
+  VirtualTreesD12,
   vclx,
-  vcldb,
-  dbrtl;
+  vclimg;
 
 contains
   UnitResEdExpert in 'Source\UnitResEdExpert.pas',
@@ -121,15 +117,10 @@ contains
   unitResourcePNG in 'ResourceUtils\unitResourcePNG.pas',
   unitResourceRCData in 'ResourceUtils\unitResourceRCData.pas',
   RESEDRegExpr in 'Helper\RESEDRegExpr.pas',
-  ResEd_GIFImage in 'reImageTypes\ResEd_GIFImage.pas',
-  ResEd_PngImage in 'reImageTypes\ResEd_PngImage.pas',
-  ResEd_pnglang in 'reImageTypes\ResEd_pnglang.pas',
-  ResEd_pngzlib in 'reImageTypes\ResEd_pngzlib.pas',
   ResEd_unitExIcon in 'reImageTypes\ResEd_unitExIcon.pas',
   unitResourceMessages in 'ResourceUtils\unitResourceMessages.pas',
   UnitResEdSLEditor in 'Source\UnitResEdSLEditor.pas' {FormResEdSLEditor},
   UnitResEdListForm in 'Source\UnitResEdListForm.pas' {ResEdListForm},
-  ResEdVirtualTrees in 'VirtualTree\ResEdVirtualTrees.pas',
   unitResourceDotNet in 'ResourceUtils\unitResourceDotNet.pas',
   resx in 'ResourceUtils\resx.pas',
   UnitResEdDotNetEditor in 'Source\UnitResEdDotNetEditor.pas' {ResEdDotNetEdit},
@@ -138,6 +129,7 @@ contains
   unitResourceXPManifests in 'ResourceUtils\unitResourceXPManifests.pas',
   UnitResEdManifestEditor in 'Source\UnitResEdManifestEditor.pas' {FormResEdManifestEditor},
   UnitMSXML2_TLB in 'Source\UnitMSXML2_TLB.pas',
+  ResEdVirtualTrees in 'VirtualTree\ResEdVirtualTrees.pas',
   ResEdVTAccessibility in 'VirtualTree\ResEdVTAccessibility.pas',
   ResEdVTAccessibilityFactory in 'VirtualTree\ResEdVTAccessibilityFactory.pas';
 

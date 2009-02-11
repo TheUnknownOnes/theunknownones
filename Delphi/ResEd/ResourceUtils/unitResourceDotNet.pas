@@ -8,30 +8,30 @@ type
 
   TDotNetResourceElement = class (TResourceElement)
     private
-      FType     : String;
-      FMimeType : String;
-      FComment  : String;
-      function GetText: string;
-      procedure SetText(const Value: string);
+      FType     : AnsiString;
+      FMimeType : AnsiString;
+      FComment  : AnsiString;
+      function GetText: AnsiString;
+      procedure SetText(const Value: AnsiString);
     protected
     public
-      property Text : string read GetText write SetText;
-      property rType: string read FType write FType;
-      property MimeType: String read FMimeType write FMimeType;
-      property Comment: String read FComment write FComment;
-      class function GetBaseType : string; override;
+      property Text : AnsiString read GetText write SetText;
+      property rType: AnsiString read FType write FType;
+      property MimeType: AnsiString read FMimeType write FMimeType;
+      property Comment: AnsiString read FComment write FComment;
+      class function GetBaseType : AnsiString; override;
     end;
 
 implementation
 
 { TDotNetResourceElement }
 
-class function TDotNetResourceElement.GetBaseType: string;
+class function TDotNetResourceElement.GetBaseType: AnsiString;
 begin
   result := 'DotNet';
 end;
 
-function TDotNetResourceElement.GetText: string;
+function TDotNetResourceElement.GetText: AnsiString;
 var
   s : TStringStream;
 begin
@@ -46,7 +46,7 @@ begin
   end;
 end;
 
-procedure TDotNetResourceElement.SetText(const Value: string);
+procedure TDotNetResourceElement.SetText(const Value: AnsiString);
 var
   s : TStringStream;
   m : TMemoryStream;

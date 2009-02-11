@@ -96,7 +96,7 @@ begin
 
     manifest:=xml.xml;
     RD.Data.Clear;
-    RD.Data.Write(PChar (manifest)^, Length (manifest))
+    RD.Data.Write(PAnsiChar (manifest)^, Length (manifest))
   end;
 end;
 

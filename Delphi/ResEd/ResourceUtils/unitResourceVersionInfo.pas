@@ -15,15 +15,15 @@ type
 
   TVersionStringValue = class
   private
-    fKeyName : string;
-    fValue : string;
+    fKeyName : AnsiString;
+    fValue : AnsiString;
     fLangId : Integer;
     fCodePage : Integer;
 
   public
-    constructor Create (const AKeyName, AValue : string; ALangId, ACodePage : Integer);
-    property KeyName : string read fKeyName;
-    property Value : string read fValue;
+    constructor Create (const AKeyName, AValue : AnsiString; ALangId, ACodePage : Integer);
+    property KeyName : AnsiString read fKeyName;
+    property Value : AnsiString read fValue;
   end;
 
   TVersionInfoResourceElement = class (TResourceElement)
@@ -34,7 +34,7 @@ type
     fTranslations : TList;
     procedure GetFixedFileInfo;
     procedure UpdateData;
-    procedure ExportToStream (strm : TStream; const ext : string);
+    procedure ExportToStream (strm : TStream; const ext : AnsiString);
 
     function GetFileFlags: TVersionFileFlags;
     function GetFileType : Cardinal;
@@ -47,18 +47,18 @@ type
     procedure SetFileType(const Value: Cardinal);
     procedure SetProductVersion(const Value: TULargeInteger);
   protected
-    constructor Create (AParent : TResourceModule; ALanguage : Integer; const AName, AType : string; ASize : Integer; AData : pointer); override;
+    constructor Create (AParent : TResourceModule; ALanguage : Integer; const AName, AType : AnsiString; ASize : Integer; AData : pointer); override;
     procedure InitNew; override;
   public
-    constructor CreateNew (AParent : TResourceModule; ALanguage : Integer; const AName : string); reintroduce;
+    constructor CreateNew (AParent : TResourceModule; ALanguage : Integer; const AName : AnsiString); reintroduce;
     destructor Destroy; override;
-    class function GetBaseType : string; override;
+    class function GetBaseType : AnsiString; override;
     procedure ChangeData (newData : TMemoryStream); override;
-    function SetKeyValue (const AKeyName, AValue : string) : Integer;
-    procedure ChangeKey (const AOldKey, ANewKey : string);
+    function SetKeyValue (const AKeyName, AValue : AnsiString) : Integer;
+    procedure ChangeKey (const AOldKey, ANewKey : AnsiString);
     procedure DeleteKey (idx : Integer);
     procedure EmptyFixedInfo;
-    function IndexOf (const AKeyName : string) : Integer;
+    function IndexOf (const AKeyName : AnsiString) : Integer;
     property ProductVersion : TULargeInteger read GetProductVersion write SetProductVersion;
     property FileVersion    : TULargeInteger read GetFileVersion write SetFileVersion;
     property FileFlags : TVersionFileFlags read GetFileFlags write SetFileFlags;
@@ -79,11 +79,11 @@ resourcestring
   rstProductVersionChanged = 'change product version';
   rstVersion      = 'Version';
   rstInvalidVersionInfoResource = 'Invalid version info resource';
-  rstStringChanged = 'change string';
-  rstStringAdded = 'add string';
-  rstStringDeleted = 'delete string';
+  rstStringChanged = 'change AnsiString';
+  rstStringAdded = 'add AnsiString';
+  rstStringDeleted = 'delete AnsiString';
   rstCodePageChanged = 'change code page';
-  rstKeyNameChanged = 'change string name';
+  rstKeyNameChanged = 'change AnsiString name';
 
 { TVersionInfoResourceElement }
 
@@ -95,7 +95,7 @@ begin
 end;
 
 procedure TVersionInfoResourceElement.ChangeKey(const AOldKey,
-  ANewKey: string);
+  ANewKey: AnsiString);
 var
   idx : Integer;
 begin
@@ -113,7 +113,7 @@ begin
 end;
 
 constructor TVersionInfoResourceElement.Create(AParent: TResourceModule;
-  ALanguage: Integer; const AName, AType: string; ASize: Integer;
+  ALanguage: Integer; const AName, AType: AnsiString; ASize: Integer;
   AData: pointer);
 begin
   fChildStrings := TObjectList.Create;
@@ -123,7 +123,7 @@ begin
 end;
 
 constructor TVersionInfoResourceElement.CreateNew(AParent: TResourceModule;
-  ALanguage: Integer; const AName: string);
+  ALanguage: Integer; const AName: AnsiString);
 begin
   fChildStrings := TObjectList.Create;
   fTranslations := TList.Create;
@@ -164,11 +164,11 @@ begin
 end;
 
 procedure TVersionInfoResourceElement.ExportToStream(strm: TStream;
-  const ext: string);
+  const ext: AnsiString);
 var
   zeros, v : DWORD;
   wSize : WORD;
-  stringInfoStream : TMemoryStream;
+  StringInfoStream : TMemoryStream;
   strg : TVersionStringValue;
   i, p, p1 : Integer;
   wValue : WideString;
@@ -181,7 +181,7 @@ var
       strm.Write (zeros, 4 - (strm.Position mod 4))
   end;
 
-  procedure SaveVersionHeader (strm : TStream; wLength, wValueLength, wType : word; const key : string; const value);
+  procedure SaveVersionHeader (strm : TStream; wLength, wValueLength, wType : word; const key : AnsiString; const value);
   var
     wKey : WideString;
     valueLen : word;
@@ -216,7 +216,7 @@ begin { ExportToStream }
 
     if fChildStrings.Count > 0 then
     begin
-      stringInfoStream := TMemoryStream.Create;
+      StringInfoStream := TMemoryStream.Create;
       try
         SaveVersionHeader (stringInfoStream, 0, 0, 0, IntToHex (ResourceLanguage, 4) + IntToHex (CodePage, 4), zeros);
 
@@ -224,28 +224,28 @@ begin { ExportToStream }
         begin
           PadStream (stringInfoStream);
 
-          p := stringInfoStream.Position;
+          p := StringInfoStream.Position;
           strg := TVersionStringValue (fChildStrings [i]);
           wValue := strg.fValue;
           SaveVersionHeader (stringInfoStream, 0, Length (strg.fValue) + 1, 1, strg.KeyName, wValue [1]);
-          wSize := stringInfoStream.Size - p;
-          stringInfoStream.Seek (p, soFromBeginning);
-          stringInfoStream.Write (wSize, sizeof (wSize));
-          stringInfoStream.Seek (0, soFromEnd);
+          wSize := StringInfoStream.Size - p;
+          StringInfoStream.Seek (p, soFromBeginning);
+          StringInfoStream.Write (wSize, sizeof (wSize));
+          StringInfoStream.Seek (0, soFromEnd);
 
         end;
 
-        stringInfoStream.Seek (0, soFromBeginning);
-        wSize := stringInfoStream.Size;
-        stringInfoStream.Write (wSize, sizeof (wSize));
+        StringInfoStream.Seek (0, soFromBeginning);
+        wSize := StringInfoStream.Size;
+        StringInfoStream.Write (wSize, sizeof (wSize));
 
         PadStream (strm);
         p := strm.Position;
         SaveVersionHeader (strm, 0, 0, 0, 'StringFileInfo', zeros);
-        strm.Write (stringInfoStream.Memory^, stringInfoStream.size);
+        strm.Write (stringInfoStream.Memory^, StringInfoStream.size);
         wSize := strm.Size - p;
       finally
-        stringInfoStream.Free
+        StringInfoStream.Free
       end;
       strm.Seek (p, soFromBeginning);
       strm.Write (wSize, sizeof (wSize));
@@ -291,7 +291,7 @@ begin { ExportToStream }
     raise Exception.Create ('Invalid version resource');
 end;
 
-class function TVersionInfoResourceElement.GetBaseType: string;
+class function TVersionInfoResourceElement.GetBaseType: AnsiString;
 begin
   result := IntToStr (Integer (RT_VERSION));
 end;
@@ -327,17 +327,17 @@ end;
 
 procedure TVersionInfoResourceElement.GetFixedFileInfo;
 var
-  p : PChar;
+  p : PAnsiChar;
   t, wLength, wValueLength, wType : word;
-  key : string;
+  key : AnsiString;
 
   varwLength, varwValueLength, varwType : word;
-  varKey : string;
+  varKey : AnsiString;
 
-  function GetVersionHeader (var p : PChar; var wLength, wValueLength, wType : word; var key : string) : Integer;
+  function GetVersionHeader (var p : PAnsiChar; var wLength, wValueLength, wType : word; var key : AnsiString) : Integer;
   var
     szKey : PWideChar;
-    baseP : PChar;
+    baseP : PAnsiChar;
   begin
     baseP := p;
     wLength := PWord (p)^;
@@ -354,11 +354,11 @@ var
     key := szKey;
   end;
 
-  procedure GetStringChildren (var base : PChar; len : word);
+  procedure GetStringChildren (var base : PAnsiChar; len : word);
   var
-    p, strBase : PChar;
+    p, strBase : PAnsiChar;
     t, wLength, wValueLength, wType, wStrLength, wStrValueLength, wStrType : word;
-    key, value : string;
+    key, value : AnsiString;
     langID, codePage : Integer;
 
   begin
@@ -397,11 +397,11 @@ var
     base := p
   end;
 
-  procedure GetVarChildren (var base : PChar; len : word);
+  procedure GetVarChildren (var base : PAnsiChar; len : word);
   var
-    p, strBase : PChar;
+    p, strBase : PAnsiChar;
     t, wLength, wValueLength, wType: word;
-    key : string;
+    key : AnsiString;
     v : DWORD;
   begin
     p := base;
@@ -481,7 +481,7 @@ begin
 end;
 
 function TVersionInfoResourceElement.IndexOf(
-  const AKeyName: string): Integer;
+  const AKeyName: AnsiString): Integer;
 var
   i : Integer;
   k : TVersionStringValue;
@@ -590,7 +590,7 @@ begin
 end;
 
 function TVersionInfoResourceElement.SetKeyValue(const AKeyName,
-  AValue: string): Integer;
+  AValue: AnsiString): Integer;
 var
   idx : Integer;
   k : TVersionStringValue;
@@ -645,7 +645,7 @@ end;
 
 { TVersionStringValue }
 
-constructor TVersionStringValue.Create(const AKeyName, AValue: string; ALangId, ACodePage : Integer);
+constructor TVersionStringValue.Create(const AKeyName, AValue: AnsiString; ALangId, ACodePage : Integer);
 begin
   fKeyName := AKeyName;
   fValue := AValue;

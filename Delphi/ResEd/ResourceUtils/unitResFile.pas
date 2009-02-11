@@ -25,7 +25,7 @@ end;
 TResModule = class (TResourceList)
 private
   f16Bit : boolean;
-  procedure ParseResource(header, data: PChar; dataSize: Integer);
+  procedure ParseResource(header, data: PAnsiChar; dataSize: Integer);
 protected
 public
   procedure SaveToStream (stream : TStream); override;
@@ -36,9 +36,9 @@ implementation
 
 { TResModule }
 
-procedure TResModule.ParseResource (header, data : PChar; dataSize : Integer);
+procedure TResModule.ParseResource (header, data : PAnsiChar; dataSize : Integer);
 var
-  p : PChar;
+  p : PAnsiChar;
   sName, sType : string;
   res : TResourceElement;
   language, memoryFlags : word;
@@ -96,7 +96,7 @@ end;
 
 procedure TResModule.LoadFromStream(stream: TStream);
 var
-  buffer, p, q : PChar;
+  buffer, p, q : PAnsiChar;
   bufLen, n, DataSize, HeaderSize, ChunkSize : Integer;
 begin
   bufLen := stream.Size;
@@ -134,10 +134,10 @@ procedure TResModule.SaveToStream(stream: TStream);
 var
   res : TResourceElement;
   dataSize, headerSize, totalSize : Integer;
-  header : array [0..1023] of char;
+  header : array [0..1023] of ansichar;
   i : Integer;
 
-  function GetResHeader (header : PChar) : DWORD;
+  function GetResHeader (header : PAnsiChar) : DWORD;
   var
     pos : DWORD;
     len, dw : DWORD;

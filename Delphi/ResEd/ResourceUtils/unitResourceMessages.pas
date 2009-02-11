@@ -18,15 +18,15 @@ TStringInfo = class
 private
   fId : Integer;
   fUnicode : boolean;
-  fST : string;
+  fST : AnsiString;
 public
-  constructor Create (const ASt : string; AId : Integer; AUnicode : boolean);
+  constructor Create (const ASt : AnsiString; AId : Integer; AUnicode : boolean);
 end;
 
 //-------------------------------------------------------------------------
 // TTextResourceElement
 //
-// Base class for messages & strings
+// Base class for messages & Strings
 TTextResourceSort = (trString, trID, trReverseString, trReverseID);
 TTextResourceElement = class (TResourceElement)
 private
@@ -35,10 +35,10 @@ private
   fUnicode : Boolean;
   function GetCount: Integer;
   procedure GetStrings;
-  function GetString(idx: Integer): string;
+  function GetString(idx: Integer): AnsiString;
   function GetId(idx: Integer): Integer;
   procedure SetId(idx: Integer; const Value: Integer);
-  procedure SetString(idx: Integer; const Value: string);
+  procedure SetString(idx: Integer; const Value: AnsiString);
 protected
   procedure DecodeStrings; virtual; abstract;
   procedure EncodeStrings; virtual; abstract;
@@ -52,7 +52,7 @@ public
   function IndexOfID (id : Integer) : Integer;
 
   property Count : Integer read GetCount;
-  property Strings [idx : Integer] : string read GetString write SetString;
+  property Strings [idx : Integer] : AnsiString read GetString write SetString;
   property Ids [idx : Integer] : Integer read GetId write SetId;
 
 end;
@@ -68,7 +68,7 @@ protected
   procedure InitNew; override;
 
 public
-  class function GetBaseType : string; override;
+  class function GetBaseType : AnsiString; override;
 end;
 
 //-------------------------------------------------------------------------
@@ -79,17 +79,17 @@ protected
   procedure DecodeStrings; override;
   procedure EncodeStrings; override;
   procedure InitNew; override;
-  procedure SetResourceName(const Value: string); override;
+  procedure SetResourceName(const Value: AnsiString); override;
 
 public
-  class function GetBaseType : string; override;
+  class function GetBaseType : AnsiString; override;
 end;
 
 //-------------------------------------------------------------------------
 // Global functions declarations
 
-function ResIdToStringsId (const resourceName : string) : string;
-function StringsIdToResId (const stringsId : string) : string;
+function ResIdToStringsId (const resourceName : AnsiString) : AnsiString;
+function StringsIdToResId (const StringsId : AnsiString) : AnsiString;
 
 implementation
 
@@ -104,12 +104,12 @@ type
 //-------------------------------------------------------------------------
 // Global functions definitions
 
-function ResIdToStringsId (const resourceName : string) : string;
+function ResIdToStringsId (const resourceName : AnsiString) : AnsiString;
 begin
   Result := IntToStr ((StrToInt (resourceName) - 1) * 16)
 end;
 
-function StringsIdToResId (const stringsId : string) : string;
+function StringsIdToResId (const StringsId : AnsiString) : AnsiString;
 begin
   Result := IntToStr (StrToInt (stringsId) div 16 + 1)
 end;
@@ -118,13 +118,13 @@ end;
 (*----------------------------------------------------------------------*
  | TStringResourceElement.DecodeStrings                                 |
  |                                                                      |
- | Extract strings from string table into fStrings list                 |
+ | Extract Strings from String table into fStrings list                 |
  *----------------------------------------------------------------------*)
 procedure TStringResourceElement.DecodeStrings;
 var
   p : PWideChar;
   cnt, id : Integer;
-  st : string;
+  st : AnsiString;
 begin
   p := PWideChar (Data.Memory);
   cnt := 0;
@@ -141,7 +141,7 @@ end;
 (*----------------------------------------------------------------------*
  | TStringResourceElement.EncodeStrings                                 |
  |                                                                      |
- | Encode strings from fStrings list into string table                  |
+ | Encode Strings from fStrings list into String table                  |
  *----------------------------------------------------------------------*)
 procedure TStringResourceElement.EncodeStrings;
 var
@@ -149,7 +149,7 @@ var
   p : PWideChar;
 begin
                                 // Calculate total size of the 16 null-terminated
-                                // wide strings.
+                                // wide Strings.
   n := 16 * sizeof (WideChar);
   for i := 0 to Count - 1 do
     if i < Count then
@@ -163,7 +163,7 @@ begin
     ResourceStrToWideChar (Strings [i], p, CodePage);
 end;
 
-class function TStringResourceElement.GetBaseType: string;
+class function TStringResourceElement.GetBaseType: AnsiString;
 begin
   result := IntToStr (Integer (RT_STRING));
 end;
@@ -178,7 +178,7 @@ begin
     data.Write (wc, SizeOf (wc))
 end;
 
-procedure TStringResourceElement.SetResourceName(const Value: string);
+procedure TStringResourceElement.SetResourceName(const Value: AnsiString);
 var
   i, id : Integer;
 
@@ -198,13 +198,13 @@ end;
 zur Verwendung
 
 var
-  buf: string;
+  buf: AnsiString;
 begin
 FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER or
               FORMAT_MESSAGE_IGNORE_INSERTS or
               FORMAT_MESSAGE_FROM_SYSTEM or
               FORMAT_MESSAGE_FROM_HMODULE,
-              NIL,1,LANG_NEUTRAL, PChar(@buf), 0, nil);
+              NIL,1,LANG_NEUTRAL, PAnsiChar(@buf), 0, nil);
 Memo1.Text:=buf;
 end;  
 }
@@ -213,13 +213,13 @@ procedure TMessageResourceElement.DecodeStrings;
 var
   i, blockCount, id : Integer;
   block : PMessageResourceBlock;
-  p : PChar;
+  p : PAnsiChar;
   len, flags : word;
   gotUnicode : Boolean;
 begin
   blockCount := PInteger (Data.Memory)^;
 
-  block := PMessageResourceBlock (PChar (Data.Memory) + sizeof (Integer));
+  block := PMessageResourceBlock (PAnsiChar (Data.Memory) + sizeof (Integer));
 
   gotUnicode := False;
   for i := 0 to blockCount - 1 do
@@ -303,7 +303,7 @@ begin
     begin
       if lastId <> -2 then
         block^.highID := lastId;
-      block := PMessageResourceBlock (PChar (data.Memory) + sizeof (Integer));
+      block := PMessageResourceBlock (PAnsiChar (data.Memory) + sizeof (Integer));
       Inc (block, blockCount);
       block^.lowID := id;
       block^.entryOffset := offset;
@@ -317,19 +317,19 @@ begin
 
     len := (len + 3) div 4 * 4;
 
-    PWORD (PChar (data.Memory) + offset)^ := 2 * sizeof (word) + len;
+    PWORD (PAnsiChar (data.Memory) + offset)^ := 2 * sizeof (word) + len;
     Inc (offset, sizeof (WORD));
 
-    PWORD (PChar (data.Memory) + offset)^ := uniCode;
+    PWORD (PAnsiChar (data.Memory) + offset)^ := uniCode;
     Inc (offset, sizeof (WORD));
 
-    ZeroMemory (PChar (data.Memory) + offset, len);
+    ZeroMemory (PAnsiChar (data.Memory) + offset, len);
     if uniCode = 0 then
-      lstrcpy (PChar (data.Memory) + offset, PChar (Strings [i]))
+      lstrcpyA (PAnsiChar (data.Memory) + offset, PAnsiChar (Strings [i]))
     else
     begin
       ws := Strings [i];
-      lstrcpyw (PWideChar (PChar (data.Memory) + offset), PWideChar (ws));
+      lstrcpyw (PWideChar (PAnsiChar (data.Memory) + offset), PWideChar (ws));
     end;
     Inc (offset, len)
   end;
@@ -337,7 +337,7 @@ begin
     block^.highID := lastId;
 end;
 
-class function TMessageResourceElement.GetBaseType: string;
+class function TMessageResourceElement.GetBaseType: AnsiString;
 begin
   result := IntToStr (Integer (RT_MESSAGETABLE));
 end;
@@ -401,7 +401,7 @@ begin
   result := TStringInfo (fStrings [idx]).fID;
 end;
 
-function TTextResourceElement.GetString(idx: Integer): string;
+function TTextResourceElement.GetString(idx: Integer): AnsiString;
 begin
   GetStrings;
   result := TStringInfo (fStrings [idx]).fST;
@@ -441,7 +441,7 @@ begin
 end;
 
 procedure TTextResourceElement.SetString(idx: Integer;
-  const Value: string);
+  const Value: AnsiString);
 begin
   if idx = fStrings.Count then
     fStrings.Add (TStringInfo.Create (Value, idx, fUnicode))
@@ -484,7 +484,7 @@ end;
 
 { TStringInfo }
 
-constructor TStringInfo.Create(const ASt : string; AId: Integer; AUnicode : boolean);
+constructor TStringInfo.Create(const ASt : AnsiString; AId: Integer; AUnicode : boolean);
 begin
   fSt := ASt;
   fID := AId;

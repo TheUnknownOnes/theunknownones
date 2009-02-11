@@ -2,7 +2,11 @@ unit unitResourceGIF;
 
 interface
 
-uses Windows, Classes, SysUtils, graphics, resed_gifimage, unitResourceElement,
+uses Windows, Classes, SysUtils, graphics,
+     {$ifndef VER200}resed_gifimage,
+     {$else}GIFImg,
+     {$endif}
+     unitResourceElement,
      unitResourceGraphics;
 
 type
@@ -17,7 +21,7 @@ type
     procedure InitNew; override;
     class function SupportsData (Size : Integer; data : Pointer) : Boolean; override;
   public
-    class function GetBaseType : string; override;
+    class function GetBaseType : AnsiString; override;
     procedure GetImage (picture : TPicture); override;
   end;
 
@@ -26,14 +30,14 @@ implementation
 
 { TGifResourceElement }
 
-class function TGifResourceElement.GetBaseType: string;
+class function TGifResourceElement.GetBaseType: AnsiString;
 begin
   Result := 'GIF';
 end;
 
 function TGifResourceElement.GetHeight: Integer;
 begin
-  Result := PWORD (PChar (data) + 6 + SizeOf (Word))^;
+  Result := PWORD (PAnsiChar (data) + 6 + SizeOf (Word))^;
 end;
 
 procedure TGifResourceElement.GetImage(picture: TPicture);
@@ -50,7 +54,7 @@ end;
 
 function TGifResourceElement.GetWidth: Integer;
 begin
-  result := PWORD (PChar (data) + 6)^;
+  result := PWORD (PAnsiChar (data) + 6)^;
 end;
 
 procedure TGifResourceElement.InitNew;
@@ -75,9 +79,9 @@ end;
 class function TGifResourceElement.SupportsData(Size: Integer;
   data: Pointer): Boolean;
 var
-  p : PChar;
+  p : PAnsiChar;
 begin
-  p := PChar (data);
+  p := PAnsiChar (data);
 
   Result := (StrLIComp (p, 'GIF87', 5) = 0) or (StrLIComp (p, 'GIF89', 5) = 0);
 end;

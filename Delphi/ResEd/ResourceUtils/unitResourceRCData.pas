@@ -12,27 +12,27 @@ uses Windows, Classes, SysUtils, Contnrs, unitResourceElement;
 type
 TRCDataResourceElement = class (TResourceElement)
 public
-  class function GetBaseType : string; override;
+  class function GetBaseType : AnsiString; override;
 end;
 
 TRCDataDescriptionResourceElement = class (TRCDataResourceElement)
 private
-  function GetDescription: string;
-  procedure SetDescription(const Value: string);
+  function GetDescription: AnsiString;
+  procedure SetDescription(const Value: AnsiString);
 protected
-  class function SupportsRCData (const AName : string; Size : Integer; data : Pointer) : Boolean; override;
+  class function SupportsRCData (const AName : AnsiString; Size : Integer; data : Pointer) : Boolean; override;
 public
-  property Description : string read GetDescription write SetDescription;
+  property Description : AnsiString read GetDescription write SetDescription;
 end;
 
 TRCDataFormResourceElement = class (TRCDataResourceElement)
   private
-  function GetText: string;
-  procedure SetText(const Value: string);
+  function GetText: AnsiString;
+  procedure SetText(const Value: AnsiString);
 protected
-  class function SupportsRCData (const AName : string; Size : Integer; data : Pointer) : Boolean; override;
+  class function SupportsRCData (const AName : AnsiString; Size : Integer; data : Pointer) : Boolean; override;
 public
-  property Text : string read GetText write SetText;
+  property Text : AnsiString read GetText write SetText;
 end;
 
 TPackageEnvironment = (pePreV4, peUndefine, peBCB, peDelphi);
@@ -45,9 +45,9 @@ private
   fFlags : DWORD;
 
   function GetRequiresCount: Integer;
-  function GetRequires(idx : Integer): string;
+  function GetRequires(idx : Integer): AnsiString;
   function GetContainsCount: Integer;
-  function GetContains(idx: Integer): string;
+  function GetContains(idx: Integer): AnsiString;
   function GetContainsFlag(idx: Integer): Byte;
 
   procedure DecodeData;
@@ -58,14 +58,14 @@ private
   function GetNeverBuild: Boolean;
   function GetRunTimeOnly: Boolean;
 protected
-  class function SupportsRCData (const AName : string; Size : Integer; data : Pointer) : Boolean; override;
+  class function SupportsRCData (const AName : AnsiString; Size : Integer; data : Pointer) : Boolean; override;
 public
   destructor Destroy; override;
   procedure ChangeData (newData : TMemoryStream); override;
   property RequiresCount : Integer read GetRequiresCount;
-  property Requires [idx : Integer] : string read GetRequires;
+  property Requires [idx : Integer] : AnsiString read GetRequires;
   property ContainsCount : Integer read GetContainsCount;
-  property Contains [idx : Integer] : string read GetContains;
+  property Contains [idx : Integer] : AnsiString read GetContains;
   property ContainsFlag [idx : Integer] : Byte read GetContainsFlag;
 
   property NeverBuild : Boolean read GetNeverBuild;
@@ -107,20 +107,20 @@ type
 
 { TRCDataResourceElement }
 
-class function TRCDataResourceElement.GetBaseType: string;
+class function TRCDataResourceElement.GetBaseType: AnsiString;
 begin
   result := IntToStr (Integer (RT_RCDATA));
 end;
 
 { TRCDataDescriptionResourceElement }
 
-function TRCDataDescriptionResourceElement.GetDescription: string;
+function TRCDataDescriptionResourceElement.GetDescription: AnsiString;
 begin
   Result := PWideChar (data.Memory);
 end;
 
 procedure TRCDataDescriptionResourceElement.SetDescription(
-  const Value: string);
+  const Value: AnsiString);
 var
   ws : WideString;
 begin
@@ -130,7 +130,7 @@ begin
 end;
 
 class function TRCDataDescriptionResourceElement.SupportsRCData(
-  const AName: string; Size: Integer; data: Pointer): Boolean;
+  const AName: AnsiString; Size: Integer; data: Pointer): Boolean;
 begin
   Result := CompareText (AName, 'DESCRIPTION') = 0;
 end;
@@ -147,7 +147,7 @@ end;
 
 procedure TRCDataPackagesResourceElement.DecodeData;
 var
-  p : PChar;
+  p : PAnsiChar;
   i, Count : Integer;
   pkg : PPkgName;
   unt : PUnitName;
@@ -198,7 +198,7 @@ begin
   Result := (fFlags and 8) = 0
 end;
 
-function TRCDataPackagesResourceElement.GetContains(idx: Integer): string;
+function TRCDataPackagesResourceElement.GetContains(idx: Integer): AnsiString;
 begin
   DecodeData;
   Result := fContainsList [idx]
@@ -241,7 +241,7 @@ begin
   Result := (fFlags and 1) <> 0
 end;
 
-function TRCDataPackagesResourceElement.GetRequires(idx : Integer): string;
+function TRCDataPackagesResourceElement.GetRequires(idx : Integer): AnsiString;
 begin
   DecodeData;
   Result := fRequiresList [idx]
@@ -260,14 +260,14 @@ begin
 end;
 
 class function TRCDataPackagesResourceElement.SupportsRCData(
-  const AName: string; Size: Integer; data: Pointer): Boolean;
+  const AName: AnsiString; Size: Integer; data: Pointer): Boolean;
 begin
   Result := CompareText (AName, 'PACKAGEINFO') = 0;
 end;
 
 { TRCDataFormResourceElement }
 
-function TRCDataFormResourceElement.GetText: string;
+function TRCDataFormResourceElement.GetText: AnsiString;
 var
   s : TStringStream;
 begin
@@ -281,7 +281,7 @@ begin
   end
 end;
 
-procedure TRCDataFormResourceElement.SetText(const Value: string);
+procedure TRCDataFormResourceElement.SetText(const Value: AnsiString);
 var
   s : TStringStream;
   m : TMemoryStream;
@@ -302,9 +302,9 @@ begin
 end;
 
 class function TRCDataFormResourceElement.SupportsRCData(
-  const AName: string; Size: Integer; data: Pointer): Boolean;
+  const AName: AnsiString; Size: Integer; data: Pointer): Boolean;
 begin
-  Result := (Size > 0) and (strlcomp (PChar (data), 'TPF0', 4) = 0);
+  Result := (Size > 0) and (strlcomp (PAnsiChar (data), 'TPF0', 4) = 0);
 end;
 
 initialization

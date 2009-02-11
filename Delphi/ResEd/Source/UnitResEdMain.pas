@@ -85,7 +85,7 @@ type
     procedure miAddToSrcClick(Sender: TObject);
     procedure miRefreshClick(Sender: TObject);
     procedure TVNewText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; NewText: WideString);
+      Column: TColumnIndex; NewText: UnicodeString);
     procedure TVEditing(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; var Allowed: Boolean);
     procedure miCreateResourceFileClick(Sender: TObject);
@@ -104,9 +104,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure TVGetHint(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; var LineBreakStyle: TVTTooltipLineBreakStyle;
-      var HintText: WideString);
+      var HintText: UnicodeString);
     procedure TVGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: UnicodeString);
     procedure TVGetNodeDataSize(Sender: TBaseVirtualTree;
       var NodeDataSize: Integer);
     procedure FormShow(Sender: TObject);
@@ -861,7 +861,7 @@ end;
 
 procedure TFormWizardResEd.TVGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
-  var CellText: WideString);
+  var CellText: UnicodeString);
 var
   NodeData : PNodeData;
 begin
@@ -876,7 +876,7 @@ end;
 
 procedure TFormWizardResEd.TVGetHint(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex;
-  var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: WideString);
+  var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: UnicodeString);
 var
   NodeData : PNodeData;
 begin
@@ -907,7 +907,7 @@ begin
 end;
 
 procedure TFormWizardResEd.TVNewText(Sender: TBaseVirtualTree;
-  Node: PVirtualNode; Column: TColumnIndex; NewText: WideString);
+  Node: PVirtualNode; Column: TColumnIndex; NewText: UnicodeString);
 begin
   RenameResource(Node, NewText);
 end;
@@ -1514,7 +1514,7 @@ begin
           begin
             Writer:=Editor.CreateUndoableWriter;
             Writer.CopyTo(insertPos);
-            Writer.Insert(PChar(#13#10#13#10'{$R '''+FileName+'''}'));
+            Writer.Insert(PAnsiChar(#13#10#13#10'{$R '''+FileName+'''}'));
           end
         end;
 

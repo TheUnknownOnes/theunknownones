@@ -26,7 +26,12 @@ unit ResEd_unitExIcon;
 
 interface
 
-uses Windows, Classes, SysUtils, Graphics, Controls, ResEd_PNGImage;
+uses Windows, Classes, SysUtils, Graphics, Controls,
+     {$ifndef VER200}
+       resEd_PngImage
+     {$else}
+       PngImage
+     {$endif};
 
 type
 
@@ -564,12 +569,12 @@ end;
  |                                                                            |
  | But see MSDN PRB: Trouble Using DIBSection as a Monochrome Mask            |
  *----------------------------------------------------------------------------*)
-procedure MaskBitmapBits (bits : PChar; pixelFormat : TPixelFormat; mask : PChar; width, height : DWORD; palette : HPalette);
+procedure MaskBitmapBits (bits : PAnsiChar; pixelFormat : TPixelFormat; mask : PAnsiChar; width, height : DWORD; palette : HPalette);
 var
   bpScanline, maskbpScanline : Integer;
   bitsPerPixel, i, j : Integer;
   maskbp, bitbp : byte;
-  maskp, bitp : PChar;
+  maskp, bitp : PAnsiChar;
   maskPixel : boolean;
   maskByte: dword;
   maskU : UINT;
@@ -634,7 +639,7 @@ begin
                   end
               end;
                                              // Apply the mask
-              bitp^ := char ((byte (bitp^) and (not maskByte)) or maskColorByte);
+              bitp^ := ansichar ((byte (bitp^) and (not maskByte)) or maskColorByte);
             end;
 
           15, 16 :
@@ -754,7 +759,7 @@ procedure TExIconCursor.AssignFromGraphic (source : TGraphic);
 var
   src, maskBmp : TBitmap;
   offset, infoHeaderSize, imageSize, maskImageSize : DWORD;
-  colorBits, maskBits : PChar;
+  colorBits, maskBits : PAnsiChar;
   image : TExIconImage;
   info : PBitmapInfo;
   maskInfo : PBitmapInfo;
@@ -806,8 +811,8 @@ begin
 
       image.FMemoryImage.Size := infoHeaderSize + imageSize + maskImageSize + offset;
 
-      info := PBitmapInfo (PChar (image.FMemoryImage.Memory) + offset);
-      colorBits := PChar (info) + infoHeaderSize;
+      info := PBitmapInfo (PAnsiChar (image.FMemoryImage.Memory) + offset);
+      colorBits := PAnsiChar (info) + infoHeaderSize;
       maskBits := colorBits + imageSize;
 
       InternalGetDib (src.Handle, Palette, info, colorBits^, PixelFormat);
@@ -936,7 +941,7 @@ var
   info : PBitmapInfo;
   hdr : PBitmapInfoHeader;
   monoInfo : PBitmapInfo;
-  bits : PChar;
+  bits : PAnsiChar;
 begin
   with fImages [fCurrentImage] do
     if Assigned (fMemoryImage) then
@@ -965,7 +970,7 @@ begin
           GetBitmapInfoSizes (hdr^, bitsOffset, bitsSize, False);
 
                                                   // Create Color Bitmap from Color bits & ColorTable
-          colorBmp := GDICheck (CreateDIBitmap (dc, info^.bmiHeader, CBM_INIT, PChar (info) + bitsOffset, info^, DIB_RGB_COLORS));
+          colorBmp := GDICheck (CreateDIBitmap (dc, info^.bmiHeader, CBM_INIT, PAnsiChar (info) + bitsOffset, info^, DIB_RGB_COLORS));
           colorDC := GDICheck (CreateCompatibleDC (0));
           oldColorBmp := GDICheck (SelectObject(colorDC, colorBmp));
 
@@ -979,7 +984,7 @@ begin
             Move (hdr^, monoInfo^, sizeof (TBitmapInfoHeader));
             monoInfo^.bmiHeader.biBitCount := 1;
             monoInfo^.bmiHeader.biCompression := 0;
-            with PRGBQUAD (PChar (monoInfo) + sizeof (TBitmapInfoHeader) + sizeof (RGBQUAD))^ do
+            with PRGBQUAD (PAnsiChar (monoInfo) + sizeof (TBitmapInfoHeader) + sizeof (RGBQUAD))^ do
             begin
               rgbRed := $ff;
               rgbGreen := $ff;
@@ -988,7 +993,7 @@ begin
             end;
 
             monoBmp := GDICheck (CreateBitmap (hdr^.biWidth, hdr^.biHeight, 1, 1, Nil));
-            bits := PChar (info) + bitsOffset + bitsSize;
+            bits := PAnsiChar (info) + bitsOffset + bitsSize;
             monoDC := GDICheck (CreateCompatibleDC (0));
             GDICheck (SetDIBits (monoDC, monoBmp, 0, hdr^.biHeight, bits, monoInfo^, DIB_RGB_COLORS));
             oldMonoBmp := GDICheck (SelectObject(monoDC, monoBmp));
@@ -1002,7 +1007,7 @@ begin
           end
           else
             with rect do
-              StretchDIBits (ACanvas.Handle, left, top, right - left, bottom - top, 0, 0, hdr^.biWidth, hdr^.biHeight, PChar (info) + bitsOffset, info^, DIB_RGB_COLORS, SRCCOPY);
+              StretchDIBits (ACanvas.Handle, left, top, right - left, bottom - top, 0, 0, hdr^.biWidth, hdr^.biHeight, PAnsiChar (info) + bitsOffset, info^, DIB_RGB_COLORS, SRCCOPY);
         
         finally
           if not FImages[FCurrentImage].PNGCompressed then
@@ -1482,7 +1487,7 @@ procedure TExIconCursor.SaveToClipboardFormat(var AFormat: Word;
 var
   info : PBitmapInfo;
   InfoHeaderSize, ImageSize, monoSize : DWORD;
-  buf : PChar;
+  buf : PAnsiChar;
 begin
   AFormat := CF_DIB;
   ImageNeeded;
@@ -1741,7 +1746,7 @@ begin
     if FIsIcon then
       result := PBitmapInfo (FMemoryImage.Memory)
     else
-      result := PBitmapInfo (PChar (FMemoryImage.Memory) + sizeof (DWORD))
+      result := PBitmapInfo (PAnsiChar (FMemoryImage.Memory) + sizeof (DWORD))
   else
     result := Nil
 end;
@@ -1753,11 +1758,11 @@ end;
 
 {Characters for the header}
 const
-  PngHeader: Array[0..7] of Char = (#137, #80, #78, #71, #13, #10, #26, #10);
+  PngHeader: Array[0..7] of AnsiChar = (#137, #80, #78, #71, #13, #10, #26, #10);
 
 procedure TExIconImage.CheckForPNGCompression;
 var
-  Header : Array[0..7] of Char;
+  Header : Array[0..7] of AnsiChar;
 begin
   FMemoryImage.Seek(0, soBeginning);
   FMemoryImage.Read(Header,8);

@@ -28,18 +28,18 @@ type
     procedure InitNew; override;
     class function SupportsData (Size : Integer; data : Pointer) : Boolean; override;
   public
-    class function GetBaseType : string; override;
+    class function GetBaseType : AnsiString; override;
     procedure GetImage (picture : TPicture); override;
     procedure SetImage (image : TPicture); override;
   end;
 
 implementation
 
-function FindJPegSegment (var data : PChar; segment : byte) : Boolean;
+function FindJPegSegment (var data : PAnsiChar; segment : byte) : Boolean;
 const
   ParameterlessSegments = #$01#$d0#$d1#$d2#$d3#$d4#$d5#$d6#$d7#$d8#$d9;
 var
-  p : PChar;
+  p : PAnsiChar;
   seg : Byte;
   len : Word;
 begin
@@ -77,7 +77,7 @@ begin
   until False
 end;
 
-procedure GetJPegSize (data : PChar; var Width, Height : Integer);
+procedure GetJPegSize (data : PAnsiChar; var Width, Height : Integer);
 var
   len : Integer;
 begin
@@ -98,7 +98,7 @@ end;
 
 { TJPegResourceElement }
 
-class function TJPegResourceElement.GetBaseType: string;
+class function TJPegResourceElement.GetBaseType: AnsiString;
 begin
   Result := 'JPEG'
 end;
@@ -165,13 +165,13 @@ var
 begin
   Result := False;
   if PWORD (data)^ = $d8ff then
-    if FindJPegSegment (PChar (data), $e0) then
+    if FindJPegSegment (PAnsiChar (data), $e0) then
     begin
-      len := 256 * Byte (PChar (data)^) + Byte ((PChar (data) + 1)^);
+      len := 256 * Byte (PAnsiChar (data)^) + Byte ((PAnsiChar (data) + 1)^);
 
       if len >= 16 then
       begin
-        Inc (PChar (data), 2);
+        Inc (PAnsiChar (data), 2);
 
         if StrLIComp (data, 'JFIF', 4) = 0 then
           Result := True

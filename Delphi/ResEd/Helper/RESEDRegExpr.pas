@@ -1,4 +1,4 @@
-unit RESEDRegExpr;
+unit ResEdRegExpr;
 
 {
      TRegExpr class library
@@ -50,8 +50,8 @@ interface
 {$IFDEF VER140} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$ENDIF} // D6
 {$IFDEF VER150} {$DEFINE D7} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$ENDIF} // D7
 {$IFDEF VER170} {$DEFINE D9} {$DEFINE D7} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$ENDIF} // D7
-{$IFDEF VER180} {$DEFINE D10} {$DEFINE D9} {$DEFINE D7} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$ENDIF} // D7
-{$IFDEF VER190} {$DEFINE D10} {$DEFINE D9} {$DEFINE D7} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$ENDIF} // D7
+{$IFDEF VER180} {$DEFINE D10} {$DEFINE D9} {$DEFINE D7} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$ENDIF} // D8
+{$IFDEF VER200} {$DEFINE D12} {$DEFINE D11} {$DEFINE D10} {$DEFINE D9} {$DEFINE D7} {$DEFINE D6} {$DEFINE D5} {$DEFINE D4} {$DEFINE D3} {$DEFINE D2} {$ENDIF} // D8
 
 // ======== Define base compiler options
 {$BOOLEVAL OFF}
@@ -68,6 +68,9 @@ interface
 {$ENDIF}
 {$IFDEF FPC}
  {$MODE DELPHI} // Delphi-compatible mode in FreePascal
+{$ENDIF}
+{$IFDEF D12}
+
 {$ENDIF}
 
 // ======== Define options for TRegExpr engine

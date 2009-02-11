@@ -7,7 +7,10 @@ unit unitResourcePNG;
 
 interface
 
-uses Windows, Classes, SysUtils, graphics, resed_pngimage, unitResourceElement,
+uses Windows, Classes, SysUtils, graphics
+     {$ifndef VER200}, resEd_PngImage
+     {$else}, PNGImage{$endif}
+     ,unitResourceElement,
      unitResourceGraphics;
 
 type
@@ -21,7 +24,7 @@ type
     function GetWidth: Integer; override;
     class function SupportsData (Size : Integer; data : Pointer) : Boolean; override;
   public
-    class function GetBaseType : string; override;
+    class function GetBaseType : AnsiString; override;
     procedure GetImage (picture : TPicture); override;
   end;
 
@@ -30,14 +33,14 @@ implementation
 
 { TPngResourceElement }
 
-class function TPngResourceElement.GetBaseType: string;
+class function TPngResourceElement.GetBaseType: AnsiString;
 begin
   Result := 'PNG';
 end;
 
 function TPngResourceElement.GetHeight: Integer;
 begin
-  Result := PWORD (PChar (data) + 6 + SizeOf (Word))^;
+  Result := PWORD (PAnsiChar (data) + 6 + SizeOf (Word))^;
 end;
 
 procedure TPngResourceElement.GetImage(picture: TPicture);
@@ -57,15 +60,15 @@ end;
 
 function TPngResourceElement.GetWidth: Integer;
 begin
-  result := PWORD (PChar (data) + 6)^;
+  result := PWORD (PAnsiChar (data) + 6)^;
 end;
 
 class function TPngResourceElement.SupportsData(Size: Integer;
   data: Pointer): Boolean;
 var
-  p : PChar;
+  p : PAnsiChar;
 begin
-  p := PChar (data);
+  p := PAnsiChar (data);
   Inc (p);
 
   Result := (StrLIComp (p, 'PNG', 3) = 0);

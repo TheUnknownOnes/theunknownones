@@ -49,16 +49,16 @@ public
   procedure InsertResource (idx : Integer; Element : TResourceElement); virtual;
   function AddResource (Element : TResourceElement) : Integer; virtual;
   function IndexOfResource (Element : TResourceElement) : Integer; virtual; abstract;
-  function GetUniqueResourceName (const tp : string) : string;
+  function GetUniqueResourceName (const tp : AnsiString) : AnsiString;
 
   procedure SaveToStream (stream : TStream); virtual;
   procedure LoadFromStream (stream : TStream); virtual;
 
-  procedure SaveToFile (const FileName : string); virtual;
-  procedure LoadFromFile (const FileName : string); virtual;
+  procedure SaveToFile (const FileName : AnsiString); virtual;
+  procedure LoadFromFile (const FileName : AnsiString); virtual;
   procedure SortResources; virtual;
 
-  function FindResource (const tp, Name : string; ALanguage : Integer) : TResourceElement;
+  function FindResource (const tp, Name : AnsiString; ALanguage : Integer) : TResourceElement;
 
   property ResourceCount : Integer read GetResourceCount;
   property ResourceElement [idx : Integer] : TResourceElement read GetResourceElement;
@@ -77,8 +77,8 @@ private
   fData : TMemoryStream;
   fCodePage : Integer;
   fResourceLanguage: LCID;
-  fResourceName: string;
-  fResourceType: string;
+  fResourceName: AnsiString;
+  fResourceType: AnsiString;
 
   fMemoryFlags : word;                    // Resource memory flags
   fDataVersion, fVersion : DWORD;         // Resource header version info
@@ -88,17 +88,17 @@ private
                                          // Resource header characteristics
 
 protected
-  constructor Create (AParent : TResourceModule; ALanguage : Integer; const AName, AType : string; ASize : Integer; AData : pointer); virtual;
+  constructor Create (AParent : TResourceModule; ALanguage : Integer; const AName, AType : AnsiString; ASize : Integer; AData : pointer); virtual;
   procedure InitNew; virtual;
-  procedure SetResourceName(const Value: string); virtual;
-  class function SupportsRCData (const AName : string; Size : Integer; data : Pointer) : Boolean; virtual;
+  procedure SetResourceName(const Value: AnsiString); virtual;
+  class function SupportsRCData (const AName : AnsiString; Size : Integer; data : Pointer) : Boolean; virtual;
   class function SupportsData (Size : Integer; data : Pointer) : Boolean; virtual;
 public
-  class function CreateResourceElement (AParent : TResourceModule; ALanguage : Integer; const AName, AType : string; ASize : Integer; AData : pointer) : TResourceElement;
-  class function GetBaseType : string; virtual;
+  class function CreateResourceElement (AParent : TResourceModule; ALanguage : Integer; const AName, AType : AnsiString; ASize : Integer; AData : pointer) : TResourceElement;
+  class function GetBaseType : AnsiString; virtual;
 
-  constructor CreateNew (AParent : TResourceModule; ALanguage : Integer; const AName : string); overload;
-  constructor CreateNew (AParent : TResourceModule; ALanguage : Integer; const AName, AType : string); overload;
+  constructor CreateNew (AParent : TResourceModule; ALanguage : Integer; const AName : AnsiString); overload;
+  constructor CreateNew (AParent : TResourceModule; ALanguage : Integer; const AName, AType : AnsiString); overload;
   destructor Destroy; override;
   procedure BeforeDelete; virtual;
 
@@ -106,8 +106,8 @@ public
 
   property Parent : TResourceModule read fParent;
   property Data : TMemoryStream read fData;
-  property ResourceName : string read fResourceName write SetResourceName;
-  property ResourceType : string read fResourceType;
+  property ResourceName : AnsiString read fResourceName write SetResourceName;
+  property ResourceType : AnsiString read fResourceType;
   property ResourceLanguage : LCID read fResourceLanguage write fResourceLanguage;
 
   property CodePage : Integer read fCodePage write fCodePage;
@@ -127,13 +127,13 @@ end;
 
 TAnsiResourceElement = class (TResourceElement)
 private
-  function GetText: string;
-  procedure SetText(const Value: string);
+  function GetText: AnsiString;
+  procedure SetText(const Value: AnsiString);
 protected
   procedure InitNew; override;
   class function SupportsData (Size : Integer; data : Pointer) : Boolean; override;
 public
-  property Text : string read GetText write SetText;
+  property Text : AnsiString read GetText write SetText;
 end;
 {$endregion}
 
@@ -158,9 +158,9 @@ end;
 
 procedure RegisterResourceElement (resourceClass : TResourceElementClass);
 procedure UnRegisterResourceElement (resourceClass : TResourceElementClass);
-function ResourceWideCharToStr(var wstr : PWideChar; codePage : Integer) : string;
-procedure ResourceStrToWideChar (const s : string; var p : PWideChar; codePage : Integer);
-function ResourceNameToInt (const s : string) : Integer;
+function ResourceWideCharToStr(var wstr : PWideChar; codePage : Integer) : AnsiString;
+procedure ResourceStrToWideChar (const s : AnsiString; var p : PWideChar; codePage : Integer);
+function ResourceNameToInt (const s : AnsiString) : Integer;
 function CompareElement (p1, p2 : Pointer) : Integer;
 
 implementation
@@ -216,34 +216,34 @@ end;
 (*----------------------------------------------------------------------------*
  | procedure ResourceWideCharToStr ()                                         |
  |                                                                            |
- | Convert Pascal-style WideChar array to a string                            |
+ | Convert Pascal-style WideChar array to a AnsiString                            |
  |                                                                            |
  | Parameters:                                                                |
  |   WStr : PWChar             The characters                                 |
  *----------------------------------------------------------------------------*)
-function ResourceWideCharToStr(var wstr : PWideChar; codePage : Integer) : string;
+function ResourceWideCharToStr(var wstr : PWideChar; codePage : Integer) : AnsiString;
 var
   len : word;
 begin
   len := word (wstr^);
   SetLength (result, len);
   Inc (wstr);
-  WideCharToMultiByte(codePage, 0, WStr, Len, PChar (Result), Len + 1, nil, nil);
+  WideCharToMultiByte(codePage, 0, WStr, Len, PAnsiChar (Result), Len + 1, nil, nil);
   Inc (wstr, len);
-  result := PChar (result);
+  result := PAnsiChar (result);
 end;
 
 (*----------------------------------------------------------------------------*
  | procedure ResourceStrToWideChar ()                                         |
  |                                                                            |
- | Convert a string to a Pascal style Wide char array                         |
+ | Convert a AnsiString to a Pascal style Wide char array                         |
  |                                                                            |
  | Parameters:                                                                |
- |   s : string                The string                                     |
+ |   s : AnsiString                The AnsiString                                     |
  |   var p : PWideChar         [in]  Points to the start of the receiving buf |
  |                             [out] Points after the characters.             |
  *----------------------------------------------------------------------------*)
-procedure ResourceStrToWideChar (const s : string; var p : PWideChar; codePage : Integer);
+procedure ResourceStrToWideChar (const s : AnsiString; var p : PWideChar; codePage : Integer);
 var
   buffer : PWideChar;
   len, size : word;
@@ -252,7 +252,7 @@ begin
   size := (Length (s) + 1) * sizeof (WideChar);
   GetMem (buffer, size);
   try
-    MultiByteToWideChar (codePage, 0, PChar (s), -1, buffer, size);
+    MultiByteToWideChar (codePage, 0, PAnsiChar (s), -1, buffer, size);
     p^ := WideChar (len);
     Inc (p);
     Move (buffer^, p^, len * sizeof (WideChar));
@@ -268,7 +268,7 @@ end;
  | Get integer value of resource name (or type).  Return -1 if it's     |
  | not numeric.                                                         |
  *----------------------------------------------------------------------*)
-function ResourceNameToInt (const s : string) : Integer;
+function ResourceNameToInt (const s : AnsiString) : Integer;
 var
   isNumeric : Boolean;
   i : Integer;
@@ -318,7 +318,7 @@ begin
     if i2 >= 0 then
       Result := -1              // id2 is int, so it's less than non-int id1
     else
-                                // Compare two string resource ids
+                                // Compare two AnsiString resource ids
       Result := CompareText (d1.ResourceType, d2.ResourceType);
 
   if Result = 0 then            // If they match, do the same with the names
@@ -385,7 +385,7 @@ end;
  |                                                                      |
  | Raw - protected - constructor for resource Element.                  |
  *----------------------------------------------------------------------*)
-constructor TResourceElement.Create(AParent: TResourceModule; ALanguage: Integer; const AName, AType: string; ASize: Integer;
+constructor TResourceElement.Create(AParent: TResourceModule; ALanguage: Integer; const AName, AType: AnsiString; ASize: Integer;
   AData: pointer);
 begin
   fParent := AParent;
@@ -406,7 +406,7 @@ end;
  | Constructor to be used when adding new resources to a module.        |
  *----------------------------------------------------------------------*)
 constructor TResourceElement.CreateNew(AParent: TResourceModule;
-  ALanguage: Integer; const aName : string);
+  ALanguage: Integer; const aName : AnsiString);
 begin
   CreateNew(AParent,ALanguage,AName,GetBaseType);
 
@@ -422,7 +422,7 @@ begin
 end;
 
 constructor TResourceElement.CreateNew(AParent: TResourceModule;
-  ALanguage: Integer; const AName, AType: string);
+  ALanguage: Integer; const AName, AType: AnsiString);
 begin
   fParent := AParent;
   fResourceLanguage := ALanguage;
@@ -444,7 +444,7 @@ end;
  *----------------------------------------------------------------------*)
 class function TResourceElement.CreateResourceElement(
   AParent: TResourceModule; ALanguage: Integer; const AName,
-  AType: string; ASize: Integer; AData: pointer): TResourceElement;
+  AType: AnsiString; ASize: Integer; AData: pointer): TResourceElement;
 var
   i : Integer;
 begin
@@ -504,7 +504,7 @@ end;
  | Return the base type for the resource Element.  This is overridden   |
  | in derived classes.                                                  |
  *----------------------------------------------------------------------*)
-class function TResourceElement.GetBaseType: string;
+class function TResourceElement.GetBaseType: AnsiString;
 begin
   Result := '0';
 end;
@@ -524,7 +524,7 @@ end;
  |                                                                      |
  | Set the resource name.                                               |
  *----------------------------------------------------------------------*)
-procedure TResourceElement.SetResourceName(const Value: string);
+procedure TResourceElement.SetResourceName(const Value: AnsiString);
 begin
   fResourceName := Value;
   fDirty := True
@@ -548,7 +548,7 @@ end;
  | Can be overridden to support RC data where you can determine the     |
  | type from the data and name - eg. the Delphi splash screen JPEG      |
  *----------------------------------------------------------------------*)
-class function TResourceElement.SupportsRCData(const AName: string;
+class function TResourceElement.SupportsRCData(const AName: AnsiString;
   Size: Integer; data: Pointer): Boolean;
 begin
   Result := False; // stub
@@ -593,7 +593,7 @@ end;
  | Find a resource with a given type/name                               |
  *----------------------------------------------------------------------*)
 function TResourceModule.FindResource(const tp,
-  Name: string; ALanguage : Integer): TResourceElement;
+  Name: AnsiString; ALanguage : Integer): TResourceElement;
 var
   i : Integer;
 begin
@@ -641,9 +641,9 @@ end;
  | TResourceModule.GetUniqueResourceName                                |
  |                                                                      |
  | Generate a unique resource name for a given type.  Names start at    |
- | 1 (though string lists downgrade that to '0')                        |
+ | 1 (though AnsiString lists downgrade that to '0')                        |
  *----------------------------------------------------------------------*)
-function TResourceModule.GetUniqueResourceName(const tp: string): string;
+function TResourceModule.GetUniqueResourceName(const tp: AnsiString): AnsiString;
 var
   i : Integer;
   n, n1 : Integer;
@@ -677,7 +677,7 @@ end;
  | Load from file.  This can be overriden but usually isn't as it       |
  | relies on LoadFromStream, which must be.                             |
  *----------------------------------------------------------------------*)
-procedure TResourceModule.LoadFromFile(const FileName: string);
+procedure TResourceModule.LoadFromFile(const FileName: AnsiString);
 var
   s : TFileStream;
 begin
@@ -701,22 +701,22 @@ end;
  | Save to file.  This can be overriden but usually isn't as it         |
  | relies on SaveToStream, which must be.                               |
  *----------------------------------------------------------------------*)
-procedure TResourceModule.SaveToFile(const FileName: string);
+procedure TResourceModule.SaveToFile(const FileName: AnsiString);
 var
   s : TFileStream;
-  oldFileName, ext : string;
-  p : PChar;
+  oldFileName, ext : AnsiString;
+  p : PAnsiChar;
 begin
 // Rename old file to .~ext'
   oldFileName := FileName;
   UniqueString (oldFileName);
-  p := StrRScan (PChar (oldFileName), '.');
+  p := StrRScan (PAnsiChar (oldFileName), '.');
   if p <> Nil then
   begin
     p^ := #0;
     Inc (p);
     ext := p;
-    oldFileName := PChar (oldFileName);
+    oldFileName := PAnsiChar (oldFileName);
   end
   else
     ext := '';
@@ -758,10 +758,10 @@ end;
 {$region 'TAnsiResourceElement implementation'}
 { TAnsiResourceElement }
 
-function TAnsiResourceElement.GetText: string;
+function TAnsiResourceElement.GetText: AnsiString;
 begin
   data.Seek(0, soFromBeginning);
-  SetString (result, PChar (data.Memory), data.Size);
+  SetString (result, PAnsiChar (data.Memory), data.Size);
 end;
 
 procedure TAnsiResourceElement.InitNew;
@@ -769,7 +769,7 @@ begin
   Data.Clear;
 end;
 
-procedure TAnsiResourceElement.SetText(const Value: string);
+procedure TAnsiResourceElement.SetText(const Value: AnsiString);
 begin
   data.Clear;
   data.Write(Value [1], Length (Value))
@@ -779,13 +779,13 @@ class function TAnsiResourceElement.SupportsData(Size: Integer;
   data: Pointer): Boolean;
 var
   i, sample : Integer;
-  pc : PChar;
+  pc : PAnsiChar;
 begin
   result := Size > 0;
   sample := Size;
   if Sample > 1024 then
     Sample := 1024;
-  pc := PChar (data);
+  pc := PAnsiChar (data);
 
   if result then
     for i := 0 to Sample - 1 do
@@ -825,7 +825,7 @@ class function TUnicodeResourceElement.SupportsData(Size: Integer;
   data: Pointer): Boolean;
 var
   i, sample : Integer;
-  pc : PChar;
+  pc : PAnsiChar;
 begin
   result := Size > 5;
   sample := Size div 2;
@@ -833,7 +833,7 @@ begin
     Sample := 1024
   else
     Dec (Sample);
-  pc := PChar (data);
+  pc := PAnsiChar (data);
 
   if result then
     for i := 0 to Sample - 2 do
