@@ -204,7 +204,6 @@ constructor Tcna2Profiles.Create;
 begin
   FProfiles := Tcna2ProfileList.Create;
   FCurrentProfile := nil;
-
   Load;
 end;
 

@@ -1,4 +1,4 @@
-{----------------------------------------------------------------------------- 
+{-----------------------------------------------------------------------------
  Project: Settings
  Purpose: Contains components for loading and saving Settings in Streams,Files ...
  Created: 21.05.2008 14:45:06
@@ -10,6 +10,8 @@
 unit uSettingsStream;
 
 interface
+
+{$I JEDI.inc}
 
 uses
   Classes,
@@ -338,6 +340,13 @@ begin
       ReadValue(AStream, tempString);
       AValue := tempString;
     end;
+    {$ifdef DELPHI12_UP}
+    varUString   :
+    begin
+      ReadValue(AStream, tempOleStr);
+      AValue := tempOleStr;
+    end;
+    {$endif}
   end;
 end;
 
@@ -453,6 +462,9 @@ begin
     varLongWord : WriteValue(AStream, Data.VLongWord);
     varInt64    : WriteValue(AStream, Data.VInt64);
     varString   : WriteValue(AStream, String(Data.VString));
+    {$ifdef DELPHI12_UP}
+    varUString  : WriteValue(AStream, WideString(PWideChar(Data.VUString)));
+    {$endif}
   end;
 end;
 

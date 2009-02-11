@@ -83,7 +83,7 @@ end;
 procedure Tcna2Settings.SaveNow;
 begin
   try
-    MakeSureDirectoryPathExists(PChar(ExtractFilePath(FileName)));
+    MakeSureDirectoryPathExists(PAnsiChar(ExtractFilePath(FileName)));
     if not Save then
       raise Exception.Create(EmptyStr);
   except

@@ -1,7 +1,7 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{BA5328DC-AE89-4679-B5AE-CBBA8B28DF91}</ProjectGuid>
-			<MainSource>Settings_VirtualTrees_D120D.dpk</MainSource>
+			<ProjectGuid>{6D532F7B-43CA-46A4-98CF-9C684E5DFA9C}</ProjectGuid>
+			<MainSource>CNA2_D120.dpk</MainSource>
 			<Config Condition="'$(Config)'==''">Release</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<ProjectVersion>12.0</ProjectVersion>
@@ -25,8 +25,8 @@
 			<GenPackage>true</GenPackage>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_Platform>x86</DCC_Platform>
-			<DCC_Description>Settings Support for VirtualTrees - Design</DCC_Description>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\Settings_VirtualTrees_D120D.bpl</DCC_DependencyCheckOutputName>
+			<DCC_Description>CNA2 - Component Naming Assistant V.2 by TUO</DCC_Description>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\CNA2_D120.bpl</DCC_DependencyCheckOutputName>
 			<DCC_S>false</DCC_S>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<GenDll>true</GenDll>
@@ -45,14 +45,70 @@
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="Settings_VirtualTrees_D120D.dpk">
+			<DelphiCompile Include="CNA2_D120.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="..\..\Design\Images_SVST"/>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="settings_virtualtrees_d120R.dcp"/>
-			<DCCReference Include="..\..\Design\uRegSettingsVST.pas"/>
-			<DCCReference Include="..\..\Design\Images_SVST"/>
+			<DCCReference Include="designide.dcp"/>
+			<DCCReference Include="Settings_D120R.dcp"/>
+			<DCCReference Include="CommonTools_D120R.dcp"/>
+			<DCCReference Include="vcl.dcp"/>
+			<DCCReference Include="xmlrtl.dcp"/>
+			<DCCReference Include="vclactnband.dcp"/>
+			<DCCReference Include="vclx.dcp"/>
+			<DCCReference Include="RTTIHelper_D120R.dcp"/>
+			<DCCReference Include="uCNA2Settings.pas"/>
+			<DCCReference Include="uCNA2Main.pas"/>
+			<DCCReference Include="uCNA2Visualizers.pas"/>
+			<DCCReference Include="uCNA2ConfigDialog.pas">
+				<Form>CNA2ConfigDialog</Form>
+			</DCCReference>
+			<DCCReference Include="uCNA2Profiles.pas"/>
+			<DCCReference Include="uCNA2Actions.pas"/>
+			<DCCReference Include="Actions\uCNA2ActSetValue.pas"/>
+			<DCCReference Include="Actions\uCNA2ActSetValueConfig.pas">
+				<Form>form_ConfigSetValue</Form>
+			</DCCReference>
+			<DCCReference Include="uCNA2ValueEditors.pas">
+				<Form>cna2ValueEditor</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
+			<DCCReference Include="ValueEditors\uCNA2ValueEditorString.pas">
+				<Form>cna2ValueEditorString</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
+			<DCCReference Include="ValueEditors\uCNA2ValueEditorChar.pas">
+				<Form>cna2ValueEditorChar</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
+			<DCCReference Include="ValueEditors\uCNA2ValueEditorInteger.pas">
+				<Form>cna2ValueEditorInteger</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
+			<DCCReference Include="ValueEditors\uCNA2ValueEditorInt64.pas">
+				<Form>cna2ValueEditorInt64</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
+			<DCCReference Include="ValueEditors\uCNA2ValueEditorFloat.pas">
+				<Form>cna2ValueEditorFloat</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
+			<DCCReference Include="ValueEditors\uCNA2ValueEditorEnum.pas">
+				<Form>cna2ValueEditorEnum</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
+			<DCCReference Include="ValueEditors\uCNA2ValueEditorSet.pas">
+				<Form>cna2ValueEditorSet</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
+			<DCCReference Include="uCNA2FormEditorHooks.pas"/>
+			<DCCReference Include="uCNA2IDENotifier.pas"/>
+			<DCCReference Include="uCNA2Worker.pas"/>
+			<DCCReference Include="ValueEditors\uCNA2ValueEditorColor.pas">
+				<Form>cna2ValueEditorColor</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
+			<DCCReference Include="Actions\uCNA2ActCreateObject.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -72,12 +128,15 @@
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">Settings_VirtualTrees_D120D.dpk</Source>
+						<Source Name="MainSource">CNA2_D120.dpk</Source>
 					</Source>
 					<Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
 						<Parameters Name="LoadAllSymbols">True</Parameters>
 						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+						<Parameters Name="RunParams">-pDelphi</Parameters>
+						<Parameters Name="HostApplication">D:\Programme\CodeGear\RAD Studio\6.0\bin\bds.exe</Parameters>
+						<Parameters Name="DebugSourceDirs">D:\Libs\tuo\Libraries\RTTIHelper\;D:\Libs\tuo\Components\Settings\</Parameters>
 					</Parameters>
 					<VersionInfo>
 						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>

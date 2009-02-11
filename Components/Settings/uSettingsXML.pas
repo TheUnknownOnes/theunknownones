@@ -9,6 +9,8 @@
 
 unit uSettingsXML;
 
+{$I JEDI.inc}
+
 interface
 
 uses
@@ -149,6 +151,13 @@ begin
       tempString:=XGetText(AXMLNode);
       AValue := tempString;
     end;
+    {$ifdef DELPHI12_UP}
+    varUString  :
+    begin
+      tempOleStr:=XGetText(AXMLNode);
+      AValue := tempOleStr;
+    end;
+    {$endif}
   end;
 end;
 

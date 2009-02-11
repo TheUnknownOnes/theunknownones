@@ -10,7 +10,7 @@ unit uSettingsBase;
 
 interface
 
-{$DEFINE UniCode}
+{$I JEDI.inc}
 
 uses
   Classes,
@@ -338,6 +338,25 @@ type
 
 const
   SettingsPathDelimiter = '/';
+
+  {$IFDEF DELPHI12_UP}
+  SettingsValidValueTypes : array[0..15] of TVarType = (varEmpty,
+                                                        varNull,
+                                                        varSmallint,
+                                                        varInteger,
+                                                        varSingle,
+                                                        varDouble,
+                                                        varDate,
+                                                        varOleStr,
+                                                        varBoolean,
+                                                        varShortInt,
+                                                        varByte,
+                                                        varWord,
+                                                        varLongWord,
+                                                        varInt64,
+                                                        varString,
+                                                        varUString);
+  {$else}
   SettingsValidValueTypes : array[0..14] of TVarType = (varEmpty,
                                                         varNull,
                                                         varSmallint,
@@ -353,7 +372,8 @@ const
                                                         varLongWord,
                                                         varInt64,
                                                         varString);
-  SettingsComponentGroup = 'Settings';                                                        
+  {$endif}
+  SettingsComponentGroup = 'Settings';
 
 var
   SettingsRegExCaseinsensitive : Boolean = true;
@@ -470,7 +490,7 @@ begin
   Result:=VarIsType(AVariant, SettingsValidValueTypes);
 
   if (not Result) and ARaiseException then
-    raise Exception.Create('Invalid value type');
+    raise Exception.Create('Invalid value type "'+VarTypeAsText(VarType(AVariant))+'"');
 end;
 
 
