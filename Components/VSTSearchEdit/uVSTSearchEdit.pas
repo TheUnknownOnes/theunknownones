@@ -7,6 +7,8 @@ unit uVSTSearchEdit;
 
 interface
 
+{$I JEDI.inc}
+
 uses
   SysUtils, Classes, VirtualTrees, StdCtrls, ComCtrls, StrUtils;
 
@@ -42,7 +44,7 @@ type
 implementation
 
 uses
-  Forms, Controls, TntStdCtrls;
+  Forms, Controls {$ifndef DELPHI12_UP}, TntStdCtrls{$endif};
 
 { TVSTSearchEdit }
 
@@ -146,9 +148,11 @@ begin
   begin
     if Value is TEdit then
       TEdit(Value).OnChange:=FOldOnChangeProc
+    {$ifndef DELPHI12_UP}
     else
     if Value is TTntEdit then
       TTNTEdit(Value).OnChange:=FOldOnChangeProc;
+    {$endif}
   end;
 end;
 
@@ -158,15 +162,15 @@ begin
   begin
     if Value is TEdit then
     begin
-      FOldOnChangeProc:=TTNTEdit(FEdit).OnChange;
-      TTNTEdit(FEdit).OnChange:=OnEditChange;
+      FOldOnChangeProc:=TEdit(FEdit).OnChange;
+      TEdit(FEdit).OnChange:=OnEditChange;
     end
-    else
+    {$ifndef DELPHI12_UP}else
     if Value is TTntEdit then
     begin
       FOldOnChangeProc:=TTNTEdit(FEdit).OnChange;
       TTNTEdit(FEdit).OnChange:=OnEditChange;
-    end;
+    end;{$endif}
   end;
 end;
 

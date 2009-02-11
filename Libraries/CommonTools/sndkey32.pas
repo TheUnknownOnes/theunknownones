@@ -417,7 +417,7 @@ begin
                NumTimes:=StrToInt(Copy(KeyString,Succ(PosSpace),Length(KeyString)-PosSpace));
                KeyString:=Copy(KeyString,1,Pred(PosSpace));
             end;
-            If (Length(KeyString)=1) then MKey:=vkKeyScan(KeyString[1])
+            If (Length(KeyString)=1) then MKey:=vkKeyScanA(KeyString[1])
             else MKey:=StringToVKey(KeyString);
             If (MKey<>INVALIDKEY) then begin
               SendKey(MKey,NumTimes,True);

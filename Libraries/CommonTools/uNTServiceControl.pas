@@ -14,7 +14,7 @@ interface
 uses
 	Windows, Classes;
 
-function ServiceGetStatus(sMachine, sService: String): DWord;
+function ServiceGetStatus(sMachine, sService: AnsiString): DWord;
 // starts a service
 function ServiceStart(aMachine, aServiceName: AnsiString; ProcessAppMsg: Boolean = False): Boolean;
 // stops a service
@@ -141,7 +141,7 @@ var
 	srvStatus: TServiceStatus;
 	I, dwCheckPoint, Running: DWord;
 	Chars: PChar;
-	Services: array[0..255] of ENUM_SERVICE_STATUSA;
+	Services: array[0..255] of ENUM_SERVICE_STATUSW;
 begin
 	srvStatus.dwCurrentState := 1;
 	srvManager := OpenSCManager(PChar(aMachine), nil, SC_MANAGER_CONNECT);

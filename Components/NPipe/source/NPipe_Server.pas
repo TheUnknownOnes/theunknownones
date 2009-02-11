@@ -389,7 +389,7 @@ begin
     if FTimeOut=0 then
       FTimeOut:=NP_Default_ServerTimeout;
 
-    hPipe:=CreateNamedPipe(PAnsiChar('\\.\pipe\'+FPipeName),
+    hPipe:=CreateNamedPipe(PChar('\\.\pipe\'+FPipeName),
                              PIPE_ACCESS_DUPLEX or FILE_FLAG_OVERLAPPED,
                              PIPE_TYPE_MESSAGE or
                              PIPE_WAIT or

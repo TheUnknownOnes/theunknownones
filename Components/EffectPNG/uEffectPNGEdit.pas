@@ -7,13 +7,15 @@ unit uEffectPNGEdit;
 
 interface
 
+{$I jedi.inc}
+
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, TntStdCtrls, uEffectPng, ShlObj, ComObj, pngimage,
+  Dialogs, StdCtrls, {$ifndef DELPHI12_UP}TntStdCtrls,{$endif} uEffectPng, ShlObj, ComObj, pngimage,
   uEnumStringList;
 
 type
-  TEffectPNGEdit = class(TTntEdit)
+  TEffectPNGEdit = class({$ifdef DELPHI12_UP}TEdit{$else}TTntEdit{$endif})
   private
     FPaintCtl: TWinControl;
     FPNGEffectsEnabled : TPNGEffects;

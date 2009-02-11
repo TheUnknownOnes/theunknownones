@@ -33,7 +33,7 @@ end;
 procedure DeserializeToStream(const Data : String; const AStream : TStream);
 var
   SS : TStringStream;
-  Ser : array [0..1] of char;
+  Ser : array [0..1] of AnsiChar;
   B : Byte;
 begin
   SS:=TStringStream.Create(Data);
