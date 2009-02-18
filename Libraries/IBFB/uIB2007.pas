@@ -2225,7 +2225,7 @@ function getb(var p: BSTREAM): AnsiChar;
 begin
   Dec(p.bstr_cnt);
   if (p.bstr_cnt >= 0) then begin
-    result := Char(Int(p.bstr_ptr^) and Int(0377));
+    result := AnsiChar(Int(p.bstr_ptr^) and Int(0377));
     Inc(p.bstr_ptr);
   end else
     result := AnsiChar(BLOB_get(p));
@@ -2237,7 +2237,7 @@ begin
   if (x = Chr(Int('n') - Int('a'))) or (p.bstr_cnt = 0) then
     result := BLOB_put(x, p)
   else begin
-    p.bstr_ptr^ := Char(x);
+    p.bstr_ptr^ := AnsiChar(x);
     result := Int(x);
     Inc(p.bstr_ptr^);
   end;
@@ -2249,7 +2249,7 @@ begin
   if (x = Chr(Int('n') - Int('a'))) or (p.bstr_cnt = 0) then
     result := BLOB_put(x, p)
   else begin
-    p.bstr_ptr^ := Char(x);
+    p.bstr_ptr^ := AnsiChar(x);
     result := Int(x);
     Inc(p.bstr_ptr^);
   end;
