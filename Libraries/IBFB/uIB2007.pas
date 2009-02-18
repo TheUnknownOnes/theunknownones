@@ -2224,6 +2224,29 @@ const
   isc_blob_typed_binary              = 24;
 
 
+  { BLOB UDF related things }
+
+type
+  TBlob_Get_Segment_Function = function(blob_handle : isc_blob_handle;
+                                        buffer : Pointer;
+                                        buffer_size : long;
+                                        var result_length : long) : short; cdecl;
+
+  TBlob_Put_Segment_Function = procedure(blob_handle : isc_blob_handle;
+                                         buffer : Pointer;
+                                         buff_size : ISC_USHORT); cdecl;
+
+  Blob = packed record
+    blob_get_segment : TBlob_Get_Segment_Function;
+    blob_handle : isc_blob_handle;
+    number_segments : long;
+    max_seglen : long;
+    total_size : long;
+    blob_put_segment : TBlob_Put_Segment_Function;
+  end;
+  PBlob = ^Blob; 
+
+
 implementation
 
 function getb(var p: BSTREAM): AnsiChar;
