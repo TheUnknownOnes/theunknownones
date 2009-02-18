@@ -2228,10 +2228,10 @@ const
   { BLOB UDF related things }
 
 type
-  TBlob_Get_Segment_Function = function(blob_handle : isc_blob_handle;
+  TBlob_Get_Segment_Function = procedure(blob_handle : isc_blob_handle;
                                         buffer : Pointer;
                                         buffer_size : long;
-                                        var result_length : long) : short; cdecl;
+                                        var result_length : long); cdecl;
 
   TBlob_Put_Segment_Function = procedure(blob_handle : isc_blob_handle;
                                          buffer : Pointer;
@@ -2244,7 +2244,7 @@ type
     max_seglen : long;
     total_size : long;
     blob_put_segment : TBlob_Put_Segment_Function;
-  end;
+  end;                                                                                             
   PBlob = ^Blob;
 
   { ib_util }
