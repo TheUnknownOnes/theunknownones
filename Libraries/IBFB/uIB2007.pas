@@ -12,6 +12,7 @@ uses
 
 const
   gds32dll = 'gds32.dll';
+  ib_utildll = 'ib_util.dll';
   
   ISC_TRUE	= 1;
   ISC_FALSE	= 0;
@@ -2244,7 +2245,11 @@ type
     total_size : long;
     blob_put_segment : TBlob_Put_Segment_Function;
   end;
-  PBlob = ^Blob; 
+  PBlob = ^Blob;
+
+  { ib_util }
+
+  function ib_util_malloc(l: integer): pointer; cdecl; external ib_utildll;
 
 
 implementation
