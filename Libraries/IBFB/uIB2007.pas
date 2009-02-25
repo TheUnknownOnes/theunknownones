@@ -8,7 +8,8 @@ unit uIB2007;
 interface
 
 uses
-  uIBFBGLobals;
+  uIBFBGLobals,
+  DateUtils;
 
 const
   gds32dll = 'gds32.dll';
@@ -499,6 +500,9 @@ type
             var tm_date : tm); cdecl; external gds32dll;
 
   procedure isc_decode_sql_time (var ib_time : ISC_TIME;
+            var tm_date : tm); cdecl; external gds32dll;
+
+  procedure isc_decode_date (var ib_timestamp : ISC_TIMESTAMP;
             var tm_date : tm); cdecl; external gds32dll;
 
   procedure isc_decode_timestamp (var ib_timestamp : ISC_TIMESTAMP;
@@ -2252,7 +2256,47 @@ type
   function ib_util_malloc(l: integer): pointer; cdecl; external ib_utildll;
 
 
+function IB2007DecodeTimestamp(ATimestamp : ISC_TIMESTAMP) : TDateTime;
+
 implementation
+
+function IB2007DecodeTimestamp(ATimestamp : ISC_TIMESTAMP) : TDateTime;
+var
+  Century, Y, M, D,
+  H, Mi, S: integer;
+  TotalSeconds : Cardinal;
+const
+  SECONDS_PER_MINUTE = 60;
+  MINUTES_PER_HOUR = 60;
+  SECONDS_PER_HOUR = SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+begin
+  ATimestamp.timestamp_date := ATimestamp.timestamp_date - (1721119 - 2400001);
+  Century := (4 * ATimestamp.timestamp_date - 1) div 146097;
+  ATimestamp.timestamp_date := 4 * ATimestamp.timestamp_date - 1 - 146097 * Century;
+  D := ATimestamp.timestamp_date div 4;
+  ATimestamp.timestamp_date := (4 * D + 3) div 1461;
+  D := 4 * D + 3 - 1461 * ATimestamp.timestamp_date;
+  D := (D + 4) div 4;
+  M := (5 * D - 3) div 153;
+  D := 5 * D - 3 - 153 * M;
+  D := (D + 5) div 5;
+  Y := 100 * Century + ATimestamp.timestamp_date;
+
+  if M < 10 then
+    M := M + 3
+  else begin
+    M := M - 9;
+    Y := Y + 1;
+  end;
+
+  TotalSeconds := ATimestamp.timestamp_time div ISC_TIME_SECONDS_PRECISION;
+
+  H := TotalSeconds div SECONDS_PER_HOUR;
+  Mi := (TotalSeconds div SECONDS_PER_MINUTE) mod SECONDS_PER_MINUTE;
+  S := TotalSeconds mod SECONDS_PER_MINUTE;
+
+  Result := EncodeDateTime(Y, M, D, H, Mi, S, 0);
+end;
 
 function getb(var p: BSTREAM): AnsiChar;
 begin
