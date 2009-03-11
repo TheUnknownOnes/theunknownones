@@ -141,7 +141,7 @@ var
 	srvStatus: TServiceStatus;
 	I, dwCheckPoint, Running: DWord;
 	Chars: PChar;
-	Services: array[0..255] of ENUM_SERVICE_STATUSW;
+	Services: array[0..255] of ENUM_SERVICE_STATUSA;
 begin
 	srvStatus.dwCurrentState := 1;
 	srvManager := OpenSCManager(PChar(aMachine), nil, SC_MANAGER_CONNECT);
