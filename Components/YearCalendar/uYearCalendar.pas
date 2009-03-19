@@ -168,8 +168,9 @@ const
   XIndentDays : Single = 150;
   YIndentDays : Single = 300;
   WidthDays : Single = 120;
-  HeightDays : Single = 140;
+  SpaceDays = 700;
 var
+  HeightDays : Integer;
   TransformX,
   TransformY : Single;
   MousePosX,
@@ -195,6 +196,11 @@ var
   end;
 
 begin
+  HeightDays:=SpaceDays
+                 div
+                 (1+(WeekOfTheYear(IncMonth(EncodeDate(AYear, AMonth, 1))-1)-
+                 WeekOfTheYear(EncodeDate(AYear, AMonth, 1))));
+
   Dates:=Self.FDays.QueryByMonth(AYear, AMonth);
 
   TransformX := (ARect.Right-ARect.Left) / 1000;
