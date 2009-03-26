@@ -99,7 +99,7 @@ procedure Register;
 
 implementation
 
-uses Types;
+uses Types, Math;
 
 procedure Register;
 begin
@@ -195,12 +195,26 @@ var
             (MousePosY <= y + HeightDays);
   end;
 
+  function MyWeeksBetween(ANow, AThen : TDate): Word;
+  var
+    v1,
+    v2 : Word;
+  begin
+    v1:=(1+WeeksBetween(ANow, AThen));
+    v2:=(1+WeekOfTheYear(ANow)-WeekOfTheYear(AThen));
+    if v1>6 then
+      v1:=5;
+    if v2>6 then
+      v2:=5;
+    Result:=Max(v1, v2);
+  end;
+
 begin
   HeightDays:=SpaceDays
                  div
-                 (1+(WeekOfTheYear(IncMonth(EncodeDate(AYear, AMonth, 1))-1)-
-                 WeekOfTheYear(EncodeDate(AYear, AMonth, 1))));
-
+              MyWeeksBetween(IncMonth(EncodeDate(AYear, AMonth, 1))-1,
+                                 EncodeDate(AYear, AMonth, 1));
+                                 
   Dates:=Self.FDays.QueryByMonth(AYear, AMonth);
 
   TransformX := (ARect.Right-ARect.Left) / 1000;
