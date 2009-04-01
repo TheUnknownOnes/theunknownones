@@ -120,6 +120,28 @@ function rttihSetToList(ATypeInfo : PTypeInfo; const AList : TWideStrings) : Int
 function rttihEnumToList(ATypeInfo : PTypeInfo; const AList : TWideStrings) : Integer;
 
 
+//==============================================================================
+
+type
+  TrttihMethodParam = packed record
+    Flags : TParamFlags;
+    Name : String;
+    TypeName : String;
+  end;
+
+  TrttihMethodParamList = array of TrttihMethodParam;
+
+  TrttihMethodInfo = packed record
+    Kind : TMethodKind;
+    Params : TrttihMethodParamList;
+    ReturnType : String;
+  end;
+
+function rttihMethodKindToString(AMethodKind : TMethodKind) : String;
+
+function rttihGetMethodInfo(AMethodProperty : PTypeInfo) : TrttihMethodInfo; overload;
+function rttihGetMethodInfo(AMethodProperty : PPropInfo) : TrttihMethodInfo; overload;
+
 
 implementation
 
@@ -528,6 +550,73 @@ begin
     Inc(Result);
   end;
     
+end;
+
+
+//==============================================================================
+
+
+function rttihMethodKindToString(AMethodKind : TMethodKind) : String;
+begin
+  case AMethodKind of
+    mkProcedure: Result := 'procedure';
+    mkFunction: Result := 'function';
+    mkConstructor: Result := 'constructor';
+    mkDestructor: Result := 'destructor';
+    mkClassProcedure: Result := 'class procedure';
+    mkClassFunction: Result := 'class function';
+    mkClassConstructor: Result := '';
+    mkOperatorOverload: Result := 'class operator';
+    mkSafeProcedure: Result := 'procedure';
+    mkSafeFunction: Result := 'function';
+  end;
+end;
+
+function rttihGetMethodInfo(AMethodProperty : PPropInfo) : TrttihMethodInfo;
+begin
+  Assert(Assigned(AMethodProperty), 'Invalid property');
+
+  Result := rttihGetMethodInfo(AMethodProperty.PropType^);
+end;
+
+function rttihGetMethodInfo(AMethodProperty : PTypeInfo) : TrttihMethodInfo;
+var
+  td : PTypeData;
+  idx : Integer;
+  CurParam : Pointer;
+  Len : Byte;
+type
+  PParamFlags = ^TParamFlags;
+begin
+  Assert(Assigned(AMethodProperty) and (AMethodProperty.Kind = tkMethod), 'Invalid property');
+
+  td := GetTypeData(AMethodProperty);
+
+  Assert(Assigned(td), 'Can not determine type data');
+
+  Result.Kind := td.MethodKind;
+
+  SetLength(Result.Params, td.ParamCount);
+
+  CurParam := @td.ParamList;
+  for idx := 0 to td.ParamCount - 1 do
+  begin
+    Result.Params[idx].Flags := PParamFlags(CurParam)^;
+    Inc(PParamFlags(CurParam), 1);
+
+    Len := PByte(CurParam)^;
+    Result.Params[idx].Name := PShortString(CurParam)^;
+    Inc(PChar(CurParam), Len + 1);
+
+    Len := PByte(CurParam)^;
+    Result.Params[idx].TypeName := PShortString(CurParam)^;
+    Inc(PChar(CurParam), Len + 1);
+  end;
+
+  if td.MethodKind in [mkFunction, mkSafeFunction] then
+    Result.ReturnType := PShortString(CurParam)^
+  else
+    Result.ReturnType := '';
 end;
 
 end.
