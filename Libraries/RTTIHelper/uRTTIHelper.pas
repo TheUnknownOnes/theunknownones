@@ -347,8 +347,13 @@ begin
   if PosOfDelim > 0 then
   begin
     PropName := Copy(APropertyName, 1, PosOfDelim - 1);
-    Result := GetPropValue(AInstance, PropName, false);
-    PropInfo := GetPropInfo(AInstance, PropName);
+    if Assigned(AInstance) then
+    begin
+      Result := GetPropValue(AInstance, PropName, false);
+      PropInfo := GetPropInfo(AInstance, PropName);
+    end
+    else
+      Result := null;
 
     if (not VarIsNull(Result)) and
        (PropInfo.PropType^.Kind = tkClass) and
