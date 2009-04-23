@@ -280,11 +280,11 @@ begin
     end;
 
     for idx := 0 to Dates.Count - 1 do
-    begin
-      rgbval:=ColorToRGB(TYearCalendarDay(Dates.Items[idx]).Color);
-      FBrushSolidVariable.SetColor(MakeColor(GetRed(rgbval),
+    begin 
+      rgbval:= ColorToRGB(TYearCalendarDay(Dates.Items[idx]).Color);
+      FBrushSolidVariable.SetColor(MakeColor(GetBlue(rgbval),
                                              GetGreen(rgbval),
-                                             GetBlue(rgbval)));
+                                             GetRed(rgbval)));
 
       if SameDate(day,TYearCalendarDay(Dates.Items[idx]).Date) then
       begin
