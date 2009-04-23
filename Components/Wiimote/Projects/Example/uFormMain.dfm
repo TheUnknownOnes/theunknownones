@@ -79,8 +79,8 @@ object Form1: TForm1
     OnButtonDown = Wiimote1ButtonDown
     OnButtonUp = Wiimote1ButtonUp
     OnButtonIsDown = Wiimote1ButtonIsDown
-    Left = 64
-    Top = 32
+    Left = 192
+    Top = 152
   end
   object tm_Battery: TTimer
     OnTimer = tm_BatteryTimer

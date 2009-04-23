@@ -5,12 +5,12 @@
 			<Option Name="Personality">Delphi.Personality</Option>
 			<Option Name="ProjectType"></Option>
 			<Option Name="Version">1.0</Option>
-			<Option Name="GUID">{BECCE5C8-A8DC-458F-B7E4-3ACE3B294D26}</Option>
+			<Option Name="GUID">{F2D655D9-4F03-4955-846C-1BFFB37DFF70}</Option>
 		</Option>
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">VNCWrapper_D100.dpk</Source>
+			<Source Name="MainSource">PSBuzz_D100D.dpk</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -116,11 +116,11 @@
 			<Linker Name="MinStackSize">16384</Linker>
 			<Linker Name="MaxStackSize">1048576</Linker>
 			<Linker Name="ImageBase">4194304</Linker>
-			<Linker Name="ExeDescription"></Linker>
+			<Linker Name="ExeDescription">PSBuzz</Linker>
 		</Linker>
 		<Directories>
 			<Directories Name="OutputDir"></Directories>
-			<Directories Name="UnitOutputDir">e:\Libs\DelphiKomponenten\Net\VNCWrapper\units\D100</Directories>
+			<Directories Name="UnitOutputDir"></Directories>
 			<Directories Name="PackageDLLOutputDir"></Directories>
 			<Directories Name="PackageDCPOutputDir"></Directories>
 			<Directories Name="SearchPath"></Directories>
@@ -170,8 +170,12 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>
-	</Delphi.Personality>
-	<StarTeamAssociation></StarTeamAssociation>
-	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+		</VersionInfoKeys>  
+    
+    
+    <Excluded_Packages>
+      <Excluded_Packages Name="C:\Program Files (x86)\madCollection\madExcept\DeXter\madExceptIde_.bpl">Datei C:\Program Files (x86)\madCollection\madExcept\DeXter\madExceptIde_.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="C:\Program Files (x86)\madCollection\madExcept\DeXter\madExceptWizard_.bpl">Datei C:\Program Files (x86)\madCollection\madExcept\DeXter\madExceptWizard_.bpl nicht gefunden</Excluded_Packages>
+    </Excluded_Packages>
+  </Delphi.Personality>
 </BorlandProject>

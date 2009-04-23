@@ -1,4 +1,4 @@
-unit uRegWiimote;
+unit uRegPSBuzz;
 
 interface
 
@@ -6,7 +6,7 @@ interface
 
 uses
   Classes,
-  uWiimote;
+  uPSBuzz;
 
 procedure Register;
 
@@ -14,7 +14,7 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('TUO', [TWiimote]);
+  RegisterComponents('TUO', [TPSBuzz]);
 end;
 
 end.
