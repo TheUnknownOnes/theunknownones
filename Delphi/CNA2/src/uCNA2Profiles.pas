@@ -64,7 +64,7 @@ type
     FComponents: Tcna2ComponentList;
     FProfile : Tcna2Profile;
     FActions,
-    FProperties: TWideStringList;
+    FProperties: TStringList;
     procedure SetProfile(const Value: Tcna2Profile);
 
     procedure BuildPropertiesList;
@@ -92,8 +92,8 @@ type
     property Name : String read FName write FName;
     property Components : Tcna2ComponentList read FComponents;
     property Profile : Tcna2Profile read FProfile write SetProfile;
-    property Properties : TWideStringList read FProperties;
-    property Actions : TWideStringList read FActions;
+    property Properties : TStringList read FProperties;
+    property Actions : TStringList read FActions;
   end;
 
   Tcna2GroupList = class(Tlist)
@@ -463,7 +463,7 @@ end;
 
 procedure Tcna2Group.BuildPropertiesList;
 var
-  Props : TWideStringList;
+  Props : TStringList;
   idxComponent,
   idxList,
   idx : Integer;
@@ -481,7 +481,7 @@ begin
       FProperties.Objects[idxList] := TObject(TypeInfo);
     end;
 
-    Props := TWideStringList.Create;
+    Props := TStringList.Create;
     try
       for idxComponent := 1 to Components.Count - 1 do
       begin
@@ -539,8 +539,8 @@ end;
 
 constructor Tcna2Group.Create(AProfile: Tcna2Profile);
 begin
-  FProperties := TWideStringList.Create;
-  FActions := TWideStringList.Create;
+  FProperties := TStringList.Create;
+  FActions := TStringList.Create;
   FProfile := nil;
   Profile := AProfile;
   FComponents := Tcna2ComponentList.Create;

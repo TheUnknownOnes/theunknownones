@@ -16,7 +16,6 @@ uses
   uCNA2Settings,
   uSettingsBase,
   Variants,
-  WideStrings,
   uRTTIHelper,
   Graphics,
   dialogs;
@@ -54,11 +53,11 @@ uses uCNA2ActSetValueConfig, uCNA2ValueEditors;
 
 function Tcna2ActSetValue.AsString: WideString;
 var
-  sl : TWideStringList;
+  sl : TStringList;
   idx : Integer;
   Element : Integer;
 begin
-  sl := TWideStringList.Create;
+  sl := TStringList.Create;
   try
     if FShowDialog then
       Result := 'Show dialog'
@@ -129,13 +128,13 @@ end;
 
 constructor Tcna2ActSetValue.Create(ATypeInfo: PTypeInfo);
 var
-  sl : TWideStringList;
+  sl : TStringList;
 begin
   inherited;
 
   FShowDialog := false;
 
-  sl := TWideStringList.Create;
+  sl := TStringList.Create;
   try
     case FTypeInfo.Kind of
       tkInteger,

@@ -10,7 +10,7 @@ unit uCNA2Main;
 interface
 
 uses
-  ToolsAPI,
+  ToolsAPI,          
   SysUtils,
   Classes,
   Dialogs,
@@ -21,7 +21,7 @@ uses
   Graphics;
 
 type
-  Tcna2Wizard = class(TInterfacedObject,
+  Tcna2Wizard = class(TInterfacedObject,                               
                       IOTAWizard,
                       IOTANotifier)
   private

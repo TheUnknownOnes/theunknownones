@@ -59,12 +59,12 @@ procedure Tcna2ValueEditorEnum.Init(ATypeInfo: PTypeInfo;
                                       AValue: Variant;
                                       AExpressionEvaluation : Boolean);
 var
-  sl : TWideStrings;
+  sl : TStrings;
   idx : Integer;
 begin
   inherited;
 
-  sl := TWideStringList.Create;
+  sl := TStringList.Create;
   try
     rttihEnumToList(ATypeInfo, sl);
 

@@ -13,7 +13,7 @@ uses
 type
   TsrPropertyName = WideString;
 
-  TsrPropertyList = class(TWideStringList)
+  TsrPropertyList = class(TStringList)
   protected
     FOwner : TObject;
 

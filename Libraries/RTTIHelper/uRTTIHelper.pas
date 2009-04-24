@@ -16,37 +16,36 @@ uses
   Classes,
   SysUtils,
   Variants,
-  WideStrings,
   StrUtils,
   Math;
 
 
 function rttihGetPropertiesList(AInstance : TObject;
-                                const AList : TWideStrings;
+                                const AList : TStrings;
                                 ARecursive : Boolean = false;
                                 AIncludeTypeKinds : TTypeKinds = [];
                                 AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
-                                APrefix : WideString = '';
-                                ADelimiter : WideChar = '.';
+                                APrefix : String = '';
+                                ADelimiter : Char = '.';
                                 AIgnoreClasses : TList = nil) : Integer; overload;
 function rttihGetPropertiesList(AClassInfo : PTypeInfo;
-                                const AList : TWideStrings;
+                                const AList : TStrings;
                                 ARecursive : Boolean = false;
                                 AIncludeTypeKinds : TTypeKinds = [];
                                 AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
-                                APrefix : WideString = '';
-                                ADelimiter : WideChar = '.';
+                                APrefix : String = '';
+                                ADelimiter : Char = '.';
                                 AIgnoreClasses : TList = nil) : Integer; overload;
 function rttihGetPropertiesList(AClass : TClass;
-                                const AList : TWideStrings;
+                                const AList : TStrings;
                                 ARecursive : Boolean = false;
                                 AIncludeTypeKinds : TTypeKinds = [];
                                 AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
-                                APrefix : WideString = '';
-                                ADelimiter : WideChar = '.';
+                                APrefix : String = '';
+                                ADelimiter : Char = '.';
                                 AIgnoreClasses : TList = nil) : Integer; overload;
 //Lists all properties in the format "PropertyName[.SubPropertyName]"
 // if ATypeKinds = [] then all properties a returned
@@ -57,14 +56,14 @@ function rttihGetPropertiesList(AClass : TClass;
 
 
 function rttihGetPropertyByName(AInstance : TObject;
-                                APropertyName : WideString;
-                                ADelimiter : WideChar = '.') : PPropInfo; overload;
+                                APropertyName : String;
+                                ADelimiter : Char = '.') : PPropInfo; overload;
 function rttihGetPropertyByName(AClass : TClass;
-                                APropertyName : WideString;
-                                ADelimiter : WideChar = '.') : PPropInfo; overload;
+                                APropertyName : String;
+                                ADelimiter : Char = '.') : PPropInfo; overload;
 function rttihGetPropertyByName(AClassInfo : PTypeInfo;
-                                APropertyName : WideString;
-                                ADelimiter : WideChar = '.') : PPropInfo; overload;
+                                APropertyName : String;
+                                ADelimiter : Char = '.') : PPropInfo; overload;
 //Returns the property if existing, otherwise nil
 //Example: rttihGetPropertyByName(Memo1, 'Font.Name');
 
@@ -73,8 +72,8 @@ function rttihGetPropertyByName(AClassInfo : PTypeInfo;
 
 
 function rttihGetPropertyValue(AInstance : TObject;
-                               APropertyName : WideString;
-                               ADelimiter : WideChar = '.') : Variant;
+                               APropertyName : String;
+                               ADelimiter : Char = '.') : Variant;
 //returns the current value of the property or null if something went wrong
 //Example: v := rttihGetPropertyValue(Button1, 'Font.Name');
 
@@ -83,9 +82,9 @@ function rttihGetPropertyValue(AInstance : TObject;
 
 
 procedure rttihSetPropertyValue(AInstance : TObject;
-                                APropertyName : WideString;
+                                APropertyName : String;
                                 AValue : Variant;
-                                ADelimiter : WideChar = '.');
+                                ADelimiter : Char = '.');
 //sets the value to the specified property
 //Example: rttihSetPropertyValue(Button1, 'Font.Name', 'Webdings');
 
@@ -94,11 +93,11 @@ procedure rttihSetPropertyValue(AInstance : TObject;
 
 
 function rttihGetInheritancePath(AClassInfo : PTypeInfo;
-                                 ADelimiter : WideChar = '.') : WideString; overload;
+                                 ADelimiter : Char = '.') : String; overload;
 function rttihGetInheritancePath(AClass : TClass;
-                                 ADelimiter : WideChar = '.') : WideString; overload;
+                                 ADelimiter : Char = '.') : String; overload;
 function rttihGetInheritancePath(AInstance : TObject;
-                                 ADelimiter : WideChar = '.') : WideString; overload;
+                                 ADelimiter : Char = '.') : String; overload;
 //returns the inheritance path of a class
 //Example: rttihGetInheritancePath(Button1) returns 'TObject.TPersistent.TComponent.TControl.TWinControl.TButtonControl.TButton'
 
@@ -106,18 +105,18 @@ function rttihGetInheritancePath(AInstance : TObject;
 //==============================================================================
 
 
-function rttihGetUnit(AClassInfo : PTypeInfo) : WideString; overload;
-function rttihGetUnit(AClass : TClass) : WideString; overload;
-function rttihGetUnit(AInstance : TObject) : WideString; overload;
+function rttihGetUnit(AClassInfo : PTypeInfo) : String; overload;
+function rttihGetUnit(AClass : TClass) : String; overload;
+function rttihGetUnit(AInstance : TObject) : String; overload;
 //returns the name of the unit where the class is defined
 
 
 //==============================================================================
 
 
-function rttihOrdinalToString(ATypeInfo : PTypeInfo; Value : Integer) : WideString;
-function rttihSetToList(ATypeInfo : PTypeInfo; const AList : TWideStrings) : Integer;
-function rttihEnumToList(ATypeInfo : PTypeInfo; const AList : TWideStrings) : Integer;
+function rttihOrdinalToString(ATypeInfo : PTypeInfo; Value : Integer) : String;
+function rttihSetToList(ATypeInfo : PTypeInfo; const AList : TStrings) : Integer;
+function rttihEnumToList(ATypeInfo : PTypeInfo; const AList : TStrings) : Integer;
 
 
 //==============================================================================
@@ -146,13 +145,13 @@ function rttihGetMethodInfo(AMethodProperty : PPropInfo) : TrttihMethodInfo; ove
 implementation
 
 function rttihGetPropertiesList(AInstance : TObject;
-                                const AList : TWideStrings;
+                                const AList : TStrings;
                                 ARecursive : Boolean = false;
                                 AIncludeTypeKinds : TTypeKinds = [];
                                 AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
-                                APrefix : WideString = '';
-                                ADelimiter : WideChar = '.';
+                                APrefix : String = '';
+                                ADelimiter : Char = '.';
                                 AIgnoreClasses : TList = nil) : Integer;
 begin
   Assert(Assigned(AInstance), 'Invalid object');
@@ -168,13 +167,13 @@ begin
 end;
 
 function rttihGetPropertiesList(AClass : TClass;
-                                const AList : TWideStrings;
+                                const AList : TStrings;
                                 ARecursive : Boolean = false;
                                 AIncludeTypeKinds : TTypeKinds = [];
                                 AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
-                                APrefix : WideString = '';
-                                ADelimiter : WideChar = '.';
+                                APrefix : String = '';
+                                ADelimiter : Char = '.';
                                 AIgnoreClasses : TList = nil) : Integer; overload;
 begin
   Assert(Assigned(AClass), 'Invalid class');
@@ -190,13 +189,13 @@ begin
 end;
 
 function rttihGetPropertiesList(AClassInfo : PTypeInfo;
-                                const AList : TWideStrings;
+                                const AList : TStrings;
                                 ARecursive : Boolean = false;  
                                 AIncludeTypeKinds : TTypeKinds = [];
                                 AExcludeTypeKinds : TTypeKinds = [];
                                 ASkipExceptions : Boolean = true;
-                                APrefix : WideString = '';
-                                ADelimiter : WideChar = '.';
+                                APrefix : String = '';
+                                ADelimiter : Char = '.';
                                 AIgnoreClasses : TList = nil) : Integer;
 var
   TypeData : PTypeData;
@@ -279,27 +278,27 @@ end;
 
 
 function rttihGetPropertyByName(AInstance : TObject;
-                                APropertyName : WideString;
-                                ADelimiter : WideChar = '.') : PPropInfo;
+                                APropertyName : String;
+                                ADelimiter : Char = '.') : PPropInfo;
 begin
   Assert(Assigned(AInstance), 'Invalid object');
   Result := rttihGetPropertyByName(AInstance.ClassInfo, APropertyName, ADelimiter);
 end;
 
 function rttihGetPropertyByName(AClass : TClass;
-                                APropertyName : WideString;
-                                ADelimiter : WideChar = '.') : PPropInfo; overload;
+                                APropertyName : String;
+                                ADelimiter : Char = '.') : PPropInfo; overload;
 begin
   Assert(Assigned(AClass), 'Invalid class');
   Result := rttihGetPropertyByName(AClass.ClassInfo, APropertyName, ADelimiter);
 end;
 
 function rttihGetPropertyByName(AClassInfo : PTypeInfo;
-                                APropertyName : WideString;
-                                ADelimiter : WideChar = '.') : PPropInfo;
+                                APropertyName : String;
+                                ADelimiter : Char = '.') : PPropInfo;
 var
   PosOfDelim : Integer;
-  PropName : WideString;
+  PropName : String;
 begin
   Assert(Assigned(AClassInfo) and (AClassinfo.Kind = tkClass), 'Invalid classinfo');
 
@@ -330,11 +329,11 @@ end;
 
 
 function rttihGetPropertyValue(AInstance : TObject;
-                               APropertyName : WideString;
-                               ADelimiter : WideChar = '.') : Variant;
+                               APropertyName : String;
+                               ADelimiter : Char = '.') : Variant;
 var
   PosOfDelim : Integer;
-  PropName : WideString;
+  PropName : String;
   PropInfo : PPropInfo;
 begin
   Result := null;
@@ -371,12 +370,12 @@ end;
 
 
 procedure rttihSetPropertyValue(AInstance : TObject;
-                                APropertyName : WideString;
+                                APropertyName : String;
                                 AValue : Variant;
-                                ADelimiter : WideChar = '.');
+                                ADelimiter : Char = '.');
 var
   PosOfDelim : Integer;
-  PropName : WideString;
+  PropName : String;
   PropInfo : PPropInfo;
   PropValue : Variant;
 begin
@@ -418,21 +417,21 @@ end;
 
 
 function rttihGetInheritancePath(AClass : TClass;
-                                 ADelimiter : WideChar = '.') : WideString;
+                                 ADelimiter : Char = '.') : String;
 begin
   Result := rttihGetInheritancePath(AClass.ClassInfo,
                                     ADelimiter);
 end;
 
 function rttihGetInheritancePath(AInstance : TObject;
-                                 ADelimiter : WideChar = '.') : WideString;
+                                 ADelimiter : Char = '.') : String;
 begin
   Result := rttihGetInheritancePath(AInstance.ClassInfo,
                                     ADelimiter);
 end;
 
 function rttihGetInheritancePath(AClassInfo : PTypeInfo;
-                                 ADelimiter : WideChar = '.') : WideString;
+                                 ADelimiter : Char = '.') : String;
 var
   TypeData : PTypeData;
 begin
@@ -456,7 +455,7 @@ end;
 //==============================================================================
 
 
-function rttihGetUnit(AClassInfo : PTypeInfo) : WideString;
+function rttihGetUnit(AClassInfo : PTypeInfo) : String;
 var
   TypeData : PTypeData;
 begin
@@ -470,13 +469,13 @@ begin
     Result := EmptyWideStr;
 end;
 
-function rttihGetUnit(AClass : TClass) : WideString;
+function rttihGetUnit(AClass : TClass) : String;
 begin
   Assert(Assigned(AClass), 'Invalid class');
   Result := rttihGetUnit(AClass.ClassInfo);
 end;
 
-function rttihGetUnit(AInstance : TObject) : WideString;
+function rttihGetUnit(AInstance : TObject) : String;
 begin
   Assert(Assigned(AInstance), 'Invalid object');
   Result := rttihGetUnit(AInstance.ClassInfo);
@@ -486,7 +485,7 @@ end;
 //==============================================================================
 
 
-function rttihOrdinalToString(ATypeInfo : PTypeInfo; Value : Integer) : WideString;
+function rttihOrdinalToString(ATypeInfo : PTypeInfo; Value : Integer) : String;
 const
   AsciiChars = [32..127];
 begin
@@ -510,7 +509,7 @@ begin
   end;
 end;
 
-function rttihSetToList(ATypeInfo : PTypeInfo; const AList : TWideStrings) : Integer;
+function rttihSetToList(ATypeInfo : PTypeInfo; const AList : TStrings) : Integer;
 var
   TypeInfoComp : PTypeInfo;
   TypeData,
@@ -535,7 +534,7 @@ begin
   end;
 end;
 
-function rttihEnumToList(ATypeInfo : PTypeInfo; const AList : TWideStrings) : Integer;
+function rttihEnumToList(ATypeInfo : PTypeInfo; const AList : TStrings) : Integer;
 var
   TypeData : PTypeData;
   Element : 0..255; //May be adapted to future changes

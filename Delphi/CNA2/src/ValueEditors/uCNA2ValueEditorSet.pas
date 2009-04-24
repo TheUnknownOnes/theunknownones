@@ -11,8 +11,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, uCNA2ValueEditors, StdCtrls, CheckLst,
   TypInfo,
-  uRTTIHelper,
-  WideStrings;
+  uRTTIHelper;
 
 type
   Tcna2ValueEditorSet = class(Tcna2ValueEditor)
@@ -68,7 +67,7 @@ procedure Tcna2ValueEditorSet.Init(ATypeInfo: PTypeInfo;
                                       AValue: Variant;
                                       AExpressionEvaluation : Boolean);
 var
-  sl : TWideStringList;
+  sl : TStringList;
   idx,
   idxItem : Integer;
   Element : Integer;
@@ -78,7 +77,7 @@ begin
 
   v := AValue;
 
-  sl := TWideStringList.Create;
+  sl := TStringList.Create;
   try
     rttihSetToList(ATypeInfo, sl);
 
