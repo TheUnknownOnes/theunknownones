@@ -657,30 +657,35 @@ begin
   Assert(Assigned(ASourceObj) and Assigned(ATargetObj), 'Source and target has to be valid objects!');
 
   Props := TStringList.Create;
-
-  rttihGetPropertiesList(ASourceObj,
-                         Props,
-                         true,
-                         [],
-                         [tkUnknown, tkInterface]);
-  for idx := 0 to Props.Count - 1 do
-  begin
-    PropSource := rttihGetPropertyByName(ASourceObj, Props[idx]);
-    PropTarget := rttihGetPropertyByName(ATargetObj, Props[idx]);
-
-    if Assigned(PropSource) and
-       Assigned(PropTarget) and
-       Assigned(PropSource^.GetProc) and
-       Assigned(PropTarget^.SetProc) then
+  try
+    rttihGetPropertiesList(ASourceObj,
+                           Props,
+                           true,
+                           [],
+                           [tkUnknown, tkInterface]);
+    for idx := 0 to Props.Count - 1 do
     begin
-      try
-        rttihSetPropertyValue(ATargetObj, Props[idx], rttihGetPropertyValue(ASourceObj, Props[idx]));
-      except
-        if not ASkipExceptions then
-          raise;
+      PropSource := rttihGetPropertyByName(ASourceObj, Props[idx]);
+      PropTarget := rttihGetPropertyByName(ATargetObj, Props[idx]);
+
+      if Assigned(PropSource) and
+         Assigned(PropTarget) and
+         Assigned(PropSource^.GetProc) and
+         Assigned(PropTarget^.SetProc) then
+      begin
+        try
+          rttihSetPropertyValue(ATargetObj, Props[idx], rttihGetPropertyValue(ASourceObj, Props[idx]));
+        except
+          if not ASkipExceptions then
+            raise;
+        end;
       end;
     end;
+
+  finally
+    Props.Free;
   end;
+
 end;
 
 end.
