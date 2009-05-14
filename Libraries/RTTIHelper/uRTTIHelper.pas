@@ -668,7 +668,9 @@ begin
     PropSource := rttihGetPropertyByName(ASourceObj, Props[idx]);
     PropTarget := rttihGetPropertyByName(ATargetObj, Props[idx]);
 
-    if Assigned(PropSource^.GetProc) and
+    if Assigned(PropSource) and
+       Assigned(PropTarget) and
+       Assigned(PropSource^.GetProc) and
        Assigned(PropTarget^.SetProc) then
     begin
       try
