@@ -142,6 +142,12 @@ function rttihGetMethodInfo(AMethodProperty : PTypeInfo) : TrttihMethodInfo; ove
 function rttihGetMethodInfo(AMethodProperty : PPropInfo) : TrttihMethodInfo; overload;
 
 
+//==============================================================================
+
+
+procedure rttihCloneObject(ASourceObj, ATargetObj : TObject; ASkipExceptions : Boolean = true);
+
+
 implementation
 
 function rttihGetPropertiesList(AInstance : TObject;
@@ -335,6 +341,7 @@ var
   PosOfDelim : Integer;
   PropName : String;
   PropInfo : PPropInfo;
+  Method : TMethod;
 begin
   Result := null;
 
@@ -350,6 +357,12 @@ begin
     begin
       Result := GetPropValue(AInstance, PropName, false);
       PropInfo := GetPropInfo(AInstance, PropName);
+
+      if PropInfo^.PropType^.Kind = tkMethod then
+      begin
+        Method := GetMethodProp(AInstance, PropInfo);
+        Result := VarArrayOf([Integer(Method.Code), Integer(Method.Data)]);
+      end;
     end
     else
       Result := null;
@@ -378,6 +391,7 @@ var
   PropName : String;
   PropInfo : PPropInfo;
   PropValue : Variant;
+  Method : TMethod;
 begin
   PosOfDelim := Pos(ADelimiter, APropertyName);
   if PosOfDelim = 0 then
@@ -404,6 +418,12 @@ begin
     begin
       case PropInfo.PropType^.Kind of
         tkClass: SetOrdProp(AInstance, PropInfo, AValue);
+        tkMethod:
+        begin
+          Method.Code := Pointer(Integer(AValue[0]));
+          Method.Data := Pointer(Integer(AValue[1]));
+          SetMethodProp(AInstance, PropInfo, Method);
+        end
         else
           SetPropValue(AInstance, PropInfo, AValue);
       end;
@@ -621,6 +641,44 @@ begin
     Result.ReturnType := PShortString(CurParam)^
   else
     Result.ReturnType := '';
+end;
+
+
+//==============================================================================
+
+
+procedure rttihCloneObject(ASourceObj, ATargetObj : TObject; ASkipExceptions : Boolean = true);
+var
+  Props : TStringList;
+  idx : Integer;
+  PropSource,
+  PropTarget : PPropInfo;
+begin
+  Assert(Assigned(ASourceObj) and Assigned(ATargetObj), 'Source and target has to be valid objects!');
+
+  Props := TStringList.Create;
+
+  rttihGetPropertiesList(ASourceObj,
+                         Props,
+                         true,
+                         [],
+                         [tkUnknown, tkInterface]);
+  for idx := 0 to Props.Count - 1 do
+  begin
+    PropSource := rttihGetPropertyByName(ASourceObj, Props[idx]);
+    PropTarget := rttihGetPropertyByName(ATargetObj, Props[idx]);
+
+    if Assigned(PropSource^.GetProc) and
+       Assigned(PropTarget^.SetProc) then
+    begin
+      try
+        rttihSetPropertyValue(ATargetObj, Props[idx], rttihGetPropertyValue(ASourceObj, Props[idx]));
+      except
+        if not ASkipExceptions then
+          raise;
+      end;
+    end;
+  end;
 end;
 
 end.
