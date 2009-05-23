@@ -7,23 +7,41 @@ uses
   Controls,
   Windows,
   Graphics,
+  Bass,
+  SysUtils,
   uBassCommon;
 
 type
+  TCustomBassWaveViewLine = class(TCollectionItem)
+  private
+    FColor: TColor;
+    FChannel: Cardinal;
+  protected
+    property Channel : Cardinal read FChannel write FChannel default 1;
+    property Color : TColor read FColor write FColor default clLime;
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+  end;
+
   TCustomBassWaveView = class(TGraphicControl)
   private
-    FWaveData: TBassWaveDataList;
     FBassChannel: Cardinal;
-    FLineColor: TColor;
     FBackColor: TColor;
-    FChannel: Cardinal;
-    procedure SetBassChannel(const Value: Cardinal);
+    FZoom: Single;
+    FLines: TCollection;
+
+    FOldData : Pointer;
+    FOldDataSize : Integer;
+
+    procedure SetLines(const Value: TCollection);
+
+    procedure SetOldDataSize(ANewSize : Integer);
   protected
-    property WaveData : TBassWaveDataList read FWaveData;
-    property BassChannel : Cardinal read FBassChannel write SetBassChannel;
+    property BassChannel : Cardinal read FBassChannel write FBassChannel;
     property BackColor : TColor read FBackColor write FBackColor default clBlack;
-    property LineColor : TColor read FLineColor write FLineColor default clLime;
-    property Channel : Cardinal read FChannel write FChannel default 1;
+    property Zoom : Single read FZoom write FZoom;
+    property Lines : TCollection read FLines write SetLines;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -31,15 +49,22 @@ type
     procedure Paint; override;
   end;
 
+  TBassWaveViewLine = class(TCustomBassWaveViewLine)
+  published
+    property Channel;
+    property Color;
+  end;
+
   TBassWaveView = class(TCustomBassWaveView)
   public
-    property WaveData;
+    constructor Create(AOwner: TComponent); override;
+
     property BassChannel;
   published
     property Align;
     property BackColor;
-    property LineColor;
-    property Channel;
+    property Zoom;
+    property Lines;
   end;
 
 implementation
@@ -50,48 +75,52 @@ constructor TCustomBassWaveView.Create(AOwner: TComponent);
 begin
   inherited;
 
-  FChannel := 1;
-  FWaveData := nil;
+  FOldData := nil;
+  FOldDataSize := 0;
+
+  FLines := nil;
+
+  FBassChannel := 0;
+  FZoom := 1;
 
   FBackColor := clBlack;
-  FLineColor := clLime;
 end;
 
 destructor TCustomBassWaveView.Destroy;
 begin
-  Channel := 0;
+  if Assigned(FLines) then
+    FLines.Free;
+
+  FreeMem(FOldData, FOldDataSize);
 
   inherited;
-end;
-
-procedure TCustomBassWaveView.SetBassChannel(const Value: Cardinal);
-begin
-  FBassChannel := Value;
-  
-  if Value > 0 then
-  begin
-    FWaveData := TBassWaveDataList.Create(FBassChannel);
-  end
-  else if Assigned(FWaveData) then
-  begin
-    FWaveData.Free;
-    FWaveData := nil;
-  end;
 end;
 
 procedure TCustomBassWaveView.Paint;
 var
   bmp : TBitmap;
-  List : TList;
-  Data : Pointer;
+  Data: PSingle;
   idx,
-  midY : Integer;
+  midY,
+  ChannelCnt : Cardinal;
   X,Y : Integer;
+  Buffer : Pointer;
+  BufferSize : Integer;
+  ChunksWished : Integer;
+  ChunkSize : Integer;
+  ChunksReceived : Integer;
+  LineIndex : Integer;
+  Line : TCustomBassWaveViewLine;
+  OldChunksAvailable : Integer;
+  TempBuffer : Pointer;
 begin
   inherited;
 
-  if not Assigned(FWaveData) then
-    exit;  
+  if FBassChannel = 0 then
+    exit;
+
+  if not Assigned(FLines) then
+    exit;
 
   bmp := TBitmap.Create;
   bmp.Width := Width;
@@ -104,50 +133,133 @@ begin
     Brush.Style := bsSolid;
     FillRect(ClipRect);
 
-    pen.Color := FLineColor;
+    ChunksWished := Trunc(bmp.Width * FZoom);
+
     pen.Style := psSolid;
 
     midY := bmp.Height div 2;
 
-    FWaveData.DeleteExceptLast(bmp.Width);
+    ChannelCnt := Bass_GetChannelsFromChannel(FBassChannel);
+    ChunkSize := SizeOf(Single) * ChannelCnt;
 
-    List := FWaveData.LockList;
+    GetMem(Buffer, ChunkSize * ChunksWished);
     try
-      MoveTo(0, midY);
+      BufferSize := BASS_ChannelGetData(FBassChannel, Buffer, BASS_DATA_FLOAT or (ChunksWished * ChunkSize));
 
-      for idx := 0 to List.Count - 1 do
+      ChunksReceived := BufferSize div ChunkSize;
+
+      if ChunksReceived < ChunksWished then
       begin
-        x := idx;
-        Data := List[idx];
+        OldChunksAvailable := (FOldDataSize div ChunkSize);
 
-        case FWaveData.SampleFormat of
-          bsf16Bit:
-          begin
-            Inc(PSmallInt(Data), FChannel - 1);
-            Y := Round(PSmallInt(Data)^ * midY + midY);
-          end;
+        if OldChunksAvailable >= ChunksWished - ChunksReceived then
+        begin
+          OldChunksAvailable := ChunksWished - ChunksReceived;
 
-          bsf32Bit:
-          begin
-            Inc(PSingle(Data), FChannel - 1);
-            Y := Round(PSingle(Data)^ * midY + midY);
-          end;
+          GetMem(TempBuffer, BufferSize);
 
-          else
-            Y := 0;
+          CopyMemory(TempBuffer, Buffer, BufferSize);
+
+          CopyMemory(Buffer, FOldData, OldChunksAvailable * ChunkSize);
+
+          CopyMemory(Pointer(Integer(Buffer) + OldChunksAvailable * ChunkSize), TempBuffer, BufferSize);
+
+          FreeMem(TempBuffer, BufferSize);
+
+          Inc(ChunksReceived, OldChunksAvailable);
         end;
+      end;
 
+      SetOldDataSize(BufferSize);
 
-        LineTo(X, Y);
+      if Assigned(FOldData) then
+        CopyMemory(FOldData, Buffer, BufferSize);
+
+      if ChunksReceived > 0 then
+      begin
+        for LineIndex := 0 to FLines.Count - 1 do
+        begin
+
+          Line := TCustomBassWaveViewLine(FLines.Items[LineIndex]);
+
+          Pen.Color := Line.Color;
+
+          MoveTo(0, midY);
+          Data := Buffer;
+          for idx := 0 to ChunksReceived - 1 do
+          begin
+            x := Trunc((bmp.Width / ChunksReceived) * idx);
+
+            Inc(Data, Line.Channel - 1);
+
+            Y := Trunc(Data^ * midY + midY);
+
+            LineTo(X, Y);
+
+            Inc(Data, ChannelCnt - Line.Channel + 1);
+          end;
+        end;
       end;
     finally
-      FWaveData.UnlockList;
+      FreeMem(Buffer, ChunkSize * ChunksWished);
     end;
   end;
 
   Canvas.Draw(0, 0, bmp);
 
   bmp.Free;
+end;
+
+procedure TCustomBassWaveView.SetLines(const Value: TCollection);
+begin
+  if Assigned(FLines) then
+    FLines.Assign(Value);
+end;
+
+procedure TCustomBassWaveView.SetOldDataSize(ANewSize: Integer);
+begin
+  if ANewSize <> FOldDataSize then
+  begin
+    if Assigned(FOldData) then
+      FreeMem(FOldData, FOldDataSize);
+
+
+    if ANewSize > 0 then
+    begin
+      FOldDataSize := ANewSize;
+      GetMem(FOldData, FOldDataSize);
+    end
+    else
+    begin
+      FOldDataSize := 0;
+      FOldData := nil;
+    end;
+  end;
+end;
+
+{ TCustomBassWaveViewLine }
+
+constructor TCustomBassWaveViewLine.Create(Collection: TCollection);
+begin
+  inherited;
+
+  FColor := clLime;
+  FChannel := 1;
+end;
+
+destructor TCustomBassWaveViewLine.Destroy;
+begin
+
+  inherited;
+end;
+
+{ TBassWaveView }
+
+constructor TBassWaveView.Create(AOwner: TComponent);
+begin
+  inherited;
+
+  FLines := TCollection.Create(TBassWaveViewLine);
 end;
 
 end.

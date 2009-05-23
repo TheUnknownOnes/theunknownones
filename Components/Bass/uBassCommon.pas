@@ -13,31 +13,20 @@ type
                        bsf16Bit = 16,
                        bsf32Bit = 32);
 
-  TBassWaveDataList = class(TThreadList)
-  protected
-    FChannels : Cardinal;
-    FSampleFormat : TBassSampleFormat;
-
-    procedure FreeData(AData : Pointer);
-  public
-    constructor Create(AChannel : Cardinal); reintroduce;
-    destructor Destroy(); override;
-
-    property Channels : Cardinal read FChannels;
-    property SampleFormat : TBassSampleFormat read FSampleFormat;
-
-    procedure Clear;
-
-    procedure CopyFrom(ABuffer : Pointer; ABufferLen : Integer);
-
-    function DataSize : Integer;
-
-    procedure DeleteRange(AFromIndex, AToIndex : Integer);
-    procedure DeleteExceptLast(ALast : Integer);
-  end;
+  TBassFFTResolution = (bfr128,
+                   bfr256,
+                   bfr512,
+                   bfr1024,
+                   bfr2048,
+                   bfr4096);
 
 function Bass_GetSampleFormatFromChannel(AChannel : Cardinal) : TBassSampleFormat;
 function Bass_GetChannelsFromChannel(AChannel : Cardinal) : Cardinal;
+
+function Bass_GetFFTLength(AFFTWidth : TBassFFTResolution) : Cardinal;
+function Bass_GetFFTCount(AFFTWidth : TBassFFTResolution) : Integer;
+function Bass_AllocFFTBuffer(AFFTWidth : TBassFFTResolution) : Pointer;
+procedure Bass_FreeFFTBuffer(AFFTWidth : TBassFFTResolution; var ABuffer : Pointer);
 
 implementation
 
@@ -73,106 +62,58 @@ begin
     Result := 0;
 end;
 
-{ TBassWaveDataList }
-
-procedure TBassWaveDataList.Clear;
+function Bass_GetFFTLength(AFFTWidth : TBassFFTResolution) : Cardinal;
 begin
-  DeleteRange(-1, -1);
-end;
-
-procedure TBassWaveDataList.CopyFrom(ABuffer: Pointer; ABufferLen: Integer);
-var
-  Data : Pointer;
-  List : TList;
-  idx,
-  cnt : Integer;
-  lDataSize : Integer;
-begin
-  lDataSize := DataSize;
-  List := LockList;
-  try
-    cnt := ABufferLen div lDataSize;
-    
-    for idx := 0 to cnt - 1 do
-    begin
-      GetMem(Data, lDataSize);
-      CopyMemory(Data, ABuffer, lDataSize);
-      List.Add(Data);
-
-      Inc(PByte(ABuffer), lDataSize);
-    end;
-    
-  finally
-    UnlockList;
+  case AFFTWidth of
+    bfr128: Result := BASS_DATA_FFT256;
+    bfr256: Result := BASS_DATA_FFT512;
+    bfr512: Result := BASS_DATA_FFT1024;
+    bfr1024: Result := BASS_DATA_FFT2048;
+    bfr2048: Result := BASS_DATA_FFT4096;
+    bfr4096: Result := BASS_DATA_FFT8192;
+    else
+      Result := 0;
   end;
 end;
 
-constructor TBassWaveDataList.Create(AChannel: Cardinal);
+function Bass_GetFFTCount(AFFTWidth : TBassFFTResolution) : Integer;
 begin
-  inherited Create();
-
-  FSampleFormat := Bass_GetSampleFormatFromChannel(AChannel);
-  FChannels := Bass_GetChannelsFromChannel(AChannel);
-end;
-
-function TBassWaveDataList.DataSize: Integer;
-begin
-  Result := FChannels * Integer(FSampleFormat);
-end;
-
-procedure TBassWaveDataList.DeleteExceptLast(ALast: Integer);
-var
-  idx : Integer;
-  List : TList;
-begin
-  List := LockList;
-  try
-
-    for idx := List.Count - 1 - ALast downto 0 do
-    begin
-      FreeData(List[idx]);
-      List.Delete(idx);
-    end;
-
-  finally
-    UnlockList;
+  case AFFTWidth of
+    bfr128: Result := 128;
+    bfr256: Result := 256;
+    bfr512: Result := 512;
+    bfr1024: Result := 1024;
+    bfr2048: Result := 2048;
+    bfr4096: Result := 4096;
+    else
+      Result := 0;
   end;
 end;
 
-procedure TBassWaveDataList.DeleteRange(AFromIndex, AToIndex: Integer);
-var
-  list : TList;
-  idx : Integer;
+function Bass_AllocFFTBuffer(AFFTWidth : TBassFFTResolution) : Pointer;
 begin
-  List := LockList;
-  try
-    if AFromIndex = -1 then
-      AFromIndex := 0;
-
-    if AToIndex = -1 then
-      AToIndex := list.Count - 1;
-
-    for idx := AToIndex downto AFromIndex do
-    begin
-      FreeData(List[idx]);
-      List.Delete(idx);
-    end;
-
-  finally
-    UnlockList;
+  case AFFTWidth of
+    bfr128: GetMem(Result, 128);
+    bfr256: GetMem(Result, 256);
+    bfr512: GetMem(Result, 512);
+    bfr1024: GetMem(Result, 1024);
+    bfr2048: GetMem(Result, 2048);
+    bfr4096: GetMem(Result, 4096);
+    else
+      Result := nil;
   end;
 end;
 
-destructor TBassWaveDataList.Destroy;
+procedure Bass_FreeFFTBuffer(AFFTWidth : TBassFFTResolution; var ABuffer : Pointer);
 begin
-  Clear;
-  
-  inherited;
-end;
-
-procedure TBassWaveDataList.FreeData(AData: Pointer);
-begin
-  FreeMem(AData, DataSize);
+  case AFFTWidth of
+    bfr128: FreeMem(ABuffer, 128);
+    bfr256: FreeMem(ABuffer, 256);
+    bfr512: FreeMem(ABuffer, 512);
+    bfr1024: FreeMem(ABuffer, 1024);
+    bfr2048: FreeMem(ABuffer, 2048);
+    bfr4096: FreeMem(ABuffer, 4096);
+  end;
 end;
 
 end.

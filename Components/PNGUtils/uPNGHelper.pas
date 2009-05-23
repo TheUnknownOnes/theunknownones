@@ -16,7 +16,7 @@ uses
                       AHotSpotX : Integer = 0;
                       AHotSpotY : Integer = 0) : HICON; overload;
 
-  function PNGtoIcon(const APNG : TPNGObject;
+  function PNGtoIcon(const APNG : TPngObject;
                       ACursor : Boolean = false;
                       AHotSpotX : Integer = 0;
                       AHotSpotY : Integer = 0) : HICON; overload;
@@ -25,15 +25,15 @@ uses
   function IconFromPNGFile (const AFileName : String) : HICON;
   function IconFromPNGStream(AStream: IStream) : HICON;
 
-  function IconFromTPNGObject(APNG: TPNGObject) : HICON;
+  function IconFromTPNGObject(APNG: TPngObject) : HICON;
   
-  function AddPNGToImageListTransparent(APNG: TPNGObject; AImageList : TCustomImagelist) : Integer;
+  function AddPNGToImageListTransparent(APNG: TPngObject; AImageList : TCustomImagelist) : Integer;
 
   procedure ModifyImageList16(const AImageList : TCustomImageList);
 
   procedure GetAsPNG(Instance : THandle;
                     Identifier : String;
-                    const PNG : TPNGObject);
+                    const PNG : TPngObject);
 
   procedure GetAsBitmap(Instance : THandle;
                         Identifier : String;
@@ -45,18 +45,18 @@ uses
                              Backcolor : Graphics.TColor;
                              ImageList : TCustomImageList):Integer; overload;
 
-  function AddPNGToImageList(PNG : TPNGObject;
+  function AddPNGToImageList(PNG : TPngObject;
                              Backcolor : Graphics.TColor;
                              ImageList : TCustomImageList):Integer; overload;
 
   function AlphaBlendColors(Color1, Color2 : Graphics.TColor;
                             Alpha: Byte):Graphics.TColor;
 
-  procedure PNGtoBitmap(PNG : TPNGObject;
+  procedure PNGtoBitmap(PNG : TPngObject;
                         BMP : Graphics.TBitmap;
                         BackColor : Graphics.TColor); overload;
 
-  procedure PNGtoBitmap(PNG : TPNGObject;
+  procedure PNGtoBitmap(PNG : TPngObject;
                         BMP : Graphics.TBitmap;
                         BackColor : Graphics.TColor;
                         Width, Height: Integer); overload;
@@ -68,7 +68,7 @@ uses
                                   ImageList : TCustomImageList);
 
   procedure ReplacePNGInImageListTransparent(Index: integer;
-                                             APNG: TPNGObject;
+                                             APNG: TPngObject;
                                              ImageList : TCustomImageList);
 
   procedure DrawTransparentBackground(ACanvas : TCanvas; APatternSize : Word = 8);
@@ -144,7 +144,7 @@ begin
   GdiplusShutdown(gdiplusToken);
 end;
 
-function IconFromTPNGObject(APNG: TPNGObject) : HICON;
+function IconFromTPNGObject(APNG: TPngObject) : HICON;
 var
   Stream: TMemoryStream;
   StreamAdapt: TStreamAdapter;
@@ -176,7 +176,7 @@ begin
   Shutdown;
 end;
 
-function AddPNGToImageListTransparent(APNG: TPNGObject; AImageList : TCustomimagelist) : Integer;
+function AddPNGToImageListTransparent(APNG: TPngObject; AImageList : TCustomimagelist) : Integer;
 var
   ico : HICON;
 begin
@@ -250,7 +250,7 @@ begin
   AImageList.Clear;
 end;
 
-function PNGtoIcon(const APNG : TPNGObject;
+function PNGtoIcon(const APNG : TPngObject;
                       ACursor : Boolean = false;
                       AHotSpotX : Integer = 0;
                       AHotSpotY : Integer = 0) : HICON;
@@ -378,7 +378,7 @@ begin
   // ... freigegeben werden, wenn wir es nicht mehr brauchen.
 end;
 
-procedure PNGtoBitmap(PNG : TPNGObject; BMP : Graphics.TBitmap; BackColor : Graphics.TColor);
+procedure PNGtoBitmap(PNG : TPngObject; BMP : Graphics.TBitmap; BackColor : Graphics.TColor);
 begin
   BMP.PixelFormat:=pf32bit;
   BMP.Width:=PNG.Width;
@@ -388,7 +388,7 @@ begin
   PNG.Draw(BMP.Canvas,Rect(0,0,BMP.Width,BMP.Height));
 end;
 
-procedure PNGtoBitmap(PNG : TPNGObject; BMP : Graphics.TBitmap; BackColor : Graphics.TColor; Width, Height: Integer);
+procedure PNGtoBitmap(PNG : TPngObject; BMP : Graphics.TBitmap; BackColor : Graphics.TColor; Width, Height: Integer);
 begin
   BMP.PixelFormat:=pf32bit;
   BMP.Width:=Width;
@@ -399,16 +399,16 @@ begin
     PNG.Draw(BMP.Canvas,Rect(0,0,BMP.Width,BMP.Height));
 end;
 
-procedure GetAsPNG(Instance:THandle;Identifier:String;const PNG:TPNGObject);
+procedure GetAsPNG(Instance:THandle;Identifier:String;const PNG:TPngObject);
 begin
   PNG.LoadFromResourceName(Instance,Identifier);
 end;
 
 procedure GetAsBitmap(Instance:THandle;Identifier:String;Backcolor:Graphics.TColor;const Bitmap:Graphics.TBitmap);
 var
-  PNG:TPNGObject;
+  PNG:TPngObject;
 begin
-  PNG:=TPNGObject.Create;
+  PNG:=TPngObject.Create;
   GetAsPNG(Instance,Identifier,PNG);
 
   PNGtoBitmap(PNG,Bitmap,Backcolor);
@@ -437,7 +437,7 @@ begin
 end;
 
 procedure ReplacePNGInImageListTransparent(Index: integer;
-                                             APNG: TPNGObject;
+                                             APNG: TPngObject;
                                              ImageList : TCustomImageList);
 var
   ico : HICON;
@@ -447,7 +447,7 @@ begin
   DestroyIcon(ico);
 end;
 
-function AddPNGToImageList(PNG: TPNGObject; Backcolor:Graphics.TColor;ImageList:TCustomImageList):Integer;
+function AddPNGToImageList(PNG: TPngObject; Backcolor:Graphics.TColor;ImageList:TCustomImageList):Integer;
 var
   BMP:Graphics.TBitmap;
 begin

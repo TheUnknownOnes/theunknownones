@@ -33,11 +33,11 @@ requires
   vclactnband,
   vclx,
   vcldb,
-  Jcl,
   DirectX9_D12,
   GDIPlus120,
   RegExp_D120R,
-  vclimg;
+  vclimg,
+  Jcl;
 
 contains
   sndkey32 in '..\..\sndkey32.pas',
@@ -56,7 +56,6 @@ contains
   uTaskbar in '..\..\uTaskbar.pas',
   uWinNT in '..\..\uWinNT.pas',
   wm_helper in '..\..\wm_helper.pas',
-  uNTServiceControl in '..\..\uNTServiceControl.pas',
   uVirtualEarth in '..\..\uVirtualEarth.pas';
 
 end.

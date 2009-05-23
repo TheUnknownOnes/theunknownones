@@ -1,4 +1,4 @@
-unit uRegisterWaveView;
+unit uRegisterVisualComponents;
 
 interface
 

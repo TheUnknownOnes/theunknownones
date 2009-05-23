@@ -1,8 +1,8 @@
 {-----------------------------------------------------------------------------
  Project: Settings
- Purpose: Contains the base classes for working with Settings 
+ Purpose: Contains the base classes for working with Settings
  Created: 21.05.2008 14:40:48
- 
+
  (c) by TheUnknownOnes
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
@@ -21,7 +21,8 @@ uses
   RegExpr,
   Windows,
   uSettingsRTTI,
-  uRTTIHelper;
+  uRTTIHelper,
+  TypInfo;
 
 type
 
@@ -179,6 +180,12 @@ type
                        ACreateIfMissing : Boolean = true;
                        AIsRegExPath : Boolean = false);
 
+    procedure WriteObject(APath : TSettingName;
+                        const AObject : TObject;
+                        ARecursive : Boolean = true;
+                        ACreateIfMssing : Boolean = true;
+                        AIsRegExPath : Boolean = false);
+
     function GetValues(APath : TSettingName;
                        ADefault : Variant;
                        AIsRegExPath : Boolean = false) : TSettingValues;
@@ -186,6 +193,12 @@ type
     function GetValue(APath : TSettingName;
                       ADefault : Variant;
                       AIsRegExPath : Boolean = false) : TSettingValue;
+
+    procedure ReadObject(APath : TSettingName;
+                        const AObject : TObject;
+                        ARecursive : Boolean = true;
+                        ACreateIfMssing : Boolean = true;
+                        AIsRegExPath : Boolean = false);
 
     function GetNames(APath : TSettingName;
                       AIsRegExPath : Boolean = true;
@@ -374,6 +387,11 @@ const
                                                         varString);
   {$endif}
   SettingsComponentGroup = 'Settings';
+
+  SettingsExcludeObjectPropertyTypeKinds = [tkUnknown,
+                                            tkClass,
+                                            tkMethod,
+                                            tkInterface];
 
 var
   SettingsRegExCaseinsensitive : Boolean = true;
@@ -1102,6 +1120,49 @@ begin
   end;
 end;
 
+procedure TCustomSettings.ReadObject(APath: TSettingName; const AObject: TObject;
+  ARecursive, ACreateIfMssing, AIsRegExPath: Boolean);
+var
+  APropertyNames : TStringList;
+  idx : Integer;
+  v : Variant;
+  Setts : TSettingList;
+begin
+  APropertyNames := TStringList.Create;
+  Setts := TSettingList.Create;
+  try
+    rttihGetPropertiesList(AObject,
+                           APropertyNames,
+                           ARecursive,
+                           [],
+                           SettingsExcludeObjectPropertyTypeKinds,
+                           true,
+                           '',
+                           SettingsPathDelimiter);
+
+    for idx := 0 to APropertyNames.Count - 1 do
+    begin
+      Setts.Clear;
+
+      QuerySettings(APath + SettingsPathDelimiter + APropertyNames[idx], AIsRegExPath, Setts, true);
+
+      if (Setts.Count > 0) then
+      begin
+        v := Setts.First.Value;
+
+        if not VarIsEmpty(v) then
+          rttihSetPropertyValue(AObject,
+                                APropertyNames[idx],
+                                v,
+                                SettingsPathDelimiter);
+      end;
+    end;
+  finally
+    APropertyNames.Free;
+    Setts.Free;
+  end;
+end;
+
 function TCustomSettings.GetValue(APath: TSettingName; ADefault: Variant;
   AIsRegExPath: Boolean): TSettingValue;
 var
@@ -1262,6 +1323,38 @@ begin
   InformComponentLinksAboutSave;
 
   Result := DoSave;
+end;
+
+procedure TCustomSettings.WriteObject(APath: TSettingName; const AObject: TObject;
+  ARecursive, ACreateIfMssing, AIsRegExPath: Boolean);
+var
+  APropertyNames : TStringList;
+  idx : Integer;
+  v : Variant;
+begin
+  APropertyNames := TStringList.Create;
+  try
+    rttihGetPropertiesList(AObject,
+                           APropertyNames,
+                           ARecursive,
+                           [],
+                           SettingsExcludeObjectPropertyTypeKinds,
+                           true,
+                           '',
+                           SettingsPathDelimiter);
+
+    for idx := 0 to APropertyNames.Count - 1 do
+    begin
+      v := rttihGetPropertyValue(AObject, APropertyNames[idx], SettingsPathDelimiter);
+
+      SetValue(APath + SettingsPathDelimiter + APropertyNames[idx],
+               v,
+               ACreateIfMssing,
+               AIsRegExPath);
+    end;
+  finally
+    APropertyNames.Free;
+  end;
 end;
 
 procedure TCustomSettings.SetParentSettings(const Value: TCustomSettings);
