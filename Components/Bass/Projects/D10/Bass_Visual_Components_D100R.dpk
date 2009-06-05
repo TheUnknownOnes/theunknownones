@@ -1,4 +1,4 @@
-package Bass_WaveView_D100D;
+package Bass_Visual_Components_D100R;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,14 +22,15 @@ package Bass_WaveView_D100D;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESIGNONLY}
+{$RUNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  bass_waveview_d100R;
+  vcl,
+  Bass_D100R;
 
 contains
-  uRegisterWaveView in '..\..\Design\uRegisterWaveView.pas';
+  uBassWaveView in '..\..\uBassWaveView.pas';
 
 end.

@@ -56,6 +56,7 @@ contains
   uTaskbar in '..\..\uTaskbar.pas',
   uWinNT in '..\..\uWinNT.pas',
   wm_helper in '..\..\wm_helper.pas',
-  uVirtualEarth in '..\..\uVirtualEarth.pas';
+  uVirtualEarth in '..\..\uVirtualEarth.pas',
+  uRDPHash in '..\..\uRDPHash.pas';
 
 end.
