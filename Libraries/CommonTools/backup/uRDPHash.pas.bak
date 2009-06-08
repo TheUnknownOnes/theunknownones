@@ -31,7 +31,7 @@ type
 
 
 function CryptRDPPassword(sPassword: string): string;
-{$ifndef FPC}function DecryptRDPPassword(sPasswordHash: string): string;{$endif}
+function DecryptRDPPassword(sPasswordHash: string): string;
 function BlobDataToHexStr(P: PByte; I: Integer): string;
 function PasswordHashToBlobData(sPasswordHash: string): DATA_BLOB;
 
@@ -170,8 +170,6 @@ end;
 {                     with the computerkey                  }
 { sPasswordHash: Password hash (string)                     }
 {***********************************************************}
-
-{$ifndef FPC}
 function DecryptRDPPassword(sPasswordHash: string): string;
 var DataIn: DATA_BLOB;
     DataOut: DATA_BLOB;
@@ -211,8 +209,6 @@ begin
     LocalFree(Cardinal(DataOut.pbData));
   end;
 end;
-
-{$endif}
 
 
 end.
