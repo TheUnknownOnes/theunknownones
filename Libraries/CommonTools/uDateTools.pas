@@ -349,8 +349,13 @@ function TCalendarWeek.ToString: String;
 var
   Fmt : String;
 begin
-  Fmt:='%.'+InttoStr(CW_YEARLEN)+'d/%.'+InttoStr(CW_WEEKLEN)+'d';
-  Result:=Format(FMT, [FYear, FWeek]);
+  if FYear=0 then
+    Result:=''
+  else
+  begin
+    Fmt:='%.'+InttoStr(CW_YEARLEN)+'d/%.'+InttoStr(CW_WEEKLEN)+'d';
+    Result:=Format(FMT, [FYear, FWeek]);
+  end;
 end;
 
 function TCalendarWeek.WeekEnd: TDateTime;
