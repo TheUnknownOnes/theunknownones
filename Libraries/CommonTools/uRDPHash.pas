@@ -21,6 +21,7 @@ interface
 
 uses Windows, Sysutils {$ifndef FPC}, JwaWinCrypt{$endif};
 
+{$ifdef FPC}
 type
   TBlobData = record
     cbData : DWORD;
@@ -28,6 +29,7 @@ type
   end;
   DATA_BLOB = TBlobData;
   PBlobData = ^TBlobData;
+{$endif}
 
 
 function CryptRDPPassword(sPassword: string): string;
