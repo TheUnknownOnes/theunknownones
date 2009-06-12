@@ -355,13 +355,18 @@ begin
     PropName := Copy(APropertyName, 1, PosOfDelim - 1);
     if Assigned(AInstance) then
     begin
-      Result := GetPropValue(AInstance, PropName, false);
       PropInfo := GetPropInfo(AInstance, PropName);
-
-      if PropInfo^.PropType^.Kind = tkMethod then
+      if PropInfo^.PropType^.Kind = tkInterface then
+        Result:=GetInterfaceProp(AInstance, APropertyName)
+      else
       begin
-        Method := GetMethodProp(AInstance, PropInfo);
-        Result := VarArrayOf([Integer(Method.Code), Integer(Method.Data)]);
+        Result := GetPropValue(AInstance, PropName, false);
+
+        if PropInfo^.PropType^.Kind = tkMethod then
+        begin
+          Method := GetMethodProp(AInstance, PropInfo);
+          Result := VarArrayOf([Integer(Method.Code), Integer(Method.Data)]);
+        end;
       end;
     end
     else
@@ -374,7 +379,6 @@ begin
       Result := rttihGetPropertyValue(TObject(Integer(Result)),
                                       Copy(APropertyName, PosOfDelim + 1, Length(APropertyName)));
     end
-
   end;
 end;
 
