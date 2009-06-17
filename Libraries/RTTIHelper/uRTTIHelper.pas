@@ -226,7 +226,7 @@ begin
            ((PropInfoList[idx].PropType^.Kind in AIncludeTypeKinds) and (AIncludeTypeKinds <> [])) or
            ((not (PropInfoList[idx].PropType^.Kind in AExcludeTypeKinds)) and (AExcludeTypeKinds <> [])) then
         begin
-          AList.Add(APrefix + PropInfoList[idx].Name);
+          AList.AddObject(APrefix + PropInfoList[idx].Name, TObject(PropInfoList[idx]));
 
           Inc(Result);
         end;
