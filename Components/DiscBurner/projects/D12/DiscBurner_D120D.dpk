@@ -27,6 +27,10 @@ package DiscBurner_D120D;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl;
+  rtl,
+  DiscBurner_D120R;
+
+contains
+  uRegDiscBurner in '..\..\design\uRegDiscBurner.pas';
 
 end.

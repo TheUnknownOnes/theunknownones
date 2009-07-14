@@ -21,6 +21,8 @@ uses
   Variants;
 
 type
+  TDiscMaster = class;
+
   TDiscRecorderState = (rsUnknown,
                         rsIdle,
                         rsOpen,
@@ -127,6 +129,7 @@ type
     function Get(Index: Integer): TDiscRecorder;
     procedure Put(Index: Integer; const Value: TDiscRecorder);
   public
+    destructor Destroy; override;
     procedure ToStrings(const AStrings : TStrings);
     function Add(Item: TDiscRecorder): Integer;
     function Extract(Item: TDiscRecorder): TDiscRecorder;
@@ -137,21 +140,43 @@ type
     procedure Insert(Index: Integer; Item: TDiscRecorder);
     function Last: TDiscRecorder;
     function Remove(Item: TDiscRecorder): Integer;
+
     property Items[Index: Integer]: TDiscRecorder read Get write Put; default;
   end;
+
 
   TDiscMasterProgressProc = procedure(ACompleted, ATotal : Integer) of object;
   TDiscMasterEstimationProc = procedure(ASecondsEstimated : Integer) of object;
   TDiscMasterResultProc = procedure(ASucceeded : Boolean; ACode : HRESULT) of object;
-  TDiscMasterPnPActivityProc = procedure(const ANewDiscRecorderList : TDiscRecorderList) of object;
+  TDiscMasterPnPActivityProc = procedure() of object;
   TDiscMasterCancelActionProc = procedure(out ACancelAction : Boolean) of object;
 
-  TDiscMaster = class(TComponent, IDiscMasterProgressEvents)
+
+  TDiscMasterEvents = class(TInterfacedObject, IDiscMasterProgressEvents)
+  private
+    FDiscMaster : TDiscMaster;
+  public
+    constructor Create(const ADiscMaster : TDiscMaster);
+
+    function QueryCancel(out pbCancel: BOOL): HRESULT; stdcall;
+    function NotifyPnPActivity: HRESULT; stdcall;
+    function NotifyAddProgress(nCompletedSteps, nTotalSteps: Longint): HRESULT; stdcall;
+    function NotifyBlockProgress(nCompleted, nTotal: Longint): HRESULT; stdcall;
+    function NotifyTrackProgress(nCurrentTrack, nTotalTracks: Longint): HRESULT; stdcall;
+    function NotifyPreparingBurn(nEstimatedSeconds: Longint): HRESULT; stdcall;
+    function NotifyClosingDisc(nEstimatedSeconds: Longint): HRESULT; stdcall;
+    function NotifyBurnComplete(status: HRESULT): HRESULT; stdcall;
+    function NotifyEraseComplete(status: HRESULT): HRESULT; stdcall;
+  end;
+
+
+  TDiscMaster = class(TComponent)
   private
     FDiscMaster : IDiscMaster;
     FRedBookDiscMaster : IRedbookDiscMaster;
     FJolietDiscMaster : IJolietDiscMaster;
 
+    FEvents : IDiscMasterProgressEvents;
     FEventCookie : Cardinal;
     
     FFormats : TDiscMasterFormats;
@@ -170,16 +195,6 @@ type
     procedure SetActiveFormat(const Value: TDiscMasterFormat);
     function GetActiveRecorder: IDiscRecorder;
     procedure SetActiveRecord(const Value: IDiscRecorder);
-
-    function QueryCancel(out pbCancel: BOOL): HRESULT; stdcall;
-    function NotifyPnPActivity: HRESULT; stdcall;
-    function NotifyAddProgress(nCompletedSteps, nTotalSteps: Longint): HRESULT; stdcall;
-    function NotifyBlockProgress(nCompleted, nTotal: Longint): HRESULT; stdcall;
-    function NotifyTrackProgress(nCurrentTrack, nTotalTracks: Longint): HRESULT; stdcall;
-    function NotifyPreparingBurn(nEstimatedSeconds: Longint): HRESULT; stdcall;
-    function NotifyClosingDisc(nEstimatedSeconds: Longint): HRESULT; stdcall;
-    function NotifyBurnComplete(status: HRESULT): HRESULT; stdcall;
-    function NotifyEraseComplete(status: HRESULT): HRESULT; stdcall;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -266,7 +281,7 @@ begin
     varWord: begin Result.vt := VT_UI2; Result.uiVal := AVariant end;
     varLongWord: begin Result.vt := VT_UI4; Result.ulVal := AVariant end;
     varInt64: begin Result.vt := VT_I8; i64 := AVariant; CopyMemory(@Result.hVal, @i64, 8) end;
-    varString: begin Result.vt := VT_LPSTR; Result.pszVal := PAnsiChar(String(AVariant)) end;
+    varString: begin Result.vt := VT_LPSTR; Result.pszVal := PAnsiChar(AnsiString(AVariant)) end;
   end;
 end;
 
@@ -569,6 +584,17 @@ begin
   Result := inherited Add(Item);
 end;
 
+destructor TDiscRecorderList.Destroy;
+begin
+  while Count > 0 do
+  begin
+    First.Free;
+    Delete(0);
+  end;
+
+  inherited;
+end;
+
 function TDiscRecorderList.Extract(Item: TDiscRecorder): TDiscRecorder;
 begin
   Result := inherited Extract(Item);
@@ -720,14 +746,14 @@ begin
   else
     FJolietDiscMaster := nil;
 
-  FEventCookie := 0;
-
-  EDiscBurnerException.Check(FDiscMaster.ProgressAdvise(Self, FEventCookie));
+  FEvents := TDiscMasterEvents.Create(Self);
+  EDiscBurnerException.Check(FDiscMaster.ProgressAdvise(FEvents, FEventCookie));
 end;
 
 destructor TDiscMaster.Destroy;
 begin
   FDiscMaster.ProgressUnadvise(FEventCookie);
+  FEvents := nil;
 
   if Assigned(FDiscMaster) then
     FDiscMaster.Close;
@@ -768,96 +794,6 @@ begin
     AList.Add(TDiscRecorder.Create(rec));
     e.Next(1, rec, Fetched);
   end;
-end;
-
-function TDiscMaster.NotifyAddProgress(nCompletedSteps,
-  nTotalSteps: Integer): HRESULT;
-begin
-  Result := S_OK;
-
-  if Assigned(FOnAddProgress) then
-    FOnAddProgress(nCompletedSteps, nTotalSteps);
-end;
-
-function TDiscMaster.NotifyBlockProgress(nCompleted, nTotal: Integer): HRESULT;
-begin
-  Result := S_OK;
-
-  if Assigned(FOnBlockProgress) then
-    FOnBlockProgress(nCompleted, nTotal);
-end;
-
-function TDiscMaster.NotifyBurnComplete(status: HRESULT): HRESULT;
-begin
-  Result := S_OK;
-
-  if Assigned(FOnBurnComplete) then
-    FOnBurnComplete(Succeeded(status), status);
-end;
-
-function TDiscMaster.NotifyClosingDisc(nEstimatedSeconds: Integer): HRESULT;
-begin
-  Result := S_OK;
-
-  if Assigned(FOnClosingDisc) then
-    FOnClosingDisc(nEstimatedSeconds);
-end;
-
-function TDiscMaster.NotifyEraseComplete(status: HRESULT): HRESULT;
-begin
-  Result := S_OK;
-
-  if Assigned(FOnEraseComplete) then
-    FOnEraseComplete(Succeeded(status), status);
-end;
-
-function TDiscMaster.NotifyPnPActivity: HRESULT;
-var
-  list : TDiscRecorderList;
-begin
-  Result := S_OK;
-
-  if Assigned(FOnPnPActivity) then
-  begin
-    list := TDiscRecorderList.Create;
-    try
-      GetRecorderList(list);
-      FOnPnPActivity(list);
-    finally
-      list.Free;
-    end;
-  end;
-end;
-
-function TDiscMaster.NotifyPreparingBurn(nEstimatedSeconds: Integer): HRESULT;
-begin
-  Result := S_OK;
-
-  if Assigned(FOnPreparingBurn) then
-    FOnPreparingBurn(nEstimatedSeconds);
-end;
-
-function TDiscMaster.NotifyTrackProgress(nCurrentTrack,
-  nTotalTracks: Integer): HRESULT;
-begin
-  Result := S_OK;
-
-  if Assigned(FOnTrackProgress) then
-    FOnTrackProgress(nCurrentTrack, nTotalTracks);
-end;
-
-function TDiscMaster.QueryCancel(out pbCancel: BOOL): HRESULT;
-var
-  Cancel : Boolean;
-begin
-  Result := S_OK;
-
-  Cancel := false;
-
-  if Assigned(FOnCancelAction) then
-    FOnCancelAction(Cancel);
-
-  pbCancel := Cancel;
 end;
 
 procedure TDiscMaster.ReadAvailableFormats;
@@ -903,7 +839,7 @@ begin
     for idx := AList.Count - 1 downto 0 do
     begin
       if newlist.IndexByGUID(AList[idx].GUID) = -1 then
-        AList.Delete(idx);
+        AList.Extract(AList[idx]).Free;
     end;
 
 
@@ -925,6 +861,122 @@ end;
 procedure TDiscMaster.SetActiveRecord(const Value: IDiscRecorder);
 begin
   FDiscMaster.SetActiveDiscRecorder(Value);
+end;
+
+{ TDiscMasterEvents }
+
+constructor TDiscMasterEvents.Create(const ADiscMaster: TDiscMaster);
+begin
+  FDiscMaster := ADiscMaster;
+  inherited Create();
+end;
+
+function TDiscMasterEvents.NotifyAddProgress(nCompletedSteps,
+  nTotalSteps: Integer): HRESULT;
+begin
+  if Assigned(FDiscMaster) and Assigned(FDiscMaster.FOnAddProgress) then
+  begin
+    FDiscMaster.FOnAddProgress(nCompletedSteps, nTotalSteps);
+    Result := S_OK;
+  end
+  else
+    Result := E_NOTIMPL;
+end;
+
+function TDiscMasterEvents.NotifyBlockProgress(nCompleted,
+  nTotal: Integer): HRESULT;
+begin
+  if Assigned(FDiscMaster) and Assigned(FDiscMaster.FOnBlockProgress) then
+  begin
+    FDiscMaster.FOnBlockProgress(nCompleted, nTotal);
+    Result := S_OK;
+  end
+  else
+    Result := E_NOTIMPL;
+end;
+
+function TDiscMasterEvents.NotifyBurnComplete(status: HRESULT): HRESULT;
+begin
+  if Assigned(FDiscMaster) and Assigned(FDiscMaster.FOnBurnComplete) then
+  begin
+    FDiscMaster.FOnBurnComplete(Succeeded(status), status);
+    Result := S_OK;
+  end
+  else
+    Result := E_NOTIMPL;
+end;
+
+function TDiscMasterEvents.NotifyClosingDisc(
+  nEstimatedSeconds: Integer): HRESULT;
+begin
+  if Assigned(FDiscMaster) and Assigned(FDiscMaster.FOnClosingDisc) then
+  begin
+    FDiscMaster.FOnClosingDisc(nEstimatedSeconds);
+    Result := S_OK;
+  end
+  else
+    Result := E_NOTIMPL;
+end;
+
+function TDiscMasterEvents.NotifyEraseComplete(status: HRESULT): HRESULT;
+begin
+  if Assigned(FDiscMaster) and Assigned(FDiscMaster.FOnEraseComplete) then
+  begin
+    FDiscMaster.FOnEraseComplete(Succeeded(status), status);
+    Result := S_OK;
+  end
+  else
+    Result := E_NOTIMPL;
+end;
+
+function TDiscMasterEvents.NotifyPnPActivity: HRESULT;
+begin
+  if Assigned(FDiscMaster) and Assigned(FDiscMaster.FOnPnPActivity) then
+  begin
+    FDiscMaster.FOnPnPActivity();
+    Result := S_OK;
+  end
+  else
+    Result := E_NOTIMPL;
+end;
+
+function TDiscMasterEvents.NotifyPreparingBurn(
+  nEstimatedSeconds: Integer): HRESULT;
+begin
+  if Assigned(FDiscMaster) and Assigned(FDiscMaster.FOnPreparingBurn) then
+  begin
+    FDiscMaster.FOnPreparingBurn(nEstimatedSeconds);
+    Result := S_OK;
+  end
+  else
+    Result := E_NOTIMPL;
+end;
+
+function TDiscMasterEvents.NotifyTrackProgress(nCurrentTrack,
+  nTotalTracks: Integer): HRESULT;
+begin
+  if Assigned(FDiscMaster) and Assigned(FDiscMaster.FOnTrackProgress) then
+  begin
+    FDiscMaster.FOnTrackProgress(nCurrentTrack, nTotalTracks);
+    Result := S_OK;
+  end
+  else
+    Result := E_NOTIMPL;
+end;
+
+function TDiscMasterEvents.QueryCancel(out pbCancel: BOOL): HRESULT;
+var
+  Cancel : Boolean;
+begin
+  if Assigned(FDiscMaster) and Assigned(FDiscMaster.FOnCancelAction) then
+  begin
+    Cancel := false;
+    FDiscMaster.FOnCancelAction(Cancel);
+    pbCancel := Cancel;
+    Result := S_OK;
+  end
+  else
+    Result := E_NOTIMPL;
 end;
 
 initialization

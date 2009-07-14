@@ -87,6 +87,7 @@ const
 function BASS_Encode_GetVersion: DWORD; stdcall; external bassencdll;
 
 function BASS_Encode_Start(handle:DWORD; cmdline:PChar; flags:DWORD; proc:ENCODEPROC; user:Pointer): HENCODE; stdcall; external bassencdll;
+function BASS_Encode_StartLimit(handle:DWORD; cmdline:PChar; flags:DWORD; proc:ENCODEPROC; user:Pointer; limit:DWORD): HENCODE; stdcall; external bassencdll;
 function BASS_Encode_AddChunk(handle:HENCODE; id:PAnsiChar; buffer:Pointer; length:DWORD): BOOL; stdcall; external bassencdll;
 function BASS_Encode_IsActive(handle:DWORD): DWORD; stdcall; external bassencdll;
 function BASS_Encode_Stop(handle:DWORD): BOOL; stdcall; external bassencdll;

@@ -44,6 +44,8 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="DiscBurner_D120R.dcp"/>
+			<DCCReference Include="..\..\design\uRegDiscBurner.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
