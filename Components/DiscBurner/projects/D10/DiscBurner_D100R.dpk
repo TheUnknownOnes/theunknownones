@@ -1,0 +1,47 @@
+package DiscBurner_D100R;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  CommonTools_D100R,
+  RegExp_D100R,
+  GDIPlus100,
+  DirectX9_D10,
+  PNGSupport_D100,
+  vcl,
+  Jcl,
+  vcldb,
+  dbrtl,
+  vclx,
+  vclactnband,
+  TntUnicodeVcl,
+  VirtualTreesD10;
+
+contains
+  uDiscBurner in '..\..\uDiscBurner.pas';
+
+end.

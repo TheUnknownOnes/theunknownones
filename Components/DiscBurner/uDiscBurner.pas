@@ -1,3 +1,10 @@
+{-----------------------------------------------------------------------------
+ Purpose: Implement the IMAPI as objects
+
+ (c) by TheUnknownOnes
+ see http://www.TheUnknownOnes.net
+-----------------------------------------------------------------------------}
+
 unit uDiscBurner;
 
 interface
@@ -11,8 +18,7 @@ uses
   jwaIMAPI,
   jwaIMAPIError,
   ComObj,
-  Variants,
-  uSysTools;
+  Variants;
 
 type
   TDiscRecorderState = (rsUnknown,
@@ -39,16 +45,27 @@ type
                             mfWriteable);
   TDiscRecorderMediaFlags = set of TDiscRecorderMediaFlag;
 
+  TDiscMasterFormat = (fJoliet,
+                       fRedBook);
+  TDiscMasterFormats = set of TDiscMasterFormat;
+
   TDiscRecorder = class(TObject)
   private
     FDiscRecorder : IDiscRecorder;
-    FFlagDeleteMe : Boolean;
 
     FVendor,
     FProductID,
     Frevision : String;
 
+    FSessionCount,
+    FLastTrack : Byte;
+    FStartAddress,
+    FNextWriteable,
+    FFreeBlocks : Cardinal;
+
+
     procedure ReadNames;
+    procedure ReadMediaInfo;
 
     function GetProductID: String;
     function GetRevision: String;
@@ -60,6 +77,13 @@ type
     function GetMediaType: TDiscRecorderMediaTypes;
     function GetProp(AName: String): Variant;
     procedure SetProp(AName: String; const Value: Variant);
+    function GetGUID: TGUID;
+    function GetMediaSessionCount: Byte;
+    function GetLastTrack: Byte;
+    function GetMediaFreeBlocks: Cardinal;
+    function GetMediaNextWriteableAddress: Cardinal;
+    function GetMediaSize: Cardinal;
+    function GetMediaStartAddressLastTrack: Cardinal;
   public
     constructor Create(const ADiskRecorder : IDiscRecorder);
     destructor Destroy; override;
@@ -72,9 +96,13 @@ type
 
     procedure ReadPropertyNames(const AProperties : TStrings);
 
+    property DiscRecorder : IDiscRecorder read FDiscRecorder;
+
     property Vendor : String read GetVendor;
     property ProductID : String read GetProductID;
     property Revision : String read GetRevision;
+
+    property GUID : TGUID read GetGUID;
 
     property State : TDiscRecorderState read GetState;
     property RekorderType : TDiscRecorderType read GetRekorderType;
@@ -82,9 +110,17 @@ type
 
     property MediaType : TDiscRecorderMediaTypes read GetMediaType;
     property MediaFlags : TDiscRecorderMediaFlags read GetMediaFlags;
+    property MediaSessionCount : Byte read GetMediaSessionCount;
+    property MediaLastTrack : Byte read GetLastTrack;
+    property MediaStartAddressLastTrack : Cardinal read GetMediaStartAddressLastTrack;
+    property MediaNextWriteableAddress : Cardinal read GetMediaNextWriteableAddress;
+    property MediaFreeBlocks : Cardinal read GetMediaFreeBlocks;
+    property MediaSize : Cardinal read GetMediaSize;
 
     property Prop[AName : String] : Variant read GetProp write SetProp;
   end;
+
+
 
   TDiscRecorderList = class(TList)
   private
@@ -92,31 +128,49 @@ type
     procedure Put(Index: Integer; const Value: TDiscRecorder);
   public
     procedure ToStrings(const AStrings : TStrings);
-    function IndexByGUID(AGUID : TGUID) : Integer;
     function Add(Item: TDiscRecorder): Integer;
     function Extract(Item: TDiscRecorder): TDiscRecorder;
     function First: TDiscRecorder;
-    function IndexOf(Item: TDiscRecorder): Integer;
+    function IndexOf(Item: TDiscRecorder): Integer; overload;
+    function IndexOf(Item: IDiscRecorder): Integer; overload;
+    function IndexByGUID(AGUID : TGUID) : Integer;
     procedure Insert(Index: Integer; Item: TDiscRecorder);
     function Last: TDiscRecorder;
     function Remove(Item: TDiscRecorder): Integer;
     property Items[Index: Integer]: TDiscRecorder read Get write Put; default;
   end;
 
-  TBlockProgressEvent = procedure(ACompleted, ATotal : Integer) of object;
+  TDiscMasterProgressProc = procedure(ACompleted, ATotal : Integer) of object;
+  TDiscMasterEstimationProc = procedure(ASecondsEstimated : Integer) of object;
+  TDiscMasterResultProc = procedure(ASucceeded : Boolean; ACode : HRESULT) of object;
+  TDiscMasterPnPActivityProc = procedure(const ANewDiscRecorderList : TDiscRecorderList) of object;
+  TDiscMasterCancelActionProc = procedure(out ACancelAction : Boolean) of object;
 
-
-  TDiscBurner = class(TComponent, IDiscMasterProgressEvents)
+  TDiscMaster = class(TComponent, IDiscMasterProgressEvents)
   private
-    FDiscmaster : IDiscMaster;
-    FDiscRecorderList : TDiscRecorderList;
-    FOnBlockProgress: TBlockProgressEvent;
+    FDiscMaster : IDiscMaster;
+    FRedBookDiscMaster : IRedbookDiscMaster;
+    FJolietDiscMaster : IJolietDiscMaster;
 
     FEventCookie : Cardinal;
+    
+    FFormats : TDiscMasterFormats;
+    FOnAddProgress: TDiscMasterProgressProc;
+    FOnTrackProgress: TDiscMasterProgressProc;
+    FOnEraseComplete: TDiscMasterResultProc;
+    FOnBurnComplete: TDiscMasterResultProc;
+    FOnPreparingBurn: TDiscMasterEstimationProc;
+    FOnCancelAction: TDiscMasterCancelActionProc;
+    FOnClosingDisc: TDiscMasterEstimationProc;
+    FOnBlockProgress: TDiscMasterProgressProc;
+    FOnPnPActivity: TDiscMasterPnPActivityProc;
 
-    procedure ClearDiscRecorder;
+    procedure ReadAvailableFormats;
+    function GetActiveFormat: TDiscMasterFormat;
+    procedure SetActiveFormat(const Value: TDiscMasterFormat);
+    function GetActiveRecorder: IDiscRecorder;
+    procedure SetActiveRecord(const Value: IDiscRecorder);
 
-    {$REGION 'IDiscMasterProgressEvents'}
     function QueryCancel(out pbCancel: BOOL): HRESULT; stdcall;
     function NotifyPnPActivity: HRESULT; stdcall;
     function NotifyAddProgress(nCompletedSteps, nTotalSteps: Longint): HRESULT; stdcall;
@@ -126,23 +180,39 @@ type
     function NotifyClosingDisc(nEstimatedSeconds: Longint): HRESULT; stdcall;
     function NotifyBurnComplete(status: HRESULT): HRESULT; stdcall;
     function NotifyEraseComplete(status: HRESULT): HRESULT; stdcall;
-    {$ENDREGION}
   public
-    constructor Create(AOwner : TComponent); override;
-    destructor Destroy(); override;
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
 
-    procedure RefreshDiscRekorderList;
+    procedure GetRecorderList(const AList : TDiscRecorderList);
+    procedure RefreshRecorderList(const AList : TDiscRecorderList);
 
-    property DiscRecorderList : TDiscRecorderList read FDiscRecorderList;
+    procedure ClearContent;
+
+    property ActiveRecorder : IDiscRecorder read GetActiveRecorder write SetActiveRecord;
 
   published
-    property OnBlockProgress : TBlockProgressEvent read FOnBlockProgress write FOnBlockProgress;
+    property ActiveFormat : TDiscMasterFormat read GetActiveFormat write SetActiveFormat default fJoliet;
+
+    property OnCancelAction : TDiscMasterCancelActionProc read FOnCancelAction write FOnCancelAction;
+    property OnPnPActivity : TDiscMasterPnPActivityProc read FOnPnPActivity write FOnPnPActivity;
+    property OnAddProgress : TDiscMasterProgressProc read FOnAddProgress write FOnAddProgress;
+    property OnBlockProgress : TDiscMasterProgressProc read FOnBlockProgress write FOnBlockProgress;
+    property OnTrackProgress : TDiscMasterProgressProc read FOnTrackProgress write FOnTrackProgress;
+    property OnPreparingBurn : TDiscMasterEstimationProc read FOnPreparingBurn write FOnPreparingBurn;
+    property OnClosingDisc : TDiscMasterEstimationProc read FOnClosingDisc write FOnClosingDisc;
+    property OnBurnComplete : TDiscMasterResultProc read FOnBurnComplete write FOnBurnComplete;
+    property OnEraseComplete : TDiscMasterResultProc read FOnEraseComplete write FOnEraseComplete;
   end;
+
 
   EDiscBurnerException = class(Exception)
   public
-    class procedure CreateAndRaise(AErrorCode : Integer);
+    class procedure Check(AErrorCode : Integer);
   end;
+
+const
+  DISC_BLOCK_SIZE = 2048;
 
 implementation
 
@@ -173,135 +243,30 @@ begin
   end;
 end;
 
-{ TDiscBurner }
-
-procedure TDiscBurner.ClearDiscRecorder;
-begin
-  while FDiscRecorderList.Count > 0 do
-  begin
-    FDiscRecorderList.First.Free;
-    FDiscRecorderList.Delete(0);
-  end;
-end;
-
-constructor TDiscBurner.Create(AOwner : TComponent);
+function VariantToPropVariant(const AVariant : Variant) : TPropVariant;
 var
-  Res : HRESULT;
+  i64 : Int64;
 begin
-  inherited;
-  
-  Res := CoCreateInstance(CLSID_MSDiscMasterObj,
-                          nil,
-                          CLSCTX_LOCAL_SERVER,
-                          IID_IDiscMaster,
-                          FDiscmaster);
+  FillMemory(@Result, SizeOf(Result), 0);
 
-  EDiscBurnerException.CreateAndRaise(Res);
-
-  EDiscBurnerException.CreateAndRaise(FDiscmaster.Open);
-
-  FDiscRecorderList := TDiscRecorderList.Create;
-  RefreshDiscRekorderList;
-
-  EDiscBurnerException.CreateAndRaise(FDiscmaster.ProgressAdvise(Self, FEventCookie));
-end;
-
-destructor TDiscBurner.Destroy;
-begin
-  ClearDiscRecorder;
-  FDiscRecorderList.Free;
-
-
-  FDiscmaster.ProgressUnadvise(FEventCookie);
-  FDiscmaster.Close;
-  FDiscmaster := nil;
-
-  inherited;
-end;
-
-
-function TDiscBurner.NotifyAddProgress(nCompletedSteps,
-  nTotalSteps: Integer): HRESULT;
-begin
-  Result := S_OK;
-end;
-
-function TDiscBurner.NotifyBlockProgress(nCompleted, nTotal: Integer): HRESULT;
-begin
-  if Assigned(FOnBlockProgress) then
-    FOnBlockProgress(nCompleted, nTotal);
-    
-  Result := S_OK;
-end;
-
-function TDiscBurner.NotifyBurnComplete(status: HRESULT): HRESULT;
-begin
-  Result := S_OK;
-end;
-
-function TDiscBurner.NotifyClosingDisc(nEstimatedSeconds: Integer): HRESULT;
-begin
-  Result := S_OK;
-end;
-
-function TDiscBurner.NotifyEraseComplete(status: HRESULT): HRESULT;
-begin
-  Result := S_OK;
-end;
-
-function TDiscBurner.NotifyPnPActivity: HRESULT;
-begin
-  Result := S_OK;
-end;
-
-function TDiscBurner.NotifyPreparingBurn(nEstimatedSeconds: Integer): HRESULT;
-begin
-  Result := S_OK;
-end;
-
-function TDiscBurner.NotifyTrackProgress(nCurrentTrack,
-  nTotalTracks: Integer): HRESULT;
-begin
-  Result := S_OK;
-end;
-
-function TDiscBurner.QueryCancel(out pbCancel: BOOL): HRESULT;
-begin
-  Result := E_NOTIMPL;
-end;
-
-procedure TDiscBurner.RefreshDiscRekorderList;
-var
-  idx,
-  idy : Integer;
-  enum : IEnumDiscRecorders;
-  rec : IDiscRecorder;
-  fetched : Cardinal;
-begin
-  for idx := 0 to FDiscRecorderList.Count - 1 do
-    FDiscRecorderList[idx].FFlagDeleteMe := true;
-
-  if Succeeded(FDiscmaster.EnumDiscRecorders(enum)) then
-  begin
-    fetched := 1;
-    enum.Next(1, rec, fetched);
-    while fetched > 0 do
-    begin
-      idy := FDiscRecorderList.IndexByGUID(TDiscRecorder.GUIDFromDiscRecorder(rec));
-
-      if idy > -1 then
-        FDiscRecorderList[idy].FFlagDeleteMe := false
-      else
-        FDiscRecorderList.Add(TDiscRecorder.Create(rec));
-
-      enum.Next(1, rec, fetched);
-    end;
-  end;
-
-  for idx := FDiscRecorderList.Count - 1 downto 0 do
-  begin
-    if FDiscRecorderList[idx].FFlagDeleteMe then
-      FDiscRecorderList.Delete(idx);
+  case VarType(AVariant) of
+    varEmpty: Result.vt := VT_EMPTY;
+    varNull: Result.vt := VT_NULL;
+    varSmallInt: begin Result.vt := VT_I2; Result.iVal := AVariant end;
+    varInteger: begin Result.vt := VT_I4; Result.lVal := AVariant end;
+    varSingle: begin Result.vt := VT_R4; Result.fltVal := AVariant end;
+    varDouble: begin Result.vt := VT_R4; Result.dblVal := AVariant end;
+    varCurrency: begin Result.vt := VT_CY; Result.cyVal := AVariant end;
+    varDate: begin Result.vt := VT_DATE; Result.date := AVariant end;
+    varOleStr: begin Result.vt := VT_LPWSTR; Result.pwszVal := PWideChar(WideString(AVariant)) end;
+    varError: begin Result.vt := VT_ERROR; Result.scode := AVariant end;
+    varBoolean: begin Result.vt := VT_BOOL; Result.bool := AVariant end;
+    varShortInt: begin Result.vt := VT_I1; Result.bVal := AVariant end;
+    varByte: begin Result.vt := VT_I2; Result.iVal := AVariant end;
+    varWord: begin Result.vt := VT_UI2; Result.uiVal := AVariant end;
+    varLongWord: begin Result.vt := VT_UI4; Result.ulVal := AVariant end;
+    varInt64: begin Result.vt := VT_I8; i64 := AVariant; CopyMemory(@Result.hVal, @i64, 8) end;
+    varString: begin Result.vt := VT_LPSTR; Result.pszVal := PAnsiChar(String(AVariant)) end;
   end;
 end;
 
@@ -310,7 +275,6 @@ end;
 constructor TDiscRecorder.Create(const ADiskRecorder: IDiscRecorder);
 begin
   FDiscRecorder := ADiskRecorder;
-  FFlagDeleteMe := false;
 
   FVendor := '';
   FProductID := '';
@@ -324,9 +288,9 @@ end;
 
 procedure TDiscRecorder.Eject;
 begin
-  EDiscBurnerException.CreateAndRaise(FDiscRecorder.OpenExclusive);
+  EDiscBurnerException.Check(FDiscRecorder.OpenExclusive);
   try
-    EDiscBurnerException.CreateAndRaise(FDiscRecorder.Eject);
+    EDiscBurnerException.Check(FDiscRecorder.Eject);
   finally
     FDiscRecorder.Close;
   end;
@@ -334,12 +298,23 @@ end;
 
 procedure TDiscRecorder.Erase(AFull: Boolean);
 begin
-  EDiscBurnerException.CreateAndRaise(FDiscRecorder.OpenExclusive);
+  EDiscBurnerException.Check(FDiscRecorder.OpenExclusive);
   try
-    EDiscBurnerException.CreateAndRaise(FDiscRecorder.Erase(AFull));
+    EDiscBurnerException.Check(FDiscRecorder.Erase(AFull));
   finally
     FDiscRecorder.Close;
   end;
+end;
+
+function TDiscRecorder.GetGUID: TGUID;
+begin
+  Result := TDiscRecorder.GUIDFromDiscRecorder(FDiscRecorder);
+end;
+
+function TDiscRecorder.GetLastTrack: Byte;
+begin
+  ReadMediaInfo;
+  Result := FLastTrack;
 end;
 
 function TDiscRecorder.GetMediaFlags: TDiscRecorderMediaFlags;
@@ -348,9 +323,9 @@ var
 begin
   Result := [];
   
-  EDiscBurnerException.CreateAndRaise(FDiscRecorder.OpenExclusive);
+  EDiscBurnerException.Check(FDiscRecorder.OpenExclusive);
   try
-    EDiscBurnerException.CreateAndRaise(FDiscRecorder.QueryMediaType(mt, mf));
+    EDiscBurnerException.Check(FDiscRecorder.QueryMediaType(mt, mf));
 
     if mf = 0 then
       Include(Result, mfNoMedia)
@@ -368,15 +343,45 @@ begin
   end;
 end;
 
+function TDiscRecorder.GetMediaFreeBlocks: Cardinal;
+begin
+  ReadMediaInfo;
+  Result := FFreeBlocks;
+end;
+
+function TDiscRecorder.GetMediaNextWriteableAddress: Cardinal;
+begin
+  ReadMediaInfo;
+  Result := FNextWriteable;
+end;
+
+function TDiscRecorder.GetMediaSessionCount: Byte;
+begin
+  ReadMediaInfo;
+  Result := FSessionCount;
+end;
+
+function TDiscRecorder.GetMediaSize: Cardinal;
+begin
+  ReadMediaInfo;
+  Result := FNextWriteable + FFreeBlocks;
+end;
+
+function TDiscRecorder.GetMediaStartAddressLastTrack: Cardinal;
+begin
+  ReadMediaInfo;
+  Result := FStartAddress;
+end;
+
 function TDiscRecorder.GetMediaType: TDiscRecorderMediaTypes;
 var
   mt, mf : Integer;
 begin
   Result := [];
 
-  EDiscBurnerException.CreateAndRaise(FDiscRecorder.OpenExclusive);
+  EDiscBurnerException.Check(FDiscRecorder.OpenExclusive);
   try
-    EDiscBurnerException.CreateAndRaise(FDiscRecorder.QueryMediaType(mt, mf));
+    EDiscBurnerException.Check(FDiscRecorder.QueryMediaType(mt, mf));
 
     if mt = 0 then
       Include(Result, mtNoMedia)
@@ -408,7 +413,7 @@ var
   p : PWideChar;
 begin
   p := nil;
-  EDiscBurnerException.CreateAndRaise(FDiscRecorder.GetPath(p));
+  EDiscBurnerException.Check(FDiscRecorder.GetPath(p));
   Result := P;  
 end;
 
@@ -425,12 +430,12 @@ var
   Spec : PROPSPEC;
   V : TPropVariant;
 begin
-  EDiscBurnerException.CreateAndRaise(FDiscRecorder.GetRecorderProperties(Props));
+  EDiscBurnerException.Check(FDiscRecorder.GetRecorderProperties(Props));
 
   Spec.ulKind := PRSPEC_LPWSTR;
-  Spec.lpwstr := PWideChar(AName);
+  Spec.lpwstr := PWideChar(WideString(AName));
 
-  EDiscBurnerException.CreateAndRaise(Props.ReadMultiple(1,@Spec, @V));
+  EDiscBurnerException.Check(Props.ReadMultiple(1,@Spec, @V));
 
   Result := PropVariantToVariant(V);
 end;
@@ -439,7 +444,7 @@ function TDiscRecorder.GetRekorderType: TDiscRecorderType;
 var
   t : Integer;
 begin
-  EDiscBurnerException.CreateAndRaise(FDiscRecorder.GetRecorderType(t));
+  EDiscBurnerException.Check(FDiscRecorder.GetRecorderType(t));
 
   case t of
     $01: Result := rtCDR;
@@ -461,7 +466,7 @@ function TDiscRecorder.GetState: TDiscRecorderState;
 var
   s : Cardinal;
 begin
-  EDiscBurnerException.CreateAndRaise(FDiscRecorder.GetRecorderState(s));
+  EDiscBurnerException.Check(FDiscRecorder.GetRecorderState(s));
 
   case s of
     RECORDER_DOING_NOTHING: Result := rsIdle;
@@ -490,6 +495,16 @@ begin
 end;
 
 
+procedure TDiscRecorder.ReadMediaInfo;
+begin
+  EDiscBurnerException.Check(FDiscRecorder.OpenExclusive);
+  try
+    EDiscBurnerException.Check(FDiscRecorder.QueryMediaInfo(FSessionCount, FLastTrack, FStartAddress, FNextWriteable, FFreeBlocks));
+  finally
+    FDiscRecorder.Close;
+  end;
+end;
+
 procedure TDiscRecorder.ReadNames;
 var
   V, P, R : PWideChar;
@@ -498,7 +513,7 @@ begin
   P := nil;
   R := nil;
 
-  EDiscBurnerException.CreateAndRaise(FDiscRecorder.GetDisplayNames(V, P, R));
+  EDiscBurnerException.Check(FDiscRecorder.GetDisplayNames(V, P, R));
   
   FVendor := V;
   FProductID := P;
@@ -512,7 +527,7 @@ var
   s : STATPROPSTG;
   fetched : Cardinal;
 begin
-  EDiscBurnerException.CreateAndRaise(FDiscRecorder.GetRecorderProperties(Props));
+  EDiscBurnerException.Check(FDiscRecorder.GetRecorderProperties(Props));
 
   if Succeeded(Props.Enum(enum)) then
   begin
@@ -526,13 +541,25 @@ begin
 end;
 
 procedure TDiscRecorder.SetProp(AName: String; const Value: Variant);
+var
+  Props : IPropertyStorage;
+  Spec : PROPSPEC;
+  V : TPropVariant;
 begin
+  EDiscBurnerException.Check(FDiscRecorder.GetRecorderProperties(Props));
 
+  Spec.ulKind := PRSPEC_LPWSTR;
+  Spec.lpwstr := PWideChar(WideString(AName));
+
+  v := VariantToPropVariant(Value);
+
+  EDiscBurnerException.Check(Props.WriteMultiple(1, @Spec, @V, PID_FIRST_USABLE));
+  EDiscBurnerException.Check(FDiscRecorder.SetRecorderProperties(Props));
 end;
 
 function TDiscRecorder.ToString: String;
 begin
-  Result := Vendor + ' ' + ProductID; 
+  Result := Vendor + ' ' + ProductID;
 end;
 
 { TDiscRecorderList }
@@ -560,15 +587,12 @@ end;
 function TDiscRecorderList.IndexByGUID(AGUID: TGUID): Integer;
 var
   idx : Integer;
-  GUID : TGUID;
 begin
   Result := -1;
 
   for idx := 0 to Count - 1 do
   begin
-    GUID := TDiscRecorder.GUIDFromDiscRecorder(Items[idx].FDiscRecorder);
-
-    if SameGUID(AGUID, GUID) then
+    if IsEqualGUID(AGUID, Items[idx].GUID) then
     begin
       Result := idx;
       break;
@@ -576,7 +600,12 @@ begin
   end;
 end;
 
-function TDiscRecorderList.IndexOf(Item: TDiscRecorder): Integer;
+function TDiscRecorderList.IndexOf(Item: IDiscRecorder): Integer;
+begin
+  Result := IndexByGUID(TDiscRecorder.GUIDFromDiscRecorder(Item));
+end;
+
+function TDiscRecorderList.IndexOf(Item: TDiscRecorder): Integer; 
 begin
   Result := inherited IndexOf(Item);
 end;
@@ -611,14 +640,14 @@ end;
 
 { EDiscBurnerException }
 
-class procedure EDiscBurnerException.CreateAndRaise(AErrorCode: Integer);
+class procedure EDiscBurnerException.Check(AErrorCode: Integer);
 var
   msg : String;
 begin
   msg := '';
 
   case AErrorCode of
-    IMAPI_S_PROPERTIESIGNORED: msg := 'An unknown property was passed in a property set and it was ignored.';
+    //IMAPI_S_PROPERTIESIGNORED: msg := 'An unknown property was passed in a property set and it was ignored.';
     IMAPI_S_BUFFER_TO_SMALL: msg := 'The output buffer is too small.';
     IMAPI_E_NOTOPENED: msg := 'A call to IDiscMaster::Open has not been made.';
     IMAPI_E_NOTINITIALIZED: msg := 'A recorder object has not been initialized.';
@@ -662,6 +691,240 @@ begin
 
   if msg <> '' then
     raise EDiscBurnerException.Create(msg);
+end;
+
+{ TDiscMaster }
+
+procedure TDiscMaster.ClearContent;
+begin
+  EDiscBurnerException.Check(FDiscMaster.ClearFormatContent);
+end;
+
+constructor TDiscMaster.Create(AOwner: TComponent);
+begin
+  inherited;
+
+  FDiscMaster := CreateComObject(MSDiscMasterObj) as IDiscMaster;
+
+  EDiscBurnerException.Check(FDiscMaster.Open);
+
+  ReadAvailableFormats;
+
+  if fRedBook in FFormats then
+    FRedBookDiscMaster := FDiscMaster as IRedbookDiscMaster
+  else
+    FRedBookDiscMaster := nil;
+
+  if fJoliet in FFormats then
+    FJolietDiscMaster := FDiscMaster as IJolietDiscMaster
+  else
+    FJolietDiscMaster := nil;
+
+  FEventCookie := 0;
+
+  EDiscBurnerException.Check(FDiscMaster.ProgressAdvise(Self, FEventCookie));
+end;
+
+destructor TDiscMaster.Destroy;
+begin
+  FDiscMaster.ProgressUnadvise(FEventCookie);
+
+  if Assigned(FDiscMaster) then
+    FDiscMaster.Close;
+  
+  inherited;
+end;
+  
+function TDiscMaster.GetActiveFormat: TDiscMasterFormat;
+var
+  fmt : TGUID;
+begin
+  EDiscBurnerException.Check(FDiscMaster.GetActiveDiscMasterFormat(fmt));
+
+  if IsEqualGUID(fmt, IID_IRedbookDiscMaster) then
+    Result := fRedBook
+  else
+  if IsEqualGUID(fmt, IID_IJolietDiscMaster) then
+    Result := fJoliet;
+end;                
+
+function TDiscMaster.GetActiveRecorder: IDiscRecorder;
+begin
+  FDiscMaster.GetActiveDiscRecorder(Result);
+end;
+
+procedure TDiscMaster.GetRecorderList(const AList: TDiscRecorderList);
+var
+  e : IEnumDiscRecorders;
+  rec : IDiscRecorder;
+  Fetched : Cardinal;
+begin
+  EDiscBurnerException.Check(FDiscMaster.EnumDiscRecorders(e));
+
+  Fetched := 1;
+  e.Next(1, rec, Fetched);
+  while Fetched > 0 do
+  begin
+    AList.Add(TDiscRecorder.Create(rec));
+    e.Next(1, rec, Fetched);
+  end;
+end;
+
+function TDiscMaster.NotifyAddProgress(nCompletedSteps,
+  nTotalSteps: Integer): HRESULT;
+begin
+  Result := S_OK;
+
+  if Assigned(FOnAddProgress) then
+    FOnAddProgress(nCompletedSteps, nTotalSteps);
+end;
+
+function TDiscMaster.NotifyBlockProgress(nCompleted, nTotal: Integer): HRESULT;
+begin
+  Result := S_OK;
+
+  if Assigned(FOnBlockProgress) then
+    FOnBlockProgress(nCompleted, nTotal);
+end;
+
+function TDiscMaster.NotifyBurnComplete(status: HRESULT): HRESULT;
+begin
+  Result := S_OK;
+
+  if Assigned(FOnBurnComplete) then
+    FOnBurnComplete(Succeeded(status), status);
+end;
+
+function TDiscMaster.NotifyClosingDisc(nEstimatedSeconds: Integer): HRESULT;
+begin
+  Result := S_OK;
+
+  if Assigned(FOnClosingDisc) then
+    FOnClosingDisc(nEstimatedSeconds);
+end;
+
+function TDiscMaster.NotifyEraseComplete(status: HRESULT): HRESULT;
+begin
+  Result := S_OK;
+
+  if Assigned(FOnEraseComplete) then
+    FOnEraseComplete(Succeeded(status), status);
+end;
+
+function TDiscMaster.NotifyPnPActivity: HRESULT;
+var
+  list : TDiscRecorderList;
+begin
+  Result := S_OK;
+
+  if Assigned(FOnPnPActivity) then
+  begin
+    list := TDiscRecorderList.Create;
+    try
+      GetRecorderList(list);
+      FOnPnPActivity(list);
+    finally
+      list.Free;
+    end;
+  end;
+end;
+
+function TDiscMaster.NotifyPreparingBurn(nEstimatedSeconds: Integer): HRESULT;
+begin
+  Result := S_OK;
+
+  if Assigned(FOnPreparingBurn) then
+    FOnPreparingBurn(nEstimatedSeconds);
+end;
+
+function TDiscMaster.NotifyTrackProgress(nCurrentTrack,
+  nTotalTracks: Integer): HRESULT;
+begin
+  Result := S_OK;
+
+  if Assigned(FOnTrackProgress) then
+    FOnTrackProgress(nCurrentTrack, nTotalTracks);
+end;
+
+function TDiscMaster.QueryCancel(out pbCancel: BOOL): HRESULT;
+var
+  Cancel : Boolean;
+begin
+  Result := S_OK;
+
+  Cancel := false;
+
+  if Assigned(FOnCancelAction) then
+    FOnCancelAction(Cancel);
+
+  pbCancel := Cancel;
+end;
+
+procedure TDiscMaster.ReadAvailableFormats;
+var
+  e : IEnumDiscMasterFormats;
+  fmtID : TGUID;
+  Fetched : Cardinal;
+begin
+  FFormats := [];
+
+  EDiscBurnerException.Check(FDiscMaster.EnumDiscMasterFormats(e));
+
+  Fetched := 1;
+  e.Next(1, fmtID, Fetched);
+
+  while Fetched > 0 do
+  begin
+    if IsEqualGUID(fmtID, IID_IRedbookDiscMaster) then
+      Include(FFormats, fRedBook)
+    else
+    if IsEqualGUID(fmtID, IID_IJolietDiscMaster) then
+      Include(FFormats, fJoliet);
+
+    e.Next(1, fmtID, Fetched);
+  end;
+end;
+
+procedure TDiscMaster.RefreshRecorderList(const AList: TDiscRecorderList);
+var
+  newlist : TDiscRecorderList;
+  idx : Integer;
+begin
+  newlist := TDiscRecorderList.Create;
+  try
+    GetRecorderList(newlist);
+
+    for idx := 0 to newlist.Count - 1 do
+    begin
+      if AList.IndexByGUID(newlist[idx].GUID) = -1 then
+        AList.Add(TDiscRecorder.Create(newlist[idx].DiscRecorder));
+    end;
+
+    for idx := AList.Count - 1 downto 0 do
+    begin
+      if newlist.IndexByGUID(AList[idx].GUID) = -1 then
+        AList.Delete(idx);
+    end;
+
+
+  finally
+    newlist.Free;
+  end;
+end;
+
+procedure TDiscMaster.SetActiveFormat(const Value: TDiscMasterFormat);
+var
+  unk : IInterface;
+begin
+  case Value of
+    fJoliet: EDiscBurnerException.Check(FDiscMaster.SetActiveDiscMasterFormat(IID_IJolietDiscMaster, unk));
+    fRedBook: EDiscBurnerException.Check(FDiscMaster.SetActiveDiscMasterFormat(IID_IRedbookDiscMaster, unk));
+  end;
+end;
+
+procedure TDiscMaster.SetActiveRecord(const Value: IDiscRecorder);
+begin
+  FDiscMaster.SetActiveDiscRecorder(Value);
 end;
 
 initialization
