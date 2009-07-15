@@ -27,19 +27,7 @@ package DiscBurner_D100R;
 
 requires
   rtl,
-  CommonTools_D100R,
-  RegExp_D100R,
-  GDIPlus100,
-  DirectX9_D10,
-  PNGSupport_D100,
-  vcl,
-  Jcl,
-  vcldb,
-  dbrtl,
-  vclx,
-  vclactnband,
-  TntUnicodeVcl,
-  VirtualTreesD10;
+  vcl;
 
 contains
   uDiscBurner in '..\..\uDiscBurner.pas';
