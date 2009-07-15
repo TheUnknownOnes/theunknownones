@@ -210,7 +210,7 @@ type
     procedure GetRecorderList(const AList : TDiscRecorderList);
     procedure RefreshRecorderList(const AList : TDiscRecorderList);
 
-    procedure ClearContent;
+    procedure ClearFormatContent;
 
     procedure JolietAddContent(AContent : IStorage; AOverwriteExisting : Boolean = false);
 
@@ -737,7 +737,7 @@ begin
   EDiscBurnerException.Check(FJolietDiscMaster.AddData(AContent, o));
 end;
 
-procedure TDiscMaster.ClearContent;
+procedure TDiscMaster.ClearFormatContent;
 begin
   EDiscBurnerException.Check(FDiscMaster.ClearFormatContent);
 end;
