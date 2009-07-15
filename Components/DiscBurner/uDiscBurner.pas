@@ -13,7 +13,9 @@ uses
   Classes,
   Windows,
   Sysutils,
+  Dialogs,
   ActiveX,
+  Contnrs,
   jwaActiveX,
   jwaIMAPI,
   jwaIMAPIError,
@@ -87,7 +89,7 @@ type
     function GetMediaSize: Cardinal;
     function GetMediaStartAddressLastTrack: Cardinal;
   public
-    constructor Create(const ADiskRecorder : IDiscRecorder);
+    constructor Create(ADiskRecorder : IDiscRecorder);
     destructor Destroy; override;
 
     class function GUIDFromDiscRecorder(const ADiscRecorder : IDiscRecorder) : TGUID;
@@ -124,12 +126,11 @@ type
 
 
 
-  TDiscRecorderList = class(TList)
+  TDiscRecorderList = class(TObjectList)
   private
     function Get(Index: Integer): TDiscRecorder;
     procedure Put(Index: Integer; const Value: TDiscRecorder);
   public
-    destructor Destroy; override;
     procedure ToStrings(const AStrings : TStrings);
     function Add(Item: TDiscRecorder): Integer;
     function Extract(Item: TDiscRecorder): TDiscRecorder;
@@ -178,7 +179,7 @@ type
 
     FEvents : IDiscMasterProgressEvents;
     FEventCookie : Cardinal;
-    
+
     FFormats : TDiscMasterFormats;
     FOnAddProgress: TDiscMasterProgressProc;
     FOnTrackProgress: TDiscMasterProgressProc;
@@ -191,10 +192,17 @@ type
     FOnPnPActivity: TDiscMasterPnPActivityProc;
 
     procedure ReadAvailableFormats;
+    procedure NeedJoliet;
+
     function GetActiveFormat: TDiscMasterFormat;
     procedure SetActiveFormat(const Value: TDiscMasterFormat);
     function GetActiveRecorder: IDiscRecorder;
     procedure SetActiveRecord(const Value: IDiscRecorder);
+    function GetJTotalDataBlocks: Integer;
+    function GetJUsedDataBlocks: Integer;
+    function GetJDataBlockSize: Integer;
+    function GetJProp(AName: String): Variant;
+    procedure SetJProp(AName: String; const Value: Variant);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -204,7 +212,14 @@ type
 
     procedure ClearContent;
 
+    procedure JolietAddContent(AContent : IStorage; AOverwriteExisting : Boolean = false);
+
     property ActiveRecorder : IDiscRecorder read GetActiveRecorder write SetActiveRecord;
+
+    property JolietTotalDataBlocks : Integer read GetJTotalDataBlocks;
+    property JolietUsedDataBlocks : Integer read GetJUsedDataBlocks;
+    property JolietDataBlockSize : Integer read GetJDataBlockSize;
+    property JolietProp[AName : String] : Variant read GetJProp write SetJProp;
 
   published
     property ActiveFormat : TDiscMasterFormat read GetActiveFormat write SetActiveFormat default fJoliet;
@@ -225,9 +240,6 @@ type
   public
     class procedure Check(AErrorCode : Integer);
   end;
-
-const
-  DISC_BLOCK_SIZE = 2048;
 
 implementation
 
@@ -287,7 +299,7 @@ end;
 
 { TDiscRecorder }
 
-constructor TDiscRecorder.Create(const ADiskRecorder: IDiscRecorder);
+constructor TDiscRecorder.Create(ADiskRecorder: IDiscRecorder);
 begin
   FDiscRecorder := ADiskRecorder;
 
@@ -584,25 +596,14 @@ begin
   Result := inherited Add(Item);
 end;
 
-destructor TDiscRecorderList.Destroy;
-begin
-  while Count > 0 do
-  begin
-    First.Free;
-    Delete(0);
-  end;
-
-  inherited;
-end;
-
 function TDiscRecorderList.Extract(Item: TDiscRecorder): TDiscRecorder;
 begin
-  Result := inherited Extract(Item);
+  Result := TDiscRecorder(inherited Extract(Item));
 end;
 
 function TDiscRecorderList.First: TDiscRecorder;
 begin
-  Result := inherited First;
+  Result := TDiscRecorder(inherited First);
 end;
 
 function TDiscRecorderList.Get(Index: Integer): TDiscRecorder;
@@ -643,7 +644,7 @@ end;
 
 function TDiscRecorderList.Last: TDiscRecorder;
 begin
-  Result := inherited Last;
+  Result := TDiscRecorder(inherited Last);
 end;
 
 procedure TDiscRecorderList.Put(Index: Integer; const Value: TDiscRecorder);
@@ -721,6 +722,21 @@ end;
 
 { TDiscMaster }
 
+procedure TDiscMaster.JolietAddContent(AContent: IStorage;
+  AOverwriteExisting: Boolean);
+var
+  o : Integer;
+begin
+  NeedJoliet;
+
+  if AOverwriteExisting then
+    o := 1
+  else
+    o := 0;
+
+  EDiscBurnerException.Check(FJolietDiscMaster.AddData(AContent, o));
+end;
+
 procedure TDiscMaster.ClearContent;
 begin
   EDiscBurnerException.Check(FDiscMaster.ClearFormatContent);
@@ -746,17 +762,21 @@ begin
   else
     FJolietDiscMaster := nil;
 
+  FEventCookie := 0;
   FEvents := TDiscMasterEvents.Create(Self);
   EDiscBurnerException.Check(FDiscMaster.ProgressAdvise(FEvents, FEventCookie));
+
 end;
 
 destructor TDiscMaster.Destroy;
 begin
+
   FDiscMaster.ProgressUnadvise(FEventCookie);
   FEvents := nil;
 
   if Assigned(FDiscMaster) then
     FDiscMaster.Close;
+
   
   inherited;
 end;
@@ -779,6 +799,43 @@ begin
   FDiscMaster.GetActiveDiscRecorder(Result);
 end;
 
+function TDiscMaster.GetJDataBlockSize: Integer;
+begin
+  NeedJoliet;
+
+  EDiscBurnerException.Check(FJolietDiscMaster.GetDataBlockSize(Result));
+end;
+
+function TDiscMaster.GetJProp(AName: String): Variant;
+var
+  Props : IPropertyStorage;
+  Spec : PROPSPEC;
+  V : TPropVariant;
+begin
+  EDiscBurnerException.Check(FJolietDiscMaster.GetJolietProperties(Props));
+
+  Spec.ulKind := PRSPEC_LPWSTR;
+  Spec.lpwstr := PWideChar(WideString(AName));
+
+  EDiscBurnerException.Check(Props.ReadMultiple(1,@Spec, @V));
+
+  Result := PropVariantToVariant(V);
+end;
+
+function TDiscMaster.GetJTotalDataBlocks: Integer;
+begin
+  NeedJoliet;
+
+  EDiscBurnerException.Check(FJolietDiscMaster.GetTotalDataBlocks(Result));
+end;
+
+function TDiscMaster.GetJUsedDataBlocks: Integer;
+begin
+  NeedJoliet;
+
+  EDiscBurnerException.Check(FJolietDiscMaster.GetUsedDataBlocks(Result));
+end;
+
 procedure TDiscMaster.GetRecorderList(const AList: TDiscRecorderList);
 var
   e : IEnumDiscRecorders;
@@ -794,6 +851,12 @@ begin
     AList.Add(TDiscRecorder.Create(rec));
     e.Next(1, rec, Fetched);
   end;
+end;
+
+procedure TDiscMaster.NeedJoliet;
+begin
+  if not Assigned(FJolietDiscMaster) then
+    raise Exception.Create('No Joliet support!');
 end;
 
 procedure TDiscMaster.ReadAvailableFormats;
@@ -863,12 +926,29 @@ begin
   FDiscMaster.SetActiveDiscRecorder(Value);
 end;
 
+procedure TDiscMaster.SetJProp(AName: String; const Value: Variant);
+var
+  Props : IPropertyStorage;
+  Spec : PROPSPEC;
+  V : TPropVariant;
+begin
+  EDiscBurnerException.Check(FJolietDiscMaster.GetJolietProperties(Props));
+
+  Spec.ulKind := PRSPEC_LPWSTR;
+  Spec.lpwstr := PWideChar(WideString(AName));
+
+  v := VariantToPropVariant(Value);
+
+  EDiscBurnerException.Check(Props.WriteMultiple(1, @Spec, @V, PID_FIRST_USABLE));
+  EDiscBurnerException.Check(FJolietDiscMaster.SetJolietProperties(Props));
+end;
+
 { TDiscMasterEvents }
 
 constructor TDiscMasterEvents.Create(const ADiscMaster: TDiscMaster);
 begin
-  FDiscMaster := ADiscMaster;
   inherited Create();
+  FDiscMaster := ADiscMaster;
 end;
 
 function TDiscMasterEvents.NotifyAddProgress(nCompletedSteps,

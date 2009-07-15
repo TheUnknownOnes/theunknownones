@@ -82,6 +82,7 @@ begin
         FTree.FullyVisible[Node]:=NodeMatches(Node, AWords)
       else
         FTree.IsVisible[Node]:=true;
+
       Node:=FTree.GetNext(Node);
     end;
   finally
