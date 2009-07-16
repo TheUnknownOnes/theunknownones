@@ -20,6 +20,7 @@ uses
   jwaIMAPI,
   jwaIMAPIError,
   ComObj,
+  StrUtils,
   Variants;
 
 type
@@ -151,6 +152,8 @@ type
   TDiscMasterResultProc = procedure(ASucceeded : Boolean; ACode : HRESULT) of object;
   TDiscMasterPnPActivityProc = procedure() of object;
   TDiscMasterCancelActionProc = procedure(out ACancelAction : Boolean) of object;
+  TDiscMasterErrorProc = procedure(AException : Exception) of object;
+  TDiscMasterCachingProc = procedure(AObject : String) of object;
 
 
   TDiscMasterEvents = class(TInterfacedObject, IDiscMasterProgressEvents)
@@ -190,9 +193,20 @@ type
     FOnClosingDisc: TDiscMasterEstimationProc;
     FOnBlockProgress: TDiscMasterProgressProc;
     FOnPnPActivity: TDiscMasterPnPActivityProc;
+    FOnJAddContentError: TDiscMasterErrorProc;
+    FOnAddObjectToCache: TDiscMasterCachingProc;
+    FOnAddFileToCache: TDiscMasterProgressProc;
+    FAutoCutNamesAt: Integer;
 
     procedure ReadAvailableFormats;
     procedure NeedJoliet;
+
+    procedure DoAddObjectToCache(AObject : String);
+
+    function AutoCut(const AText : String) : String;
+
+    procedure AddFileToStorage(AFile : String; AStorage : IStorage; ANewFileName : String = '');
+    procedure AddFiles(AFiles : TStringList; AOverwrite : Boolean);
 
     function GetActiveFormat: TDiscMasterFormat;
     procedure SetActiveFormat(const Value: TDiscMasterFormat);
@@ -211,8 +225,16 @@ type
     procedure RefreshRecorderList(const AList : TDiscRecorderList);
 
     procedure ClearFormatContent;
+    procedure RecordDisc(ASimulate, AEjectAfter : Boolean);
 
-    procedure JolietAddContent(AContent : IStorage; AOverwriteExisting : Boolean = false);
+    procedure JolietAddData(AContent : IStorage; AOverwriteExisting : Boolean = false);
+    procedure JolietAddFolder(AFolderOnHDD, AFolderOnDisc : String;
+                              AFileMask : String = '*.*';
+                              ARecursive : Boolean = true;
+                              AOverwriteExisting : Boolean = false);
+
+    procedure JolietAddFile(AFile, AFolderOnDisc : String;
+                            AOverwriteExisting : Boolean = false);
 
     property ActiveRecorder : IDiscRecorder read GetActiveRecorder write SetActiveRecord;
 
@@ -224,6 +246,8 @@ type
   published
     property ActiveFormat : TDiscMasterFormat read GetActiveFormat write SetActiveFormat default fJoliet;
 
+    property AutoCutNamesAt : Integer read FAutoCutNamesAt write FAutoCutNamesAt default 31;
+
     property OnCancelAction : TDiscMasterCancelActionProc read FOnCancelAction write FOnCancelAction;
     property OnPnPActivity : TDiscMasterPnPActivityProc read FOnPnPActivity write FOnPnPActivity;
     property OnAddProgress : TDiscMasterProgressProc read FOnAddProgress write FOnAddProgress;
@@ -233,6 +257,9 @@ type
     property OnClosingDisc : TDiscMasterEstimationProc read FOnClosingDisc write FOnClosingDisc;
     property OnBurnComplete : TDiscMasterResultProc read FOnBurnComplete write FOnBurnComplete;
     property OnEraseComplete : TDiscMasterResultProc read FOnEraseComplete write FOnEraseComplete;
+    property OnJolietAddContentError : TDiscMasterErrorProc read FOnJAddContentError write FOnJAddContentError;
+    property OnAddObjectToCache : TDiscMasterCachingProc read FOnAddObjectToCache write FOnAddObjectToCache;
+    property OnAddFileToCache : TDiscMasterProgressProc read FOnAddFileToCache write FOnAddFileToCache;
   end;
 
 
@@ -722,7 +749,7 @@ end;
 
 { TDiscMaster }
 
-procedure TDiscMaster.JolietAddContent(AContent: IStorage;
+procedure TDiscMaster.JolietAddData(AContent: IStorage;
   AOverwriteExisting: Boolean);
 var
   o : Integer;
@@ -734,7 +761,293 @@ begin
   else
     o := 0;
 
-  EDiscBurnerException.Check(FJolietDiscMaster.AddData(AContent, o));
+  try
+    EDiscBurnerException.Check(FJolietDiscMaster.AddData(AContent, o));
+  except
+    on E : Exception do
+    begin
+      if Assigned(FOnJAddContentError) then
+        FOnJAddContentError(E)
+      else
+        raise;
+    end;
+  end;
+end;
+
+procedure TDiscMaster.JolietAddFile(AFile, AFolderOnDisc: String;
+  AOverwriteExisting: Boolean);
+var
+  RootStorage,
+  LastStorage,
+  Storage : IStorage;
+  FoldersOnDisc : TStringList;
+  idx : Integer;
+  Stores : TInterfaceList;
+begin
+  NeedJoliet;
+
+  FoldersOnDisc := TStringList.Create;
+  Stores := TInterfaceList.Create;
+  try
+    FoldersOnDisc.Delimiter := PathDelim;
+    FoldersOnDisc.StrictDelimiter := true;
+    FoldersOnDisc.DelimitedText := Trim(AFolderOnDisc);
+
+    if FoldersOnDisc.Count = 0 then
+      exit
+    else
+    if FoldersOnDisc[0] = EmptyStr then
+      FoldersOnDisc.Delete(0);
+    
+    OleCheck(StgCreateDocFile(nil,
+                            STGM_CREATE or STGM_READWRITE or STGM_DIRECT or
+                            STGM_SHARE_EXCLUSIVE or STGM_DELETEONRELEASE,
+                            0,
+                            ActiveX.IStorage(RootStorage)));
+
+    LastStorage := RootStorage;
+    Storage := RootStorage;
+
+    for idx := 0 to FoldersOnDisc.Count - 1 do
+    begin
+      if FoldersOnDisc[idx] = EmptyStr then
+        break;
+
+      OleCheck(LastStorage.CreateStorage(PWideChar(WideString(AutoCut(FoldersOnDisc[idx]))),
+                                         STGM_CREATE or STGM_READWRITE or STGM_DIRECT or
+                                         STGM_SHARE_EXCLUSIVE, 0, 0, Storage));
+      Stores.Add(LastStorage);
+      LastStorage := Storage;
+    end;
+
+  finally
+    FoldersOnDisc.Free;
+    LastStorage := nil;
+  end;
+
+  AddFileToStorage(AFile, Storage);
+
+  Stores.Free;
+  Storage := nil;
+  LastStorage := nil;
+
+  JolietAddData(RootStorage, AOverwriteExisting);
+end;
+
+procedure TDiscMaster.JolietAddFolder(AFolderOnHDD, AFolderOnDisc, AFileMask: String;
+  ARecursive, AOverwriteExisting: Boolean);
+var
+  list : TStringList;
+
+  procedure AddFilesToList(AFolderHDD, AFolderDisc : String);
+  var
+    sr : TSearchRec;
+  begin
+    AFolderHDD := IncludeTrailingPathDelimiter(AFolderHDD);
+    AFolderDisc := IncludeTrailingPathDelimiter(AFolderDisc);
+
+    DoAddObjectToCache(AFolderHDD);
+
+    if FindFirst(AFolderHDD + AFileMask, faAnyFile, sr) = 0 then
+    begin
+      repeat
+        if (sr.Name <> '.') and (sr.Name <> '..') then
+        begin
+          if ((sr.Attr and faDirectory) = faDirectory) and ARecursive then
+            AddFilesToList(AFolderHDD + sr.Name, AFolderDisc + sr.Name)
+          else
+            list.Values[AFolderDisc + sr.Name] := AFolderHDD + sr.Name;
+        end;
+      until FindNext(sr) <> 0;
+      FindClose(sr);
+    end;
+  end;
+begin
+  NeedJoliet;
+
+  list := TStringList.Create;
+  try
+    AddFilesToList(AFolderOnHDD, AFolderOnDisc);
+    AddFiles(list, AOverwriteExisting);
+  finally
+    list.Free;
+  end;
+
+end;
+
+procedure TDiscMaster.AddFiles(AFiles: TStringList; AOverwrite : Boolean);
+{ List has to be in this format:
+\Folder\On\Disc\file1.txt=c:\test.txt
+\Sub\Folder\On\Disc\file2.txt=c:\app.exe
+}
+var
+  idxFile : Integer;
+  Folders : TInterfaceList;
+  FolderNames : TStringList;
+
+  PathSplitter : TStringList;
+  RootFolder,
+  CurrentFolder : IStorage;
+
+  function FirstNParts(N : Integer) : String;
+  var
+    idx : Integer;
+  begin
+    Result := '';
+
+    for idx := 0 to N do
+    begin
+      if idx > 0 then
+        Result := Result + PathSplitter.Delimiter;
+      Result := Result + PathSplitter[idx];
+    end;
+  end;
+
+  function GetFolder(AFolderName : String) : IStorage;
+  var
+    idxFolderName,
+    idxFolderPart,
+    idxFolder,
+    idx : Integer;
+    tempStorage : IStorage;
+  begin
+    Result := nil;
+
+    AFolderName := Trim(ExcludeTrailingPathDelimiter(AFolderName));
+
+    if AFolderName = '' then
+    begin
+      Result := RootFolder;
+      exit;
+    end;
+
+    idxFolderName := FolderNames.IndexOf(AFolderName);
+    if idxFolderName > -1 then
+    begin
+      idxFolder := Integer(FolderNames.Objects[idxFolderName]);
+      Result := Folders[idxFolder] as IStorage;
+      exit;
+    end;
+
+    PathSplitter.DelimitedText := AFolderName;
+
+    idx := 0;
+
+    for idxFolderPart := PathSplitter.Count - 1 downto 1 do
+    begin
+      PathSplitter.Delete(idxFolderPart);
+
+      idxFolderName := FolderNames.IndexOf(PathSplitter.DelimitedText);
+      if idxFolderName > -1 then
+      begin
+        idx := idxFolderPart;
+        idxFolder := Integer(FolderNames.Objects[idxFolderName]);
+        Result := Folders[idxFolder] as IStorage;
+        break;
+      end;
+    end;
+
+    if not Assigned(Result) then
+      Result := RootFolder;
+
+    PathSplitter.DelimitedText := AFolderName;
+
+    for idxFolderPart := idx to PathSplitter.Count - 1 do
+    begin
+      tempStorage := Result;
+      tempStorage.CreateStorage(PWideChar(WideString(PathSplitter[idxFolderPart])),
+                                STGM_CREATE or STGM_READWRITE or STGM_DIRECT or
+                                STGM_SHARE_EXCLUSIVE, 0, 0, Result);
+
+      FolderNames.AddObject(FirstNParts(idxFolderPart), TObject(Folders.Add(Result)));
+    end;
+  end;
+  
+begin
+  OleCheck(StgCreateDocFile(nil,
+                            STGM_CREATE or STGM_READWRITE or STGM_DIRECT or
+                            STGM_SHARE_EXCLUSIVE or STGM_DELETEONRELEASE,
+                            0,
+                            ActiveX.IStorage(RootFolder)));
+                            
+  Folders := TInterfaceList.Create;
+
+  FolderNames := TStringList.Create;
+  FolderNames.Sorted := true;
+
+  PathSplitter := TStringList.Create;
+  PathSplitter.Delimiter := PathDelim;
+  PathSplitter.StrictDelimiter := true;
+  try
+
+    for idxFile := 0 to AFiles.Count - 1 do
+    begin
+      AddFileToStorage(AFiles.ValueFromIndex[idxFile],
+                       GetFolder(ExtractFilePath(AFiles.Names[idxFile])),
+                       ExtractFileName(AFiles.Names[idxFile]));
+    end;
+
+  finally
+    Folders.Free;
+    FolderNames.Free;
+    PathSplitter.Free;
+  end;
+
+  JolietAddData(RootFolder, AOverwrite);
+
+  RootFolder := nil;
+end;
+
+procedure TDiscMaster.AddFileToStorage(AFile: String; AStorage: IStorage;
+ANewFileName : String);
+var
+  FileName : String;
+  FS : TFileStream;
+  Buffer : Pointer;
+  DataInBuffer : Integer;
+  Written : Longint;
+  Stream : IStream;
+const
+  BUFFER_SIZE = 4096;
+begin
+  if not FileExists(AFile) then
+    exit;
+
+  FileName := ExtractFileName(AFile);
+
+  if ANewFileName = '' then
+    ANewFileName := ExtractFileName(AFile);
+
+  DoAddObjectToCache(AFile);
+  OleCheck(AStorage.CreateStream(PWideChar(WideString(AutoCut(ANewFileName))),
+                                 STGM_CREATE or STGM_READWRITE or STGM_DIRECT or
+                                 STGM_SHARE_EXCLUSIVE, 0, 0, Stream));
+
+  FS := TFileStream.Create(AFile, fmOpenRead);
+  GetMem(Buffer, BUFFER_SIZE);
+  try
+    repeat
+      DataInBuffer := FS.Read(Buffer^, BUFFER_SIZE);
+      Stream.Write(Buffer, DataInBuffer, @Written);
+
+      if Assigned(FOnAddFileToCache) then
+        FOnAddFileToCache(Fs.Position, Fs.Size);
+    until DataInBuffer = 0;
+
+  finally
+    fs.Free;
+    
+    if Assigned(Buffer) then
+      FreeMem(Buffer, BUFFER_SIZE);
+  end;
+end;
+
+function TDiscMaster.AutoCut(const AText: String): String;
+begin
+  if FAutoCutNamesAt > 0 then
+    Result := LeftStr(AText, FAutoCutNamesAt)
+  else
+    Result := AText;
 end;
 
 procedure TDiscMaster.ClearFormatContent;
@@ -749,6 +1062,8 @@ begin
   FDiscMaster := CreateComObject(MSDiscMasterObj) as IDiscMaster;
 
   EDiscBurnerException.Check(FDiscMaster.Open);
+
+  FAutoCutNamesAt := 31;
 
   ReadAvailableFormats;
 
@@ -781,6 +1096,12 @@ begin
   inherited;
 end;
   
+procedure TDiscMaster.DoAddObjectToCache(AObject: String);
+begin
+  if Assigned(FOnAddObjectToCache) then
+    FOnAddObjectToCache(AObject);
+end;
+
 function TDiscMaster.GetActiveFormat: TDiscMasterFormat;
 var
   fmt : TGUID;
@@ -882,6 +1203,11 @@ begin
 
     e.Next(1, fmtID, Fetched);
   end;
+end;
+
+procedure TDiscMaster.RecordDisc(ASimulate, AEjectAfter: Boolean);
+begin
+  EDiscBurnerException.Check(FDiscMaster.RecordDisc(ASimulate, AEjectAfter));
 end;
 
 procedure TDiscMaster.RefreshRecorderList(const AList: TDiscRecorderList);
