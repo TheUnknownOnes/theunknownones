@@ -1,9 +1,31 @@
 {-----------------------------------------------------------------------------
  Purpose: Implement the IMAPI as objects
+ Mady by TheUnknownOnes
 
- (c) by TheUnknownOnes
- see http://www.TheUnknownOnes.net
------------------------------------------------------------------------------}
+ Current version can be found at http://svn.theunknownones.net
+
+
+{ The contents of this file are used with permission, subject to the Mozilla   }
+{ Public License Version 1.1 (the "License"); you may not use this file except }
+{ in compliance with the License. You may obtain a copy of the License at      }
+{ http://www.mozilla.org/MPL/MPL-1.1.html                                      }
+{                                                                              }
+{ Software distributed under the License is distributed on an "AS IS" basis,   }
+{ WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for }
+{ the specific language governing rights and limitations under the License.    }
+{                                                                              }
+{ Alternatively, the contents of this file may be used under the terms of the  }
+{ GNU Lesser General Public License (the  "LGPL License"), in which case the   }
+{ provisions of the LGPL License are applicable instead of those above.        }
+{ If you wish to allow use of your version of this file only under the terms   }
+{ of the LGPL License and not to allow others to use your version of this file }
+{ under the MPL, indicate your decision by deleting  the provisions above and  }
+{ replace  them with the notice and other provisions required by the LGPL      }
+{ License.  If you do not delete the provisions above, a recipient may use     }
+{ your version of this file under either the MPL or the LGPL License.          }
+{                                                                              }
+{ For more information about the LGPL: http://www.gnu.org/copyleft/lesser.html }
+
 
 unit uDiscBurner;
 
@@ -11,7 +33,7 @@ interface
 
 uses
   Classes,
-  Windows,
+  jwaWinType,
   Sysutils,
   Dialogs,
   ActiveX,
@@ -207,7 +229,7 @@ type
     function AutoCut(const AText : String) : String;
 
     procedure DoJolietAddFileToStorage(AFile : String; AStorage : IStorage; ANewFileName : String = '');
-    procedure DoJolietAddFiles(AFiles : TStringList; AOverwrite : Boolean);
+    procedure DoJolietAddFiles(AFiles : TStrings; AOverwrite : Boolean);
 
     function GetActiveFormat: TDiscMasterFormat;
     procedure SetActiveFormat(const Value: TDiscMasterFormat);
@@ -236,7 +258,7 @@ type
 
     procedure JolietAddFile(AFile, AFolderOnDisc : String;
                             AOverwriteExisting : Boolean = false);
-    procedure JolietAddFiles(AFileList : TStringList;
+    procedure JolietAddFiles(AFileList : TStrings;
                              AOverwriteExisting : Boolean = false);
 
     property ActiveRecorder : IDiscRecorder read GetActiveRecorder write SetActiveRecord;
@@ -304,8 +326,6 @@ function VariantToPropVariant(const AVariant : Variant) : TPropVariant;
 var
   i64 : Int64;
 begin
-  FillMemory(@Result, SizeOf(Result), 0);
-
   case VarType(AVariant) of
     varEmpty: Result.vt := VT_EMPTY;
     varNull: Result.vt := VT_NULL;
@@ -322,7 +342,7 @@ begin
     varByte: begin Result.vt := VT_I2; Result.iVal := AVariant end;
     varWord: begin Result.vt := VT_UI2; Result.uiVal := AVariant end;
     varLongWord: begin Result.vt := VT_UI4; Result.ulVal := AVariant end;
-    varInt64: begin Result.vt := VT_I8; i64 := AVariant; CopyMemory(@Result.hVal, @i64, 8) end;
+    varInt64: begin Result.vt := VT_I8; i64 := AVariant; Move(Result.hVal, i64, 8) end;
     varString: begin Result.vt := VT_LPSTR; Result.pszVal := PAnsiChar(AnsiString(AVariant)) end;
   end;
 end;
@@ -809,7 +829,7 @@ begin
   end;
 end;
 
-procedure TDiscMaster.JolietAddFiles(AFileList: TStringList;
+procedure TDiscMaster.JolietAddFiles(AFileList: TStrings;
   AOverwriteExisting: Boolean);
 begin
   DoJolietAddFiles(AFileList, AOverwriteExisting);
@@ -859,7 +879,7 @@ begin
 
 end;
 
-procedure TDiscMaster.DoJolietAddFiles(AFiles: TStringList; AOverwrite : Boolean);
+procedure TDiscMaster.DoJolietAddFiles(AFiles: TStrings; AOverwrite : Boolean);
 { List has to be in this format:
 \Folder\On\Disc\file1.txt=c:\test.txt
 \Sub\Folder\On\Disc\file2.exe=c:\app.exe
