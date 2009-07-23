@@ -5,7 +5,7 @@
 
 TSettings is the name of a bunch of components, which are developed for an easy way to read and write settings out of your application.
 
-This project is currently under development. And this is your chance to get involved with it. Checkout the current release from the Download-Section and provide suggestions or patch-files with your ideas.
+This project is currently under development. And this is your chance to get involved with it. Checkout the current release out of the SVN and provide suggestions or patch-files with your ideas.
 
 === The philosophy behind the components ===
 
