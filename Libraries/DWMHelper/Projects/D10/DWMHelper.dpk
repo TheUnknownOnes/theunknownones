@@ -28,7 +28,8 @@ package DWMHelper;
 
 requires
   rtl,
-  vcl;
+  vcl,
+  JediApi_StaticRelease;
 
 contains
   uDWMHelper in '..\..\uDWMHelper.pas';

@@ -8,7 +8,7 @@ unit uDWMHelper;
 interface
 
 uses
-  Windows, Graphics, JwaDwmapi, JwaUxTheme;
+  Windows, Graphics, Jwadwmapi, jwauxtheme;
 
 function DWM_EnableBlurBehind(hwnd : HWND; AEnable: Boolean; hRgnBlur : HRGN = 0; ATransitionOnMaximized: Boolean = False; AFlags: Cardinal = 1): HRESULT;
 function DWM_ExtendFrameIntoClientArea(hwnd: HWND; ATopHeight, ALeftWidth, ABottomHeight, ARightWidth: Integer): HRESULT;
