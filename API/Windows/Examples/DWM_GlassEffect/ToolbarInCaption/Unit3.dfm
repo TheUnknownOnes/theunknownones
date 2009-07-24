@@ -18,12 +18,11 @@ object Form1: TForm1
   PixelsPerInch = 96
   TextHeight = 13
   object btn1: TToolBar
-    Left = 0
-    Top = 0
+    Left = 200
+    Top = 3
     Width = 75
-    Height = 25
+    Height = 29
     Align = alNone
-    AutoSize = True
     ButtonHeight = 25
     ButtonWidth = 25
     Caption = 'btn1'
@@ -58,5 +57,13 @@ object Form1: TForm1
       Caption = 'bohne'
       ImageIndex = 2
     end
+  end
+  object Button1: TButton
+    Left = 168
+    Top = 56
+    Width = 75
+    Height = 25
+    Caption = 'Button1'
+    TabOrder = 1
   end
 end

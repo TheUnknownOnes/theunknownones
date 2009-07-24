@@ -14,6 +14,7 @@ type
     ToolButton1: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
+    Button1: TButton;
 
     procedure FormActivate(Sender: TObject); 
     procedure FormPaint(Sender: TObject); 
@@ -268,12 +269,13 @@ const
 var
     Result : LResult; 
     dwmHandled : bool;
+
+    msgCalcSize : TWMNCCalcSize;
 begin
     dwmHandled:=DwmDefWindowProc(Form1.Handle, Message.Msg, Message.WParam, Message.LParam, result);
     if (dwmHandled = true) then begin
         message.Result:=result;
         exit;
-        //return
     end;
     if ( (Message.Msg = WM_NCCALCSIZE) and (message.WParam = 1)) then
     begin
@@ -286,7 +288,7 @@ begin
            _marginOk := true;
        end;
 
-       Message.Result:=WVR_REDRAW;
+       self.invalidate;
     end 
     else if (message.Msg = WM_NCHITTEST) and (Integer(Message.Result)= 0) then 
        Message.Result:= HitTestNCA(Form1.Handle, Message.WParam, message.LParam) 
