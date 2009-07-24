@@ -2,7 +2,7 @@ object Form2: TForm2
   Left = 720
   Top = 459
   AlphaBlendValue = 20
-  Caption = 'DWM API - Demo'
+  Caption = 't'
   ClientHeight = 249
   ClientWidth = 245
   Color = clBlack

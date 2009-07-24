@@ -3,14 +3,14 @@
 	<PersonalityInfo>
 		<Option>
 			<Option Name="Personality">Delphi.Personality</Option>
-			<Option Name="ProjectType">VCLApplication</Option>
+			<Option Name="ProjectType"></Option>
 			<Option Name="Version">1.0</Option>
-			<Option Name="GUID">{30B1205A-976F-46A7-9466-A9903D08ABF3}</Option>
+			<Option Name="GUID">{46733B0E-95DB-4A17-A5CC-882E5A3A511F}</Option>
 		</Option>
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">Project1.dpr</Source>
+			<Source Name="MainSource">Project2.dpr</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -106,7 +106,7 @@
 			<Compiler Name="CodePage"></Compiler>
 		</Compiler>
 		<Linker>
-			<Linker Name="MapFile">0</Linker>
+			<Linker Name="MapFile">3</Linker>
 			<Linker Name="OutputObjs">0</Linker>
 			<Linker Name="GenerateHpps">False</Linker>
 			<Linker Name="ConsoleApp">1</Linker>
@@ -123,9 +123,9 @@
 			<Directories Name="UnitOutputDir"></Directories>
 			<Directories Name="PackageDLLOutputDir"></Directories>
 			<Directories Name="PackageDCPOutputDir"></Directories>
-			<Directories Name="SearchPath"></Directories>
-			<Directories Name="Packages"></Directories>
-			<Directories Name="Conditionals"></Directories>
+			<Directories Name="SearchPath">C:\Users\MaWarm\Documents\Projects\TUO\Components\EffectPNG;C:\Users\MaWarm\Documents\Projects\TUO\Libraries\PNGSupport;C:\users\MaWarm\Documents\Projects\Komponenten\Graphic\gdiplus\pas\D10;C:\users\MaWarm\Documents\Projects\Komponenten\Graphic\DSPACK\src\DirectX9;C:\users\MaWarm\Documents\Projects\Jedi\jwapi\Win32API;C:\Users\MaWarm\Documents\Projects\TUO\Libraries\DWMHelper</Directories>
+			<Directories Name="Packages">vcl;rtl;JediApi_StaticRelease;vclx;dbrtl;vcldb;dwmhelper;adortl;dbxcds;dbexpress;vclib;ibxpress;indy;dsnap;bdertl;teeui;teedb;tee;vcldbx;dsnapcon;vclactnband;ConsoleTools_D100R;EffectPNGEdit_D100R;PNGSupport_D100;DirectX9_D10;GDIPlus100;EffectPNGImage_D100R;EffectPNGImageList_D100R;EffectPNGToolbar_D100R;GDIPlus100D;GroupListView_D100R;ImageListProvider_D100D;ImageListProvider_D100R;PNGImageList_D100D;PNGUtils_D100R;PNGImageList_D100R;xmlrtl;PSBuzz_D100R;SearchEdit_D100D;SearchEdit_D100R;RegExp_D100R;XMLTools_D100R;Settings_D100R;Settings_VirtualTrees_D100R;SPPVirtualTrees_D100D;SPPVirtualTrees_D100R;VirtualTreesD10;tdbf_d10d;tdbf_d10r;VirtualActionTree_D100R;Wiimote_D100R;TntUnicodeVcl;TUOScript100;eltreeD10;SPPComponents100;qrpt100;JvStdCtrlsD10R;JvCoreD10R;Jcl;frx10;frxADO10;frxBDE10;frxDB10;frxDBX10;frxe10;frxFib10;FIBPlus2006;frxIBX10;frxTee10;fs10;fsADO10;fsBDE10;fsDB10;fsIBX10;fsTee10;QRExports100;FlexCelXLS100;FlexCel100;RxCtl100;VclSmp;FIBDBMidas2006;PCheck100;SQLClientDataset100;XPMenu100;DBIni100;Rechte100;JclVcl;JvSystemD10R;SingleSignOn100;CommonTools_D100R;JvCryptD10R;Etikettendruck_D100;xtrafil100;JvCustomD10R;JvCtrlsD10R;ImageTypes100;CheckCombo100;HotKeyManager_D100;QRAngledLabel100;BarcodeHelper_D100;Drucker_D100;EffectPNG_D100R;RichViewEditor_D100;RVPkg2006;madBasic_;madDisAsm_;madExcept_;JvAppFrmD10R;JvBandsD10R;JvDBD10R;JvDlgsD10R;JvBDED10R;JvCmpD10R;JvDockingD10R;JvDotNetCtrlsD10R;JvEDID10R;JvGlobusD10R;JvHMID10R;JvInterpreterD10R;JvJansD10R;JvManagedThreadsD10R;JvMMD10R;JvNetD10R;JvPageCompsD10R;JvPluginD10R;JvPrintPreviewD10R;JvRuntimeDesignD10R;JvTimeFrameworkD10R;JvValidatorsD10R;JvWizardD10R;JvXPCtrlsD10R;vclie;inet;inetdbbde;inetdbxpress;NPipe_D100</Directories>
+			<Directories Name="Conditionals">madExcept</Directories>
 			<Directories Name="DebugSourceDirs"></Directories>
 			<Directories Name="UsePackages">False</Directories>
 		</Directories>
@@ -139,11 +139,6 @@
 			<Parameters Name="LoadAllSymbols">True</Parameters>
 			<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
 		</Parameters>
-		<Language>
-			<Language Name="ActiveLang"></Language>
-			<Language Name="ProjectLang">$00000000</Language>
-			<Language Name="RootDir"></Language>
-		</Language>
 		<VersionInfo>
 			<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
 			<VersionInfo Name="AutoIncBuild">False</VersionInfo>
@@ -170,8 +165,11 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>
-	</Delphi.Personality>
+		</VersionInfoKeys>  
+    <Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\qrpt100.bpl">QuickReport Runtime Package</Excluded_Packages>
+    </Excluded_Packages>
+  </Delphi.Personality>
 	<StarTeamAssociation></StarTeamAssociation>
 	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
 </BorlandProject>

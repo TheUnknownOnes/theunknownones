@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 116
   Caption = 'Form1'
   ClientHeight = 280
-  ClientWidth = 269
+  ClientWidth = 291
   Color = 15790320
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -38,57 +38,13 @@ object Form1: TForm1
     TabOrder = 1
     OnClick = Button2Click
   end
-  object SpinEdit1: TSpinEdit
-    Left = 119
-    Top = 151
-    Width = 65
-    Height = 22
-    MaxValue = 0
-    MinValue = 0
-    TabOrder = 2
-    Value = 0
-    OnChange = SpinEdit1Change
-  end
-  object SpinEdit2: TSpinEdit
-    Left = 119
-    Top = 207
-    Width = 65
-    Height = 22
-    MaxValue = 0
-    MinValue = 0
-    TabOrder = 3
-    Value = 0
-    OnChange = SpinEdit1Change
-  end
-  object SpinEdit3: TSpinEdit
-    Left = 48
-    Top = 179
-    Width = 65
-    Height = 22
-    MaxValue = 0
-    MinValue = 0
-    TabOrder = 4
-    Value = 0
-    OnChange = SpinEdit1Change
-  end
-  object SpinEdit4: TSpinEdit
-    Left = 190
-    Top = 179
-    Width = 65
-    Height = 22
-    MaxValue = 0
-    MinValue = 0
-    TabOrder = 5
-    Value = 0
-    OnChange = SpinEdit1Change
-  end
   object Button3: TButton
     Left = 16
     Top = 39
     Width = 120
     Height = 25
     Caption = 'extend Frame to client'
-    TabOrder = 6
+    TabOrder = 2
     OnClick = Button3Click
   end
   object Button4: TButton
@@ -97,7 +53,7 @@ object Form1: TForm1
     Width = 120
     Height = 25
     Caption = 'active Colorization Color'
-    TabOrder = 7
+    TabOrder = 3
     OnClick = Button4Click
   end
   object Button5: TButton
@@ -106,7 +62,43 @@ object Form1: TForm1
     Width = 120
     Height = 25
     Caption = 'Region Blur'
-    TabOrder = 8
+    TabOrder = 4
     OnClick = Button5Click
+  end
+  object Edit1: TEdit
+    Left = 112
+    Top = 152
+    Width = 73
+    Height = 21
+    TabOrder = 5
+    Text = '10'
+    OnChange = Edit1Change
+  end
+  object Edit2: TEdit
+    Left = 112
+    Top = 200
+    Width = 73
+    Height = 21
+    TabOrder = 6
+    Text = '10'
+    OnChange = Edit1Change
+  end
+  object Edit3: TEdit
+    Left = 33
+    Top = 176
+    Width = 73
+    Height = 21
+    TabOrder = 7
+    Text = '10'
+    OnChange = Edit1Change
+  end
+  object Edit4: TEdit
+    Left = 191
+    Top = 173
+    Width = 73
+    Height = 21
+    TabOrder = 8
+    Text = '10'
+    OnChange = Edit1Change
   end
 end

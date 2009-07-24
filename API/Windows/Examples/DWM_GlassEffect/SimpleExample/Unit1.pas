@@ -9,25 +9,25 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, Spin, uDWMHelper, JwaDwmapi, xpman;
+  Dialogs, StdCtrls, ExtCtrls, Spin, uDWMHelper, JwaWindows, xpman;
 
 type
   TForm1 = class(TForm)
     Button1: TButton;
     Button2: TButton;
-    SpinEdit1: TSpinEdit;
-    SpinEdit2: TSpinEdit;
-    SpinEdit3: TSpinEdit;
-    SpinEdit4: TSpinEdit;
     Button3: TButton;
     Button4: TButton;
     Button5: TButton;
+    Edit1: TEdit;
+    Edit2: TEdit;
+    Edit3: TEdit;
+    Edit4: TEdit;
     procedure Button1Click(Sender: TObject);
-    procedure SpinEdit1Change(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
+    procedure Edit1Change(Sender: TObject);
   private
   public
     { Public-Deklarationen }
@@ -45,10 +45,10 @@ uses Unit2;
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-  SpinEdit1.Value:=0;
-  SpinEdit2.Value:=0;
-  SpinEdit3.Value:=0;
-  SpinEdit4.Value:=0;
+  Edit1.Text:='0';
+  Edit2.Text:='0';
+  Edit3.Text:='0';
+  Edit4.Text:='0';
 
   DWM_EnableBlurBehind(form2.Handle, true);
   DWM_ExtendFrameIntoClientArea(form2.Handle, 0,0,0,0);
@@ -56,10 +56,10 @@ end;
 
 procedure TForm1.Button2Click(Sender: TObject);
 begin
-  SpinEdit1.Value:=10;
-  SpinEdit2.Value:=10;
-  SpinEdit3.Value:=10;
-  SpinEdit4.Value:=10;
+  Edit1.Text:='10';
+  Edit2.Text:='10';
+  Edit3.Text:='10';
+  Edit4.Text:='10';
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
@@ -88,10 +88,14 @@ begin
   DWM_EnableBlurBehind(form2.Handle, true, rgn, false, DWM_BB_ENABLE or DWM_BB_BLURREGION);
 end;
 
-procedure TForm1.SpinEdit1Change(Sender: TObject);
+procedure TForm1.Edit1Change(Sender: TObject);
 begin
   DWM_EnableBlurBehind(form2.Handle, true);
-  DWM_ExtendFrameIntoClientArea(form2.Handle, SpinEdit1.Value, SpinEdit3.Value, SpinEdit2.Value, SpinEdit4.Value);
+  DWM_ExtendFrameIntoClientArea(form2.Handle,
+                                SysUtils.StrToInt(Edit1.Text),
+                                SysUtils.StrToInt(Edit3.Text),
+                                SysUtils.StrToInt(Edit2.Text),
+                                SysUtils.StrToInt(Edit4.Text));
 end;
 
 end.
