@@ -70,7 +70,7 @@ begin
   if FileExists(Data.Settings.MailTool) then
     ShellExecute(GetDesktopWindow, 'open', Pchar(Data.Settings.MailTool), nil, Pchar(ExtractFilePath(Data.Settings.MailTool)), SW_SHOWNORMAL)
   else
-    MessageDlg('', mtWarning, [mbOK], 0);
+    ShowConfigDialog;
   Data.ResetUnseenMessages;
 end;
 

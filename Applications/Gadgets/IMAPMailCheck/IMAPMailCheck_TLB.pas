@@ -12,7 +12,7 @@ unit IMAPMailCheck_TLB;
 // ************************************************************************ //
 
 // PASTLWTR : 1.2
-// Datei generiert am 31.07.2009 09:29:03 aus der unten beschriebenen Typbibliothek.
+// Datei generiert am 31.07.2009 10:48:41 aus der unten beschriebenen Typbibliothek.
 
 // ************************************************************************  //
 // Typbib: E:\Libs\tuo\Applications\Gadgets\IMAPMailCheck\IMAPMailCheck.tlb (1)
