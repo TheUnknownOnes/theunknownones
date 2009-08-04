@@ -32,7 +32,7 @@ object Data: TData
       'from tmp$attachments a'
       '  inner join tmp$transactions t'
       '    on t.tmp$attachment_id = a.tmp$attachment_id'
-      'where t.tmp$state = '#39'ACTIVE'#39
+      'where t.tmp$state = '#39'ACTIVE'#39' and t.tmp$type <> '#39'SNAPSHOT'#39
       
         'group by a.tmp$user, a.tmp$user_ip_addr, a.tmp$user_host, t.tmp$' +
         'attachment_id'

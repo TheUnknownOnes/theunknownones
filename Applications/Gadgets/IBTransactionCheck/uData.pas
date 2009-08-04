@@ -28,7 +28,7 @@ var
 
 implementation
 
-uses uFormSettings;
+uses uFormSettings, Controls;
 
 {$R *.dfm}
 
@@ -109,12 +109,15 @@ end;
 
 procedure TData.Shutdown(AAttachment: Integer);
 begin
-  try
-    Db.Connected := true;
-    db.Execute('update tmp$attachments set tmp$state = ''SHUTDOWN'' where TMP$ATTACHMENT_ID =' + IntToStr(AAttachment));
-  finally
-    if DB.Connected then
-      db.Connected := false;
+  if (MessageDlg('Do you really want to shut down this attachment?', mtConfirmation, [mbYes, mbNo], 0) in [mrYes]) then
+  begin
+    try
+      Db.Connected := true;
+      db.Execute('update tmp$attachments set tmp$state = ''SHUTDOWN'' where TMP$ATTACHMENT_ID =' + IntToStr(AAttachment));
+    finally
+      if DB.Connected then
+        db.Connected := false;
+    end;
   end;
 end;
 

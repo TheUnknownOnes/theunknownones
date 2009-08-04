@@ -12,7 +12,7 @@ unit IBTransactionCheck_TLB;
 // ************************************************************************ //
 
 // PASTLWTR : 1.2
-// Datei generiert am 03.08.2009 12:57:44 aus der unten beschriebenen Typbibliothek.
+// Datei generiert am 04.08.2009 06:34:38 aus der unten beschriebenen Typbibliothek.
 
 // ************************************************************************  //
 // Typbib: E:\Libs\tuo\Applications\Gadgets\IBTransactionCheck\IBTransactionCheck.tlb (1)
