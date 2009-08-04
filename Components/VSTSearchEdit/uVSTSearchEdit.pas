@@ -119,10 +119,10 @@ end;
 
 procedure TVSTSearchEdit.OnEditChange(Sender: TObject);
 begin
+  RunSearch(FEdit.Text);
+
   if Assigned(FOldOnChangeProc) then
     FOldOnChangeProc(Sender);
-
-  RunSearch(FEdit.Text);
 end;
 
 procedure TVSTSearchEdit.RunSearch(AText: String);
