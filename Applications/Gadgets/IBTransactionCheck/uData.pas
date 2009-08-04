@@ -4,7 +4,8 @@ interface
 
 uses
   SysUtils, ActiveX, ComObj, Classes, FIBDatabase, pFIBDatabase, FIBQuery,
-  pFIBQuery, uSettingsBase, uSettingsStream, ShlObj, uSysTools, dialogs;
+  pFIBQuery, uSettingsBase, uSettingsStream, ShlObj, uSysTools, dialogs,
+  DateUtils;
 
 type
   TData = class(TDataModule)
@@ -14,8 +15,10 @@ type
     SettingsFile: TSettingsFile;
     procedure DataModuleCreate(Sender: TObject);
   private
-    { Private-Deklarationen }
   public
+    MinLen : Integer;
+    RefreshInterval : Integer;
+
     function GetTransactions : String;
     procedure Shutdown(AAttachment : Integer);
 
@@ -42,11 +45,15 @@ begin
     SettingsFile.Load;
 
   SettingsFile.ReadObject('/DB', DB);
+
+  MinLen := SettingsFile.GetValue('/MinLen', 1);
+  RefreshInterval := SettingsFile.GetValue('/RefreshInterval', 60000);
 end;
 
 function TData.GetTransactions: String;
 var
   lines : Integer;
+  Len : Single;
 const
   max_lines = 10;
 begin
@@ -62,16 +69,21 @@ begin
 
       while (not qry_1.Eof) and (lines < max_lines) do
       begin
-        Result := Result + '<span class="attachment" ';
-        Result := Result + 'title="' + qry_1.FieldByName('Hostname').AsString + '">';
-        Result := Result + Format('%s (%d min)', [qry_1.FieldByName('Username').AsString,
-                                                  qry_1.FieldByName('Len').AsInteger]);
-        Result := Result + '</span>';
-        
-        Result := Result + '<img class="ShutdownButton" src="shutdown.png" title="Shutdown!" ';
-        Result := Result + 'onclick="Shutdown(' + qry_1.FieldByName('Attachment').AsString + ')" />';
+        Len := MinuteSpan(qry_1.FieldByName('Starttime').AsDateTime, Now);
+        if Len > MinLen then
+        begin
+          Result := Result + '<span class="attachment" ';
+          Result := Result + 'title="' + qry_1.FieldByName('Hostname').AsString + '">';
+          Result := Result + Format('%s (%.1f min)', [qry_1.FieldByName('Username').AsString,
+                                                    Len]);
+          Result := Result + '</span>';
 
-        Inc(lines);
+          Result := Result + '<img class="ShutdownButton" src="shutdown.png" title="Shutdown!" ';
+          Result := Result + 'onclick="Shutdown(' + qry_1.FieldByName('Attachment').AsString + ')" />';
+
+          Inc(lines);
+        end;
+        
         qry_1.Next;
       end;
 
@@ -98,6 +110,8 @@ end;
 procedure TData.SaveSettings;
 begin
   SettingsFile.WriteObject('/DB', DB);
+  SettingsFile.SetValue('/MinLen', MinLen);
+  SettingsFile.SetValue('/RefreshInterval', RefreshInterval);
 
   SettingsFile.Save;
 end;

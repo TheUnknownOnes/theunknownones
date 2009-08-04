@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, uSettingsBase, uSettingsLinksDefault, StdCtrls, ExtCtrls, Mask,
-  JvExMask, JvToolEdit;
+  JvExMask, JvToolEdit, Spin;
 
 type
   Tform_Settings = class(TForm)
@@ -25,6 +25,12 @@ type
     ed_ClientDLL: TJvFilenameEdit;
     Label6: TLabel;
     ed_Role: TEdit;
+    Label7: TLabel;
+    ed_MinLen: TSpinEdit;
+    Label8: TLabel;
+    Label9: TLabel;
+    ed_Refresh: TSpinEdit;
+    Label10: TLabel;
     procedure FormShow(Sender: TObject);
     procedure btn_OKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -48,6 +54,8 @@ begin
   Data.DB.ConnectParams.RoleName := ed_Role.Text;
   Data.DB.ConnectParams.CharSet := ed_Charset.Text;
   Data.db.LibraryName := ed_ClientDLL.FileName;
+  Data.MinLen := ed_MinLen.Value;
+  Data.RefreshInterval := ed_Refresh.Value;
 
   Data.SaveSettings;
 end;
@@ -81,6 +89,8 @@ begin
   ed_Role.Text := Data.DB.ConnectParams.RoleName;
   ed_Charset.Text := Data.DB.ConnectParams.CharSet;
   ed_ClientDLL.FileName := Data.DB.LibraryName;
+  ed_MinLen.Value := Data.MinLen;
+  ed_Refresh.Value := Data.RefreshInterval;
 end;
 
 end.

@@ -27,7 +27,7 @@ object Data: TData
       
         '       f_lrtrim(a.tmp$user_ip_addr) || '#39' ('#39' || f_lrtrim(a.tmp$us' +
         'er_host) || '#39')'#39' Hostname,'
-      '       f_minutesbetween(max(t.tmp$timestamp), '#39'now'#39') Len,'
+      '       min(t.tmp$timestamp) Starttime,'
       '       t.tmp$attachment_id Attachment'
       'from tmp$attachments a'
       '  inner join tmp$transactions t'
@@ -36,8 +36,7 @@ object Data: TData
       
         'group by a.tmp$user, a.tmp$user_ip_addr, a.tmp$user_host, t.tmp$' +
         'attachment_id'
-      'having f_minutesbetween(max(t.tmp$timestamp), '#39'now'#39') > 0'
-      'order by 3 desc'
+      'order by 3 asc'
       '')
     CSMonitorSupport.Enabled = csmeTransactionDriven
     Left = 224

@@ -12,7 +12,7 @@ unit IBTransactionCheck_TLB;
 // ************************************************************************ //
 
 // PASTLWTR : 1.2
-// Datei generiert am 04.08.2009 06:34:38 aus der unten beschriebenen Typbibliothek.
+// Datei generiert am 04.08.2009 07:07:56 aus der unten beschriebenen Typbibliothek.
 
 // ************************************************************************  //
 // Typbib: E:\Libs\tuo\Applications\Gadgets\IBTransactionCheck\IBTransactionCheck.tlb (1)
@@ -74,7 +74,9 @@ type
     function Get_Transactions: WideString; safecall;
     procedure Shutdown(Attachment: Integer); safecall;
     procedure ShowOptionsDialog; safecall;
+    function Get_RefreshInterval: Integer; safecall;
     property Transactions: WideString read Get_Transactions;
+    property RefreshInterval: Integer read Get_RefreshInterval;
   end;
 
 // *********************************************************************//
@@ -87,6 +89,7 @@ type
     property Transactions: WideString readonly dispid 202;
     procedure Shutdown(Attachment: Integer); dispid 201;
     procedure ShowOptionsDialog; dispid 203;
+    property RefreshInterval: Integer readonly dispid 204;
   end;
 
 // *********************************************************************//

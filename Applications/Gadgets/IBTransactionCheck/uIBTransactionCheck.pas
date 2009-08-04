@@ -13,6 +13,7 @@ type
     function Get_Transactions: WideString; safecall;
     procedure Shutdown(Attachment: Integer); safecall;
     procedure ShowOptionsDialog; safecall;
+    function Get_RefreshInterval: Integer; safecall;
 
   end;
 
@@ -33,6 +34,11 @@ end;
 procedure TTIBTransactionCheck.ShowOptionsDialog;
 begin
   Data.ShowOptionsDialog;
+end;
+
+function TTIBTransactionCheck.Get_RefreshInterval: Integer;
+begin
+  Result := Data.RefreshInterval;
 end;
 
 initialization
