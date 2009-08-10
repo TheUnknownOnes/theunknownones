@@ -14,6 +14,14 @@ uses
 type
   TCheckStates = set of TCheckState;
 
+  TVirtualTreeExpandState = record
+                              Node : PVirtualNode;
+                              Expanded : Boolean;
+                            end;
+
+  TVirtualTreeExpandStates = Array of TVirtualTreeExpandState;
+
+
   TBaseVirtualTreeHelper = class helper for TBaseVirtualTree
   private
     function GetVisibleRecursive(Node: PVirtualNode): Boolean;
@@ -31,8 +39,9 @@ type
 
     procedure ScanEditorKeys(var AKey : Word);
 
-    procedure ExpandAll;
-    procedure CollapseAll;
+    function ExpandAll: TVirtualTreeExpandStates;
+    function CollapseAll: TVirtualTreeExpandStates;
+    procedure SetExpandState(AExpandStates : TVirtualTreeExpandStates);
 
     function GetFirstNodeByData(AData : Pointer; out ANode : PVirtualNode) : Boolean;
     function GetNextNodeByData(AStartAtNode : PVirtualNode; AData : Pointer; out ANode : PVirtualNode) : Boolean;
@@ -55,7 +64,7 @@ begin
   Result := AddChild(ANode, FFakeData);
 end;
 
-procedure TBaseVirtualTreeHelper.CollapseAll;
+function TBaseVirtualTreeHelper.CollapseAll: TVirtualTreeExpandStates;
 var
   Node : PVirtualNode;
 begin
@@ -67,16 +76,29 @@ begin
   end;
 end;
 
-procedure TBaseVirtualTreeHelper.ExpandAll;
+function TBaseVirtualTreeHelper.ExpandAll: TVirtualTreeExpandStates;
 var
   Node : PVirtualNode;
+  idx : Integer;
 begin
+  SetLength(Result, 100);
+  idx:=0;
+
   Node:=GetFirst;
   while Assigned(Node) do
   begin
+    inc(idx);
+    if High(Result)<idx then
+      SetLength(Result, Length(Result)+100);
+
+    Result[idx].Node:=Node;
+    Result[idx].Expanded:=Expanded[Node];
+
     Expanded[Node]:=True;
     Node:=GetNext(Node);
   end;
+
+  SetLength(Result,idx);
 end;
 
 function TBaseVirtualTreeHelper.GetCheckedChildrenCount(ANode: PVirtualNode;
@@ -268,6 +290,15 @@ begin
         end;
     end;
   end;
+end;
+
+procedure TBaseVirtualTreeHelper.SetExpandState(
+  AExpandStates: TVirtualTreeExpandStates);
+var
+  idx : Integer;
+begin
+  for idx := Low(AExpandStates) to High(AExpandStates) do
+    Self.Expanded[AExpandStates[idx].Node]:=AExpandStates[idx].Expanded;
 end;
 
 procedure TBaseVirtualTreeHelper.SetVisibleRecursive(Node: PVirtualNode;
