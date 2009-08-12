@@ -640,6 +640,7 @@ var
   FileCount: Integer;
   i: Integer;
 begin
+  dwAttributes := 0;
   Result := nil;
   if Files.Count = 0 then
     Exit;
