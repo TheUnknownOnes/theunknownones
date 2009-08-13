@@ -179,9 +179,13 @@ procedure TVSTSearchEdit.SetEdit(const Value: TCustomEdit);
 begin
   if FEdit<>Value then
   begin
-    DetachFromEdit(FEdit);
+    if not (csDesigning in ComponentState) then
+      DetachFromEdit(FEdit);
+
     FEdit := Value;
-    AttachToEdit(FEdit);
+
+    if not (csDesigning in ComponentState) then
+      AttachToEdit(FEdit);
   end;
 end;
 

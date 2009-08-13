@@ -30,7 +30,7 @@ package VSTSearchEdit_D100R;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'VSTSearchEdit - Runtime'}
 {$RUNONLY}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,
