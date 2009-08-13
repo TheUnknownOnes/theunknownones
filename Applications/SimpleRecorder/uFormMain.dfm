@@ -11,6 +11,7 @@ object form_Main: Tform_Main
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  FormStyle = fsStayOnTop
   KeyPreview = True
   OldCreateOrder = False
   OnClose = FormClose
@@ -451,9 +452,6 @@ object form_Main: Tform_Main
       ShowSelRange = False
       TabOrder = 1
       OnChange = track_LevelChange
-      ExplicitLeft = 351
-      ExplicitWidth = 150
-      ExplicitHeight = 36
     end
   end
   object lv_Files: TListView
@@ -474,12 +472,13 @@ object form_Main: Tform_Main
     Font.Style = []
     HideSelection = False
     MultiSelect = True
+    ReadOnly = True
     ParentColor = True
     ParentFont = False
     PopupMenu = pum_Files
     TabOrder = 3
     ViewStyle = vsSmallIcon
-    OnMouseDown = lv_FilesMouseDown
+    OnMouseMove = lv_FilesMouseMove
   end
   object pum_Main: TPopupMenu
     Left = 8
@@ -568,11 +567,6 @@ object form_Main: Tform_Main
     Settings = Settings
     Component = cb_AutoLevel
     Left = 560
-    Top = 8
-  end
-  object DropFileSource: TDropFileSource
-    DragTypes = [dtCopy]
-    Left = 712
     Top = 8
   end
   object pum_Files: TPopupMenu

@@ -7,8 +7,8 @@ uses
   Dialogs, Menus, ComCtrls, uEffectPNGToolbar, ToolWin, ExtCtrls, uBassWaveView,
   Bass, SyncObjs, ImageHlp, uSettingsBase, uSettingsStream, uSysTools, ShlObj,
   uSettingsLinksDefault, JvExComCtrls, JvComCtrls, StdCtrls, JvExControls,
-  JvTracker, JvComponentBase, uEffectPNGImage, ActiveX, ComObj, DragDrop,
-  DropSource, DragDropFile, ImgList, uImageListProvider, uBaseImageList,
+  JvTracker, JvComponentBase, uEffectPNGImage, ActiveX, ComObj, ImgList,
+  uImageListProvider, uBaseImageList,
   uPNGImageList;
 
 type
@@ -52,7 +52,6 @@ type
     sl_Min: TSettingsLinkComponent;
     SettingsLinkComponent1: TSettingsLinkComponent;
     lv_Files: TListView;
-    DropFileSource: TDropFileSource;
     pum_Files: TPopupMenu;
     mi_Delete: TMenuItem;
     track_Level: TTrackBar;
@@ -70,12 +69,13 @@ type
     procedure cb_AutoLevelClick(Sender: TObject);
     procedure tm_MaxTimer(Sender: TObject);
     procedure tm_MinTimer(Sender: TObject);
-    procedure lv_FilesMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure mi_DeleteClick(Sender: TObject);
     procedure track_LevelChange(Sender: TObject);
+    procedure lv_FilesMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
   private
+    FRecDir : String;
     FStreamLock : TCriticalSection;
     FStream : TFileStream;
 
@@ -232,6 +232,9 @@ procedure Tform_Main.FormCreate(Sender: TObject);
 begin
   SRSettings := TSRSettings.Create;
 
+  FRecDir := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)) + 'records\';
+  MakeSureDirectoryPathExists(PAnsiChar(Ansistring(FRecDir)));
+
   LoadSettings;
 
   FStreamLock := TCriticalSection.Create;
@@ -262,37 +265,12 @@ end;
 
 function Tform_Main.GenFilename: String;
 begin
-  Result := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)) + 'records\';
-  MakeSureDirectoryPathExists(PAnsiChar(Result));
-  Result := Result + FormatDateTime('hh_nn_ss.wav', Now);
+  Result := FRecDir + FormatDateTime('hh_nn_ss.wav', Now);
 end;
 
 function Tform_Main.GiveFeedback(dwEffect: Integer): HResult;
 begin
   Result := DRAGDROP_S_USEDEFAULTCURSORS;
-end;
-
-procedure Tform_Main.lv_FilesMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-var
-  idx : Integer;
-begin
-  if not Assigned(lv_Files.Selected) then
-    exit;
-
-  if DragDetectPlus(TWinControl(Sender)) then
-  begin
-    DropFileSource.Files.Clear;
-
-    for idx := 0 to lv_Files.Items.Count - 1 do
-    begin
-      if lv_Files.Items[idx].Selected then      
-        DropFileSource.Files.Add(lv_Files.Items[idx].SubItems[0]);
-    end;
-
-    DropFileSource.Execute();
-    
-  end;
 end;
 
 procedure Tform_Main.LoadSettings;
@@ -302,6 +280,32 @@ begin
     Settings.Load;
 
   Settings.ReadObject('/Settings', SRSettings);
+end;
+
+procedure Tform_Main.lv_FilesMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+var
+  idx : Integer;
+  d : IDataObject;
+  e : Integer;
+  fileList : TStringList;
+begin
+  if not Assigned(lv_Files.Selected) or (not (ssLeft in Shift)) then
+    exit;
+
+  fileList := TStringList.Create;
+  try
+    for idx := 0 to lv_Files.Items.Count - 1 do
+    begin
+      if lv_Files.Items[idx].Selected then
+        fileList.Add(ExtractFileName(lv_Files.Items[idx].SubItems[0]));
+    end;
+
+    d := GetDataObjectFromFileList(FRecDir, fileList);
+    DoDragDrop(d, Self, DROPEFFECT_COPY or DROPEFFECT_LINK, e);
+  finally
+    fileList.Free;
+  end;
 end;
 
 procedure Tform_Main.mi_CloseClick(Sender: TObject);
@@ -351,14 +355,13 @@ procedure Tform_Main.SearchInput;
 var
   v : Single;
 begin
-  FInput := -1;
+  FInput := 99;
 
-  repeat
-    Inc(FInput);
-  until (BASS_RecordGetInputName(FInput) = nil) or
-        ((BASS_RecordGetInput(FInput, v) and BASS_INPUT_OFF) = BASS_INPUT_OFF);
-        
-  Dec(FInput);
+  while (BASS_RecordGetInputName(FInput) = nil) or
+        ((BASS_RecordGetInput(FInput, v) and BASS_INPUT_OFF) = BASS_INPUT_OFF) do
+  begin
+    Dec(FInput);
+  end;
 end;
 
 procedure Tform_Main.SetRecording(const Value: Boolean);
@@ -482,5 +485,36 @@ begin
   FNoActLevel := 10;
 end;
 
+
+procedure PatchINT3;
+var
+  NOP : Byte;
+  NTDLL: THandle;
+  BytesWritten: DWORD;
+  Address: Pointer;
+begin
+  if Win32Platform <> VER_PLATFORM_WIN32_NT then Exit;
+  NTDLL := GetModuleHandle('NTDLL.DLL');
+  if NTDLL = 0 then Exit;
+  Address := GetProcAddress(NTDLL, 'DbgBreakPoint');
+  if Address = nil then Exit;
+  try
+    if AnsiChar(Address^) <> #$CC then Exit;
+
+    NOP := $90;
+    if WriteProcessMemory(GetCurrentProcess, Address, @NOP, 1, BytesWritten) and
+      (BytesWritten = 1) then
+      FlushInstructionCache(GetCurrentProcess, Address, 1);
+  except
+    //Do not panic if you see an EAccessViolation here, it is perfectly harmless!
+    on EAccessViolation do ;
+    else raise;
+  end;
+end;
+
+initialization
+  // nur wenn ein Debugger vorhanden, den Patch ausführen
+  if DebugHook<>0 then
+     PatchINT3;
 
 end.
