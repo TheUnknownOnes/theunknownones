@@ -11,9 +11,11 @@ object form_Main: Tform_Main
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyUp = FormKeyUp
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -438,17 +440,46 @@ object form_Main: Tform_Main
       TabOrder = 0
       OnClick = cb_AutoLevelClick
     end
-    object track_Level: TJvTracker
-      Left = 0
-      Top = 0
-      Width = 214
-      Height = 36
-      BackColor = clBlack
-      TrackPositionColored = False
-      OnChangedValue = track_LevelChangedValue
+    object track_Level: TTrackBar
+      AlignWithMargins = True
+      Left = 3
+      Top = 3
+      Width = 208
+      Height = 30
       Align = alClient
+      Max = 100
+      ShowSelRange = False
       TabOrder = 1
+      OnChange = track_LevelChange
+      ExplicitLeft = 351
+      ExplicitWidth = 150
+      ExplicitHeight = 36
     end
+  end
+  object lv_Files: TListView
+    AlignWithMargins = True
+    Left = 639
+    Top = 3
+    Width = 177
+    Height = 36
+    Align = alClient
+    BevelInner = bvNone
+    BevelKind = bkTile
+    BorderStyle = bsNone
+    Columns = <>
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWhite
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    HideSelection = False
+    MultiSelect = True
+    ParentColor = True
+    ParentFont = False
+    PopupMenu = pum_Files
+    TabOrder = 3
+    ViewStyle = vsSmallIcon
+    OnMouseDown = lv_FilesMouseDown
   end
   object pum_Main: TPopupMenu
     Left = 8
@@ -472,7 +503,7 @@ object form_Main: Tform_Main
     Top = 8
   end
   object Settings: TSettingsFile
-    Left = 680
+    Left = 144
     Top = 8
   end
   object sl_Wave: TSettingsLinkComponent
@@ -503,13 +534,13 @@ object form_Main: Tform_Main
     Enabled = False
     Interval = 100
     OnTimer = tm_MaxTimer
-    Left = 600
+    Left = 456
     Top = 8
   end
   object tm_Min: TTimer
     Enabled = False
     OnTimer = tm_MinTimer
-    Left = 632
+    Left = 488
     Top = 8
   end
   object sl_Max: TSettingsLinkComponent
@@ -518,7 +549,7 @@ object form_Main: Tform_Main
       'Interval')
     Settings = Settings
     Component = tm_Max
-    Left = 600
+    Left = 456
     Top = 24
   end
   object sl_Min: TSettingsLinkComponent
@@ -527,7 +558,7 @@ object form_Main: Tform_Main
       'Interval')
     Settings = Settings
     Component = tm_Min
-    Left = 632
+    Left = 488
     Top = 24
   end
   object SettingsLinkComponent1: TSettingsLinkComponent
@@ -538,5 +569,18 @@ object form_Main: Tform_Main
     Component = cb_AutoLevel
     Left = 560
     Top = 8
+  end
+  object DropFileSource: TDropFileSource
+    DragTypes = [dtCopy]
+    Left = 712
+    Top = 8
+  end
+  object pum_Files: TPopupMenu
+    Left = 752
+    Top = 8
+    object mi_Delete: TMenuItem
+      Caption = 'Delete'
+      OnClick = mi_DeleteClick
+    end
   end
 end

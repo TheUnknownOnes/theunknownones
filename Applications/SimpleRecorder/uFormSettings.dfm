@@ -32,18 +32,22 @@ object form_Settings: Tform_Settings
     Align = alClient
     ParentColor = True
     TabOrder = 0
-    ExplicitTop = -8
-    ExplicitHeight = 308
     object bnd_Waveview: TJvScrollMaxBand
       Width = 462
       Height = 100
       Caption = 'Waveview'
       ExpandedHeight = 100
+      ButtonFont.Charset = DEFAULT_CHARSET
+      ButtonFont.Color = clWindowText
+      ButtonFont.Height = -11
+      ButtonFont.Name = 'Tahoma'
+      ButtonFont.Style = []
+      ParentButtonFont = False
       object GridPanel1: TGridPanel
         Left = 3
-        Top = 20
+        Top = 22
         Width = 456
-        Height = 77
+        Height = 75
         Align = alClient
         BevelOuter = bvNone
         ColumnCollection = <
@@ -83,19 +87,16 @@ object form_Settings: Tform_Settings
             Value = 50.000000000000000000
           end>
         TabOrder = 0
-        ExplicitLeft = 136
-        ExplicitTop = 32
-        ExplicitWidth = 185
-        ExplicitHeight = 41
         object Label1: TLabel
           Left = 0
           Top = 0
           Width = 100
-          Height = 38
+          Height = 37
           Align = alClient
           Alignment = taRightJustify
           Caption = 'Refreshinterval:'
           Layout = tlCenter
+          ExplicitLeft = 22
           ExplicitWidth = 78
           ExplicitHeight = 13
         end
@@ -103,7 +104,7 @@ object form_Settings: Tform_Settings
           Left = 100
           Top = 0
           Width = 356
-          Height = 38
+          Height = 37
           Align = alClient
           Max = 1000
           Min = 50
@@ -112,27 +113,26 @@ object form_Settings: Tform_Settings
           ShowSelRange = False
           TabOrder = 0
           OnChange = track_WaveIntervalChange
-          ExplicitLeft = 84
-          ExplicitWidth = 372
-          ExplicitHeight = 23
         end
         object Label2: TLabel
           Left = 0
-          Top = 38
+          Top = 37
           Width = 100
-          Height = 39
+          Height = 38
           Align = alClient
           Alignment = taRightJustify
           Caption = 'Zoom:'
           Layout = tlCenter
-          ExplicitLeft = -6
-          ExplicitTop = 35
+          ExplicitLeft = 70
+          ExplicitTop = 38
+          ExplicitWidth = 30
+          ExplicitHeight = 13
         end
         object track_WaveZoom: TJvTrackBar
           Left = 100
-          Top = 38
+          Top = 37
           Width = 356
-          Height = 39
+          Height = 38
           Align = alClient
           Max = 1000
           Min = 5
@@ -141,8 +141,6 @@ object form_Settings: Tform_Settings
           ShowSelRange = False
           TabOrder = 1
           OnChange = track_WaveZoomChange
-          ExplicitLeft = 106
-          ExplicitTop = 35
         end
       end
     end
@@ -151,11 +149,17 @@ object form_Settings: Tform_Settings
       Height = 140
       Caption = 'Autolevel'
       ExpandedHeight = 140
+      ButtonFont.Charset = DEFAULT_CHARSET
+      ButtonFont.Color = clWindowText
+      ButtonFont.Height = -11
+      ButtonFont.Name = 'Tahoma'
+      ButtonFont.Style = []
+      ParentButtonFont = False
       object GridPanel2: TGridPanel
         Left = 3
-        Top = 20
+        Top = 22
         Width = 456
-        Height = 117
+        Height = 115
         Align = alClient
         BevelOuter = bvNone
         ColumnCollection = <
@@ -164,7 +168,7 @@ object form_Settings: Tform_Settings
             Value = 100.000000000000000000
           end
           item
-            Value = 60.753164104796760000
+            Value = 60.753164104796770000
           end
           item
             Value = 39.246835895203240000
@@ -243,7 +247,6 @@ object form_Settings: Tform_Settings
             Value = 32.000000000000000000
           end>
         TabOrder = 0
-        ExplicitHeight = 77
         object Label3: TLabel
           Left = 0
           Top = 0
@@ -284,7 +287,7 @@ object form_Settings: Tform_Settings
           Font.Name = 'Tahoma'
           Font.Style = [fsBold]
           ParentFont = False
-          ExplicitLeft = 278
+          ExplicitLeft = 319
           ExplicitWidth = 108
           ExplicitHeight = 13
         end
@@ -317,10 +320,6 @@ object form_Settings: Tform_Settings
           ShowSelRange = False
           TabOrder = 0
           OnChange = track_MaxChange
-          ExplicitLeft = 94
-          ExplicitTop = 36
-          ExplicitWidth = 178
-          ExplicitHeight = 45
         end
         object ed_MaxInterval: TJvSpinEdit
           AlignWithMargins = True
@@ -331,14 +330,10 @@ object form_Settings: Tform_Settings
           Margins.Top = 5
           Margins.Bottom = 5
           Align = alClient
-          MaxValue = 10000.000000000000000000
-          MinValue = 20.000000000000000000
+          MaxValue = 60000.000000000000000000
           Value = 50.000000000000000000
           TabOrder = 1
           OnChange = ed_MaxIntervalChange
-          ExplicitLeft = 168
-          ExplicitTop = 56
-          ExplicitWidth = 121
           ExplicitHeight = 21
         end
         object Label7: TLabel
@@ -370,8 +365,6 @@ object form_Settings: Tform_Settings
           ShowSelRange = False
           TabOrder = 2
           OnChange = track_MinChange
-          ExplicitLeft = 97
-          ExplicitTop = 52
         end
         object ed_MinInterval: TJvSpinEdit
           AlignWithMargins = True
@@ -382,14 +375,10 @@ object form_Settings: Tform_Settings
           Margins.Top = 5
           Margins.Bottom = 5
           Align = alClient
-          MaxValue = 10000.000000000000000000
-          MinValue = 20.000000000000000000
+          MaxValue = 60000.000000000000000000
           Value = 1000.000000000000000000
           TabOrder = 3
           OnChange = ed_MinIntervalChange
-          ExplicitLeft = 168
-          ExplicitTop = 56
-          ExplicitWidth = 121
           ExplicitHeight = 21
         end
         object Label8: TLabel
@@ -422,10 +411,6 @@ object form_Settings: Tform_Settings
           ShowSelRange = False
           TabOrder = 4
           OnChange = track_NoActChange
-          ExplicitLeft = 94
-          ExplicitTop = 36
-          ExplicitWidth = 150
-          ExplicitHeight = 45
         end
       end
     end

@@ -7,7 +7,9 @@ uses
   Dialogs, Menus, ComCtrls, uEffectPNGToolbar, ToolWin, ExtCtrls, uBassWaveView,
   Bass, SyncObjs, ImageHlp, uSettingsBase, uSettingsStream, uSysTools, ShlObj,
   uSettingsLinksDefault, JvExComCtrls, JvComCtrls, StdCtrls, JvExControls,
-  JvTracker, JvComponentBase, uEffectPNGImage, ActiveX, ComObj;
+  JvTracker, JvComponentBase, uEffectPNGImage, ActiveX, ComObj, DragDrop,
+  DropSource, DragDropFile, ImgList, uImageListProvider, uBaseImageList,
+  uPNGImageList;
 
 type
   {$TYPEINFO ON}
@@ -43,13 +45,17 @@ type
     sl_TimerWave: TSettingsLinkComponent;
     pan_Level: TPanel;
     cb_AutoLevel: TCheckBox;
-    track_Level: TJvTracker;
     tm_Level: TTimer;
     tm_Max: TTimer;
     tm_Min: TTimer;
     sl_Max: TSettingsLinkComponent;
     sl_Min: TSettingsLinkComponent;
     SettingsLinkComponent1: TSettingsLinkComponent;
+    lv_Files: TListView;
+    DropFileSource: TDropFileSource;
+    pum_Files: TPopupMenu;
+    mi_Delete: TMenuItem;
+    track_Level: TTrackBar;
     procedure btn_MainMenuClick(Sender: TObject);
     procedure mi_CloseClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -61,12 +67,15 @@ type
     procedure btn_StopClick(Sender: TObject);
     procedure mi_SettingsClick(Sender: TObject);
     procedure tm_LevelTimer(Sender: TObject);
-    procedure track_LevelChangedValue(Sender: TObject; NewValue: Integer);
     procedure cb_AutoLevelClick(Sender: TObject);
     procedure tm_MaxTimer(Sender: TObject);
     procedure tm_MinTimer(Sender: TObject);
+    procedure lv_FilesMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure mi_DeleteClick(Sender: TObject);
+    procedure track_LevelChange(Sender: TObject);
   private
-    FLastFile : String;
     FStreamLock : TCriticalSection;
     FStream : TFileStream;
 
@@ -221,10 +230,8 @@ end;
 
 procedure Tform_Main.FormCreate(Sender: TObject);
 begin
-  FLastFile := '';
-
   SRSettings := TSRSettings.Create;
-  
+
   LoadSettings;
 
   FStreamLock := TCriticalSection.Create;
@@ -240,6 +247,13 @@ begin
   Wave.BassChannel := FRecChannel;
 end;
 
+procedure Tform_Main.FormKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_SPACE then
+    btn_Cut.Click;
+end;
+
 procedure Tform_Main.FormShow(Sender: TObject);
 begin
   DoubleBuffered := true;
@@ -250,13 +264,35 @@ function Tform_Main.GenFilename: String;
 begin
   Result := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)) + 'records\';
   MakeSureDirectoryPathExists(PAnsiChar(Result));
-  Result := Result + FormatDateTime('yyyy_mm_dd_hh_nn_ss.wav', Now);
-  FLastFile := Result;
+  Result := Result + FormatDateTime('hh_nn_ss.wav', Now);
 end;
 
 function Tform_Main.GiveFeedback(dwEffect: Integer): HResult;
 begin
   Result := DRAGDROP_S_USEDEFAULTCURSORS;
+end;
+
+procedure Tform_Main.lv_FilesMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  idx : Integer;
+begin
+  if not Assigned(lv_Files.Selected) then
+    exit;
+
+  if DragDetectPlus(TWinControl(Sender)) then
+  begin
+    DropFileSource.Files.Clear;
+
+    for idx := 0 to lv_Files.Items.Count - 1 do
+    begin
+      if lv_Files.Items[idx].Selected then      
+        DropFileSource.Files.Add(lv_Files.Items[idx].SubItems[0]);
+    end;
+
+    DropFileSource.Execute();
+    
+  end;
 end;
 
 procedure Tform_Main.LoadSettings;
@@ -271,6 +307,21 @@ end;
 procedure Tform_Main.mi_CloseClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure Tform_Main.mi_DeleteClick(Sender: TObject);
+begin
+  if Assigned(lv_Files.Selected) then
+  begin
+    if (MessageBox(0, 'Do you really want to delete the selected files?', 'Delete files', MB_ICONWARNING or MB_YESNO) = idYes) then
+    begin
+      while Assigned(lv_Files.Selected) do
+      begin
+        DeleteFileToWasteBin(lv_Files.Selected.SubItems[0]);
+        lv_Files.Selected.Delete;
+      end;
+    end;
+  end;
 end;
 
 procedure Tform_Main.mi_SettingsClick(Sender: TObject);
@@ -314,6 +365,7 @@ procedure Tform_Main.SetRecording(const Value: Boolean);
 var
   wh : TWaveHeader;
   i : Integer;
+  Li : TListItem;
 begin
   if Value = FRecording then
     exit;
@@ -357,6 +409,15 @@ begin
       i := i - $24;
       FStream.Position := 40;
       FStream.Write(i, 4);
+
+
+      Li := lv_Files.Items.Insert(0);
+      Li.Caption := ExtractFileName(FStream.FileName);
+      Li.SubItems.Add(FStream.FileName);
+      lv_Files.Selected := nil;
+      lv_Files.Selected := li;
+      li.MakeVisible(false);
+
       FStream.Free;
     finally
       FStreamLock.Leave;
@@ -376,19 +437,19 @@ var
   v : Single;
 begin
   BASS_RecordGetInput(FInput, v);
-  track_Level.Value := Round(v * 100);
+  track_Level.Position := Round(v * 100);
 end;
 
 procedure Tform_Main.tm_MaxTimer(Sender: TObject);
 begin
   if PeakLevel > SRSettings.MaxLevel then
-    track_LevelChangedValue(track_Level, track_Level.Value - 1);
+    track_Level.Position := track_Level.Position - 1;
 end;
 
 procedure Tform_Main.tm_MinTimer(Sender: TObject);
 begin
   if (PeakLevel > SRSettings.NoActLevel) and (PeakLevel < SRSettings.MinLevel) then
-    track_LevelChangedValue(track_Level, track_Level.Value + 1);
+    track_Level.Position := track_Level.Position + 1;
 end;
 
 procedure Tform_Main.tm_WaveTimer(Sender: TObject);
@@ -396,10 +457,9 @@ begin
   Wave.Refresh;
 end;
 
-procedure Tform_Main.track_LevelChangedValue(Sender: TObject;
-  NewValue: Integer);
+procedure Tform_Main.track_LevelChange(Sender: TObject);
 begin
-  BASS_RecordSetInput(FInput, 0, NewValue / 100);
+  BASS_RecordSetInput(FInput, 0, track_Level.Position / 100);
 end;
 
 procedure Tform_Main.UndockFromTop;
