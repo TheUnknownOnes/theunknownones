@@ -9,7 +9,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, pngImage, gdipapi, gdipobj, ActiveX, ImgList, ShellAPI;
+  Dialogs, StdCtrls, pngImage, gdipapi, gdipobj, ActiveX, ImgList, ShellAPI,
+  gdiputil;
 
   function PNGtoIcon(const APNG : TGPBitmap;
                       ACursor : Boolean = false;
@@ -72,6 +73,20 @@ uses
                                              ImageList : TCustomImageList);
 
   procedure DrawTransparentBackground(ACanvas : TCanvas; APatternSize : Word = 8);
+
+type
+  TMixPNGPosition = (mppTopLeft, mppTopRight, mppBottomLeft, mppBottomRight,
+                     mppCenter);
+
+  procedure MixPNGs(const ABackgroundImage: TPNGObject;
+                    const AForegroundImage: TPNGObject;
+                    const AMixedImage: TPngObject;
+                    AMixPosition : TMixPNGPosition); overload;
+
+  procedure MixPNGs(const ABackgroundImage: TPNGObject;
+                    const AForegroundImage: TPNGObject;
+                    const AMixedImage: TPngObject;
+                    AX, AY: Integer); overload;
 
 var
   gdiplusToken: ULONG;
@@ -499,5 +514,60 @@ begin
   bmp.Free;
 end;
 
+procedure MixPNGs(const ABackgroundImage: TPNGObject;
+                  const AForegroundImage: TPNGObject;
+                  const AMixedImage: TPngObject;
+                  AMixPosition : TMixPNGPosition); overload;
+begin
+  case AMixPosition of
+    mppTopLeft: MixPNGs(ABackgroundImage, AForegroundImage, AMixedImage, 0, 0);
+    mppTopRight: MixPNGs(ABackgroundImage, AForegroundImage, AMixedImage, ABackgroundImage.Width-AForegroundImage.Width, 0);
+    mppBottomLeft: MixPNGs(ABackgroundImage, AForegroundImage, AMixedImage, 0, ABackgroundImage.Height-AForegroundImage.Height);
+    mppBottomRight: MixPNGs(ABackgroundImage, AForegroundImage, AMixedImage, ABackgroundImage.Width-AForegroundImage.Width, ABackgroundImage.Height-AForegroundImage.Height);
+    mppCenter: MixPNGs(ABackgroundImage, AForegroundImage, AMixedImage,
+                        (ABackgroundImage.Width div 2) - (AForegroundImage.Width div 2),
+                        (ABackgroundImage.Height div 2) - (AForegroundImage.Height div 2));
+  end;
+end;
+
+procedure MixPNGs(const ABackgroundImage: TPNGObject;
+                  const AForegroundImage: TPNGObject;
+                  const AMixedImage: TPngObject;
+                  AX, AY: Integer); overload;
+var
+  graphicsBack: TGPGraphics;
+  imgfg, imgbg : TGPImage;
+  strmfg, strmbg : TMemoryStream;
+  strmafg, strmabg: TStreamAdapter;
+  encClsid: TGUID;
+begin
+  strmbg:=TMemoryStream.Create;
+  ABackgroundImage.SaveToStream(strmbg);
+  strmbg.Seek(0, soBeginning);
+  strmabg:=TStreamAdapter.Create(strmbg, soOwned);
+  imgbg:=TGPImage.Create(strmabg);
+
+  strmfg:=TMemoryStream.Create;
+  AForegroundImage.SaveToStream(strmfg);
+  strmfg.Seek(0, soBeginning);
+  strmafg:=TStreamAdapter.Create(strmfg, soOwned);
+  imgfg:=TGPImage.Create(strmafg);
+
+  GetEncoderClsid('image/png', encClsid);
+
+  graphicsBack:=TGPGraphics.Create(imgbg);
+  try
+    graphicsBack.DrawImage(imgfg, AX, AY);
+
+    strmabg.SetSize(0);
+    imgbg.Save(strmabg, encClsid);
+    strmbg.Seek(0, soBeginning);
+    AMixedImage.LoadFromStream(strmbg);
+  finally
+    graphicsBack.Free;
+    imgfg.Free;
+    imgbg.Free;
+  end;
+end;
 
 end.
