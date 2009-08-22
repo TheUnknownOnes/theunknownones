@@ -125,7 +125,7 @@ type
   private
     FProcess : TCustomConsoleProcess;
     FExitCode : Cardinal;
-    FWideStringBuffer : WideString;
+    FStringBuffer : AnsiString;
 
     procedure DoProcessExit;
     procedure DoStdOut;
@@ -134,7 +134,7 @@ type
     function ProcessRunning : Boolean;
 
     function PipeHasData(APipe : THandle) : Boolean; 
-    function ReadPipe(APipe : THandle) : String;
+    function ReadPipe(APipe : THandle) : AnsiString;
   protected
     procedure Execute; override;
   public
@@ -413,12 +413,12 @@ end;
 
 procedure TConsoleProcessWatcher.DoStdErr;
 begin
-  FProcess.DoStdErr(FWideStringBuffer);
+  FProcess.DoStdErr(FStringBuffer);
 end;
 
 procedure TConsoleProcessWatcher.DoStdOut;
 begin
-  FProcess.DoStdOut(FWideStringBuffer);
+  FProcess.DoStdOut(FStringBuffer);
 end;
 
 procedure TConsoleProcessWatcher.Execute;
@@ -431,16 +431,16 @@ begin
   begin
     if PipeHasData(FProcess.FPipeOutputRead) then
     begin
-      FWideStringBuffer:=ReadPipe(FProcess.FPipeOutputRead);
+      FStringBuffer:=ReadPipe(FProcess.FPipeOutputRead);
       Synchronize(DoStdOut);
-      FWideStringBuffer:=EmptyStr;
+      FStringBuffer:=EmptyStr;
     end;
 
     if PipeHasData(FProcess.FPipeErrorRead) then
     begin
-      FWideStringBuffer:=ReadPipe(FProcess.FPipeErrorRead);
+      FStringBuffer:=ReadPipe(FProcess.FPipeErrorRead);
       Synchronize(DoStdErr);
-      FWideStringBuffer:=EmptyStr;
+      FStringBuffer:=EmptyStr;
     end;
 
     if not ProcessRunning then
@@ -466,7 +466,7 @@ begin
   Result:=WaitForSingleObject(FProcess.ProcessInformation.hProcess, 50)<>WAIT_OBJECT_0;
 end;
 
-function TConsoleProcessWatcher.ReadPipe(APipe: THandle): String;
+function TConsoleProcessWatcher.ReadPipe(APipe: THandle): AnsiString;
 var
   BytesAvailable,
   BytesRead : Cardinal;
