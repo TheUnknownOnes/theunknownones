@@ -29,7 +29,7 @@ requires
   rtl;
 
 contains
-  bass in '..\..\..\..\..\Bass\delphi\bass.pas',
-  uBassCommon in '..\..\uBassCommon.pas';
+  uBassCommon in '..\..\uBassCommon.pas',
+  bass in '..\..\bass.pas';
 
 end.
