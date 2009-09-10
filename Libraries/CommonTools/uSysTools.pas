@@ -447,8 +447,10 @@ begin
       Result:=AValue.VCurrency^;
     vtVariant:
       Result:=AValue.VVariant^;
+    vtInt64:
+      Result :=  AValue.VInt64^;
     else
-    raise Exception.Create ('invalid data type')
+    raise Exception.Create ('invalid data type ' + IntToStr(AValue.VType));
   end;
 end;
 
