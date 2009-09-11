@@ -33,6 +33,8 @@ type
     function GenTagRowEnd() : String;
     function GenTagCell(AData: Variant) : WideString;
     function GenManifest : WideString;
+
+    procedure WriteFile(AContent : TStream);
   published
     property Filename : String read FFilename write FFilename;
   end;
@@ -60,19 +62,11 @@ end;
 
 function TExporterDestinationODS.Execute1D(
   ASource: TExporterSource1DBase): Boolean;
-begin
-
-end;
-
-function TExporterDestinationODS.Execute2D(
-  ASource: TExporterSource2DBase): Boolean;
 var
   content : Widestring;
   utf8 : String;
   fs : TFileStream;
-  MS_Content,
-  MS_Manifest : TMemoryStream;
-  arch : I7zOutArchive;
+  MS_Content: TMemoryStream;
 
   procedure WriteContent;
   begin
@@ -83,12 +77,45 @@ var
   
 begin
   MS_Content := TMemoryStream.Create;
-  MS_Manifest := TMemoryStream.Create;
   try
-    utf8 := UTF8Encode(GenManifest);
-    MS_Manifest.Write(PChar(utf8)^, Length(utf8));
+    content := GenTagsDocumentHead + GenTagTableStart('Tabelle1');
 
-    
+    ASource.NavigateRow(ndBeginning);
+
+    repeat
+      content := content + GenTagRowStart + GenTagCell(ASource.GetValue) + GenTagRowEnd;
+      WriteContent;
+    until ASource.NavigateRow(ndNext) <> nrOK;
+
+    content := content + GenTagTableEnd + GenTagsDocumentFoot;
+
+    WriteContent;
+
+    WriteFile(MS_Content);
+
+  finally
+    MS_Content.Free;
+  end;
+end;
+
+function TExporterDestinationODS.Execute2D(
+  ASource: TExporterSource2DBase): Boolean;
+var
+  content : Widestring;
+  utf8 : String;
+  fs : TFileStream;
+  MS_Content: TMemoryStream;
+
+  procedure WriteContent;
+  begin
+    utf8 := UTF8Encode(content);
+    MS_Content.Write(PChar(UTF8)^, length(utf8));
+    content := EmptyStr;
+  end;
+
+begin
+  MS_Content := TMemoryStream.Create;
+  try
     content := GenTagsDocumentHead + GenTagTableStart('Tabelle1');
 
     ASource.NavigateRow(ndBeginning);
@@ -119,21 +146,75 @@ begin
 
     WriteContent;
 
-  finally
-    arch := CreateOutArchive(CLSID_CFormatZip);
-    arch.AddStream(MS_Content, soReference, faArchive, CurrentFileTime, CurrentFileTime, 'content.xml', false, false);
-    arch.AddStream(MS_Manifest,  soReference, faArchive, CurrentFileTime, CurrentFileTime, 'META-INF\manifest.xml', false, false);
-    arch.SaveToFile(FFilename);
+    WriteFile(MS_Content);
 
+  finally
     MS_Content.Free;
-    MS_Manifest.Free;
   end;
 end;
 
 function TExporterDestinationODS.Execute3D(
   ASource: TExporterSource3DBase): Boolean;
-begin
+var
+  content : Widestring;
+  utf8 : String;
+  fs : TFileStream;
+  MS_Content: TMemoryStream;
 
+  procedure WriteContent;
+  begin
+    utf8 := UTF8Encode(content);
+    MS_Content.Write(PChar(UTF8)^, length(utf8));
+    content := EmptyStr;
+  end;
+
+begin
+  MS_Content := TMemoryStream.Create;
+  try
+    content := GenTagsDocumentHead;
+
+    ASource.NavigatePage(ndBeginning);
+    repeat
+      GenTagTableStart(ASource.GetCaption(2));
+
+      ASource.NavigateRow(ndBeginning);
+      ASource.NavigateColumn(ndBeginning);
+
+      content := content + GenTagRowStart;
+      repeat
+        content := content + GenTagCell(ASource.GetCaption(1))
+      until ASource.NavigateColumn(ndNext) <> nrOK;
+      content := content + GenTagRowEnd;
+
+      WriteContent;
+
+      repeat
+        content := content + GenTagRowStart;
+
+        ASource.NavigateColumn(ndBeginning);
+        repeat
+          content := content + GenTagCell(ASource.GetValue);
+        until ASource.NavigateColumn(ndNext) <> nrOK;
+
+        content := content + GenTagRowEnd;
+        WriteContent;
+
+      until ASource.NavigateRow(ndNext) <> nrOK;
+
+      content := content + GenTagTableEnd;
+      WriteContent;
+      
+    until ASource.NavigatePage(ndNext) <> nrOK;
+
+    content := content + GenTagsDocumentFoot;
+
+    WriteContent;
+
+    WriteFile(MS_Content);
+
+  finally
+    MS_Content.Free;
+  end;
 end;
 
 function TExporterDestinationODS.GenManifest: WideString;
@@ -315,6 +396,26 @@ end;
 function TExporterDestinationODS.GenTagTableStart(AName: String): String;
 begin
   Result := Format('<table:table table:name="%s">', [AName]);
+end;
+
+procedure TExporterDestinationODS.WriteFile(AContent: TStream);
+var
+  MS_Manifest : TMemoryStream;
+  s : String;
+  arch : I7zOutArchive;
+begin
+  MS_Manifest := TMemoryStream.Create;
+  try
+    s := UTF8Encode(GenManifest);
+    MS_Manifest.Write(PChar(s)^, Length(s));
+
+    arch := CreateOutArchive(CLSID_CFormatZip);
+    arch.AddStream(AContent, soReference, faArchive, CurrentFileTime, CurrentFileTime, 'content.xml', false, false);
+    arch.AddStream(MS_Manifest,  soReference, faArchive, CurrentFileTime, CurrentFileTime, 'META-INF\manifest.xml', false, false);
+    arch.SaveToFile(FFilename);
+  finally
+    MS_Manifest.Free;
+  end;
 end;
 
 initialization
