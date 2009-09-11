@@ -6,6 +6,8 @@ uses
   uExporter, Classes, SysUtils;
 
 type
+  {$M+}
+
   TExporterDestinationCSVBase = class(TExporterDestinationBase)
   private
     FSepChar: Char;
@@ -20,6 +22,7 @@ type
     function Execute2D(ASource: TExporterSource2DBase): Boolean;
     function Execute3D(ASource: TExporterSource3DBase): Boolean;
     procedure DoWriteLine(AFile, ALine: WideString); virtual; abstract;
+    procedure DoFinalTasks(AFile: WideString); virtual; abstract;
   public
     constructor Create;
 
@@ -35,15 +38,21 @@ type
     FFilePath: TFileName;
     FFileExt: TFileName;
     FBaseFileName: TFilename;
+    function GetFilename: String;
+    procedure SetFilename(const Value: String);
+    procedure SetFilePath(const Value: TFileName);
   protected
     function GetFileStream(AFile: WideString): TFileStream;
     procedure DoWriteLine(AFile, ALine: WideString); override;
+    procedure DoFinalTasks(AFile: WideString); override;
   public
-    constructor Create(AFileName: String); 
+    constructor Create(AFileName: String);
     destructor Destroy; override;
-    property FilePath: TFileName read FFilePath write FFilePath;
+  published
+    property FilePath: TFileName read FFilePath write SetFilePath;
     property BaseFileName: TFilename read FBaseFileName write FBaseFileName;
     property FileExtension: TFileName read FFileExt write FFileExt;
+    property Filename : String read GetFilename write SetFilename;
   end;
 
 implementation
@@ -88,6 +97,8 @@ begin
   repeat
     Self.DoWriteLine('', QuoteValue(ASource.GetValue));
   until ASource.NavigateRow(ndNext)<>nrOK;
+
+  DoFinalTasks('');
 end;
 
 function TExporterDestinationCSVBase.Execute2D(
@@ -120,7 +131,9 @@ begin
       Line:=Line+sep+QuoteValue(ASource.GetValue);
 
     Self.DoWriteLine('', Line);
-  until ASource.NavigateRow(ndNext)<>nrOK;  
+  until ASource.NavigateRow(ndNext)<>nrOK;
+
+  DoFinalTasks('');
 end;
 
 function TExporterDestinationCSVBase.Execute3D(
@@ -159,6 +172,8 @@ begin
 
       Self.DoWriteLine(PageName, Line);
     until ASource.NavigateRow(ndNext)<>nrOK;
+
+    DoFinalTasks(PageName);
   until ASource.NavigatePage(ndNext)<>nrOK;
 end;
 
@@ -175,9 +190,7 @@ constructor TExporterDestinationCSVFile.Create(AFileName: String);
 begin
   inherited Create;
   FFileList:=TStringList.Create;
-  FFilePath:=ExtractFilePath(AFileName);
-  FBaseFileName:=ChangeFileExt(ExtractFileName(AFileName),'');
-  FFileExt:=ExtractFileExt(AFileName);
+  Filename := AFileName;
 end;
 
 destructor TExporterDestinationCSVFile.Destroy;
@@ -192,6 +205,20 @@ begin
   inherited;
 end;
 
+procedure TExporterDestinationCSVFile.DoFinalTasks(AFile: WideString);
+var
+  fs : TFileStream;
+  idx : integer;
+begin
+  fs:=GetFileStream(AFile);
+  idx:=FFileList.IndexOfObject(fs);
+  if idx>=0 then
+  begin
+    FFileList.Delete(idx);
+    fs.Free;
+  end;
+end;
+
 procedure TExporterDestinationCSVFile.DoWriteLine(AFile, ALine: WideString);
 var
   txt : String;
@@ -199,6 +226,11 @@ begin
   txt:=ALine+FLineSep;
 
   GetFileStream(AFile).WriteBuffer(Pchar(txt)^, Length(txt));
+end;
+
+function TExporterDestinationCSVFile.GetFilename: String;
+begin
+  Result := FFilePath + FBaseFileName + FFileExt;
 end;
 
 function TExporterDestinationCSVFile.GetFileStream(
@@ -210,7 +242,7 @@ begin
   idx:=FFileList.IndexOf(AFile);
   if idx<0 then
   begin
-    FNam:=IncludeTrailingPathDelimiter(FFilePath)+FBaseFileName+AFile+FFileExt;
+    FNam:=FFilePath+FBaseFileName+AFile+FFileExt;
     
     Result:=TFileStream.Create(FNam, fmCreate);
     FFileList.AddObject(AFile, Result);
@@ -219,5 +251,17 @@ begin
     Result:=TFileStream(FFileList.Objects[idx]);
 end;
 
+
+procedure TExporterDestinationCSVFile.SetFilename(const Value: String);
+begin
+  FFilePath:=IncludeTrailingPathDelimiter(ExtractFilePath(Value));
+  FBaseFileName:=ChangeFileExt(ExtractFileName(Value),'');
+  FFileExt:=ExtractFileExt(Value);
+end;
+
+procedure TExporterDestinationCSVFile.SetFilePath(const Value: TFileName);
+begin
+  FFilePath := IncludeTrailingPathDelimiter(Value);
+end;
 
 end.

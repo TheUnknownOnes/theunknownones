@@ -55,6 +55,8 @@ type
     function Execute(ASource: TExporterSourceBase): Boolean; virtual; abstract;
   end;
 
+  TExporterDestinationBaseClass = class of TExporterDestinationBase;
+
   TExporter = class(TInterfacedObject)
   private
     FDestination: TExporterDestinationBase;
