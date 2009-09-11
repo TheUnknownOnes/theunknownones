@@ -8,7 +8,7 @@ unit uXMLTools;
 interface
 
 uses
-  Classes, SysUtils, MSXML2, MSXML, IniFiles, WideStrings, ComObj;
+  Classes, SysUtils, MSXML2, MSXML, IniFiles, WideStrings, ComObj, uSysTools;
 
 type
   TXMLIni = class(TCustomIniFile)
@@ -63,7 +63,40 @@ type
   function CreateMSXMLV1Document : IXMLDOMDocument;
   function CreateMSXMLV2Document : IXMLDOMDocument2;
 
+  function ReplaceSpecialCharsWithEntities(AXML : String) : String;
+  function ReplaceEntitiesWithSpecialChars(AXML : String) : String;
+
 implementation
+
+function ReplaceSpecialCharsWithEntities(AXML : String) : String;
+begin
+  Result := MultipleStringReplace(AXML, ['"',
+                                         '&',
+                                         '''',
+                                         '<',
+                                         '>'],
+                                        ['&quot;',
+                                         '&amp;',
+                                         '&apos;',
+                                         '&lt;',
+                                         '&gt;'],
+                                         [rfReplaceAll]);
+end;
+
+function ReplaceEntitiesWithSpecialChars(AXML : String) : String;
+begin
+  Result := MultipleStringReplace(AXML, ['&quot;',
+                                         '&amp;',
+                                         '&apos;',
+                                         '&lt;',
+                                         '&gt;'],
+                                        ['"',
+                                         '&',
+                                         '''',
+                                         '<',
+                                         '>'],
+                                        [rfReplaceAll]);
+end;
 
 function CreateMSXMLV1Document : IXMLDOMDocument;
 begin

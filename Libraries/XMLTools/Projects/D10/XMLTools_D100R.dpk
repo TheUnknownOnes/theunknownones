@@ -28,7 +28,8 @@ package XMLTools_D100R;
 
 requires
   rtl,
-  vcl;
+  vcl,
+  CommonTools_D100R;
 
 contains
   MSXML2 in '..\..\MSXML2.pas',
