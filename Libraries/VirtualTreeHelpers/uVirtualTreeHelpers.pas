@@ -239,7 +239,10 @@ end;
 
 function TBaseVirtualTreeHelper.IsFakeNode(ANode: PVirtualNode): Boolean;
 begin
-  Result:= Pointer(GetNodeData(ANode)^) = FFakeData;
+  if Assigned(ANode) then
+    Result:= Pointer(GetNodeData(ANode)^) = FFakeData
+  else
+    Result := false;
 end;
 
 procedure TBaseVirtualTreeHelper.ScanEditorKeys(var AKey: Word);
