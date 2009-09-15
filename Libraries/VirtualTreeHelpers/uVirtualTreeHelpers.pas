@@ -238,9 +238,13 @@ begin
 end;
 
 function TBaseVirtualTreeHelper.IsFakeNode(ANode: PVirtualNode): Boolean;
+var
+  Data : Pointer;
 begin
-  if Assigned(ANode) then
-    Result:= Pointer(GetNodeData(ANode)^) = FFakeData
+  Data := GetNodeData(ANode);
+  
+  if Assigned(Data) then
+    Result:= Pointer(Data^) = FFakeData
   else
     Result := false;
 end;
