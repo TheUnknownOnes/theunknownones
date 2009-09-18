@@ -12,7 +12,7 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('TUO', [TZintBarcodeControl]);
+  
 end;
 
 end.

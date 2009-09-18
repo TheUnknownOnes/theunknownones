@@ -12,6 +12,92 @@ uses
 
 type
   TZBRotation = (r0, r90, r180, r270);
+  TZBType = (
+    tBARCODE_CODE11,
+    tBARCODE_C25MATRIX,
+    tBARCODE_C25INTER,
+    tBARCODE_C25IATA,
+    tBARCODE_C25LOGIC,
+    tBARCODE_C25IND,
+    tBARCODE_CODE39,
+    tBARCODE_EXCODE39,
+    tBARCODE_EANX,
+    tBARCODE_EAN128,
+    tBARCODE_CODABAR,
+    tBARCODE_CODE128,
+    tBARCODE_DPLEIT,
+    tBARCODE_DPIDENT,
+    tBARCODE_CODE16K,
+    tBARCODE_CODE49,
+    tBARCODE_CODE93,
+    tBARCODE_FLAT,
+    tBARCODE_RSS14,
+    tBARCODE_RSS_LTD,
+    tBARCODE_RSS_EXP,
+    tBARCODE_TELEPEN,
+    tBARCODE_UPCA,
+    tBARCODE_UPCE,
+    tBARCODE_POSTNET,
+    tBARCODE_MSI_PLESSEY,
+    tBARCODE_FIM,
+    tBARCODE_LOGMARS,
+    tBARCODE_PHARMA,
+    tBARCODE_PZN,
+    tBARCODE_PHARMA_TWO,
+    tBARCODE_PDF417	,
+    tBARCODE_PDF417TRUNC,
+    tBARCODE_MAXICODE,
+    tBARCODE_QRCODE,
+    tBARCODE_CODE128B,
+    tBARCODE_AUSPOST,
+    tBARCODE_AUSREPLY,
+    tBARCODE_AUSROUTE	,
+    tBARCODE_AUSREDIRECT,
+    tBARCODE_ISBNX,
+    tBARCODE_RM4SCC,
+    tBARCODE_DATAMATRIX,
+    tBARCODE_EAN14,
+    tBARCODE_CODABLOCKF,
+    tBARCODE_NVE18,
+    tBARCODE_JAPANPOST,
+    tBARCODE_KOREAPOST,
+    tBARCODE_RSS14STACK,
+    tBARCODE_RSS14STACK_OMNI,
+    tBARCODE_RSS_EXPSTACK,
+    tBARCODE_PLANET,
+    tBARCODE_MICROPDF417,
+    tBARCODE_ONECODE,
+    tBARCODE_PLESSEY,
+
+    tBARCODE_TELEPEN_NUM,
+    tBARCODE_ITF14,
+    tBARCODE_KIX,
+    tBARCODE_AZTEC,
+    tBARCODE_DAFT,
+    tBARCODE_MICROQR,
+
+    tBARCODE_HIBC_128,
+    tBARCODE_HIBC_39,
+    tBARCODE_HIBC_DM,
+    tBARCODE_HIBC_QR,
+    tBARCODE_HIBC_PDF,
+    tBARCODE_HIBC_MICPDF,
+    tBARCODE_HIBC_BLOCKF,
+
+    tBARCODE_AZRUNE,
+    tBARCODE_CODE32,
+    tBARCODE_EANX_CC,
+    tBARCODE_EAN128_CC,
+    tBARCODE_RSS14_CC,
+    tBARCODE_RSS_LTD_CC,
+    tBARCODE_RSS_EXP_CC,
+    tBARCODE_UPCA_CC,
+    tBARCODE_UPCE_CC,
+    tBARCODE_RSS14STACK_CC,
+    tBARCODE_RSS14_OMNI_CC,
+    tBARCODE_RSS_EXPSTACK_CC,
+    tBARCODE_CHANNEL,
+    tBARCODE_CODEONE);
 
   TZintBarcode = class(TPersistent)
   private
@@ -19,15 +105,17 @@ type
     FData : UTF8String;
     FRotation: TZBRotation;
     FOnEncoded: TNotifyEvent;
+    FAutoEncode: Boolean;
 
     procedure CheckForError(AReturnValue : Integer);
     function ErrorTextFromSymbol : String;
     procedure SetData(const Value: WideString);
     procedure Encode;
+    procedure EncodeNow;
 
-    procedure SetType(const Value: TZBarcodeType);
+    procedure SetType(const Value: TZBType);
     function GetData: WideString;
-    function GetType: TZBarcodeType;
+    function GetType: TZBType;
     function GetScale: Single;
     procedure SetScale(const Value: Single);
     function GetHeight: Integer;
@@ -42,18 +130,23 @@ type
     procedure SetOption(const Index, Value: Integer);
     procedure SetRotation(const Value: TZBRotation);
     function GetBarcodeSize: TPoint;
+    function GetPrimary: String;
+    procedure SetPrimary(const Value: String);
   public
     constructor Create();
     destructor Destroy(); override;
 
+    procedure Assign(Source: TPersistent); override;
+
     procedure GetBarcode(const ABitmap : TBitmap);
 
+    property AutoEncode : Boolean read FAutoEncode write FAutoEncode;
     property BarcodeSize : TPoint read GetBarcodeSize;
 
     property OnEncoded : TNotifyEvent read FOnEncoded write FOnEncoded;
   published
     property Data : Widestring read GetData write SetData;
-    property BarcodeType : TZBarcodeType read GetType write SetType;
+    property BarcodeType : TZBType read GetType write SetType;
     property Scale : Single read GetScale write SetScale;
     property Height : Integer read GetHeight write SetHeight;
     property BorderWidth : Integer read GetBorderWidth write SetBorderWidth;
@@ -64,21 +157,9 @@ type
     property Option2 : Integer index 2 read GetOption write SetOption;
     property Option3 : Integer index 3 read GetOption write SetOption;
     property Roatation : TZBRotation read FRotation write SetRotation;
+    property Primary : String read GetPrimary write SetPrimary;
   end;
 
-  TZintBarcodeControl = class(TGraphicControl)
-  private
-    FBarcode: TZintBarcode;
-
-    procedure OnNewBarcode(Sender : TObject);
-  protected
-    procedure Paint; override;
-  public
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-  published
-    property Barcode : TZintBarcode read FBarcode;
-  end;
 
   EZintError = type Exception;
   EZintErrorTooLong = type EZintError;
@@ -91,6 +172,36 @@ type
 implementation
 
 { TZintBarcode }
+
+procedure TZintBarcode.Assign(Source: TPersistent);
+var
+  OldAutoEncode : Boolean;
+begin
+  if Source is TZintBarcode then
+  begin
+    OldAutoEncode := FAutoEncode;
+    FAutoEncode := false;
+
+    Data := TZintBarcode(Source).Data;
+    BarcodeType := TZintBarcode(Source).BarcodeType;
+    Scale := TZintBarcode(Source).Scale;
+    Height := TZintBarcode(Source).Height;
+    BorderWidth := TZintBarcode(Source).BorderWidth;
+    OutputOptions := TZintBarcode(Source).OutputOptions;
+    FGColor := TZintBarcode(Source).FGColor;
+    BGColor := TZintBarcode(Source).BGColor;
+    Option1 := TZintBarcode(Source).Option1;
+    Option2 := TZintBarcode(Source).Option2;
+    Option3 := TZintBarcode(Source).Option3;
+    Roatation := TZintBarcode(Source).Roatation;
+    Primary := TZintBarcode(Source).Primary;
+
+    FAutoEncode := OldAutoEncode;
+    Encode;
+  end
+  else
+    inherited;
+end;
 
 procedure TZintBarcode.CheckForError(AReturnValue: Integer);
 begin
@@ -108,14 +219,16 @@ constructor TZintBarcode.Create;
 begin
   inherited;
   FSymbol := ZBarcode_Create;
-  FSymbol.input_mode := Integer(UNICODE_MODE);
-
-  FRotation := r0;
-  FSymbol.outfile := '.BMP';
-  Data := '123456789';
 
   if not Assigned(FSymbol) then
     raise Exception.Create('Can not create internal symbol structure');
+
+  FAutoEncode := false;
+
+  FSymbol.input_mode := Integer(UNICODE_MODE);
+  FRotation := r0;
+  FSymbol.outfile := '.BMP';
+  Data := '123456789';
 end;
 
 destructor TZintBarcode.Destroy;
@@ -127,6 +240,12 @@ begin
 end;
 
 procedure TZintBarcode.Encode();
+begin
+  if FAutoEncode then
+    EncodeNow;
+end;
+
+procedure TZintBarcode.EncodeNow;
 var
   rotation : Integer;
 begin
@@ -139,7 +258,7 @@ begin
       rotation := 0;
   end;
 
-  CheckForError(ZBarcode_Encode_and_Print_Rotated(FSymbol, PAnsiChar(FData), rotation));
+  CheckForError(ZBarcode_Encode_and_Print_Rotated(FSymbol, PAnsiChar(FData + #0), rotation));
 
   if Assigned(FOnEncoded) then
     FOnEncoded(Self);
@@ -152,6 +271,7 @@ end;
 
 procedure TZintBarcode.GetBarcode(const ABitmap: TBitmap);
 begin
+  EncodeNow;
   ZBarcodeToBitmap(FSymbol, ABitmap);
 end;
 
@@ -179,7 +299,7 @@ end;
 
 function TZintBarcode.GetData: Widestring;
 begin
-  Result := UTF8Decode(StrPas(FSymbol.text));
+  Result := UTF8Decode(FData);
 end;
 
 function TZintBarcode.GetHeight: Integer;
@@ -203,14 +323,102 @@ begin
   Result := TZOutputOptions(FSymbol.output_options);
 end;
 
+function TZintBarcode.GetPrimary: String;
+begin
+  Result := StrPas(@FSymbol.primary);
+end;
+
 function TZintBarcode.GetScale: Single;
 begin
   Result := FSymbol.scale;
 end;
 
-function TZintBarcode.GetType: TZBarcodeType;
+function TZintBarcode.GetType: TZBType;
 begin
-  Result := TZBarcodeType(FSymbol.symbology);
+  case FSymbol.symbology of
+    BARCODE_CODE11 : Result := tBARCODE_CODE11;
+    BARCODE_C25MATRIX : Result := tBARCODE_C25MATRIX;
+    BARCODE_C25INTER : Result := tBARCODE_C25INTER;
+    BARCODE_C25IATA : Result := tBARCODE_C25IATA;
+    BARCODE_C25LOGIC : Result := tBARCODE_C25LOGIC;
+    BARCODE_C25IND : Result := tBARCODE_C25IND;
+    BARCODE_CODE39 : Result := tBARCODE_CODE39;
+    BARCODE_EXCODE39 : Result := tBARCODE_EXCODE39;
+    BARCODE_EANX : Result := tBARCODE_EANX;
+    BARCODE_EAN128 : Result := tBARCODE_EAN128;
+    BARCODE_CODABAR : Result := tBARCODE_CODABAR;
+    BARCODE_CODE128 : Result := tBARCODE_CODE128;
+    BARCODE_DPLEIT : Result := tBARCODE_DPLEIT;
+    BARCODE_DPIDENT : Result := tBARCODE_DPIDENT;
+    BARCODE_CODE16K : Result := tBARCODE_CODE16K;
+    BARCODE_CODE49 : Result := tBARCODE_CODE49;
+    BARCODE_CODE93 : Result := tBARCODE_CODE93;
+    BARCODE_FLAT : Result := tBARCODE_FLAT;
+    BARCODE_RSS14 : Result := tBARCODE_RSS14;
+    BARCODE_RSS_LTD : Result := tBARCODE_RSS_LTD;
+    BARCODE_RSS_EXP : Result := tBARCODE_RSS_EXP;
+    BARCODE_TELEPEN : Result := tBARCODE_TELEPEN;
+    BARCODE_UPCA : Result := tBARCODE_UPCA;
+    BARCODE_UPCE : Result := tBARCODE_UPCE;
+    BARCODE_POSTNET : Result := tBARCODE_POSTNET;
+    BARCODE_MSI_PLESSEY : Result := tBARCODE_MSI_PLESSEY;
+    BARCODE_FIM : Result := tBARCODE_FIM;
+    BARCODE_LOGMARS : Result := tBARCODE_LOGMARS;
+    BARCODE_PHARMA : Result := tBARCODE_PHARMA;
+    BARCODE_PZN : Result := tBARCODE_PZN;
+    BARCODE_PHARMA_TWO : Result := tBARCODE_PHARMA_TWO;
+    BARCODE_PDF417 : Result := tBARCODE_PDF417;
+    BARCODE_PDF417TRUNC : Result := tBARCODE_PDF417TRUNC;
+    BARCODE_MAXICODE : Result := tBARCODE_MAXICODE;
+    BARCODE_QRCODE : Result := tBARCODE_QRCODE;
+    BARCODE_CODE128B : Result := tBARCODE_CODE128B;
+    BARCODE_AUSPOST : Result := tBARCODE_AUSPOST;
+    BARCODE_AUSREPLY : Result := tBARCODE_AUSREPLY;
+    BARCODE_AUSROUTE : Result := tBARCODE_AUSROUTE;
+    BARCODE_AUSREDIRECT : Result := tBARCODE_AUSREDIRECT;
+    BARCODE_ISBNX : Result := tBARCODE_ISBNX;
+    BARCODE_RM4SCC : Result := tBARCODE_RM4SCC;
+    BARCODE_DATAMATRIX : Result := tBARCODE_DATAMATRIX;
+    BARCODE_EAN14 : Result := tBARCODE_EAN14;
+    BARCODE_CODABLOCKF : Result := tBARCODE_CODABLOCKF;
+    BARCODE_NVE18 : Result := tBARCODE_NVE18;
+    BARCODE_JAPANPOST : Result := tBARCODE_JAPANPOST;
+    BARCODE_KOREAPOST : Result := tBARCODE_KOREAPOST;
+    BARCODE_RSS14STACK : Result := tBARCODE_RSS14STACK;
+    BARCODE_RSS14STACK_OMNI : Result := tBARCODE_RSS14STACK_OMNI;
+    BARCODE_RSS_EXPSTACK : Result := tBARCODE_RSS_EXPSTACK;
+    BARCODE_PLANET : Result := tBARCODE_PLANET;
+    BARCODE_MICROPDF417 : Result := tBARCODE_MICROPDF417;
+    BARCODE_ONECODE : Result := tBARCODE_ONECODE;
+    BARCODE_PLESSEY : Result := tBARCODE_PLESSEY;
+    BARCODE_TELEPEN_NUM : Result := tBARCODE_TELEPEN_NUM;
+    BARCODE_ITF14 : Result := tBARCODE_ITF14;
+    BARCODE_KIX : Result := tBARCODE_KIX;
+    BARCODE_AZTEC : Result := tBARCODE_AZTEC;
+    BARCODE_DAFT : Result := tBARCODE_DAFT;
+    BARCODE_MICROQR : Result := tBARCODE_MICROQR;
+    BARCODE_HIBC_128 : Result := tBARCODE_HIBC_128;
+    BARCODE_HIBC_39 : Result := tBARCODE_HIBC_39;
+    BARCODE_HIBC_DM : Result := tBARCODE_HIBC_DM;
+    BARCODE_HIBC_QR : Result := tBARCODE_HIBC_QR;
+    BARCODE_HIBC_PDF : Result := tBARCODE_HIBC_PDF;
+    BARCODE_HIBC_MICPDF : Result := tBARCODE_HIBC_MICPDF;
+    BARCODE_HIBC_BLOCKF : Result := tBARCODE_HIBC_BLOCKF;
+    BARCODE_AZRUNE : Result := tBARCODE_AZRUNE;
+    BARCODE_CODE32 : Result := tBARCODE_CODE32;
+    BARCODE_EANX_CC : Result := tBARCODE_EANX_CC;
+    BARCODE_EAN128_CC : Result := tBARCODE_EAN128_CC;
+    BARCODE_RSS14_CC : Result := tBARCODE_RSS14_CC;
+    BARCODE_RSS_LTD_CC : Result := tBARCODE_RSS_LTD_CC;
+    BARCODE_RSS_EXP_CC : Result := tBARCODE_RSS_EXP_CC;
+    BARCODE_UPCA_CC : Result := tBARCODE_UPCA_CC;
+    BARCODE_UPCE_CC : Result := tBARCODE_UPCE_CC;
+    BARCODE_RSS14STACK_CC : Result := tBARCODE_RSS14STACK_CC;
+    BARCODE_RSS14_OMNI_CC : Result := tBARCODE_RSS14_OMNI_CC;
+    BARCODE_RSS_EXPSTACK_CC : Result := tBARCODE_RSS_EXPSTACK_CC;
+    BARCODE_CHANNEL : Result := tBARCODE_CHANNEL;
+    BARCODE_CODEONE : Result := tBARCODE_CODEONE;
+  end;
 end;
 
 procedure TZintBarcode.SetBorderWidth(const Value: Integer);
@@ -223,7 +431,7 @@ procedure TZintBarcode.SetColor(const Index: Integer; const Value: TColor);
 var
   S : String;
 begin
-  S := IntToHex(GetRValue(Value), 2) + IntToHex(GetGValue(Value), 2) + IntToHex(GetBValue(Value), 2);
+  S := Format('%.6x', [Value]);
 
   case Index of
     0: StrPCopy(@FSymbol.fgcolour, S);
@@ -259,6 +467,12 @@ begin
   FSymbol.output_options := Integer(Value);
 end;
 
+procedure TZintBarcode.SetPrimary(const Value: String);
+begin
+  StrPCopy(@FSymbol.primary, Value);
+  Encode;
+end;
+
 procedure TZintBarcode.SetRotation(const Value: TZBRotation);
 begin
   FRotation := Value;
@@ -271,47 +485,94 @@ begin
   Encode;
 end;
 
-procedure TZintBarcode.SetType(const Value: TZBarcodeType);
+procedure TZintBarcode.SetType(const Value: TZBType);
 begin
-  FSymbol.symbology := Integer(Value);
-  Encode;
-end;
-
-{ TZintBarcodeControl }
-
-constructor TZintBarcodeControl.Create(AOwner: TComponent);
-begin
-  inherited;
-
-  FBarcode := TZintBarcode.Create;
-  FBarcode.OnEncoded := OnNewBarcode;
-end;
-
-destructor TZintBarcodeControl.Destroy;
-begin
-  FBarcode.Free;
-  inherited;
-end;
-
-procedure TZintBarcodeControl.OnNewBarcode(Sender: TObject);
-begin
-  Width := Barcode.BarcodeSize.X;
-  Height := Barcode.BarcodeSize.Y;
-end;
-
-procedure TZintBarcodeControl.Paint;
-var
-  bmp : TBitmap;
-begin
-  inherited;
-
-  bmp := TBitmap.Create;
-  try
-    FBarcode.GetBarcode(bmp);
-    Canvas.Draw(0, 0, bmp);
-  finally
-    bmp.Free;
+  case Value of
+    tBARCODE_CODE11: FSymbol.symbology := BARCODE_CODE11;
+    tBARCODE_C25MATRIX: FSymbol.symbology := BARCODE_C25MATRIX;
+    tBARCODE_C25INTER: FSymbol.symbology := BARCODE_C25INTER;
+    tBARCODE_C25IATA: FSymbol.symbology := BARCODE_C25IATA;
+    tBARCODE_C25LOGIC: FSymbol.symbology := BARCODE_C25LOGIC;
+    tBARCODE_C25IND: FSymbol.symbology := BARCODE_C25IND;
+    tBARCODE_CODE39: FSymbol.symbology := BARCODE_CODE39;
+    tBARCODE_EXCODE39: FSymbol.symbology := BARCODE_EXCODE39;
+    tBARCODE_EANX: FSymbol.symbology := BARCODE_EANX;
+    tBARCODE_EAN128: FSymbol.symbology := BARCODE_EAN128;
+    tBARCODE_CODABAR: FSymbol.symbology := BARCODE_CODABAR;
+    tBARCODE_CODE128: FSymbol.symbology := BARCODE_CODE128;
+    tBARCODE_DPLEIT: FSymbol.symbology := BARCODE_DPLEIT;
+    tBARCODE_DPIDENT: FSymbol.symbology := BARCODE_DPIDENT;
+    tBARCODE_CODE16K: FSymbol.symbology := BARCODE_CODE16K;
+    tBARCODE_CODE49: FSymbol.symbology := BARCODE_CODE49;
+    tBARCODE_CODE93: FSymbol.symbology := BARCODE_CODE93;
+    tBARCODE_FLAT: FSymbol.symbology := BARCODE_FLAT;
+    tBARCODE_RSS14: FSymbol.symbology := BARCODE_RSS14;
+    tBARCODE_RSS_LTD: FSymbol.symbology := BARCODE_RSS_LTD;
+    tBARCODE_RSS_EXP: FSymbol.symbology := BARCODE_RSS_EXP;
+    tBARCODE_TELEPEN: FSymbol.symbology := BARCODE_TELEPEN;
+    tBARCODE_UPCA: FSymbol.symbology := BARCODE_UPCA;
+    tBARCODE_UPCE: FSymbol.symbology := BARCODE_UPCE;
+    tBARCODE_POSTNET: FSymbol.symbology := BARCODE_POSTNET;
+    tBARCODE_MSI_PLESSEY: FSymbol.symbology := BARCODE_MSI_PLESSEY;
+    tBARCODE_FIM: FSymbol.symbology := BARCODE_FIM;
+    tBARCODE_LOGMARS: FSymbol.symbology := BARCODE_LOGMARS;
+    tBARCODE_PHARMA: FSymbol.symbology := BARCODE_PHARMA;
+    tBARCODE_PZN: FSymbol.symbology := BARCODE_PZN;
+    tBARCODE_PHARMA_TWO: FSymbol.symbology := BARCODE_PHARMA_TWO;
+    tBARCODE_PDF417: FSymbol.symbology := BARCODE_PDF417;
+    tBARCODE_PDF417TRUNC: FSymbol.symbology := BARCODE_PDF417TRUNC;
+    tBARCODE_MAXICODE: FSymbol.symbology := BARCODE_MAXICODE;
+    tBARCODE_QRCODE: FSymbol.symbology := BARCODE_QRCODE;
+    tBARCODE_CODE128B: FSymbol.symbology := BARCODE_CODE128B;
+    tBARCODE_AUSPOST: FSymbol.symbology := BARCODE_AUSPOST;
+    tBARCODE_AUSREPLY: FSymbol.symbology := BARCODE_AUSREPLY;
+    tBARCODE_AUSROUTE: FSymbol.symbology := BARCODE_AUSROUTE;
+    tBARCODE_AUSREDIRECT: FSymbol.symbology := BARCODE_AUSREDIRECT;
+    tBARCODE_ISBNX: FSymbol.symbology := BARCODE_ISBNX;
+    tBARCODE_RM4SCC: FSymbol.symbology := BARCODE_RM4SCC;
+    tBARCODE_DATAMATRIX: FSymbol.symbology := BARCODE_DATAMATRIX;
+    tBARCODE_EAN14: FSymbol.symbology := BARCODE_EAN14;
+    tBARCODE_CODABLOCKF: FSymbol.symbology := BARCODE_CODABLOCKF;
+    tBARCODE_NVE18: FSymbol.symbology := BARCODE_NVE18;
+    tBARCODE_JAPANPOST: FSymbol.symbology := BARCODE_JAPANPOST;
+    tBARCODE_KOREAPOST: FSymbol.symbology := BARCODE_KOREAPOST;
+    tBARCODE_RSS14STACK: FSymbol.symbology := BARCODE_RSS14STACK;
+    tBARCODE_RSS14STACK_OMNI: FSymbol.symbology := BARCODE_RSS14STACK_OMNI;
+    tBARCODE_RSS_EXPSTACK: FSymbol.symbology := BARCODE_RSS_EXPSTACK;
+    tBARCODE_PLANET: FSymbol.symbology := BARCODE_PLANET;
+    tBARCODE_MICROPDF417: FSymbol.symbology := BARCODE_MICROPDF417;
+    tBARCODE_ONECODE: FSymbol.symbology := BARCODE_ONECODE;
+    tBARCODE_PLESSEY: FSymbol.symbology := BARCODE_PLESSEY;
+    tBARCODE_TELEPEN_NUM: FSymbol.symbology := BARCODE_TELEPEN_NUM;
+    tBARCODE_ITF14: FSymbol.symbology := BARCODE_ITF14;
+    tBARCODE_KIX: FSymbol.symbology := BARCODE_KIX;
+    tBARCODE_AZTEC: FSymbol.symbology := BARCODE_AZTEC;
+    tBARCODE_DAFT: FSymbol.symbology := BARCODE_DAFT;
+    tBARCODE_MICROQR: FSymbol.symbology := BARCODE_MICROQR;
+    tBARCODE_HIBC_128: FSymbol.symbology := BARCODE_HIBC_128;
+    tBARCODE_HIBC_39: FSymbol.symbology := BARCODE_HIBC_39;
+    tBARCODE_HIBC_DM: FSymbol.symbology := BARCODE_HIBC_DM;
+    tBARCODE_HIBC_QR: FSymbol.symbology := BARCODE_HIBC_QR;
+    tBARCODE_HIBC_PDF: FSymbol.symbology := BARCODE_HIBC_PDF;
+    tBARCODE_HIBC_MICPDF: FSymbol.symbology := BARCODE_HIBC_MICPDF;
+    tBARCODE_HIBC_BLOCKF: FSymbol.symbology := BARCODE_HIBC_BLOCKF;
+    tBARCODE_AZRUNE: FSymbol.symbology := BARCODE_AZRUNE;
+    tBARCODE_CODE32: FSymbol.symbology := BARCODE_CODE32;
+    tBARCODE_EANX_CC: FSymbol.symbology := BARCODE_EANX_CC;
+    tBARCODE_EAN128_CC: FSymbol.symbology := BARCODE_EAN128_CC;
+    tBARCODE_RSS14_CC: FSymbol.symbology := BARCODE_RSS14_CC;
+    tBARCODE_RSS_LTD_CC: FSymbol.symbology := BARCODE_RSS_LTD_CC;
+    tBARCODE_RSS_EXP_CC: FSymbol.symbology := BARCODE_RSS_EXP_CC;
+    tBARCODE_UPCA_CC: FSymbol.symbology := BARCODE_UPCA_CC;
+    tBARCODE_UPCE_CC: FSymbol.symbology := BARCODE_UPCE_CC;
+    tBARCODE_RSS14STACK_CC: FSymbol.symbology := BARCODE_RSS14STACK_CC;
+    tBARCODE_RSS14_OMNI_CC: FSymbol.symbology := BARCODE_RSS14_OMNI_CC;
+    tBARCODE_RSS_EXPSTACK_CC: FSymbol.symbology := BARCODE_RSS_EXPSTACK_CC;
+    tBARCODE_CHANNEL: FSymbol.symbology := BARCODE_CHANNEL;
+    tBARCODE_CODEONE: FSymbol.symbology := BARCODE_CODEONE;
   end;
+
+  Encode;
 end;
 
 end.
