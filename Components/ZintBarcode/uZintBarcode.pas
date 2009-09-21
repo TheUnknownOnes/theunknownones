@@ -104,13 +104,12 @@ type
     FSymbol : PZSymbol;
     FData : UTF8String;
     FRotation: TZBRotation;
-    FOnEncoded: TNotifyEvent;
-    FAutoEncode: Boolean;
+    FOnChanged: TNotifyEvent;
 
     procedure CheckForError(AReturnValue : Integer);
     function ErrorTextFromSymbol : String;
     procedure SetData(const Value: WideString);
-    procedure Encode;
+    procedure Changed;
     procedure EncodeNow;
 
     procedure SetType(const Value: TZBType);
@@ -140,10 +139,9 @@ type
 
     procedure GetBarcode(const ABitmap : TBitmap);
 
-    property AutoEncode : Boolean read FAutoEncode write FAutoEncode;
     property BarcodeSize : TPoint read GetBarcodeSize;
 
-    property OnEncoded : TNotifyEvent read FOnEncoded write FOnEncoded;
+    property OnChanged : TNotifyEvent read FOnChanged write FOnChanged;
   published
     property Data : Widestring read GetData write SetData;
     property BarcodeType : TZBType read GetType write SetType;
@@ -175,12 +173,12 @@ implementation
 
 procedure TZintBarcode.Assign(Source: TPersistent);
 var
-  OldAutoEncode : Boolean;
+  OldChanged : TNotifyEvent;
 begin
   if Source is TZintBarcode then
   begin
-    OldAutoEncode := FAutoEncode;
-    FAutoEncode := false;
+    OldChanged := FOnChanged;
+    OldChanged := nil;
 
     Data := TZintBarcode(Source).Data;
     BarcodeType := TZintBarcode(Source).BarcodeType;
@@ -196,11 +194,17 @@ begin
     Roatation := TZintBarcode(Source).Roatation;
     Primary := TZintBarcode(Source).Primary;
 
-    FAutoEncode := OldAutoEncode;
-    Encode;
+    FOnChanged := OldChanged;
+    Changed;
   end
   else
     inherited;
+end;
+
+procedure TZintBarcode.Changed;
+begin
+  if Assigned(FOnChanged) then
+    FOnChanged(Self);  
 end;
 
 procedure TZintBarcode.CheckForError(AReturnValue: Integer);
@@ -223,8 +227,6 @@ begin
   if not Assigned(FSymbol) then
     raise Exception.Create('Can not create internal symbol structure');
 
-  FAutoEncode := false;
-
   FSymbol.input_mode := Integer(UNICODE_MODE);
   FRotation := r0;
   FSymbol.outfile := '.BMP';
@@ -237,12 +239,6 @@ begin
     ZBarcode_Delete(FSymbol);
     
   inherited;
-end;
-
-procedure TZintBarcode.Encode();
-begin
-  if FAutoEncode then
-    EncodeNow;
 end;
 
 procedure TZintBarcode.EncodeNow;
@@ -259,9 +255,6 @@ begin
   end;
 
   CheckForError(ZBarcode_Encode_and_Print_Rotated(FSymbol, PAnsiChar(FData + #0), rotation));
-
-  if Assigned(FOnEncoded) then
-    FOnEncoded(Self);
 end;
 
 function TZintBarcode.ErrorTextFromSymbol: String;
@@ -424,7 +417,7 @@ end;
 procedure TZintBarcode.SetBorderWidth(const Value: Integer);
 begin
   FSymbol.border_width := Value;
-  Encode;
+  Changed;
 end;
 
 procedure TZintBarcode.SetColor(const Index: Integer; const Value: TColor);
@@ -438,19 +431,19 @@ begin
     1: StrPCopy(@FSymbol.bgcolour, S);
   end;
 
-  Encode;
+  Changed;
 end;
 
 procedure TZintBarcode.SetData(const Value: Widestring);
 begin
   FData := UTF8Encode(Value);
-  Encode;
+  Changed;
 end;
 
 procedure TZintBarcode.SetHeight(const Value: Integer);
 begin
   FSymbol.height := Value;
-  Encode;
+  Changed;
 end;
 
 procedure TZintBarcode.SetOption(const Index, Value: Integer);
@@ -470,19 +463,19 @@ end;
 procedure TZintBarcode.SetPrimary(const Value: String);
 begin
   StrPCopy(@FSymbol.primary, Value);
-  Encode;
+  Changed;
 end;
 
 procedure TZintBarcode.SetRotation(const Value: TZBRotation);
 begin
   FRotation := Value;
-  Encode;
+  Changed;
 end;
 
 procedure TZintBarcode.SetScale(const Value: Single);
 begin
   FSymbol.scale := Value;
-  Encode;
+  Changed;
 end;
 
 procedure TZintBarcode.SetType(const Value: TZBType);
@@ -572,7 +565,7 @@ begin
     tBARCODE_CODEONE: FSymbol.symbology := BARCODE_CODEONE;
   end;
 
-  Encode;
+  Changed;
 end;
 
 end.
