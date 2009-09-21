@@ -196,6 +196,7 @@ begin
     Option3 := TZintBarcode(Source).Option3;
     Roatation := TZintBarcode(Source).Roatation;
     Primary := TZintBarcode(Source).Primary;
+    ShowHumanReadableText:=TZintBarcode(Source).ShowHumanReadableText;
 
     FOnChanged := OldChanged;
     Changed;
