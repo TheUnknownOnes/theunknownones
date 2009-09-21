@@ -166,6 +166,9 @@ implementation
 procedure ZBarcodeToBitmap(ASymbol : PZSymbol; const ABitmap : TBitmap);
 var
   bmpinfo : TBitmapInfo;
+  myp : PRGBTriple;
+  row : Integer;
+  rowwidth : Integer;
 begin
   ABitmap.PixelFormat := pf24bit;
   ABitmap.SetSize(ASymbol.bitmap_width, ASymbol.bitmap_height);
@@ -178,9 +181,20 @@ begin
   bmpinfo.bmiHeader.biBitCount := 24;
   bmpinfo.bmiHeader.biCompression := BI_RGB;
 
+  myp := ASymbol.bitmap;
+  rowwidth := Asymbol.bitmap_width * 3;
+
+  for row := 0 to ASymbol.bitmap_height - 1 do
+  begin
+    CopyMemory(ABitmap.ScanLine[row], myp, rowwidth);
+    Inc(myp, Asymbol.bitmap_width);
+  end;
+    
+    
+
 
   //Normaly StretchDIBits should do this work. But it has problems with odd image_width
-  SetBitmapBits(ABitmap.Handle, ASymbol.bitmap_width * ASymbol.bitmap_height * 3, ASymbol.bitmap);
+  //SetBitmapBits(ABitmap.Handle, ASymbol.bitmap_width * ASymbol.bitmap_height * 3, ASymbol.bitmap);
 
   {StretchDIBits(ABitmap.Canvas.Handle,
                 0, 0, ASymbol.bitmap_width, ASymbol.bitmap_height,
