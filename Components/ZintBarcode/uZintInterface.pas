@@ -36,6 +36,7 @@ type
     bitmap : Pointer;
     bitmap_width : Integer;
     bitmap_height : Integer;
+    show_humand_readable_text : Integer;
   end;
   PZSymbol = ^TZSymbol;
   

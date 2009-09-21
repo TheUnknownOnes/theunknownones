@@ -131,6 +131,8 @@ type
     function GetBarcodeSize: TPoint;
     function GetPrimary: String;
     procedure SetPrimary(const Value: String);
+    function GetSHRT: Boolean;
+    procedure SetSHRT(const Value: Boolean);
   public
     constructor Create();
     destructor Destroy(); override;
@@ -156,6 +158,7 @@ type
     property Option3 : Integer index 3 read GetOption write SetOption;
     property Roatation : TZBRotation read FRotation write SetRotation;
     property Primary : String read GetPrimary write SetPrimary;
+    property ShowHumanReadableText : Boolean read GetSHRT write SetSHRT;
   end;
 
 
@@ -227,6 +230,7 @@ begin
   if not Assigned(FSymbol) then
     raise Exception.Create('Can not create internal symbol structure');
 
+  FSymbol.show_humand_readable_text := 1;
   FSymbol.input_mode := Integer(UNICODE_MODE);
   FRotation := r0;
   FSymbol.outfile := '.BMP';
@@ -324,6 +328,11 @@ end;
 function TZintBarcode.GetScale: Single;
 begin
   Result := FSymbol.scale;
+end;
+
+function TZintBarcode.GetSHRT: Boolean;
+begin
+  Result := FSymbol.show_humand_readable_text = 1;
 end;
 
 function TZintBarcode.GetType: TZBType;
@@ -475,6 +484,16 @@ end;
 procedure TZintBarcode.SetScale(const Value: Single);
 begin
   FSymbol.scale := Value;
+  Changed;
+end;
+
+procedure TZintBarcode.SetSHRT(const Value: Boolean);
+begin
+  if Value then
+    FSymbol.show_humand_readable_text := 1
+  else
+    FSymbol.show_humand_readable_text := 0;
+
   Changed;
 end;
 
