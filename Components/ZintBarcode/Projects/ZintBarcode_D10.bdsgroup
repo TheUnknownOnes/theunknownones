@@ -10,9 +10,8 @@
 	</PersonalityInfo>
 	<Default.Personality>  <Projects>
       <Projects Name="ZintBarcode_D100R.bpl">D10\ZintBarcode_D100R.bdsproj</Projects>
-      <Projects Name="ZintBarcode_D100D.bpl">D10\ZintBarcode_D100D.bdsproj</Projects>
       <Projects Name="frxZintBarcode_D100R.bpl">D10\frxZintBarcode_D100R.bdsproj</Projects>
-      <Projects Name="Targets">ZintBarcode_D100R.bpl ZintBarcode_D100D.bpl frxZintBarcode_D100R.bpl</Projects>
+      <Projects Name="Targets">ZintBarcode_D100R.bpl frxZintBarcode_D100R.bpl</Projects>
     </Projects>
     <Dependencies/>
   </Default.Personality>
