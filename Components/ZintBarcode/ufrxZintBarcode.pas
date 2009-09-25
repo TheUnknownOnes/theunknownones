@@ -6,7 +6,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Menus, Controls, Variants,
-  frxClass, frxDsgnIntf, uZintBarcode, uZintInterface;
+  frxClass, frxDsgnIntf, uZintBarcode, uZintInterface, fs_iinterpreter;
 
 type
   TfrxZintBarcode = class(TfrxView)
@@ -56,6 +56,11 @@ type
     property Roatation : TZBRotation read FRotation write SetRotation;
     property Primary : String read GetPrimary write SetPrimary;
     property ShowHumanReadableText : Boolean read GetSHRT write SetSHRT;
+  end;
+
+  TfrxZintBarcodeRTTI = class(TfsRTTIModule)
+  public
+    constructor Create(AScript : TfsScript); override;
   end;
 
 implementation
@@ -249,11 +254,21 @@ end;
 var
   bmp : TBitmap;
 
+{ TfrxZintBarcodeRTTI }
+
+constructor TfrxZintBarcodeRTTI.Create(AScript: TfsScript);
+begin
+  inherited;
+
+  AScript.AddClass(TfrxZintBarcode, 'TfrxView');
+end;
+
 initialization
   bmp:=TBitmap.Create;
   bmp.LoadFromResourceName(HInstance, 'ZINTTUOLOGO');
 
   frxObjects.RegisterObject1(TfrxZintBarcode, bmp);
+  fsRTTIModules.Add(TfrxZintBarcodeRTTI)
 
 finalization
   frxObjects.Unregister(TfrxZintBarcode);
