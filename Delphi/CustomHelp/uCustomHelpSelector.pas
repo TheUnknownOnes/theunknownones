@@ -7,19 +7,13 @@ uses
   Dialogs, HelpIntfs, OleCtrls, StdCtrls, ExtCtrls, ActiveX, mshtml, ComCtrls;
 
 type
-  THelpSelector = class(TInterfacedObject, IHelpSelector)
-  protected
-    function SelectKeyword(Keywords: TStrings) : Integer;
-    function TableOfContents(Contents: TStrings): Integer;
-  public
-  end;
-
   TFormHelpSelector = class(TForm)
     ListBox1: TListView;
     Panel1: TPanel;
     btnOk: TButton;
     procedure ListBox1DblClick(Sender: TObject);
     procedure ListBox1KeyPress(Sender: TObject; var Key: Char);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     procedure MakeFriendlyCaptions;
   protected
@@ -27,6 +21,14 @@ type
     { Public-Deklarationen }
   end;
 
+  THelpSelector = class(TInterfacedObject, IHelpSelector)
+  protected
+    function SelectKeyword(Keywords: TStrings) : Integer;
+    function TableOfContents(Contents: TStrings): Integer;
+  public
+    procedure AfterConstruction; override;
+    procedure BeforeDestruction; override;
+  end;
 
 implementation
 
@@ -34,6 +36,16 @@ uses
   UrlMon, StrUtils, ComObj, ShellAPI, uCustomHelpMain;
 
 {$R *.dfm}
+
+procedure THelpSelector.AfterConstruction;
+begin
+  inherited;
+end;
+
+procedure THelpSelector.BeforeDestruction;
+begin
+  inherited;
+end;
 
 function THelpSelector.SelectKeyword(Keywords: TStrings): Integer;
 var
@@ -54,7 +66,7 @@ begin
     ListBox1.ItemIndex:=0;
     if ShowModal=mrOk then
       Result:=ListBox1.ItemIndex;
-    Release;
+    Free;
   end;
 end;
 
@@ -96,6 +108,13 @@ begin
   end;
 
   SetLength( Buffer, 0 );
+end;
+
+procedure TFormHelpSelector.FormKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then
+    ModalResult := mrCancel;
 end;
 
 procedure TFormHelpSelector.ListBox1DblClick(Sender: TObject);

@@ -11,8 +11,10 @@ object FormHelpSelector: TFormHelpSelector
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poMainFormCenter
+  OnKeyUp = FormKeyUp
   PixelsPerInch = 96
   TextHeight = 13
   object ListBox1: TListView
@@ -24,12 +26,12 @@ object FormHelpSelector: TFormHelpSelector
     Align = alClient
     Columns = <
       item
-        Caption = 'Titel'
+        Caption = 'Title'
         Width = 250
       end
       item
         AutoSize = True
-        Caption = 'Ziel'
+        Caption = 'Description'
       end>
     RowSelect = True
     TabOrder = 0
@@ -50,8 +52,8 @@ object FormHelpSelector: TFormHelpSelector
       769
       33)
     object btnOk: TButton
-      Left = 685
-      Top = 2
+      Left = 691
+      Top = 3
       Width = 75
       Height = 25
       Anchors = [akTop, akRight]
