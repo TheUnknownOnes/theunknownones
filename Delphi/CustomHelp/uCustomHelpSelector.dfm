@@ -58,7 +58,6 @@ object FormHelpSelector: TFormHelpSelector
       Height = 25
       Anchors = [akTop, akRight]
       Caption = 'Ok'
-      Default = True
       ModalResult = 1
       TabOrder = 0
     end
