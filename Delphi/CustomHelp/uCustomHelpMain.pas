@@ -233,7 +233,7 @@ begin
     WriteProviderToRegistry('1',
                             'DP DelphiReference',
                             'Search with Daniels Cool Tool',
-                            'http://ref.dp200x.de/dp_reference.php?sourceid=captaincaveman&wsproencoding=ISO-8859-1&securitytoken=guest&tabbed=1&sbutton=Search&searchD2009=1&searchDPCodeLib=1&searchDPForums=1&searchMSDN=1&query=');
+                            'http://ref.dp200x.de/dp_reference.php?sourceid=captaincaveman&wsproencoding=ISO-8859-1&securitytoken=guest&tabbed=1&sbutton=Search&query=');
 
     WriteProviderToRegistry('2',
                             'Koders.com',
