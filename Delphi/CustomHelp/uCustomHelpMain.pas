@@ -116,10 +116,12 @@ begin
 
   for idy := 0 to Result.Count - 1 do
   begin
-    if Pos('://', Result[idy])<1 then
+    TCustomHelp.DecodeURL(Result[idy], c, d, u);
+
+    if Pos('://', u)>0 then
       Result[idy] := Result[idy] + e
     else
-    if AnsiSameText(ExtractFileExt(Result[idy]),'.hlp') then
+    if AnsiSameText(ExtractFileExt(u),'.hlp') then
     begin
       TCustomHelp.DecodeURL(Result[idy], c, d, u);
       Result[idy] := CPROT + c + '|' + d + '|' + 'winhlp://-k '+HelpString+' '+u;
