@@ -27,11 +27,16 @@ package CustomHelp_D120;
 requires
   rtl,
   designide,
-  vclie;
+  vclie,
+  vcl,
+  xmlrtl,
+  vclactnband,
+  vclx;
 
 contains
   uCustomHelpMain in '..\..\uCustomHelpMain.pas',
   uCustomHelpSelector in '..\..\uCustomHelpSelector.pas' {FormHelpSelector},
-  uFormConfigCustomHelp in '..\..\uFormConfigCustomHelp.pas' {form_Config};
+  uFormConfigCustomHelp in '..\..\uFormConfigCustomHelp.pas' {form_Config},
+  uCustomHelpIDEIntegration in '..\..\uCustomHelpIDEIntegration.pas';
 
 end.

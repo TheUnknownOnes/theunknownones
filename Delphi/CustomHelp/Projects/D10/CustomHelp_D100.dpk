@@ -32,6 +32,7 @@ requires
 contains
   uCustomHelpMain in '..\..\uCustomHelpMain.pas',
   uCustomHelpSelector in '..\..\uCustomHelpSelector.pas' {FormHelpSelector},
-  uFormConfigCustomHelp in '..\..\uFormConfigCustomHelp.pas' {form_Config};
+  uFormConfigCustomHelp in '..\..\uFormConfigCustomHelp.pas' {form_Config},
+  uCustomHelpIDEIntegration in '..\..\uCustomHelpIDEIntegration.pas';
 
 end.

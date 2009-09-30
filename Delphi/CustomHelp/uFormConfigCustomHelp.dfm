@@ -50,9 +50,9 @@ object form_Config: Tform_Config
   object ListView1: TListView
     AlignWithMargins = True
     Left = 3
-    Top = 3
+    Top = 44
     Width = 487
-    Height = 320
+    Height = 279
     Align = alClient
     Columns = <
       item
@@ -101,9 +101,9 @@ object form_Config: Tform_Config
     object Label3: TLabel
       Left = 6
       Top = 52
-      Width = 19
+      Width = 45
       Height = 13
-      Caption = 'URL'
+      Caption = 'URL/Path'
     end
     object edName: TEdit
       Left = 65
@@ -126,8 +126,42 @@ object form_Config: Tform_Config
       Top = 48
       Width = 422
       Height = 21
+      Hint = 
+        '- URL to a webbased search provider (e.g. koders.com)'#13#10'- Path to' +
+        ' a windows *.hlp file (be aware to have winhlp32.exe installed)'
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 2
       OnChange = edURLChange
+    end
+  end
+  object Panel3: TPanel
+    Left = 0
+    Top = 0
+    Width = 493
+    Height = 41
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 3
+    object cbmshelpwp: TCheckBox
+      Left = 11
+      Top = 3
+      Width = 438
+      Height = 17
+      Caption = 
+        'use Welcome Page to display Delphi help (otherwise Internet Expl' +
+        'orer is used)'
+      TabOrder = 0
+    end
+    object cbcusthelpwp: TCheckBox
+      Left = 11
+      Top = 21
+      Width = 438
+      Height = 17
+      Caption = 
+        'use WelcomePage to display custom help provider (otherwise syste' +
+        'm browser is used)'
+      TabOrder = 1
     end
   end
 end

@@ -24,7 +24,7 @@
 			<GenPackage>true</GenPackage>
 			<DCC_E>false</DCC_E>
 			<DCC_Platform>x86</DCC_Platform>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp_D120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp_D120.bpl</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_S>false</DCC_S>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
@@ -49,6 +49,10 @@
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="designide.dcp"/>
 			<DCCReference Include="vclie.dcp"/>
+			<DCCReference Include="vcl.dcp"/>
+			<DCCReference Include="xmlrtl.dcp"/>
+			<DCCReference Include="vclactnband.dcp"/>
+			<DCCReference Include="vclx.dcp"/>
 			<DCCReference Include="..\..\uCustomHelpMain.pas"/>
 			<DCCReference Include="..\..\uCustomHelpSelector.pas">
 				<Form>FormHelpSelector</Form>
@@ -56,6 +60,7 @@
 			<DCCReference Include="..\..\uFormConfigCustomHelp.pas">
 				<Form>form_Config</Form>
 			</DCCReference>
+			<DCCReference Include="..\..\uCustomHelpIDEIntegration.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

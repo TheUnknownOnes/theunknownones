@@ -19,12 +19,15 @@ type
     FMenuItem : TMenuItem;
 
     FProvider : TStringList;
+    FShowMSHelpOnWP : Boolean;
+    FShowCustHelpOnWP : Boolean;
 
     procedure ConnectToIDE;
     procedure DisconnectFromIDE;
     function GetHelpMenu : TMenuItem;
 
     procedure LoadProviderFromRegistry;
+    procedure LoadSettingsFromRegistry;
 
     procedure OnMenuItemClick(Sender : TObject);
   public
@@ -35,10 +38,15 @@ type
 
     property ProviderList : TStringList read FProvider;
 
+    property ShowMsHelpOnWelcomePage: Boolean read FShowMSHelpOnWP;
+    property ShowCustomHelpOnWelcomePage: Boolean read FShowCustHelpOnWP;
+
     class function DecodeURL(const URL: String; out Caption: String;
       out Description: String; out Link: String): boolean;
 
-    class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String);
+    class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String); 
+    class procedure WriteSettingToRegistry(AName, AValue: String);
+    class procedure ReadSettingsFromRegistry(const ANameValueList: TStrings);
   end;
 
   TMyViewer = class(TInterfacedObject, ICustomHelpViewer)
@@ -63,16 +71,20 @@ const
   VALUE_DESCR = 'Description';
   VALUE_URL = 'URL';
 
+  SETTINGS_MSHELPWP = 'MsHelpOnWP';
+  SETTINGS_CUSTHELPWP = 'CustomHelpOnWP';
+
+var
+  GlobalCustomHelp : TCustomHelp;
+
 implementation
 
 uses
-  SysUtils, uCustomHelpSelector, StrUtils, ShellAPI, uFormConfigCustomHelp;
+  SysUtils, uCustomHelpSelector, StrUtils, ShellAPI, uFormConfigCustomHelp,
+  uCustomHelpIDEIntegration, Graphics;
 
 var
-  ch : TCustomHelp;
   vi : Integer;
-  Selector : IHelpSelector;
-
 
 { TMyViewer }
 
@@ -85,6 +97,7 @@ function TMyViewer.GetHelpStrings(const HelpString: String): TStringList;
 var
   idy : Integer;
   e : String;
+  c, d, u : String;
 
   function EncodedHelpString: String;
   var
@@ -97,12 +110,21 @@ var
 
 begin
   Result := TStringList.Create;
-  Result.Assign(ch.ProviderList);
+  Result.Assign(GlobalCustomHelp.ProviderList);
 
   e := EncodedHelpString;
 
   for idy := 0 to Result.Count - 1 do
-    Result[idy] := Result[idy] + e;
+  begin
+    if Pos('://', Result[idy])<1 then
+      Result[idy] := Result[idy] + e
+    else
+    if AnsiSameText(ExtractFileExt(Result[idy]),'.hlp') then
+    begin
+      TCustomHelp.DecodeURL(Result[idy], c, d, u);
+      Result[idy] := CPROT + c + '|' + d + '|' + 'winhlp://-k '+HelpString+' '+u;
+    end;
+  end;
 end;
 
 function TMyViewer.GetViewerName: String;
@@ -113,15 +135,39 @@ end;
 procedure TMyViewer.NotifyID(const ViewerID: Integer);
 begin
   vi := ViewerID;
-end;
+end;                  
 
 procedure TMyViewer.ShowHelp(const HelpString: String);
 var
   c,d,u: String;
+  alternativeNavigate : boolean;
 begin
   if TCustomHelp.DecodeURL(HelpString, c, d, u) then
   begin
-    ShellExecute(Application.Handle, 'open', PChar(u), '', '', SW_SHOWNORMAL);
+    if Pos('winhlp://', u)=1 then
+    begin
+      Delete(u,1,9);
+      ShellExecute(Application.Handle,
+                   'open',
+                   'winhlp32',
+                   PChar(u),
+                   PChar(ExtractFileDir(Application.ExeName)),
+                   SW_SHOWNORMAL);
+    end
+    else
+    begin
+      alternativeNavigate := False;
+      if GlobalCustomHelp.ShowCustomHelpOnWelcomePage then
+      begin
+        if not WelcomePageNavigate(u) then
+          alternativeNavigate:=True;
+      end
+      else
+        alternativeNavigate:=True;
+
+      if alternativeNavigate then
+        ShellExecute(Application.Handle, 'open', PChar(u), '', '', SW_SHOWNORMAL);
+    end;
   end
 end;
 
@@ -211,7 +257,6 @@ begin
   Result:=False;
   if AnsiStartsText(CPROT, URL) then
   begin
-    Result:=True;
     sl:=TStringList.Create;
     sl.QuoteChar:=#0;
     sl.Delimiter:='|';
@@ -226,9 +271,6 @@ begin
 end;
 
 destructor TCustomHelp.Destroy;
-var
-  HelpSys : IHelpSystem;
-  HelpManager : IHelpManager;
 begin
   DisconnectFromIDE;
 
@@ -273,6 +315,8 @@ var
   sl : TStringList;
   s : String;
 begin
+  LoadSettingsFromRegistry;
+
   FProvider.Clear;
 
   sl := TStringList.Create;
@@ -291,7 +335,8 @@ begin
     begin
       if Reg.OpenKey(PROVIDER_ROOT_KEY + '\' + s, false) then
       begin
-        FProvider.Add(CPROT + Reg.ReadString(VALUE_NAME) + '|' +
+        if trim(reg.ReadString(VALUE_NAME))<>EmptyStr then
+          FProvider.Add(CPROT + Reg.ReadString(VALUE_NAME) + '|' +
                               Reg.ReadString(VALUE_DESCR) + '|' +
                               Reg.ReadString(VALUE_URL));
 
@@ -305,10 +350,66 @@ begin
   end;
 end;
 
+procedure TCustomHelp.LoadSettingsFromRegistry;
+var
+  sl : TStringList;
+begin
+  sl:=TStringList.Create;
+  try
+    ReadSettingsFromRegistry(sl);
+    FShowMSHelpOnWP:=sl.Values[SETTINGS_MSHELPWP]='1';
+    FShowCustHelpOnWP:=sl.Values[SETTINGS_MSHELPWP]='1';
+  finally
+    sl.Free;
+  end;
+end;
+
 procedure TCustomHelp.OnMenuItemClick(Sender: TObject);
 begin
   Tform_Config.Execute;
   LoadProviderFromRegistry;
+end;
+
+class procedure TCustomHelp.ReadSettingsFromRegistry(const ANameValueList: TStrings);
+var
+  Reg : TRegistry;
+  idx: Integer;
+begin
+  Reg := TRegistry.Create;
+  try
+    Reg.RootKey := HKEY_CURRENT_USER;
+
+    if Reg.OpenKey(PROVIDER_ROOT_KEY + '\Settings', true) then
+    begin
+      Reg.GetValueNames(ANameValueList);
+
+      for idx := 0 to ANameValueList.count - 1 do
+        ANameValueList[idx]:=ANameValueList[idx]+'='+Reg.ReadString(ANameValueList[idx]);
+
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
+end;
+
+class procedure TCustomHelp.WriteSettingToRegistry(AName, AValue: String);
+var
+  Reg : TRegistry;
+begin
+  Reg := TRegistry.Create;
+  try
+    Reg.RootKey := HKEY_CURRENT_USER;
+
+    if Reg.OpenKey(PROVIDER_ROOT_KEY + '\Settings', true) then
+    begin
+      Reg.WriteString(AName, AValue);
+
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
 end;
 
 class procedure TCustomHelp.WriteProviderToRegistry(AKeyName, AName, ADesc,
@@ -333,10 +434,31 @@ begin
   end;
 end;
 
+{$R Images.res}
+
+var
+  bmp : TBitmap;
+
+procedure AddSpashBitmap;
+begin
+  bmp:=TBitmap.Create;
+  bmp.LoadFromResourceName(hinstance, 'Splash');
+  SplashScreenServices.AddPluginBitmap(
+             'Custom Help',
+             bmp.Handle,
+             false,
+             'Free and OpenSource',
+             'by TheUnknownOnes');
+
+end;
+
 initialization
-  ch:=TCustomHelp.Create;
+  GlobalCustomHelp:=TCustomHelp.Create;
+  AddSpashBitmap;
 
 finalization
-  ch.Free;
+  GlobalCustomHelp.Free;
+  If Assigned(bmp) then
+    bmp.Free;
 
 end.

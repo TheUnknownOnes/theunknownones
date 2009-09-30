@@ -16,40 +16,30 @@ type
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     procedure MakeFriendlyCaptions;
+    function GetUrl: String;
   protected
   public
-    { Public-Deklarationen }
+    property URL : String read GetUrl;
   end;
 
   THelpSelector = class(TInterfacedObject, IHelpSelector)
   protected
     function SelectKeyword(Keywords: TStrings) : Integer;
     function TableOfContents(Contents: TStrings): Integer;
-  public
-    procedure AfterConstruction; override;
-    procedure BeforeDestruction; override;
   end;
 
 implementation
 
 uses
-  UrlMon, StrUtils, ComObj, ShellAPI, uCustomHelpMain;
+  UrlMon, StrUtils, ComObj, ShellAPI, uCustomHelpMain, uCustomHelpIDEIntegration;
 
 {$R *.dfm}
-
-procedure THelpSelector.AfterConstruction;
-begin
-  inherited;
-end;
-
-procedure THelpSelector.BeforeDestruction;
-begin
-  inherited;
-end;
 
 function THelpSelector.SelectKeyword(Keywords: TStrings): Integer;
 var
   idx : integer;
+  navigateTo : String;
+  alternativeNavigate : boolean;
 begin
   with TFormHelpSelector.Create(nil) do
   begin
@@ -65,9 +55,26 @@ begin
     Result:=-1;
     ListBox1.ItemIndex:=0;
     if ShowModal=mrOk then
+    begin
       Result:=ListBox1.ItemIndex;
+      navigateTo:=URL;
+    end;
     Free;
   end;
+
+  alternativeNavigate := False;
+
+  if navigateTo<>EmptyStr then
+    if (GlobalCustomHelp.ShowMsHelpOnWelcomePage) then
+    begin
+      if not WelcomePageNavigate(navigateTo) then
+        alternativeNavigate:=True;
+    end
+    else
+      alternativeNavigate:=True;
+
+    if alternativeNavigate then    
+      ShellExecute(Application.Handle, 'open', PChar(navigateTo), '', '', SW_SHOWNORMAL);
 end;
 
 function THelpSelector.TableOfContents(Contents: TStrings): Integer;
@@ -117,14 +124,14 @@ begin
     ModalResult := mrCancel;
 end;
 
-procedure TFormHelpSelector.ListBox1DblClick(Sender: TObject);
-var
-  URL : String;
+function TFormHelpSelector.GetUrl: String;
 begin
-  URL:=ListBox1.ItemFocused.SubItems[1];
-  if URL<>EmptyStr then
-    ShellExecute(self.Handle, 'open', PChar(URL), '', '', SW_SHOWNORMAL);
+  if Assigned(ListBox1.ItemFocused) then
+    Result:=ListBox1.ItemFocused.SubItems[1];
+end;
 
+procedure TFormHelpSelector.ListBox1DblClick(Sender: TObject);
+begin      
   ModalResult:=mrOk;
 end;
 

@@ -19,6 +19,9 @@ type
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
+    Panel3: TPanel;
+    cbmshelpwp: TCheckBox;
+    cbcusthelpwp: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure ListView1Change(Sender: TObject; Item: TListItem;
@@ -101,6 +104,10 @@ begin
   Reg := TRegistry.Create;
   sl := TStringList.Create;
   try
+    TCustomHelp.ReadSettingsFromRegistry(sl);
+    cbmshelpwp.Checked:=sl.Values[SETTINGS_MSHELPWP]='1';
+    cbcusthelpwp.Checked:=sl.Values[SETTINGS_CUSTHELPWP]='1';
+
     if Reg.OpenKey(PROVIDER_ROOT_KEY, true) then
     begin
       Reg.GetKeyNames(sl);
@@ -170,13 +177,15 @@ var
   Reg : TRegistry;
   idx: Integer;
 begin
+ 
   Reg := TRegistry.Create;
   try
     Reg.DeleteKey(PROVIDER_ROOT_KEY);
 
     for idx := 0 to ListView1.Items.Count - 1 do
     begin
-      if ListView1.Items[idx]<>FInsertItem then
+      if (ListView1.Items[idx]<>FInsertItem) and
+         (Trim(ListView1.Items[Idx].Caption)<>EmptyStr) then
       begin
         TCustomHelp.WriteProviderToRegistry(IntToStr(idx),
                                             ListView1.Items[Idx].Caption,
@@ -187,6 +196,9 @@ begin
   finally
     Reg.Free;
   end;
+
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_MSHELPWP, IntToStr(byte(cbmshelpwp.checked)));
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_CUSTHELPWP, IntToStr(byte(cbcusthelpwp.checked)));
 end;
 
 end.
