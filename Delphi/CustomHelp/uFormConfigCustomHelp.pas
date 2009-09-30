@@ -147,7 +147,7 @@ begin
     TCustomHelp.ReadSettingsFromRegistry(sl);
     cbcusthelpwp.Checked:=sl.Values[SETTINGS_CUSTHELPWP]='1';
 
-    if Reg.OpenKey(PROVIDER_ROOT_KEY, true) then
+    if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY, true) then
     begin
       Reg.GetKeyNames(sl);
       Reg.CloseKey;
@@ -155,7 +155,7 @@ begin
 
     for s in sl do
     begin
-      if Reg.OpenKey(PROVIDER_ROOT_KEY + '\' + s, false) then
+      if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY + '\' + s, false) then
       begin
         with ListView1.Items.Add do
         begin
@@ -177,10 +177,14 @@ procedure Tform_Config.ListView1Change(Sender: TObject; Item: TListItem;
   Change: TItemChange);
 begin
   if Change = ctState then
-  begin
+  begin                                        
     edName.Text:=Item.Caption;
     edDesc.Text:=Item.SubItems[0];
     edURL.Text:=Item.SubItems[1];
+
+    edName.Enabled := Assigned(ListView1.Selected) and (ListView1.Selected <> FInsertItem);
+    edDesc.Enabled := edName.Enabled;
+    edURL.Enabled := edName.Enabled;
   end;
 end;
 
@@ -188,7 +192,7 @@ procedure Tform_Config.ListView1DblClick(Sender: TObject);
 var
   item : TListItem;
 begin
-  if ListView1.ItemIndex=0 then
+  if ListView1.Selected = FInsertItem  then
   begin
     item:=ListView1.Items.Add;
     item.SubItems.Add('');
@@ -218,7 +222,7 @@ var
 begin
   Reg := TRegistry.Create;
   try
-    Reg.DeleteKey(PROVIDER_ROOT_KEY);
+    Reg.DeleteKey(REG_ROOT_KEY);
 
     for idx := 0 to ListView1.Items.Count - 1 do
     begin

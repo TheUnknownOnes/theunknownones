@@ -86,29 +86,30 @@ type
 
 const
   {$IfDef VER170}
-    PROVIDER_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER170\CustomHelp';
+    REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER170\CustomHelp';
   {$EndIf}
   {$IfDef VER180}
-    PROVIDER_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER180\CustomHelp';
+    REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER180\CustomHelp';
   {$EndIf}
   {$IfDef VER185}
-    PROVIDER_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER185\CustomHelp';
+    REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER185\CustomHelp';
   {$EndIf}
   {$IfDef VER200}
-    PROVIDER_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER200\CustomHelp';
+    REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER200\CustomHelp';
   {$EndIf}
   {$IfDef VER210}
-    PROVIDER_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER210\CustomHelp';
+    REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER210\CustomHelp';
   {$EndIf}
 
   CPROT = 'CustomHelp://';
   VALUE_NAME = 'Name';
   VALUE_DESCR = 'Description';
   VALUE_URL = 'URL';
+  PROVIDER_SUB_KEY = '\Provider';
+  SETTINGS_SUB_KEY= '\Settings';
+  NAMESPACES_SUB_KEY = SETTINGS_SUB_KEY + '\NAMESPACES';
 
   SETTINGS_CUSTHELPWP = 'CustomHelpOnWP';
-
-  NAMESPACES_ROOT = 'Namespaces';
 var
   GlobalCustomHelp : TCustomHelp;
 
@@ -423,7 +424,7 @@ begin
   try
     Reg.RootKey := HKEY_CURRENT_USER;
 
-    if Reg.OpenKey(PROVIDER_ROOT_KEY, true) then
+    if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY, true) then
     begin
       Reg.GetKeyNames(sl);
       Reg.CloseKey;
@@ -431,7 +432,7 @@ begin
 
     for s in sl do
     begin
-      if Reg.OpenKey(PROVIDER_ROOT_KEY + '\' + s, false) then
+      if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY + '\' + s, false) then
       begin
         if trim(reg.ReadString(VALUE_NAME))<>EmptyStr then
           FProvider.Add(TCustomHelp.EncodeURL(
@@ -510,7 +511,7 @@ begin
   try
     Reg.RootKey := HKEY_CURRENT_USER;
 
-    if Reg.OpenKey(PROVIDER_ROOT_KEY + '\'+NAMESPACES_ROOT, true) then
+    if Reg.OpenKey(REG_ROOT_KEY + NAMESPACES_SUB_KEY, true) then
     begin
       Reg.GetValueNames(ANamesList);
 
@@ -534,7 +535,7 @@ begin
   try
     Reg.RootKey := HKEY_CURRENT_USER;
 
-    if Reg.OpenKey(PROVIDER_ROOT_KEY + '\Settings', true) then
+    if Reg.OpenKey(REG_ROOT_KEY + SETTINGS_SUB_KEY, true) then
     begin
       Reg.GetValueNames(ANameValueList);
 
@@ -556,7 +557,7 @@ begin
   try
     Reg.RootKey := HKEY_CURRENT_USER;
 
-    if Reg.OpenKey(PROVIDER_ROOT_KEY + '\Settings', true) then
+    if Reg.OpenKey(REG_ROOT_KEY + SETTINGS_SUB_KEY, true) then
     begin
       Reg.WriteString(AName, AValue);
 
@@ -576,7 +577,7 @@ begin
   try
     Reg.RootKey := HKEY_CURRENT_USER;
 
-    if Reg.OpenKey(PROVIDER_ROOT_KEY + '\'+NAMESPACES_ROOT, true) then
+    if Reg.OpenKey(REG_ROOT_KEY + NAMESPACES_SUB_KEY, true) then
     begin
       Reg.WriteBool(ANamespace, AEnabled);
 
@@ -596,7 +597,7 @@ begin
   try
     Reg.RootKey := HKEY_CURRENT_USER;
 
-    if Reg.OpenKey(PROVIDER_ROOT_KEY + '\' + AKeyName, true) then
+    if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY + '\' + AKeyName, true) then
     begin
       Reg.WriteString(VALUE_NAME, AName);
       Reg.WriteString(VALUE_DESCR, ADesc);

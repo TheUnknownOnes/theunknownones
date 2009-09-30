@@ -69,8 +69,8 @@ begin
     Result:=-1;
     ListBox1.ItemIndex:=0;
     
-    if ShowModal=mrOk then
-      Result:=StrToInt(ListBox1.ItemFocused.SubItems[2]);
+    if (ShowModal=mrOk) and (ListBox1.ItemIndex > -1) then
+      Result:=StrToInt(ListBox1.Selected.SubItems[2]);
 
     Free;
   end;

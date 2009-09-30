@@ -169,6 +169,7 @@ object form_Config: Tform_Config
         Top = 3
         Width = 415
         Height = 21
+        Enabled = False
         TabOrder = 0
         OnChange = edNameChange
       end
@@ -177,6 +178,7 @@ object form_Config: Tform_Config
         Top = 26
         Width = 415
         Height = 21
+        Enabled = False
         TabOrder = 1
         OnChange = edDescChange
       end
@@ -188,6 +190,7 @@ object form_Config: Tform_Config
         Hint = 
           '- URL to a webbased search provider (e.g. koders.com)'#13#10'- Path to' +
           ' a windows *.hlp file (be aware to have winhlp32.exe installed)'
+        Enabled = False
         ParentShowHint = False
         ShowHint = True
         TabOrder = 2
