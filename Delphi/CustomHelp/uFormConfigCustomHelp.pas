@@ -11,7 +11,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, ComCtrls, Registry;
+  Dialogs, StdCtrls, ExtCtrls, ComCtrls, Registry, CheckLst, uMSHelpServices;
 
 type
   Tform_Config = class(TForm)
@@ -26,9 +26,11 @@ type
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
-    Panel3: TPanel;
-    cbmshelpwp: TCheckBox;
+    Panel3: TGroupBox;
     cbcusthelpwp: TCheckBox;
+    GroupBox1: TGroupBox;
+    GroupBox2: TGroupBox;
+    ListView2: TListView;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure ListView1Change(Sender: TObject; Item: TListItem;
@@ -42,6 +44,7 @@ type
   private
     FInsertItem : TListItem;
     procedure Save;
+    procedure BuildNamespaceList;
   public
     class function Execute : Boolean; 
   end;
@@ -93,12 +96,42 @@ begin
   end;
 end;
 
+procedure Tform_Config.BuildNamespaceList;
+var
+  nsl : IHxRegNamespaceList;
+  idx : integer;
+  Enabled : TStringList;
+begin
+  Enabled:=TStringList.Create;
+  try
+    GlobalCustomHelp.ReadEnabledNamespacesFromRegistry(Enabled);
+
+    nsl:=GlobalCustomHelp.Namespaces;
+    for idx := 1 to nsl.Count do
+    begin
+      with ListView2.Items.Add do
+      begin
+        Caption:=nsl.Item(idx).Name;
+        SubItems.Add(nsl.Item(idx).GetProperty(HxRegNamespaceDescription));
+        if Enabled.IndexOf(Caption)>=0 then
+          Checked:=True
+        else
+          Checked:=False;
+      end;
+    end;
+  finally
+    Enabled.Free;
+  end;
+end;
+
 procedure Tform_Config.FormShow(Sender: TObject);
 var
   Reg : TRegistry;
   sl : TStringList;
   s : String;
 begin
+  BuildNamespaceList;
+  
   FInsertItem:=ListView1.Items.Add;
 
   with FInsertItem do
@@ -112,7 +145,6 @@ begin
   sl := TStringList.Create;
   try
     TCustomHelp.ReadSettingsFromRegistry(sl);
-    cbmshelpwp.Checked:=sl.Values[SETTINGS_MSHELPWP]='1';
     cbcusthelpwp.Checked:=sl.Values[SETTINGS_CUSTHELPWP]='1';
 
     if Reg.OpenKey(PROVIDER_ROOT_KEY, true) then
@@ -184,7 +216,6 @@ var
   Reg : TRegistry;                        
   idx: Integer;
 begin
- 
   Reg := TRegistry.Create;
   try
     Reg.DeleteKey(PROVIDER_ROOT_KEY);
@@ -204,8 +235,11 @@ begin
     Reg.Free;
   end;
 
-  TCustomHelp.WriteSettingToRegistry(SETTINGS_MSHELPWP, IntToStr(byte(cbmshelpwp.checked)));
   TCustomHelp.WriteSettingToRegistry(SETTINGS_CUSTHELPWP, IntToStr(byte(cbcusthelpwp.checked)));
+
+  for idx := 0 to ListView2.Items.Count-1 do
+    GlobalCustomHelp.WriteNamespacesToRegistry(ListView2.Items[idx].Caption, ListView2.Items[idx].Checked);
+    
 end;
 
 end.

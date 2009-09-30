@@ -44,6 +44,8 @@ type
     property ModuleName: string read GetModuleName;
   end;
 
+  //Thist timer makes the welcome page navigation since we must not change the
+  //ide module while in the F1 keyboard loop
   TNavigateTimer = class(TTimer)
   private
     FURL : WideString;
@@ -75,7 +77,7 @@ begin
            OR
            (GetModuleHandle( 'startpageide140.bpl' ) > 0); 
 end;
-
+                                          
 procedure TNavigateTimer.ShowWP;
 var IDEService : INTAServices;
        actList : TCustomActionList;
@@ -121,7 +123,7 @@ var
   mIdx : integer;
   URLModule: IURLModule;
   DocModule: IDocModule;
-begin
+begin   
   Enabled:=False;
   ShowWP;
 

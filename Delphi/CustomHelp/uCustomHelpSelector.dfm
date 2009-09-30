@@ -32,9 +32,12 @@ object FormHelpSelector: TFormHelpSelector
         AutoSize = True
         Caption = 'Description'
       end>
+    GridLines = True
     RowSelect = True
+    SortType = stData
     TabOrder = 0
     ViewStyle = vsReport
+    OnCompare = ListBox1Compare
     OnDblClick = ListBox1DblClick
     OnKeyPress = ListBox1KeyPress
   end

@@ -1,4 +1,4 @@
-{----------------------------------------------------------------------------- 
+{-----------------------------------------------------------------------------
  Purpose: The main unit of the custom help expert 
 
  (c) by TheUnknownOnes
@@ -16,12 +16,16 @@ uses
   ToolsAPI,
   Menus,
   Registry,
-  HelpIntfs, Windows;
+  HelpIntfs,
+  Windows,
+  uMSHelpServices;
 
 type
 
   //Das Hauptobjekt
   TCustomHelp = class
+  private
+    function GetNamespaces: IHxRegNamespaceList;
   protected
     FHelpManager : IHelpManager;
 
@@ -30,6 +34,7 @@ type
     FProvider : TStringList;
     FShowMSHelpOnWP : Boolean;
     FShowCustHelpOnWP : Boolean;
+    FEnabledIndices : TInterfaceList;
 
     //In die IDE einhacken (Menu-Eintrag, ...)
     procedure ConnectToIDE;
@@ -38,21 +43,28 @@ type
 
     procedure LoadProviderFromRegistry;
     procedure LoadSettingsFromRegistry;
+    procedure LoadEnabledNamespacesFromRegistry;
 
     procedure OnMenuItemClick(Sender : TObject);
+  published
   public
     constructor Create();
     destructor Destroy(); override;
 
     property ProviderList : TStringList read FProvider;
+    property Namespaces : IHxRegNamespaceList read GetNamespaces;
+    property EnabledIndices : TInterfaceList read FEnabledIndices;
 
     property ShowMsHelpOnWelcomePage: Boolean read FShowMSHelpOnWP;
     property ShowCustomHelpOnWelcomePage: Boolean read FShowCustHelpOnWP;
 
     class function DecodeURL(const URL: String; out Caption: String;
-      out Description: String; out Link: String): boolean;
+      out Description: String; out Link: String; out Order: Integer): boolean;
+    class function EncodeURL(Caption, Description, Link: String; Order: Integer): String;
 
-    class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String); 
+    class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String);
+    class procedure WriteNamespacesToRegistry(ANamespace: String; AEnabled: Boolean);
+    class procedure ReadEnabledNamespacesFromRegistry(const ANamesList: TStrings);
     class procedure WriteSettingToRegistry(AName, AValue: String);
     class procedure ReadSettingsFromRegistry(const ANameValueList: TStrings);
   end;
@@ -73,15 +85,30 @@ type
   end;
 
 const
+  {$IfDef VER170}
+    PROVIDER_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER170\CustomHelp';
+  {$EndIf}
+  {$IfDef VER180}
+    PROVIDER_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER180\CustomHelp';
+  {$EndIf}
+  {$IfDef VER185}
+    PROVIDER_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER185\CustomHelp';
+  {$EndIf}
+  {$IfDef VER200}
+    PROVIDER_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER200\CustomHelp';
+  {$EndIf}
+  {$IfDef VER210}
+    PROVIDER_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER210\CustomHelp';
+  {$EndIf}
+
   CPROT = 'CustomHelp://';
-  PROVIDER_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\CustomHelp';
   VALUE_NAME = 'Name';
   VALUE_DESCR = 'Description';
   VALUE_URL = 'URL';
 
-  SETTINGS_MSHELPWP = 'MsHelpOnWP';
   SETTINGS_CUSTHELPWP = 'CustomHelpOnWP';
 
+  NAMESPACES_ROOT = 'Namespaces';
 var
   GlobalCustomHelp : TCustomHelp;
 
@@ -97,23 +124,27 @@ var
 { TMyViewer }
 
 function TMyViewer.CanShowTableOfContents: Boolean;
-begin
+begin      
   Result := false;
 end;
 
 function TMyViewer.GetHelpStrings(const HelpString: String): TStringList;
 var
-  idy : Integer;
+  idx, idy : Integer;
   e : String;
   c, d, u : String;
+  o, order : Integer;
+  Index : IHxIndex;
+  Topics : IHxTopicList;
+  slot : integer;
 
   function EncodedHelpString: String;
   var
-    idx: integer;
+    i: integer;
   begin
     Result:='';
-    for idx := 1 to Length(HelpString)do
-      Result:=Result + '%'+Format('%.2x', [Ord(HelpString[idx])]);
+    for i := 1 to Length(HelpString)do
+      Result:=Result + '%'+Format('%.2x', [Ord(HelpString[i])]);
   end;
 
 begin
@@ -127,19 +158,45 @@ begin
   //Das Keyword in Hex kodieren ... der Einfachheit halber einfach alle Zeichen
   e := EncodedHelpString;
 
-  for idy := 0 to Result.Count - 1 do
+  order := 0;
+
+  for idx := 0 to Result.Count - 1 do
   begin
-    TCustomHelp.DecodeURL(Result[idy], c, d, u);
+    TCustomHelp.DecodeURL(Result[idx], c, d, u, o);
+    inc(order);
 
     if Pos('://', u)>0 then
-      Result[idy] := Result[idy] + e
+      Result[idx] := TCustomHelp.EncodeURL(c,d,u+EncodedHelpString, order)
     else
     if AnsiSameText(ExtractFileExt(u),'.hlp') then
     begin
-      TCustomHelp.DecodeURL(Result[idy], c, d, u);
-      Result[idy] := CPROT + c + '|' + d + '|' + 'winhlp://-k '+HelpString+' '+u;
+      Result[idx] := TCustomHelp.EncodeURL(c,d,'winhlp://-k '+HelpString+' '+u, order);
     end;
   end;
+
+  //Und jetzt noch die eigentlichen Hilfe-Namespaces durchsuchen
+  for idx := 0 to GlobalCustomHelp.EnabledIndices.Count-1 do
+  begin
+    if supports(GlobalCustomHelp.EnabledIndices[idx], IHxIndex, Index) then
+    begin
+      slot:=Index.GetSlotFromString(HelpString);
+
+      if AnsiContainsText(Index.GetStringFromSlot(slot),HelpString) then
+      begin
+        Topics:=Index.GetTopicsFromSlot(slot);
+
+        for idy := 1 to Topics.Count do
+        begin
+          inc(order);
+          Result.Add(TCustomHelp.EncodeURL(Topics.Item(idy).Title[HxTopicGetRLTitle,0],
+                                                Topics.Item(idy).Location,
+                                                Topics.Item(idy).URL,
+                                                order));
+        end;
+      end;
+    end;
+  end;
+
 end;
 
 function TMyViewer.GetViewerName: String;
@@ -152,11 +209,12 @@ begin
   //Das Hilfesystem sagt uns, welche ID wir bekommen haben
   //Die brauchen wir am Ende zum freigeben
   vi := ViewerID;
-end;                  
+end;
 
 procedure TMyViewer.ShowHelp(const HelpString: String);
 var
   c,d,u: String;
+  o: Integer;
   alternativeNavigate : boolean;
 begin
   //Hier gehts dann wirklich um die Wurst
@@ -164,7 +222,7 @@ begin
   //Nutzer aus der Liste, die wir bei GetHelpStrings gebaut haben,
   //gewählt hat. Natürlich bekommen wir hier nur die, die wir auch definiert haben
 
-  if TCustomHelp.DecodeURL(HelpString, c, d, u) then
+  if TCustomHelp.DecodeURL(HelpString, c, d, u, o) then
   begin
     if Pos('winhlp://', u)=1 then
     begin
@@ -242,6 +300,7 @@ constructor TCustomHelp.Create;
 var
   intf : ICustomHelpViewer;
 begin
+  FEnabledIndices:=TInterfaceList.Create;
   FHelpManager := nil;
   intf:=TMyViewer.Create;
 
@@ -250,7 +309,6 @@ begin
   RegisterViewer(intf, FHelpManager);
 
   ConnectToIDE;
-
   LoadProviderFromRegistry;
 
   //Falls es keine Provider gibt, schreiben wir mal die Standards rein
@@ -259,7 +317,7 @@ begin
     WriteProviderToRegistry('1',
                             'DP DelphiReference',
                             'Search with Daniels Cool Tool',
-                            'http://ref.dp200x.de/dp_reference.php?sourceid=captaincaveman&wsproencoding=ISO-8859-1&securitytoken=guest&tabbed=1&sbutton=Search&query=');
+                            'http://ref.dp200x.de/dp_reference.php?securitytoken=guest&tabbed=1&sbutton=Search&query=');
 
     WriteProviderToRegistry('2',
                             'Koders.com',
@@ -276,7 +334,7 @@ begin
 end;
 
 class function TCustomHelp.DecodeURL(const URL: String; out Caption,
-  Description, Link: String): boolean;
+  Description, Link: String; out Order: Integer): boolean;
 var
   sl : TStringList;
 begin
@@ -291,6 +349,7 @@ begin
     Caption:=Sl[0];
     Description:=sl[1];
     Link:=sl[2];
+    Order:=StrToIntDef(sl[3],0);
     sl.Free;
     Result:=True;
   end;           
@@ -300,6 +359,7 @@ destructor TCustomHelp.Destroy;
 begin
   DisconnectFromIDE;
 
+  FEnabledIndices.Free;
   FProvider.Free;
 
   if Assigned(FHelpManager) then
@@ -312,6 +372,12 @@ procedure TCustomHelp.DisconnectFromIDE;
 begin
   if Assigned(FMenuItem) then
     FMenuItem.Free;
+end;
+
+class function TCustomHelp.EncodeURL(Caption, Description, Link: String;
+  Order: Integer): String;
+begin
+  Result:=CPROT+Caption+'|'+Description+'|'+Link+'|'+IntToStr(Order);
 end;
 
 function TCustomHelp.GetHelpMenu: TMenuItem;
@@ -335,6 +401,11 @@ begin
 
 end;
 
+function TCustomHelp.GetNamespaces: IHxRegNamespaceList;
+begin
+  Result:=CoHxRegistryWalker.Create.RegisteredNamespaceList[''];
+end;
+
 procedure TCustomHelp.LoadProviderFromRegistry;
 var
   Reg : TRegistry;
@@ -342,6 +413,7 @@ var
   s : String;
 begin
   LoadSettingsFromRegistry;
+  LoadEnabledNamespacesFromRegistry;
 
   FProvider.Clear;
 
@@ -362,16 +434,49 @@ begin
       if Reg.OpenKey(PROVIDER_ROOT_KEY + '\' + s, false) then
       begin
         if trim(reg.ReadString(VALUE_NAME))<>EmptyStr then
-          FProvider.Add(CPROT + Reg.ReadString(VALUE_NAME) + '|' +
-                              Reg.ReadString(VALUE_DESCR) + '|' +
-                              Reg.ReadString(VALUE_URL));
+          FProvider.Add(TCustomHelp.EncodeURL(
+                              Reg.ReadString(VALUE_NAME),
+                              Reg.ReadString(VALUE_DESCR),
+                              Reg.ReadString(VALUE_URL), 0));
 
         Reg.CloseKey;
       end;
     end;
-      
+
   finally
     Reg.Free;
+    sl.Free;
+  end;
+end;
+
+procedure TCustomHelp.LoadEnabledNamespacesFromRegistry;
+var
+  sl : TStringList;
+  idx : integer;      
+  hxSession: IHxSession;
+  hxIndex: IHxIndex;
+begin
+  FEnabledIndices.Clear;
+  sl:=TStringList.Create;
+  try
+    ReadEnabledNamespacesFromRegistry(sl);
+    
+    for idx := 1 to Namespaces.Count do
+    begin
+      if sl.IndexOf(Namespaces.Item(idx).Name)>=0 then
+      begin
+        hxSession:=CoHxSession.Create;
+        hxSession.Initialize('ms-help://'+Namespaces.Item(idx).Name,0);
+
+        if Supports(hxSession.GetNavigationObject('!DefaultKeywordIndex',''),
+                    IID_IHxIndex,
+                    hxIndex) then
+        begin
+          FEnabledIndices.Add(hxIndex);
+        end;
+      end;
+    end;
+  finally
     sl.Free;
   end;
 end;
@@ -383,8 +488,7 @@ begin
   sl:=TStringList.Create;
   try
     ReadSettingsFromRegistry(sl);
-    FShowMSHelpOnWP:=sl.Values[SETTINGS_MSHELPWP]='1';
-    FShowCustHelpOnWP:=sl.Values[SETTINGS_MSHELPWP]='1';
+    FShowCustHelpOnWP:=sl.Values[SETTINGS_CUSTHELPWP]='1';
   finally
     sl.Free;
   end;
@@ -394,6 +498,31 @@ procedure TCustomHelp.OnMenuItemClick(Sender: TObject);
 begin
   Tform_Config.Execute;
   LoadProviderFromRegistry;
+end;
+
+class procedure TCustomHelp.ReadEnabledNamespacesFromRegistry(
+  const ANamesList: TStrings);
+var
+  Reg : TRegistry;
+  idx: Integer;
+begin
+  Reg := TRegistry.Create;
+  try
+    Reg.RootKey := HKEY_CURRENT_USER;
+
+    if Reg.OpenKey(PROVIDER_ROOT_KEY + '\'+NAMESPACES_ROOT, true) then
+    begin
+      Reg.GetValueNames(ANamesList);
+
+      for idx := ANamesList.count - 1 downto 0 do
+        if not Reg.ReadBool(ANamesList[idx]) then
+          ANamesList.Delete(idx);
+
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
 end;
 
 class procedure TCustomHelp.ReadSettingsFromRegistry(const ANameValueList: TStrings);
@@ -430,6 +559,26 @@ begin
     if Reg.OpenKey(PROVIDER_ROOT_KEY + '\Settings', true) then
     begin
       Reg.WriteString(AName, AValue);
+
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
+end;
+
+class procedure TCustomHelp.WriteNamespacesToRegistry(ANamespace: String;
+  AEnabled: Boolean);
+var
+  Reg : TRegistry;
+begin
+  Reg := TRegistry.Create;
+  try
+    Reg.RootKey := HKEY_CURRENT_USER;
+
+    if Reg.OpenKey(PROVIDER_ROOT_KEY + '\'+NAMESPACES_ROOT, true) then
+    begin
+      Reg.WriteBool(ANamespace, AEnabled);
 
       Reg.CloseKey;
     end;
