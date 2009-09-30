@@ -1,3 +1,10 @@
+{-----------------------------------------------------------------------------
+ Purpose: The config dialog of the custom help expert 
+ 
+ (c) by TheUnknownOnes
+ see http://www.TheUnknownOnes.net
+-----------------------------------------------------------------------------}
+
 unit uFormConfigCustomHelp;
 
 interface
@@ -174,7 +181,7 @@ end;
 
 procedure Tform_Config.Save;
 var
-  Reg : TRegistry;
+  Reg : TRegistry;                        
   idx: Integer;
 begin
  

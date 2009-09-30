@@ -1,3 +1,10 @@
+{----------------------------------------------------------------------------- 
+ Purpose: The main unit of the custom help expert 
+
+ (c) by TheUnknownOnes
+ see http://www.TheUnknownOnes.net
+-----------------------------------------------------------------------------}
+
 unit uCustomHelpMain;
 
 interface
@@ -12,6 +19,8 @@ uses
   HelpIntfs, Windows;
 
 type
+
+  //Das Hauptobjekt
   TCustomHelp = class
   protected
     FHelpManager : IHelpManager;
@@ -22,6 +31,7 @@ type
     FShowMSHelpOnWP : Boolean;
     FShowCustHelpOnWP : Boolean;
 
+    //In die IDE einhacken (Menu-Eintrag, ...)
     procedure ConnectToIDE;
     procedure DisconnectFromIDE;
     function GetHelpMenu : TMenuItem;
@@ -31,8 +41,6 @@ type
 
     procedure OnMenuItemClick(Sender : TObject);
   public
-    ViewerID : Integer;
-
     constructor Create();
     destructor Destroy(); override;
 
@@ -90,7 +98,7 @@ var
 
 function TMyViewer.CanShowTableOfContents: Boolean;
 begin
-  Result := true;
+  Result := false;
 end;
 
 function TMyViewer.GetHelpStrings(const HelpString: String): TStringList;
@@ -109,9 +117,14 @@ var
   end;
 
 begin
+  //Weil wir bei UnderstandsKeyword gesagt haben, das wir das Keyword verstehen (Result = 1)
+  //werden wir jetzt gefragt, welche Hilfethemen wir zu diesem Keyword liefern können
+  //Die StringList wird vom Hilfesystem wieder freigegeben
+
   Result := TStringList.Create;
   Result.Assign(GlobalCustomHelp.ProviderList);
 
+  //Das Keyword in Hex kodieren ... der Einfachheit halber einfach alle Zeichen
   e := EncodedHelpString;
 
   for idy := 0 to Result.Count - 1 do
@@ -136,6 +149,8 @@ end;
 
 procedure TMyViewer.NotifyID(const ViewerID: Integer);
 begin
+  //Das Hilfesystem sagt uns, welche ID wir bekommen haben
+  //Die brauchen wir am Ende zum freigeben
   vi := ViewerID;
 end;                  
 
@@ -144,6 +159,11 @@ var
   c,d,u: String;
   alternativeNavigate : boolean;
 begin
+  //Hier gehts dann wirklich um die Wurst
+  //Wir bekommen den Hilfestring übergeben, den der
+  //Nutzer aus der Liste, die wir bei GetHelpStrings gebaut haben,
+  //gewählt hat. Natürlich bekommen wir hier nur die, die wir auch definiert haben
+
   if TCustomHelp.DecodeURL(HelpString, c, d, u) then
   begin
     if Pos('winhlp://', u)=1 then
@@ -189,10 +209,14 @@ function TMyViewer.UnderstandsKeyword(const HelpString: String): Integer;
 var
   hs : IHelpSystem;
 begin
-  Result := 1;
+  //Das Hilfesystem fragt uns: Verstehst du dieses Keyword (der Begriff unter dem Cursor)?
+
+  Result := 1; //ja!
 
   if GetHelpSystem(hs) then
   begin
+    //Noch schnell dem Hilfesystem sagen, das wir einen eigenen Auswahldialog für die
+    //verschiedenen Hilfethemen haben 
     hs.AssignHelpSelector(THelpSelector.Create);
   end;
 end;
@@ -224,12 +248,12 @@ begin
   FProvider := TStringList.Create;
 
   RegisterViewer(intf, FHelpManager);
-  ViewerID:=vi;
 
   ConnectToIDE;
 
   LoadProviderFromRegistry;
 
+  //Falls es keine Provider gibt, schreiben wir mal die Standards rein
   if FProvider.Count = 0 then
   begin
     WriteProviderToRegistry('1',
@@ -279,7 +303,7 @@ begin
   FProvider.Free;
 
   if Assigned(FHelpManager) then
-    FHelpManager.Release(ViewerID);
+    FHelpManager.Release(vi);
   
   inherited;
 end;

@@ -1,5 +1,12 @@
-unit uCustomHelpSelector;
+{----------------------------------------------------------------------------- 
+ Purpose: Form to select which help should be showed 
+ 
+ (c) by TheUnknownOnes
+ see http://www.TheUnknownOnes.net
+-----------------------------------------------------------------------------}
 
+unit uCustomHelpSelector;
+              
 interface
 
 uses
