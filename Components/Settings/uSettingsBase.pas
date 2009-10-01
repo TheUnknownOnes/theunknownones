@@ -578,7 +578,7 @@ end;
 constructor TSetting.Create();
 begin
   FParent := nil;
-  FName := IntToStr(GetTickCount);
+  FName := EmptyWideStr;
   VarClear(FValue);
 
   FChildren := TSettingList.Create;
@@ -599,9 +599,9 @@ begin
     CreateFromPath(AParent, AName)
   else
   begin
-    Create(AParent);
-    
+    Create;
     Name := AName;
+    Parent := AParent;
   end;
 end;
 
