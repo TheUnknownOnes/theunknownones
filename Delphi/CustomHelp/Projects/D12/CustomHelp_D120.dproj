@@ -62,6 +62,7 @@
 			</DCCReference>
 			<DCCReference Include="..\..\uCustomHelpIDEIntegration.pas"/>
 			<DCCReference Include="..\..\uHtmlHelp.pas"/>
+			<DCCReference Include="..\..\uMSHelpServices.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

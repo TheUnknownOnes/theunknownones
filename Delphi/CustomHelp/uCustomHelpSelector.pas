@@ -11,19 +11,31 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, HelpIntfs, OleCtrls, StdCtrls, ExtCtrls, ActiveX, mshtml, ComCtrls;
+  Dialogs, HelpIntfs, OleCtrls, StdCtrls, ExtCtrls, ActiveX, mshtml, ComCtrls,
+  CategoryButtons;
 
 type
   TFormHelpSelector = class(TForm)
-    ListBox1: TListView;
-    Panel1: TPanel;
-    btnOk: TButton;
-    procedure ListBox1DblClick(Sender: TObject);
-    procedure ListBox1KeyPress(Sender: TObject; var Key: Char);
+    CategoryButtons1: TCategoryButtons;
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ListBox1Compare(Sender: TObject; Item1, Item2: TListItem;
       Data: Integer; var Compare: Integer);
+    procedure ListBox1Editing(Sender: TObject; Item: TListItem;
+      var AllowEdit: Boolean);
+    procedure CategoryButtons1DrawText(Sender: TObject;
+      const Button: TButtonItem; Canvas: TCanvas; Rect: TRect;
+      State: TButtonDrawState);
+    procedure CategoryButtons1ButtonClicked(Sender: TObject;
+      const Button: TButtonItem);
+  private
+    FURL : String;
+    FHelpIndex : Integer;
+    procedure InitList(Keywords: TStrings);
+    procedure SaveExpanded;
   public
+    property URL : String read FURL;
+    property SelectedHelpIndex : Integer read FHelpIndex;
+
     class function Execute(Keywords: TStrings; out SelectedIndex: Integer;
       out SelectedUrl: String): Boolean; static;
   end;
@@ -37,50 +49,153 @@ type
 implementation
 
 uses
-  UrlMon, StrUtils, ComObj, ShellAPI, uCustomHelpMain, uCustomHelpIDEIntegration, 
-  Math;
+  UrlMon, StrUtils, ComObj, ShellAPI, uCustomHelpMain, uCustomHelpIDEIntegration,
+  Math, Registry;
 
 {$R *.dfm}
+
+type
+  TCustomHelpButtonItem = class(TButtonItem)
+  private
+    FDesc: String;
+    FURL: String;
+    FIdx: Integer;
+  public
+    property URL: String read FURL write FURL;
+    property Description: String read FDesc write FDesc;
+    property HelpIndex: Integer read FIdx write FIdx;
+  end;
+
+procedure TFormHelpSelector.CategoryButtons1ButtonClicked(Sender: TObject;
+  const Button: TButtonItem);
+begin
+  if CategoryButtons1.SelectedItem<>Button then
+    exit;
+
+  if Button.Category.Collapsed then
+    Button.Category.Collapsed:=False
+  else
+  if Button is TCustomHelpButtonItem then
+  begin
+    FHelpIndex:=TCustomHelpButtonItem(Button).HelpIndex;
+    FURL:=TCustomHelp.EncodeURL(TCustomHelpButtonItem(Button).Caption,
+                                TCustomHelpButtonItem(Button).Description,
+                                TCustomHelpButtonItem(Button).URL,
+                                '');
+
+    SaveExpanded;
+    ModalResult:=mrOk;
+  end;
+end;
+
+procedure TFormHelpSelector.CategoryButtons1DrawText(Sender: TObject;
+  const Button: TButtonItem; Canvas: TCanvas; Rect: TRect;
+  State: TButtonDrawState);
+var
+  drawrect : TRect;
+  txt : String;
+begin
+  drawrect:=Rect;
+  Canvas.Font.Style:=[fsBold];
+  txt:=TCustomHelpButtonItem(Button).Caption;
+  drawRect.Right:=drawrect.Left+(CategoryButtons1.Width div 3);
+  Canvas.TextRect(drawrect, txt, [tfEndEllipsis]);
+
+  drawrect:=Rect;
+  Canvas.Font.Style:=[];
+  txt:=TCustomHelpButtonItem(Button).Description;
+  drawRect.Left:=drawrect.Left+(CategoryButtons1.Width div 3);
+  Canvas.TextRect(drawrect, txt, [tfEndEllipsis]);
+end;
 
 class function TFormHelpSelector.Execute(Keywords: TStrings;
                                    out SelectedIndex: Integer;
                                    out SelectedUrl: String): Boolean;
 var
-  idx : Integer;   
-  c, d, u : String;
+  idx : Integer;
+  c, d, u, g : String;
   o : Integer;
 begin             
   Result:=False;
+  SelectedIndex:=-1;
+  SelectedUrl:='';
   with TFormHelpSelector.Create(nil) do
   begin
+    InitList(Keywords);
+
+    if (ShowModal=mrOk)  then
+    begin
+      Result:=True;
+      SelectedIndex:=SelectedHelpIndex;
+      SelectedUrl:=URL;
+    end;
+    Free;
+  end;
+end;
+
+procedure TFormHelpSelector.InitList(Keywords: TStrings);
+var
+  cat : TButtonCategory;
+  idx : integer;
+  c, d, u, g: string;
+  item : TCustomHelpButtonItem;
+  Reg : TRegistry;
+  CheckExpanded: Boolean;
+
+  function GetCategoryFromLabel(ALabel: String): TButtonCategory;
+  var
+    i : Integer;
+  begin
+    Result:=nil;
+
+    for i := 0 to CategoryButtons1.Categories.Count - 1 do
+      if CategoryButtons1.Categories[i].Caption=ALabel then
+      begin
+        Result:=CategoryButtons1.Categories[i];
+        break;
+      end;
+
+    if not Assigned(Result) then
+    begin
+      Result:=CategoryButtons1.Categories.Add;
+      Result.Caption:=ALabel;
+      Result.Color:=clActiveCaption;
+      Result.TextColor:=clCaptionText;
+      Result.Collapsed:=True;
+      if CheckExpanded then
+        Result.Collapsed:=Reg.ReadString(ALabel)='0';
+    end;
+  end;
+
+begin
+  Reg := TRegistry.Create;
+  try
+    Reg.RootKey := HKEY_CURRENT_USER;
+
+    CheckExpanded:=Reg.OpenKey(REG_ROOT_KEY + EXPANDEDITEMS_SUB_KEY, true);
+
+    GetCategoryFromLabel(GROUP_LABEL_DEFAULT);
+
     for idx := 0 to KeyWords.Count - 1 do
     begin
       if not AnsiStartsText('ms-help://',KeyWords[idx]) then
       begin
-        if TCustomHelp.DecodeURL(Keywords[idx], c, d, u, o) then
-        with ListBox1.Items.Add do
+        if TCustomHelp.DecodeURL(Keywords[idx], c, d, u, g) then
         begin
-          Caption:=c;
-          SubItems.Add(d);
-          SubItems.Add(u);
-          SubItems.Add(IntToStr(idx));
-          Data:=Pointer(o);
+          cat:=GetCategoryFromLabel(g);
+
+          item:=TCustomHelpButtonItem.Create(cat.Items);
+          item.Caption:=c;
+          item.Description:=d;
+          item.URL:=u;
+          item.HelpIndex:=idx;
         end;
       end;
     end;
 
-    ListBox1.ItemIndex:=0;
-
-    if (ShowModal=mrOk) and (ListBox1.ItemIndex > -1) then
-    begin
-      Result:=True;
-      SelectedIndex:=StrToInt(ListBox1.Selected.SubItems[2]);
-      SelectedUrl:=TCustomHelp.EncodeURL(ListBox1.Selected.Caption,
-                                         ListBox1.Selected.SubItems[0],
-                                         ListBox1.Selected.SubItems[1],
-                                         0);
-    end;
-    Free;
+    Reg.CloseKey;
+  finally
+    Reg.Free;
   end;
 end;
 
@@ -89,7 +204,7 @@ var
   idx : integer;
   u : String;
 begin
-  idx:=-1;
+  Result:=-1;
   if TFormHelpSelector.Execute(Keywords, idx, u) then
     Result:=idx;
 end;
@@ -112,15 +227,31 @@ begin
   Compare:=CompareValue(Integer(Item1.Data),Integer(Item2.Data));
 end;
 
-procedure TFormHelpSelector.ListBox1DblClick(Sender: TObject);
-begin      
-  ModalResult:=mrOk;
+procedure TFormHelpSelector.ListBox1Editing(Sender: TObject; Item: TListItem;
+  var AllowEdit: Boolean);
+begin
+  AllowEdit:=False;
 end;
 
-procedure TFormHelpSelector.ListBox1KeyPress(Sender: TObject; var Key: Char);
+procedure TFormHelpSelector.SaveExpanded;
+var
+  Reg : TRegistry;
+  idx : Integer;
 begin
-  if Key=#13 then
-    ListBox1DblClick(Sender);
+  Reg := TRegistry.Create;
+  try
+    Reg.RootKey := HKEY_CURRENT_USER;
+
+    if Reg.OpenKey(REG_ROOT_KEY + EXPANDEDITEMS_SUB_KEY, true) then
+    begin
+      for idx := 0 to CategoryButtons1.Categories.Count - 1 do
+        Reg.WriteString(CategoryButtons1.Categories[idx].Caption, ifthen(CategoryButtons1.Categories[idx].Collapsed,'0','1'));
+
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
 end;
 
 end.

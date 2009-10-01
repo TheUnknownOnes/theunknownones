@@ -27,7 +27,7 @@ type
     FProvider : TStringList;
     FShowMSHelpOnWP : Boolean;
     FShowCustHelpOnWP : Boolean;
-    FEnabledIndices : TInterfaceList;
+    FEnabledhxSessions : TInterfaceList;
 
     //In die IDE einhacken (Menu-Eintrag, ...)
     procedure ConnectToIDE;
@@ -46,14 +46,14 @@ type
 
     property ProviderList : TStringList read FProvider;
     property Namespaces : IHxRegNamespaceList read GetNamespaces;
-    property EnabledIndices : TInterfaceList read FEnabledIndices;
+    property EnabledhxSessions : TInterfaceList read FEnabledhxSessions;
 
     property ShowMsHelpOnWelcomePage: Boolean read FShowMSHelpOnWP;
     property ShowCustomHelpOnWelcomePage: Boolean read FShowCustHelpOnWP;
 
     class function DecodeURL(const URL: String; out Caption: String;
-      out Description: String; out Link: String; out Order: Integer): boolean;
-    class function EncodeURL(Caption, Description, Link: String; Order: Integer): String;
+      out Description: String; out Link: String; out Group: String): boolean;
+    class function EncodeURL(Caption, Description, Link, Group: String): String;
 
     class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String);
     class procedure WriteNamespacesToRegistry(ANamespace: String; AEnabled: Boolean);
@@ -66,6 +66,9 @@ type
   private
     procedure ShowHTMLHelp(AURL: String);
     function ForceSelector(const HelpString: String): String;
+    function GetNamespaceTitle(Session : IHxSession) : String;
+    procedure SearchInHxSession(hxSession: IHxSession; const HelpString: string;
+      var Result: TStringList; hxIndex: IHxIndex);
     {$REGION 'ICustomHelpViewer'}
     function  GetViewerName : String;
     function  UnderstandsKeyword(const HelpString: String): Integer;
@@ -103,10 +106,13 @@ const
   PROVIDER_SUB_KEY = '\Provider';
   SETTINGS_SUB_KEY= '\Settings';
   NAMESPACES_SUB_KEY = SETTINGS_SUB_KEY + '\NAMESPACES';
+  EXPANDEDITEMS_SUB_KEY = SETTINGS_SUB_KEY + '\EXPANDED';
 
   URL_SPLITTER = #1;
 
   SETTINGS_CUSTHELPWP = 'CustomHelpOnWP';
+
+  GROUP_LABEL_DEFAULT = 'Available Search engines';
 var
   GlobalCustomHelp : TCustomHelp;
 
@@ -130,11 +136,12 @@ function TMyViewer.GetHelpStrings(const HelpString: String): TStringList;
 var
   idx, idy : Integer;
   e : String;
-  c, d, u : String;
-  o, order : Integer;
-  Index : IHxIndex;
+  c, d, u, g : String;
+  hxSession : IHxSession;
+  hxIndex : IHxIndex;
   Topics : IHxTopicList;
   slot : integer;
+  s : String;
 
   function EncodedHelpString: String;
   var
@@ -156,50 +163,60 @@ begin
   //Das Keyword in Hex kodieren ... der Einfachheit halber einfach alle Zeichen
   e := EncodedHelpString;
 
-  order := 0;
 
   for idx := 0 to Result.Count - 1 do
   begin
-    TCustomHelp.DecodeURL(Result[idx], c, d, u, o);
-    inc(order);
+    TCustomHelp.DecodeURL(Result[idx], c, d, u, g);
 
     if Pos('://', u)>0 then
-      Result[idx] := TCustomHelp.EncodeURL(c,d,u+EncodedHelpString, order)
+      Result[idx] := TCustomHelp.EncodeURL(c,d,u+EncodedHelpString, g)
     else
     if AnsiSameText(ExtractFileExt(u),'.hlp') then
     begin
-      Result[idx] := TCustomHelp.EncodeURL(c,d,'winhlp://-k '+HelpString+' '+u, order);
+      Result[idx] := TCustomHelp.EncodeURL(c,d,'winhlp://-k '+HelpString+' '+u, g);
     end
     else
     if AnsiSameText(ExtractFileExt(u),'.chm') then
     begin
-      Result[idx] := TCustomHelp.EncodeURL(c,d,'htmlhlp://'+HelpString+URL_SPLITTER+u, order);
+      Result[idx] := TCustomHelp.EncodeURL(c,d,'htmlhlp://'+HelpString+URL_SPLITTER+u, g);
     end;
   end;
 
   //Und jetzt noch die eigentlichen Hilfe-Namespaces durchsuchen
-  for idx := 0 to GlobalCustomHelp.EnabledIndices.Count-1 do
+  for idx := 0 to GlobalCustomHelp.EnabledhxSessions.Count-1 do
   begin
-    if supports(GlobalCustomHelp.EnabledIndices[idx], IHxIndex, Index) then
+    if Supports(GlobalCustomHelp.EnabledhxSessions[idx], IHxSession, hxSession) and
+       Supports(hxSession.GetNavigationObject('!DefaultKeywordIndex',''),
+                    IID_IHxIndex,
+                    hxIndex) then
     begin
-      slot:=Index.GetSlotFromString(HelpString);
+      SearchInHxSession(hxSession, HelpString, Result, hxIndex);
 
-      if AnsiContainsText(Index.GetStringFromSlot(slot),HelpString) then
-      begin
-        Topics:=Index.GetTopicsFromSlot(slot);
+      s:=HelpString;
+      while Pos('.', s) > 0 do
+        Delete(s, 1, Pos('.', s));
 
-        for idy := 1 to Topics.Count do
-        begin
-          inc(order);
-          Result.Add(TCustomHelp.EncodeURL(Topics.Item(idy).Title[HxTopicGetRLTitle,0],
-                                                Topics.Item(idy).Location,
-                                                Topics.Item(idy).URL,
-                                                order));
-        end;
-      end;
+      if ((s<>'') and (s<>HelpString)) then
+        SearchInHxSession(hxSession, s, Result, hxIndex);
     end;
   end;
 
+end;
+
+function TMyViewer.GetNamespaceTitle(Session: IHxSession): String;
+var
+  NamespaceName : String;
+  idx : integer;
+begin
+  NamespaceName:=Session.Collection.GetProperty(HxCollectionProp_NamespaceName);
+  for idx := 1 to GlobalCustomHelp.GetNamespaces.Count do
+  begin
+    if GlobalCustomHelp.GetNamespaces.Item(idx).Name=NamespaceName then
+    begin
+      Result:=GlobalCustomHelp.GetNamespaces.Item(idx).GetProperty(HxRegNamespaceDescription);
+      break;
+    end;
+  end;
 end;
 
 function TMyViewer.GetViewerName: String;
@@ -249,7 +266,8 @@ var
   sl : TStringList;
   i : integer;
   u : String;
-begin
+begin                    
+  Result:='';
   sl:=GetHelpStrings(HelpString);
   if TFormHelpSelector.Execute(sl, i, u) then
     Result:=u;
@@ -257,50 +275,58 @@ end;
 
 procedure TMyViewer.ShowHelp(const HelpString: String);
 var
-  c,d,u: String;
+  c,d,u,g: String;
   o: Integer;
   alternativeNavigate : boolean;
 begin
-  //Hier gehts dann wirklich um die Wurst
-  //Wir bekommen den Hilfestring übergeben, den der
-  //Nutzer aus der Liste, die wir bei GetHelpStrings gebaut haben,
-  //gewählt hat. Natürlich bekommen wir hier nur die, die wir auch definiert haben
-
-  if TCustomHelp.DecodeURL(HelpString, c, d, u, o) then
+  if HelpString<>'' then
   begin
-    if Pos('winhlp://', u)=1 then
+    //Hier gehts dann wirklich um die Wurst
+    //Wir bekommen den Hilfestring übergeben, den der
+    //Nutzer aus der Liste, die wir bei GetHelpStrings gebaut haben,
+    //gewählt hat. Natürlich bekommen wir hier nur die, die wir auch definiert haben
+
+    if TCustomHelp.DecodeURL(HelpString, c, d, u, g) then
     begin
-      Delete(u,1,9);
-      ShellExecute(Application.Handle,
-                   'open',
-                   'winhlp32',
-                   PChar(u),
-                   PChar(ExtractFileDir(Application.ExeName)),
-                   SW_SHOWNORMAL);
-    end
-    else
-    if Pos('htmlhlp://', u)=1 then
-    begin
-      Delete(u,1,10);
-      ShowHTMLHelp(u);
-    end
-    else
-    begin
-      alternativeNavigate := False;
-      if GlobalCustomHelp.ShowCustomHelpOnWelcomePage then
+      if Pos('winhlp://', u)=1 then
       begin
-        if not WelcomePageNavigate(u) then
-          alternativeNavigate:=True;
+        Delete(u,1,9);
+        ShellExecute(Application.Handle,
+                     'open',
+                     'winhlp32',
+                     PChar(u),
+                     PChar(ExtractFileDir(Application.ExeName)),
+                     SW_SHOWNORMAL);
       end
       else
-        alternativeNavigate:=True;
+      if Pos('htmlhlp://', u)=1 then
+      begin
+        Delete(u,1,10);
+        ShowHTMLHelp(u);
+      end
+      else
+      begin
+        alternativeNavigate := False;                                
+        if GlobalCustomHelp.ShowCustomHelpOnWelcomePage then
+        begin
+          if not WelcomePageNavigate(u) then
+            alternativeNavigate:=True;
+        end
+        else
+          alternativeNavigate:=True;
 
-      if alternativeNavigate then
-        ShellExecute(Application.Handle, 'open', PChar(u), '', '', SW_SHOWNORMAL);
+        if alternativeNavigate then
+          ShellExecute(Application.Handle, 'open', PChar(u), '', '', SW_SHOWNORMAL);
+      end;
+    end
+    else
+    begin
+      //oops das haben wir jetzt nicht verstanden....
+      //das heißt wir sind die letzte instanz Doch noch Hilfe zu bekommen.
+      //Wir erzwingen einen Selektor und rufen uns selbst noch mal auf
+      ShowHelp(ForceSelector(HelpString));
     end;
-  end
-  else
-    ShowHelp(ForceSelector(HelpString));
+  end;
 end;
 
 procedure TMyViewer.ShowTableOfContents;
@@ -309,6 +335,30 @@ end;
 
 procedure TMyViewer.ShutDown;
 begin
+end;
+
+procedure TMyViewer.SearchInHxSession(hxSession: IHxSession;
+  const HelpString: string; var Result: TStringList;
+  hxIndex: IHxIndex);
+var
+  Topics: IHxTopicList;
+  idx: Integer;
+  slot: Integer;
+  s : String;
+  g: string;
+begin
+  slot := hxIndex.GetSlotFromString(HelpString);
+  if AnsiContainsText(hxIndex.GetStringFromSlot(slot), HelpString) then
+  begin
+    Topics := hxIndex.GetTopicsFromSlot(slot);
+    g := GetNamespaceTitle(hxSession);
+    for idx := 1 to Topics.Count do
+    begin
+      s:=TCustomHelp.EncodeURL(Topics.Item(idx).Title[HxTopicGetRLTitle, 0], Topics.Item(idx).Location, Topics.Item(idx).URL, g);
+      if Result.IndexOf(s)<0 then
+        Result.Add(s);
+    end;
+  end;
 end;
 
 procedure TMyViewer.SoftShutDown;
@@ -353,7 +403,7 @@ var
   intf : ICustomHelpViewer;
   hs : IHelpSystem;
 begin
-  FEnabledIndices:=TInterfaceList.Create;
+  FEnabledhxSessions:=TInterfaceList.Create;
   FHelpManager := nil;
   intf:=TMyViewer.Create;
 
@@ -387,7 +437,7 @@ begin
 end;
 
 class function TCustomHelp.DecodeURL(const URL: String; out Caption,
-  Description, Link: String; out Order: Integer): boolean;
+  Description, Link: String; out Group: String): boolean;
 var
   sl : TStringList;
 begin
@@ -402,7 +452,7 @@ begin
     Caption:=Sl[0];
     Description:=sl[1];
     Link:=sl[2];
-    Order:=StrToIntDef(sl[3],0);
+    Group:=sl[3];
     sl.Free;
     Result:=True;
   end;           
@@ -412,7 +462,7 @@ destructor TCustomHelp.Destroy;
 begin
   DisconnectFromIDE;
 
-  FEnabledIndices.Free;
+  FEnabledhxSessions.Free;
   FProvider.Free;
 
   if Assigned(FHelpManager) then
@@ -427,10 +477,9 @@ begin
     FMenuItem.Free;
 end;
 
-class function TCustomHelp.EncodeURL(Caption, Description, Link: String;
-  Order: Integer): String;
+class function TCustomHelp.EncodeURL(Caption, Description, Link, Group: String): String;
 begin
-  Result:=CPROT+Caption+'|'+Description+'|'+Link+'|'+IntToStr(Order);
+  Result:=CPROT+Caption+'|'+Description+'|'+Link+'|'+Group;
 end;
 
 function TCustomHelp.GetHelpMenu: TMenuItem;
@@ -490,7 +539,8 @@ begin
           FProvider.Add(TCustomHelp.EncodeURL(
                               Reg.ReadString(VALUE_NAME),
                               Reg.ReadString(VALUE_DESCR),
-                              Reg.ReadString(VALUE_URL), 0));
+                              Reg.ReadString(VALUE_URL),
+                              GROUP_LABEL_DEFAULT));
 
         Reg.CloseKey;
       end;
@@ -507,9 +557,8 @@ var
   sl : TStringList;
   idx : integer;      
   hxSession: IHxSession;
-  hxIndex: IHxIndex;
 begin
-  FEnabledIndices.Clear;
+  FEnabledhxSessions.Clear;
   sl:=TStringList.Create;
   try
     ReadEnabledNamespacesFromRegistry(sl);
@@ -521,12 +570,7 @@ begin
         hxSession:=CoHxSession.Create;
         hxSession.Initialize('ms-help://'+Namespaces.Item(idx).Name,0);
 
-        if Supports(hxSession.GetNavigationObject('!DefaultKeywordIndex',''),
-                    IID_IHxIndex,
-                    hxIndex) then
-        begin
-          FEnabledIndices.Add(hxIndex);
-        end;
+        FEnabledhxSessions.Add(hxSession);
       end;
     end;
   finally
@@ -584,7 +628,7 @@ var
   idx: Integer;
 begin
   Reg := TRegistry.Create;
-  try
+  try                         
     Reg.RootKey := HKEY_CURRENT_USER;
 
     if Reg.OpenKey(REG_ROOT_KEY + SETTINGS_SUB_KEY, true) then

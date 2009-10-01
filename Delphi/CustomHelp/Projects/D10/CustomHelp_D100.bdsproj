@@ -170,8 +170,7 @@
 			<Language Name="ActiveLang"></Language>
 			<Language Name="ProjectLang">$00000000</Language>
 			<Language Name="RootDir"></Language>
-		</Language>  
-    <Excluded_Packages>
+		</Language>  <Excluded_Packages>
       <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\CNA2_D100.bpl">CNA2 - Component Naming Assistant V.2 by TUO</Excluded_Packages>
     </Excluded_Packages>
   </Delphi.Personality>
