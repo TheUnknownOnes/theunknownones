@@ -575,10 +575,10 @@ begin
   VarClear(FValue);
 end;
 
-constructor TSetting.Create;
+constructor TSetting.Create();
 begin
   FParent := nil;
-  FName := EmptyWideStr;
+  FName := IntToStr(GetTickCount);
   VarClear(FValue);
 
   FChildren := TSettingList.Create;
@@ -590,7 +590,6 @@ end;
 constructor TSetting.Create(AParent: TSetting);
 begin
   Create;
-
   Parent := AParent;
 end;
 
@@ -601,7 +600,7 @@ begin
   else
   begin
     Create(AParent);
-
+    
     Name := AName;
   end;
 end;
@@ -660,7 +659,7 @@ procedure TSetting.CreateIndex;
 begin
   FIndex := TWideStringList.Create;
   FIndex.Sorted := true;
-  FIndex.Duplicates := dupError;
+  FIndex.Duplicates := dupIgnore;
 end;
 
 destructor TSetting.Destroy;
