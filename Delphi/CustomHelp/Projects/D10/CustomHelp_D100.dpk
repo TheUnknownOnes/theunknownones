@@ -34,6 +34,7 @@ contains
   uCustomHelpSelector in '..\..\uCustomHelpSelector.pas' {FormHelpSelector},
   uFormConfigCustomHelp in '..\..\uFormConfigCustomHelp.pas' {form_Config},
   uCustomHelpIDEIntegration in '..\..\uCustomHelpIDEIntegration.pas',
-  uMSHelpServices in '..\..\uMSHelpServices.pas';
+  uMSHelpServices in '..\..\uMSHelpServices.pas',
+  uHtmlHelp in '..\..\uHtmlHelp.pas';
 
 end.

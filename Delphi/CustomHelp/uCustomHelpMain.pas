@@ -10,15 +10,8 @@ unit uCustomHelpMain;
 interface
 
 uses
-  Classes,
-  Forms,
-  Dialogs,
-  ToolsAPI,
-  Menus,
-  Registry,
-  HelpIntfs,
-  Windows,
-  uMSHelpServices;
+  Classes, Forms, Dialogs, ToolsAPI, Menus, Registry, HelpIntfs, Windows,
+  uMSHelpServices, uHtmlHelp;
 
 type
 
@@ -71,6 +64,8 @@ type
 
   TMyViewer = class(TInterfacedObject, ICustomHelpViewer)
   private
+    procedure ShowHTMLHelp(AURL: String);
+    function ForceSelector(const HelpString: String): String;
     {$REGION 'ICustomHelpViewer'}
     function  GetViewerName : String;
     function  UnderstandsKeyword(const HelpString: String): Integer;
@@ -108,6 +103,8 @@ const
   PROVIDER_SUB_KEY = '\Provider';
   SETTINGS_SUB_KEY= '\Settings';
   NAMESPACES_SUB_KEY = SETTINGS_SUB_KEY + '\NAMESPACES';
+
+  URL_SPLITTER = #1;
 
   SETTINGS_CUSTHELPWP = 'CustomHelpOnWP';
 var
@@ -172,6 +169,11 @@ begin
     if AnsiSameText(ExtractFileExt(u),'.hlp') then
     begin
       Result[idx] := TCustomHelp.EncodeURL(c,d,'winhlp://-k '+HelpString+' '+u, order);
+    end
+    else
+    if AnsiSameText(ExtractFileExt(u),'.chm') then
+    begin
+      Result[idx] := TCustomHelp.EncodeURL(c,d,'htmlhlp://'+HelpString+URL_SPLITTER+u, order);
     end;
   end;
 
@@ -212,6 +214,47 @@ begin
   vi := ViewerID;
 end;
 
+procedure TMyViewer.ShowHTMLHelp(AURL: String);
+var
+  SearchRecord : tagHH_AKLINK;
+  sl : TStringList;
+begin
+  sl:=TStringList.Create;
+  try
+  sl.Delimiter:=URL_SPLITTER;
+  sl.QuoteChar:=#0;
+  sl.StrictDelimiter:=True;
+  sl.DelimitedText:=AURL;
+  sl.Add('');
+  sl.Add('');
+
+  SearchRecord.cbStruct:=sizeof(SearchRecord);
+  SearchRecord.fReserved:=False;
+  SearchRecord.pszKeywords:=PChar(sl[0]);
+  SearchRecord.pszUrl:=nil;
+  SearchRecord.pszMsgText:=nil;
+  SearchRecord.pszMsgTitle:=nil;
+  SearchRecord.pszWindow:=nil;
+  SearchRecord.fIndexOnFail:=True;
+
+  HtmlHelp(Application.Handle, PChar(sl[1]), HH_DISPLAY_INDEX, 0);
+  HtmlHelp(Application.Handle, PChar(sl[1]), HH_KEYWORD_LOOKUP, cardinal(@SearchRecord));
+  finally
+    sl.Free;
+  end;                 
+end;
+
+function TMyViewer.ForceSelector(const HelpString: String): String;
+var
+  sl : TStringList;
+  i : integer;
+  u : String;
+begin
+  sl:=GetHelpStrings(HelpString);
+  if TFormHelpSelector.Execute(sl, i, u) then
+    Result:=u;
+end;
+
 procedure TMyViewer.ShowHelp(const HelpString: String);
 var
   c,d,u: String;
@@ -236,6 +279,12 @@ begin
                    SW_SHOWNORMAL);
     end
     else
+    if Pos('htmlhlp://', u)=1 then
+    begin
+      Delete(u,1,10);
+      ShowHTMLHelp(u);
+    end
+    else
     begin
       alternativeNavigate := False;
       if GlobalCustomHelp.ShowCustomHelpOnWelcomePage then
@@ -250,6 +299,8 @@ begin
         ShellExecute(Application.Handle, 'open', PChar(u), '', '', SW_SHOWNORMAL);
     end;
   end
+  else
+    ShowHelp(ForceSelector(HelpString));
 end;
 
 procedure TMyViewer.ShowTableOfContents;
@@ -275,7 +326,7 @@ begin
   if GetHelpSystem(hs) then
   begin
     //Noch schnell dem Hilfesystem sagen, das wir einen eigenen Auswahldialog für die
-    //verschiedenen Hilfethemen haben 
+    //verschiedenen Hilfethemen haben
     hs.AssignHelpSelector(THelpSelector.Create);
   end;
 end;
@@ -300,6 +351,7 @@ end;
 constructor TCustomHelp.Create;
 var
   intf : ICustomHelpViewer;
+  hs : IHelpSystem;
 begin
   FEnabledIndices:=TInterfaceList.Create;
   FHelpManager := nil;

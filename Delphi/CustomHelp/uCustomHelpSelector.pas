@@ -23,10 +23,9 @@ type
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ListBox1Compare(Sender: TObject; Item1, Item2: TListItem;
       Data: Integer; var Compare: Integer);
-  private
-    function GetUrl: String;
   public
-    property URL : String read GetUrl;
+    class function Execute(Keywords: TStrings; out SelectedIndex: Integer;
+      out SelectedUrl: String): Boolean; static;
   end;
 
   THelpSelector = class(TInterfacedObject, IHelpSelector)
@@ -43,12 +42,15 @@ uses
 
 {$R *.dfm}
 
-function THelpSelector.SelectKeyword(Keywords: TStrings): Integer;
+class function TFormHelpSelector.Execute(Keywords: TStrings;
+                                   out SelectedIndex: Integer;
+                                   out SelectedUrl: String): Boolean;
 var
-  idx : integer;
+  idx : Integer;   
   c, d, u : String;
   o : Integer;
-begin
+begin             
+  Result:=False;
   with TFormHelpSelector.Create(nil) do
   begin
     for idx := 0 to KeyWords.Count - 1 do
@@ -66,14 +68,30 @@ begin
         end;
       end;
     end;
-    Result:=-1;
-    ListBox1.ItemIndex:=0;
-    
-    if (ShowModal=mrOk) and (ListBox1.ItemIndex > -1) then
-      Result:=StrToInt(ListBox1.Selected.SubItems[2]);
 
+    ListBox1.ItemIndex:=0;
+
+    if (ShowModal=mrOk) and (ListBox1.ItemIndex > -1) then
+    begin
+      Result:=True;
+      SelectedIndex:=StrToInt(ListBox1.Selected.SubItems[2]);
+      SelectedUrl:=TCustomHelp.EncodeURL(ListBox1.Selected.Caption,
+                                         ListBox1.Selected.SubItems[0],
+                                         ListBox1.Selected.SubItems[1],
+                                         0);
+    end;
     Free;
   end;
+end;
+
+function THelpSelector.SelectKeyword(Keywords: TStrings): Integer;
+var
+  idx : integer;
+  u : String;
+begin
+  idx:=-1;
+  if TFormHelpSelector.Execute(Keywords, idx, u) then
+    Result:=idx;
 end;
 
 function THelpSelector.TableOfContents(Contents: TStrings): Integer;
@@ -86,12 +104,6 @@ procedure TFormHelpSelector.FormKeyUp(Sender: TObject; var Key: Word;
 begin
   if Key = VK_ESCAPE then
     ModalResult := mrCancel;
-end;
-
-function TFormHelpSelector.GetUrl: String;
-begin
-  if Assigned(ListBox1.ItemFocused) then
-    Result:=ListBox1.ItemFocused.SubItems[1];
 end;
 
 procedure TFormHelpSelector.ListBox1Compare(Sender: TObject; Item1,
