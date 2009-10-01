@@ -189,7 +189,8 @@ object form_Config: Tform_Config
         Height = 21
         Hint = 
           '- URL to a webbased search provider (e.g. koders.com)'#13#10'- Path to' +
-          ' a windows *.hlp file (be aware to have winhlp32.exe installed)'
+          ' a windows *.hlp file (be aware to have winhlp32.exe installed)'#13 +
+          #10'- Path to a windows htmlHelp file (*.chm)'
         Enabled = False
         ParentShowHint = False
         ShowHint = True
