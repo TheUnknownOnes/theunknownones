@@ -116,7 +116,7 @@
 			<Linker Name="MinStackSize">16384</Linker>
 			<Linker Name="MaxStackSize">1048576</Linker>
 			<Linker Name="ImageBase">4194304</Linker>
-			<Linker Name="ExeDescription"></Linker>
+			<Linker Name="ExeDescription">CustomHelp Expert ... by TUO</Linker>
 		</Linker>
 		<Directories>
 			<Directories Name="OutputDir"></Directories>
@@ -170,8 +170,21 @@
 			<Language Name="ActiveLang"></Language>
 			<Language Name="ProjectLang">$00000000</Language>
 			<Language Name="RootDir"></Language>
-		</Language>  <Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\CNA2_D100.bpl">CNA2 - Component Naming Assistant V.2 by TUO</Excluded_Packages>
+		</Language>  
+    
+    <Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxFlatPack_D10.bpl">Max's Flat Component Pack</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxCalendar_d10.bpl">Max's Calendar Component Suite</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxCaptionBarButtons_d10.bpl">Max's Caption Bar Buttons Component</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxLinkLabel_d10.bpl">Max's LinkLabel Component</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxOneInstance_D10.bpl">Max's One Instance Component</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxOutlookBar_D10.bpl">Max's Outlook Style Sidebar Component</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxPlugIn_D10.bpl">Max's Plug-In Component</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxProtector_d10.bpl">Max's Protector Component</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxStorage_d10.bpl">Max's Resource Storage Component</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxWebUpdate_d10.bpl">Max's Web Update Component</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxTipDialog_d10.bpl">Max's Tip Dialog Component</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxSymbolDlg_d10.bpl">Max's Symbol Dialog Component</Excluded_Packages>
     </Excluded_Packages>
   </Delphi.Personality>
 	<StarTeamAssociation></StarTeamAssociation>

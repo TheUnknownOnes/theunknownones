@@ -17,6 +17,8 @@ uses
 type
   TFormHelpSelector = class(TForm)
     CategoryButtons1: TCategoryButtons;
+    Panel1: TPanel;
+    cbFullTextSearch: TCheckBox;
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ListBox1Compare(Sender: TObject; Item1, Item2: TListItem;
       Data: Integer; var Compare: Integer);
@@ -27,6 +29,8 @@ type
       State: TButtonDrawState);
     procedure CategoryButtons1ButtonClicked(Sender: TObject;
       const Button: TButtonItem);
+    procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FURL : String;
     FHelpIndex : Integer;
@@ -53,6 +57,10 @@ uses
   Math, Registry;
 
 {$R *.dfm}
+
+const
+  CAPTION_INDEXCHECK = 'Index search performed (check me to perform fulltext search next time)';
+  CAPTION_FULLTEXTCHECK = 'Fulltext search performed (uncheck me to perform index search next time)';
 
 type
   TCustomHelpButtonItem = class(TButtonItem)
@@ -115,7 +123,7 @@ var
   idx : Integer;
   c, d, u, g : String;
   o : Integer;
-begin             
+begin
   Result:=False;
   SelectedIndex:=-1;
   SelectedUrl:='';
@@ -214,11 +222,28 @@ begin
   Result:=0;
 end;
 
+procedure TFormHelpSelector.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  GlobalCustomHelp.PerformFullTextSearch:=cbFullTextSearch.Checked;
+end;
+
 procedure TFormHelpSelector.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_ESCAPE then
     ModalResult := mrCancel;
+end;
+
+procedure TFormHelpSelector.FormShow(Sender: TObject);
+begin
+  cbFullTextSearch.Checked:=GlobalCustomHelp.PerformFullTextSearch;
+  if cbFullTextSearch.Checked then
+    cbFullTextSearch.Caption:=CAPTION_FULLTEXTCHECK
+  else
+    cbFullTextSearch.Caption:=CAPTION_INDEXCHECK;
+
+  Caption:=Caption+' (you searched for "'+GlobalCustomHelp.LastHelpCallKeyword+'")';
 end;
 
 procedure TFormHelpSelector.ListBox1Compare(Sender: TObject; Item1,

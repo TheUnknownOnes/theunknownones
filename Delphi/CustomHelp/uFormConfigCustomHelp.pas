@@ -31,6 +31,9 @@ type
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     ListView2: TListView;
+    Panel4: TPanel;
+    Panel5: TPanel;
+    cbFullTextSearch: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure ListView1Change(Sender: TObject; Item: TListItem;
@@ -146,6 +149,7 @@ begin
   try
     TCustomHelp.ReadSettingsFromRegistry(sl);
     cbcusthelpwp.Checked:=sl.Values[SETTINGS_CUSTHELPWP]='1';
+    cbFullTextSearch.Checked:=sl.Values[SETTINGS_FULLTEXTSEARCH]='1';
 
     if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY, true) then
     begin
@@ -212,7 +216,6 @@ begin
      (MessageDlg('Are you sure to delete '+ListView1.ItemFocused.Caption+'?',
      mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
    ListView1.DeleteSelected;
-
 end;
 
 procedure Tform_Config.Save;
@@ -239,7 +242,8 @@ begin
     Reg.Free;
   end;
 
-  TCustomHelp.WriteSettingToRegistry(SETTINGS_CUSTHELPWP, IntToStr(byte(cbcusthelpwp.checked)));
+  GlobalCustomHelp.ShowCustomHelpOnWelcomePage:=cbcusthelpwp.Checked;
+  GlobalCustomHelp.PerformFullTextSearch:=cbFullTextSearch.Checked;
 
   for idx := 0 to ListView2.Items.Count-1 do
     GlobalCustomHelp.WriteNamespacesToRegistry(ListView2.Items[idx].Caption, ListView2.Items[idx].Checked);

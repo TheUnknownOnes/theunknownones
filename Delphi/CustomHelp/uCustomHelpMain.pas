@@ -18,15 +18,18 @@ type
   //Das Hauptobjekt
   TCustomHelp = class
   private
+    FLastKeyword: String;
     function GetNamespaces: IHxRegNamespaceList;
+    procedure SetFullTextSearch(const Value: Boolean);
+    procedure SetShowCustomHelpOnWP(const Value: Boolean);
   protected
     FHelpManager : IHelpManager;
 
     FMenuItem : TMenuItem;
 
     FProvider : TStringList;
-    FShowMSHelpOnWP : Boolean;
     FShowCustHelpOnWP : Boolean;
+    FFullTextSearch : Boolean;
     FEnabledhxSessions : TInterfaceList;
 
     //In die IDE einhacken (Menu-Eintrag, ...)
@@ -39,7 +42,6 @@ type
     procedure LoadEnabledNamespacesFromRegistry;
 
     procedure OnMenuItemClick(Sender : TObject);
-  published
   public
     constructor Create();
     destructor Destroy(); override;
@@ -48,8 +50,9 @@ type
     property Namespaces : IHxRegNamespaceList read GetNamespaces;
     property EnabledhxSessions : TInterfaceList read FEnabledhxSessions;
 
-    property ShowMsHelpOnWelcomePage: Boolean read FShowMSHelpOnWP;
-    property ShowCustomHelpOnWelcomePage: Boolean read FShowCustHelpOnWP;
+    property ShowCustomHelpOnWelcomePage: Boolean read FShowCustHelpOnWP write SetShowCustomHelpOnWP;
+    property PerformFullTextSearch: Boolean read FFullTextSearch write SetFullTextSearch;
+    property LastHelpCallKeyword: String read FLastKeyword write FLastKeyword;
 
     class function DecodeURL(const URL: String; out Caption: String;
       out Description: String; out Link: String; out Group: String): boolean;
@@ -69,6 +72,8 @@ type
     function GetNamespaceTitle(Session : IHxSession) : String;
     procedure SearchInHxSession(hxSession: IHxSession; const HelpString: string;
       var Result: TStringList; hxIndex: IHxIndex);
+    procedure QueryInHxSession(hxSession: IHxSession; const HelpString: string;
+      var Result: TStringList);
     {$REGION 'ICustomHelpViewer'}
     function  GetViewerName : String;
     function  UnderstandsKeyword(const HelpString: String): Integer;
@@ -111,6 +116,7 @@ const
   URL_SPLITTER = #1;
 
   SETTINGS_CUSTHELPWP = 'CustomHelpOnWP';
+  SETTINGS_FULLTEXTSEARCH = 'FullTextSearch';
 
   GROUP_LABEL_DEFAULT = 'Available Search engines';
 var
@@ -153,11 +159,15 @@ var
   end;
 
 begin
+  GlobalCustomHelp.LastHelpCallKeyword:=HelpString;
+
   //Weil wir bei UnderstandsKeyword gesagt haben, das wir das Keyword verstehen (Result = 1)
   //werden wir jetzt gefragt, welche Hilfethemen wir zu diesem Keyword liefern können
   //Die StringList wird vom Hilfesystem wieder freigegeben
 
   Result := TStringList.Create;
+  Result.Duplicates:=dupIgnore;
+  //Result.Sorted:=True;
   Result.Assign(GlobalCustomHelp.ProviderList);
 
   //Das Keyword in Hex kodieren ... der Einfachheit halber einfach alle Zeichen
@@ -185,22 +195,30 @@ begin
   //Und jetzt noch die eigentlichen Hilfe-Namespaces durchsuchen
   for idx := 0 to GlobalCustomHelp.EnabledhxSessions.Count-1 do
   begin
-    if Supports(GlobalCustomHelp.EnabledhxSessions[idx], IHxSession, hxSession) and
-       Supports(hxSession.GetNavigationObject('!DefaultKeywordIndex',''),
+    if Supports(GlobalCustomHelp.EnabledhxSessions[idx], IHxSession, hxSession) then
+    begin
+      //Soll nach dem kompletten Text gesucht werden?
+      if GlobalCustomHelp.PerformFullTextSearch then
+      begin
+        QueryInHxSession(hxSession, HelpString, Result);  
+      end
+      else
+      //oder nur im Index der Hilfe
+        if Supports(hxSession.GetNavigationObject('!DefaultKeywordIndex',''),
                     IID_IHxIndex,
                     hxIndex) then
-    begin
-      SearchInHxSession(hxSession, HelpString, Result, hxIndex);
+        begin
+          SearchInHxSession(hxSession, HelpString, Result, hxIndex);
 
-      s:=HelpString;
-      while Pos('.', s) > 0 do
-        Delete(s, 1, Pos('.', s));
+          s:=HelpString;
+          while Pos('.', s) > 0 do
+            Delete(s, 1, Pos('.', s));
 
-      if ((s<>'') and (s<>HelpString)) then
-        SearchInHxSession(hxSession, s, Result, hxIndex);
-    end;
+          if ((s<>'') and (s<>HelpString)) then
+            SearchInHxSession(hxSession, s, Result, hxIndex);
+        end;
   end;
-
+  end;
 end;
 
 function TMyViewer.GetNamespaceTitle(Session: IHxSession): String;
@@ -355,9 +373,26 @@ begin
     for idx := 1 to Topics.Count do
     begin
       s:=TCustomHelp.EncodeURL(Topics.Item(idx).Title[HxTopicGetRLTitle, 0], Topics.Item(idx).Location, Topics.Item(idx).URL, g);
-      if Result.IndexOf(s)<0 then
-        Result.Add(s);
+      Result.Add(s);
     end;
+  end;
+end;
+
+procedure TMyViewer.QueryInHxSession(hxSession: IHxSession;
+  const HelpString: string; var Result: TStringList);
+var
+  Topics: IHxTopicList;
+  idx: Integer;
+  s : String;
+  g: string;
+begin
+  Topics:=hxSession.Query(HelpString, '!DefaultFullTextSearch', HxQuery_No_Option, '');
+
+  g := GetNamespaceTitle(hxSession);
+  for idx := 1 to Topics.Count do
+  begin
+    s:=TCustomHelp.EncodeURL(Topics.Item(idx).Title[HxTopicGetRLTitle, 0], Topics.Item(idx).Location, Topics.Item(idx).URL, g);
+    Result.Add(s);
   end;
 end;
 
@@ -586,6 +621,7 @@ begin
   try
     ReadSettingsFromRegistry(sl);
     FShowCustHelpOnWP:=sl.Values[SETTINGS_CUSTHELPWP]='1';
+    FFullTextSearch:=sl.Values[SETTINGS_FULLTEXTSEARCH]='1';
   finally
     sl.Free;
   end;
@@ -643,6 +679,18 @@ begin
   finally
     Reg.Free;
   end;
+end;
+
+procedure TCustomHelp.SetFullTextSearch(const Value: Boolean);
+begin
+  FFullTextSearch := Value;
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_FULLTEXTSEARCH, IntToStr(byte(Value)));
+end;
+
+procedure TCustomHelp.SetShowCustomHelpOnWP(const Value: Boolean);
+begin
+  FShowCustHelpOnWP := Value;
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_CUSTHELPWP, IntToStr(byte(Value)));
 end;
 
 class procedure TCustomHelp.WriteSettingToRegistry(AName, AValue: String);

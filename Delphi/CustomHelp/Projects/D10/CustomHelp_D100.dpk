@@ -22,6 +22,8 @@ package CustomHelp_D100;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
+{$DESCRIPTION 'CustomHelp Expert ... by TUO'}
+{$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
