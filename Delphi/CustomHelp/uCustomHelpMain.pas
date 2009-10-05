@@ -406,6 +406,12 @@ var
 begin
   //Das Hilfesystem fragt uns: Verstehst du dieses Keyword (der Begriff unter dem Cursor)?
 
+  if HelpString = 'erroneous type' then
+  begin
+    Result := 0;
+    Exit;
+  end;
+
   Result := 1; //ja!
 
   if GetHelpSystem(hs) then
