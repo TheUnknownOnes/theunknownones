@@ -1,9 +1,5 @@
 #summary CustomHelp is an IDE Expert for Delphi 2005+ which extends the Delphi help with some useful features.
 
-= Introduction =
-
-CustomHelp is an IDE Expert for Delphi 2005+ which extends the Delphi help with some useful features.
-
 = Overview =
   * Help via F1 key
   * Search in all installed Hx namespaces (Microsoft Developer Help) (e.g. Jedi Help)
