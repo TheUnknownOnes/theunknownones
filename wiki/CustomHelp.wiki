@@ -1,0 +1,38 @@
+#summary CustomHelp is an IDE Expert for Delphi 2005+ which extends the Delphi help with some useful features.
+
+= Introduction =
+
+CustomHelp is an IDE Expert for Delphi 2005+ which extends the Delphi help with some useful features.
+
+= Overview =
+  * Help via F1 key
+  * Search in all installed Hx namespaces (Microsoft Developer Help) (e.g. Jedi Help)
+  * Search for help in the old (.hlp) Windows help files (e.g. Delphi 7 help)
+  * Search in Html-Help (.chm) Files
+  * Search using Index of fulltext
+
+= How to get it and installation =
+  * Download the package at: http://theunknownones.googlecode.com/svn/Delphi/CustomHelp/
+or 
+  * Checkout the whole repository at: http://theunknownones.googlecode.com/svn/ using a SVN client ... 
+  * Simply load the package and install it
+
+= How to configure =
+  * The configuration can be found in the main menu at Help->Configure Custom Help...
+
+  * Help Display
+    use WelcomePage to display help ... if unchecked the help will be displayed in the system's default browser
+
+  * Help Namespaces
+    you may check as many hx help namespaces as you like. For the best results you should choose the help version appropriate your Delphi version. (borland.bds4 for Delphi2006 or ebarcadero.rs2009 for Delphi 2009). If JCL-help or JVCL-help is installed on your system you may select them too
+    
+    Perform fulltext search ... if checked all namespaces will be searched using full text analysis. You will get more results and the search lasts longer. Not all too useful ;-)
+
+  * Other Help Sources
+    You may add URLs of your favourite online help provider (e.g. google codesearch) be aware that the keyword is appended to the URL. You may as well add a path to a .hlp or .chm file. Those help sources will be searched using the index. If the help file does not support index queries the help will not work.
+
+A full description as well as a demo video can be found here-> http://www.delphipraxis.net/topic165769_ideexperte+customhelp.html&highlight=
+it's German ... sorry ;-)
+
+Have fun with it
+by TUO
