@@ -642,6 +642,7 @@ var
   FileCount: Integer;
   i: Integer;
 begin
+  {$R-}
   dwAttributes := 0;
   Result := nil;
   if Files.Count = 0 then
