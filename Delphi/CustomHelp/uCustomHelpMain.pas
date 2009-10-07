@@ -14,6 +14,7 @@ uses
   uMSHelpServices, uHtmlHelp;
 
 type
+  TNamespaceTrimOption = (nstoNoTrim=0, nstoTrimFirst, nstoTrimAll);
 
   //Das Hauptobjekt
   TCustomHelp = class
@@ -22,6 +23,7 @@ type
     function GetNamespaces: IHxRegNamespaceList;
     procedure SetFullTextSearch(const Value: Boolean);
     procedure SetShowCustomHelpOnWP(const Value: Boolean);
+    procedure SetTrimNamespaces(const Value: TNamespaceTrimOption);
   protected
     FHelpManager : IHelpManager;
 
@@ -31,6 +33,7 @@ type
     FShowCustHelpOnWP : Boolean;
     FFullTextSearch : Boolean;
     FEnabledhxSessions : TInterfaceList;
+    FTrimNamespaces: TNamespaceTrimOption;
 
     //In die IDE einhacken (Menu-Eintrag, ...)
     procedure ConnectToIDE;
@@ -53,12 +56,13 @@ type
     property ShowCustomHelpOnWelcomePage: Boolean read FShowCustHelpOnWP write SetShowCustomHelpOnWP;
     property PerformFullTextSearch: Boolean read FFullTextSearch write SetFullTextSearch;
     property LastHelpCallKeyword: String read FLastKeyword write FLastKeyword;
+    property TrimNamespacesUntilResultFound: TNamespaceTrimOption read FTrimNamespaces write SetTrimNamespaces;
 
     class function DecodeURL(const URL: String; out Caption: String;
-      out Description: String; out Link: String; out Group: String): boolean;
-    class function EncodeURL(Caption, Description, Link, Group: String): String;
+      out Description: String; out Link: String; out Group: String; out TrimOption: TNamespaceTrimOption): boolean;
+    class function EncodeURL(Caption, Description, Link, Group: String; TrimOption: TNamespaceTrimOption): String;
 
-    class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String);
+    class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String; ATrimNamespaces: TNamespaceTrimOption);
     class procedure WriteNamespacesToRegistry(ANamespace: String; AEnabled: Boolean);
     class procedure ReadEnabledNamespacesFromRegistry(const ANamesList: TStrings);
     class procedure WriteSettingToRegistry(AName, AValue: String);
@@ -70,10 +74,11 @@ type
     procedure ShowHTMLHelp(AURL: String);
     function ForceSelector(const HelpString: String): String;
     function GetNamespaceTitle(Session : IHxSession) : String;
-    procedure SearchInHxSession(hxSession: IHxSession; const HelpString: string;
-      var Result: TStringList; hxIndex: IHxIndex);
-    procedure QueryInHxSession(hxSession: IHxSession; const HelpString: string;
-      var Result: TStringList);
+    function SearchInHxSession(hxSession: IHxSession; const HelpString: string;
+      var AResult: TStringList; hxIndex: IHxIndex): Boolean;
+    function QueryInHxSession(hxSession: IHxSession; const HelpString: string;
+      var AResult: TStringList): Boolean;
+    function TrimNamespace(var s: string; ATrimOption: TNamespaceTrimOption): Boolean;
     {$REGION 'ICustomHelpViewer'}
     function  GetViewerName : String;
     function  UnderstandsKeyword(const HelpString: String): Integer;
@@ -105,9 +110,12 @@ const
   {$EndIf}
 
   CPROT = 'CustomHelp://';
+
   VALUE_NAME = 'Name';
   VALUE_DESCR = 'Description';
   VALUE_URL = 'URL';
+  VALUE_TRIMNAMESPACE = 'TrimNamespaces';
+
   PROVIDER_SUB_KEY = '\Provider';
   SETTINGS_SUB_KEY= '\Settings';
   NAMESPACES_SUB_KEY = SETTINGS_SUB_KEY + '\NAMESPACES';
@@ -117,6 +125,7 @@ const
 
   SETTINGS_CUSTHELPWP = 'CustomHelpOnWP';
   SETTINGS_FULLTEXTSEARCH = 'FullTextSearch';
+  SETTINGS_TRIMNAMESPACES = 'TrimNamespaces';
 
   GROUP_LABEL_DEFAULT = 'Available Search engines';
 var
@@ -141,21 +150,22 @@ end;
 function TMyViewer.GetHelpStrings(const HelpString: String): TStringList;
 var
   idx, idy : Integer;
-  e : String;
   c, d, u, g : String;
   hxSession : IHxSession;
   hxIndex : IHxIndex;
   Topics : IHxTopicList;
   slot : integer;
   s : String;
+  loop : byte;
+  TrimOption: TNamespaceTrimOption;
 
-  function EncodedHelpString: String;
+  function EncodedHelpString(AHelpString: String): String;
   var
     i: integer;
   begin
     Result:='';
-    for i := 1 to Length(HelpString)do
-      Result:=Result + '%'+Format('%.2x', [Ord(HelpString[i])]);
+    for i := 1 to Length(AHelpString)do
+      Result:=Result + '%'+Format('%.2x', [Ord(AHelpString[i])]);
   end;
 
 begin
@@ -170,25 +180,25 @@ begin
   //Result.Sorted:=True;
   Result.Assign(GlobalCustomHelp.ProviderList);
 
-  //Das Keyword in Hex kodieren ... der Einfachheit halber einfach alle Zeichen
-  e := EncodedHelpString;
-
-
   for idx := 0 to Result.Count - 1 do
   begin
-    TCustomHelp.DecodeURL(Result[idx], c, d, u, g);
+    TCustomHelp.DecodeURL(Result[idx], c, d, u, g, TrimOption);
+    s:=HelpString;
+    TrimNamespace(s, TrimOption);
 
     if Pos('://', u)>0 then
-      Result[idx] := TCustomHelp.EncodeURL(c,d,u+EncodedHelpString, g)
+    begin
+      Result[idx] := TCustomHelp.EncodeURL(c,d,u+EncodedHelpString(s), g, TrimOption);
+    end
     else
     if AnsiSameText(ExtractFileExt(u),'.hlp') then
     begin
-      Result[idx] := TCustomHelp.EncodeURL(c,d,'winhlp://-k '+HelpString+' '+u, g);
+      Result[idx] := TCustomHelp.EncodeURL(c,d,'winhlp://-k '+s+' '+u, g, TrimOption);
     end
     else
     if AnsiSameText(ExtractFileExt(u),'.chm') then
     begin
-      Result[idx] := TCustomHelp.EncodeURL(c,d,'htmlhlp://'+HelpString+URL_SPLITTER+u, g);
+      Result[idx] := TCustomHelp.EncodeURL(c,d,'htmlhlp://'+s+URL_SPLITTER+u, g, TrimOption);
     end;
   end;
 
@@ -200,24 +210,42 @@ begin
       //Soll nach dem kompletten Text gesucht werden?
       if GlobalCustomHelp.PerformFullTextSearch then
       begin
-        QueryInHxSession(hxSession, HelpString, Result);  
+        s:=HelpString;
+        loop:=0;
+        if (not QueryInHxSession(hxSession, s, Result)) and
+           (GlobalCustomHelp.TrimNamespacesUntilResultFound<>nstoNoTrim) then
+        repeat
+          inc(loop);
+
+          if (loop>1) and (GlobalCustomHelp.TrimNamespacesUntilResultFound<>nstoTrimAll) then
+            break;
+
+          if not TrimNamespace(s, nstoTrimFirst) then
+            break;
+        until QueryInHxSession(hxSession, s, Result);
       end
       else
       //oder nur im Index der Hilfe
+      begin
         if Supports(hxSession.GetNavigationObject('!DefaultKeywordIndex',''),
                     IID_IHxIndex,
                     hxIndex) then
         begin
-          SearchInHxSession(hxSession, HelpString, Result, hxIndex);
-
+          loop:=0;
           s:=HelpString;
-          while Pos('.', s) > 0 do
-            Delete(s, 1, Pos('.', s));
+          if (not SearchInHxSession(hxSession, s, Result, hxIndex)) and
+             (GlobalCustomHelp.TrimNamespacesUntilResultFound<>nstoNoTrim) then
+          repeat
+            inc(loop);
 
-          if ((s<>'') and (s<>HelpString)) then
-            SearchInHxSession(hxSession, s, Result, hxIndex);
+            if (loop>1) and (GlobalCustomHelp.TrimNamespacesUntilResultFound<>nstoTrimAll) then
+              break;
+            if not TrimNamespace(s, nstoTrimFirst) then
+              break;
+          until SearchInHxSession(hxSession, s, Result, hxIndex);
         end;
-  end;
+      end;
+    end;
   end;
 end;
 
@@ -296,6 +324,7 @@ var
   c,d,u,g: String;
   o: Integer;
   alternativeNavigate : boolean;
+  TrimOption : TNamespaceTrimOption;
 begin
   if HelpString<>'' then
   begin
@@ -304,7 +333,7 @@ begin
     //Nutzer aus der Liste, die wir bei GetHelpStrings gebaut haben,
     //gewählt hat. Natürlich bekommen wir hier nur die, die wir auch definiert haben
 
-    if TCustomHelp.DecodeURL(HelpString, c, d, u, g) then
+    if TCustomHelp.DecodeURL(HelpString, c, d, u, g, TrimOption) then
     begin
       if Pos('winhlp://', u)=1 then
       begin
@@ -355,9 +384,23 @@ procedure TMyViewer.ShutDown;
 begin
 end;
 
-procedure TMyViewer.SearchInHxSession(hxSession: IHxSession;
-  const HelpString: string; var Result: TStringList;
-  hxIndex: IHxIndex);
+function TMyViewer.TrimNamespace(var s: string; ATrimOption: TNamespaceTrimOption): Boolean;
+begin
+  Result:=True;
+  if ATrimOption=nstoNoTrim then
+    exit;
+
+  Result:=Pos('.', s) > 0;
+  if Result then
+    Delete(s, 1, Pos('.', s));
+
+  if Result and (ATrimOption=nstoTrimAll) then
+    TrimNamespace(s, nstoTrimAll);
+end;
+
+function TMyViewer.SearchInHxSession(hxSession: IHxSession;
+  const HelpString: string; var AResult: TStringList;
+  hxIndex: IHxIndex): Boolean;
 var
   Topics: IHxTopicList;
   idx: Integer;
@@ -365,6 +408,7 @@ var
   s : String;
   g: string;
 begin
+  Result:=False;
   slot := hxIndex.GetSlotFromString(HelpString);
   if AnsiContainsText(hxIndex.GetStringFromSlot(slot), HelpString) then
   begin
@@ -372,27 +416,30 @@ begin
     g := GetNamespaceTitle(hxSession);
     for idx := 1 to Topics.Count do
     begin
-      s:=TCustomHelp.EncodeURL(Topics.Item(idx).Title[HxTopicGetRLTitle, 0], Topics.Item(idx).Location, Topics.Item(idx).URL, g);
-      Result.Add(s);
+      s:=TCustomHelp.EncodeURL(Topics.Item(idx).Title[HxTopicGetRLTitle, 0], Topics.Item(idx).Location, Topics.Item(idx).URL, g, nstoNoTrim);
+      AResult.Add(s);
+      Result:=True;
     end;
   end;
 end;
 
-procedure TMyViewer.QueryInHxSession(hxSession: IHxSession;
-  const HelpString: string; var Result: TStringList);
+function TMyViewer.QueryInHxSession(hxSession: IHxSession;
+  const HelpString: string; var AResult: TStringList): Boolean;
 var
   Topics: IHxTopicList;
   idx: Integer;
   s : String;
   g: string;
 begin
+  Result:=False;
   Topics:=hxSession.Query(HelpString, '!DefaultFullTextSearch', HxQuery_No_Option, '');
 
   g := GetNamespaceTitle(hxSession);
   for idx := 1 to Topics.Count do
   begin
-    s:=TCustomHelp.EncodeURL(Topics.Item(idx).Title[HxTopicGetRLTitle, 0], Topics.Item(idx).Location, Topics.Item(idx).URL, g);
-    Result.Add(s);
+    s:=TCustomHelp.EncodeURL(Topics.Item(idx).Title[HxTopicGetRLTitle, 0], Topics.Item(idx).Location, Topics.Item(idx).URL, g, nstoNoTrim);
+    AResult.Add(s);
+    Result:=True;
   end;
 end;
 
@@ -406,7 +453,7 @@ var
 begin
   //Das Hilfesystem fragt uns: Verstehst du dieses Keyword (der Begriff unter dem Cursor)?
 
-  if HelpString = 'erroneous type' then
+  if AnsiContainsText(HelpString, 'erroneous type') then
   begin
     Result := 0;
     Exit;
@@ -461,24 +508,28 @@ begin
     WriteProviderToRegistry('1',
                             'DP DelphiReference',
                             'Search with Daniels Cool Tool',
-                            'http://ref.dp200x.de/dp_reference.php?securitytoken=guest&tabbed=1&sbutton=Search&query=');
+                            'http://ref.dp200x.de/dp_reference.php?securitytoken=guest&tabbed=1&sbutton=Search&query=',
+                            nstoTrimFirst);
 
     WriteProviderToRegistry('2',
                             'Koders.com',
                             'Search at koders.com',
-                            'http://www.koders.com/default.aspx?submit=Search&la=Delphi&li=*&s=');
+                            'http://www.koders.com/default.aspx?submit=Search&la=Delphi&li=*&s=',
+                            nstoTrimFirst);
 
     WriteProviderToRegistry('3',
                             'Google Codesearch',
                             'Search using Google Codesearch',
-                            'http://www.google.com/codesearch?btnG=Code+suchen&hl=de&as_lang=pascal&as_license_restrict=i&as_license=&as_package=&as_filename=&as_case=&as_q=');
+                            'http://www.google.com/codesearch?btnG=Code+suchen&hl=de&as_lang=pascal&as_license_restrict=i&as_license=&as_package=&as_filename=&as_case=&as_q=',
+                            nstoTrimFirst);
 
     LoadProviderFromRegistry;
   end;
 end;
 
 class function TCustomHelp.DecodeURL(const URL: String; out Caption,
-  Description, Link: String; out Group: String): boolean;
+  Description, Link: String; out Group: String;
+  out TrimOption: TNamespaceTrimOption): boolean;
 var
   sl : TStringList;
 begin
@@ -494,6 +545,7 @@ begin
     Description:=sl[1];
     Link:=sl[2];
     Group:=sl[3];
+    TrimOption:=TNamespaceTrimOption(StrToIntDef(sl[4],0));
     sl.Free;
     Result:=True;
   end;           
@@ -518,9 +570,9 @@ begin
     FMenuItem.Free;
 end;
 
-class function TCustomHelp.EncodeURL(Caption, Description, Link, Group: String): String;
+class function TCustomHelp.EncodeURL(Caption, Description, Link, Group: String; TrimOption: TNamespaceTrimOption): String;
 begin
-  Result:=CPROT+Caption+'|'+Description+'|'+Link+'|'+Group;
+  Result:=CPROT+Caption+'|'+Description+'|'+Link+'|'+Group+'|'+IntToStr(Integer(TrimOption));
 end;
 
 function TCustomHelp.GetHelpMenu: TMenuItem;
@@ -581,7 +633,8 @@ begin
                               Reg.ReadString(VALUE_NAME),
                               Reg.ReadString(VALUE_DESCR),
                               Reg.ReadString(VALUE_URL),
-                              GROUP_LABEL_DEFAULT));
+                              GROUP_LABEL_DEFAULT,
+                              TNamespaceTrimOption(StrToIntDef(Reg.ReadString(VALUE_TRIMNAMESPACE),0))));
 
         Reg.CloseKey;
       end;
@@ -628,6 +681,7 @@ begin
     ReadSettingsFromRegistry(sl);
     FShowCustHelpOnWP:=sl.Values[SETTINGS_CUSTHELPWP]='1';
     FFullTextSearch:=sl.Values[SETTINGS_FULLTEXTSEARCH]='1';
+    FTrimNamespaces:=TNamespaceTrimOption(StrToIntDef(sl.Values[SETTINGS_TRIMNAMESPACES], 0));
   finally
     sl.Free;
   end;
@@ -699,6 +753,12 @@ begin
   TCustomHelp.WriteSettingToRegistry(SETTINGS_CUSTHELPWP, IntToStr(byte(Value)));
 end;
 
+procedure TCustomHelp.SetTrimNamespaces(const Value: TNamespaceTrimOption);
+begin
+  FTrimNamespaces := Value;
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_TRIMNAMESPACES, IntToStr(byte(Value)));
+end;
+
 class procedure TCustomHelp.WriteSettingToRegistry(AName, AValue: String);
 var
   Reg : TRegistry;
@@ -739,7 +799,7 @@ begin
 end;
 
 class procedure TCustomHelp.WriteProviderToRegistry(AKeyName, AName, ADesc,
-  AURL: String);
+  AURL: String; ATrimNamespaces: TNamespaceTrimOption);
 var
   Reg : TRegistry;
 begin
@@ -752,6 +812,7 @@ begin
       Reg.WriteString(VALUE_NAME, AName);
       Reg.WriteString(VALUE_DESCR, ADesc);
       Reg.WriteString(VALUE_URL, AURL);
+      Reg.WriteString(VALUE_TRIMNAMESPACE, IntToStr(Integer(ATrimNamespaces)));
 
       Reg.CloseKey;
     end;

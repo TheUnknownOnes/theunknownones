@@ -68,10 +68,12 @@ type
     FDesc: String;
     FURL: String;
     FIdx: Integer;
+    FTO: TNamespaceTrimOption;
   public
     property URL: String read FURL write FURL;
     property Description: String read FDesc write FDesc;
     property HelpIndex: Integer read FIdx write FIdx;
+    property TrimOption: TNamespaceTrimOption read FTO write FTO;
   end;
 
 procedure TFormHelpSelector.CategoryButtons1ButtonClicked(Sender: TObject;
@@ -89,7 +91,8 @@ begin
     FURL:=TCustomHelp.EncodeURL(TCustomHelpButtonItem(Button).Caption,
                                 TCustomHelpButtonItem(Button).Description,
                                 TCustomHelpButtonItem(Button).URL,
-                                '');
+                                '',
+                                TCustomHelpButtonItem(Button).FTO);
 
     SaveExpanded;
     ModalResult:=mrOk;
@@ -149,6 +152,7 @@ var
   item : TCustomHelpButtonItem;
   Reg : TRegistry;
   CheckExpanded: Boolean;
+  TrimOption: TNamespaceTrimOption;
 
   function GetCategoryFromLabel(ALabel: String): TButtonCategory;
   var
@@ -188,7 +192,7 @@ begin
     begin
       if not AnsiStartsText('ms-help://',KeyWords[idx]) then
       begin
-        if TCustomHelp.DecodeURL(Keywords[idx], c, d, u, g) then
+        if TCustomHelp.DecodeURL(Keywords[idx], c, d, u, g, TrimOption) then
         begin
           cat:=GetCategoryFromLabel(g);
 
@@ -197,6 +201,7 @@ begin
           item.Description:=d;
           item.URL:=u;
           item.HelpIndex:=idx;
+          item.TrimOption:=TrimOption;
         end;
       end;
     end;

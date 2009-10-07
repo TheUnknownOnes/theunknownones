@@ -11,7 +11,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, ComCtrls, Registry, CheckLst, uMSHelpServices;
+  Dialogs, StdCtrls, ExtCtrls, ComCtrls, Registry, CheckLst, uMSHelpServices,
+  uCustomHelpMain;
 
 type
   Tform_Config = class(TForm)
@@ -34,6 +35,10 @@ type
     Panel4: TPanel;
     Panel5: TPanel;
     cbFullTextSearch: TCheckBox;
+    cbTrimNamespacesHX: TComboBox;
+    Label4: TLabel;
+    cbTrimNamespacesOHS: TComboBox;
+    Label8: TLabel;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure ListView1Change(Sender: TObject; Item: TListItem;
@@ -44,19 +49,26 @@ type
     procedure edURLChange(Sender: TObject);
     procedure ListView1KeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure FormCreate(Sender: TObject);
+    procedure cbTrimNamespacesOHSChange(Sender: TObject);
   private
     FInsertItem : TListItem;
     procedure Save;
     procedure BuildNamespaceList;
+    function TrimOptionFromString(AString: String): TNamespaceTrimOption;
   public
     class function Execute : Boolean; 
   end;
 
 implementation
 
-uses uCustomHelpMain;
-
 {$R *.dfm}
+
+
+const
+  OPTIONS_NAMESPACETRIM : array [nstoNoTrim..nstoTrimAll] of string = ('no trim',
+                                                    'trim first namespace',
+                                                    'trim all namespaces');
 
 { Tform_Config }
 
@@ -64,6 +76,13 @@ procedure Tform_Config.Button1Click(Sender: TObject);
 begin
   Save;
   ModalResult:=mrOk;
+end;
+
+procedure Tform_Config.cbTrimNamespacesOHSChange(Sender: TObject);
+begin
+  if (ListView1.ItemFocused<>FInsertItem) and
+     Assigned(ListView1.ItemFocused) then
+    ListView1.ItemFocused.SubItems[2]:=cbTrimNamespacesOHS.Text;
 end;
 
 procedure Tform_Config.edDescChange(Sender: TObject);
@@ -127,6 +146,17 @@ begin
   end;
 end;
 
+procedure Tform_Config.FormCreate(Sender: TObject);
+var
+  idx : TNamespaceTrimOption;
+begin
+  for idx := Low(OPTIONS_NAMESPACETRIM) to High(OPTIONS_NAMESPACETRIM) do
+  begin
+    cbTrimNamespacesHX.Items.Add(OPTIONS_NAMESPACETRIM[idx]);
+    cbTrimNamespacesOHS.Items.Add(OPTIONS_NAMESPACETRIM[idx]);
+  end;
+end;
+
 procedure Tform_Config.FormShow(Sender: TObject);
 var
   Reg : TRegistry;
@@ -142,6 +172,7 @@ begin
     Caption:='<new Item>';
     SubItems.Add('double click to add');
     SubItems.Add('');
+    SubItems.Add('');
   end;
 
   Reg := TRegistry.Create;
@@ -150,6 +181,7 @@ begin
     TCustomHelp.ReadSettingsFromRegistry(sl);
     cbcusthelpwp.Checked:=sl.Values[SETTINGS_CUSTHELPWP]='1';
     cbFullTextSearch.Checked:=sl.Values[SETTINGS_FULLTEXTSEARCH]='1';
+    cbTrimNamespacesHX.ItemIndex:=StrToIntDef(sl.Values[SETTINGS_TRIMNAMESPACES], 0);
 
     if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY, true) then
     begin
@@ -166,6 +198,7 @@ begin
           Caption:=Reg.ReadString(VALUE_NAME);
           SubItems.Add(Reg.ReadString(VALUE_DESCR));
           SubItems.Add(Reg.ReadString(VALUE_URL));
+          SubItems.Add(OPTIONS_NAMESPACETRIM[TNamespaceTrimOption(StrToIntDef(Reg.ReadString(VALUE_TRIMNAMESPACE),0))]);
         end;
 
         Reg.CloseKey;
@@ -185,10 +218,12 @@ begin
     edName.Text:=Item.Caption;
     edDesc.Text:=Item.SubItems[0];
     edURL.Text:=Item.SubItems[1];
+    cbTrimNamespacesOHS.ItemIndex:=Integer(TrimOptionFromString(Item.SubItems[2]));
 
     edName.Enabled := Assigned(ListView1.Selected) and (ListView1.Selected <> FInsertItem);
     edDesc.Enabled := edName.Enabled;
     edURL.Enabled := edName.Enabled;
+    cbTrimNamespacesOHS.Enabled:= edName.Enabled;
   end;
 end;
 
@@ -218,9 +253,22 @@ begin
    ListView1.DeleteSelected;
 end;
 
+function Tform_Config.TrimOptionFromString(AString: String): TNamespaceTrimOption;
+var
+  idx: TNamespaceTrimOption;
+begin
+  idx:=nstoNoTrim;
+  for idx := Low(OPTIONS_NAMESPACETRIM) to High(OPTIONS_NAMESPACETRIM) do
+    if OPTIONS_NAMESPACETRIM[idx]=AString then
+    begin
+      Result:=idx;
+      break;
+    end;
+end;
+
 procedure Tform_Config.Save;
 var
-  Reg : TRegistry;                        
+  Reg : TRegistry;
   idx: Integer;
 begin
   Reg := TRegistry.Create;
@@ -235,7 +283,8 @@ begin
         TCustomHelp.WriteProviderToRegistry(IntToStr(idx),
                                             ListView1.Items[Idx].Caption,
                                             ListView1.Items[Idx].SubItems[0],
-                                            ListView1.Items[Idx].SubItems[1]);
+                                            ListView1.Items[Idx].SubItems[1],
+                                            TrimOptionFromString(ListView1.Items[Idx].SubItems[2]));
       end;
     end; 
   finally
@@ -244,6 +293,7 @@ begin
 
   GlobalCustomHelp.ShowCustomHelpOnWelcomePage:=cbcusthelpwp.Checked;
   GlobalCustomHelp.PerformFullTextSearch:=cbFullTextSearch.Checked;
+  GlobalCustomHelp.TrimNamespacesUntilResultFound:=TNamespaceTrimOption(cbTrimNamespacesHX.ItemIndex);
 
   for idx := 0 to ListView2.Items.Count-1 do
     GlobalCustomHelp.WriteNamespacesToRegistry(ListView2.Items[idx].Caption, ListView2.Items[idx].Checked);

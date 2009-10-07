@@ -4,7 +4,7 @@ object form_Config: Tform_Config
   BorderStyle = bsSizeToolWin
   Caption = 'Configure Custom Help'
   ClientHeight = 539
-  ClientWidth = 686
+  ClientWidth = 743
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,12 +13,13 @@ object form_Config: Tform_Config
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
     AlignWithMargins = True
-    Left = 611
+    Left = 668
     Top = 3
     Width = 72
     Height = 533
@@ -52,7 +53,7 @@ object form_Config: Tform_Config
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 602
+    Width = 659
     Height = 533
     Align = alClient
     BevelOuter = bvNone
@@ -60,7 +61,7 @@ object form_Config: Tform_Config
     object GroupBox1: TGroupBox
       Left = 0
       Top = 42
-      Width = 602
+      Width = 659
       Height = 214
       Margins.Left = 2
       Margins.Top = 2
@@ -73,8 +74,8 @@ object form_Config: Tform_Config
         AlignWithMargins = True
         Left = 5
         Top = 18
-        Width = 592
-        Height = 166
+        Width = 649
+        Height = 148
         Align = alClient
         Checkboxes = True
         Columns = <
@@ -93,12 +94,19 @@ object form_Config: Tform_Config
       end
       object Panel4: TPanel
         Left = 2
-        Top = 187
-        Width = 598
-        Height = 25
+        Top = 169
+        Width = 655
+        Height = 43
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
+        object Label4: TLabel
+          Left = 6
+          Top = 22
+          Width = 176
+          Height = 13
+          Caption = 'Trim namespaces until result is found'
+        end
         object cbFullTextSearch: TCheckBox
           Left = 6
           Top = 3
@@ -109,12 +117,21 @@ object form_Config: Tform_Config
             'index searches are performed)'
           TabOrder = 0
         end
+        object cbTrimNamespacesHX: TComboBox
+          Left = 192
+          Top = 19
+          Width = 145
+          Height = 21
+          Style = csDropDownList
+          ItemHeight = 0
+          TabOrder = 1
+        end
       end
     end
     object Panel3: TGroupBox
       Left = 0
       Top = 0
-      Width = 602
+      Width = 659
       Height = 42
       Margins.Left = 2
       Margins.Top = 2
@@ -137,7 +154,7 @@ object form_Config: Tform_Config
     object GroupBox2: TGroupBox
       Left = 0
       Top = 256
-      Width = 602
+      Width = 659
       Height = 277
       Margins.Left = 2
       Margins.Top = 2
@@ -150,8 +167,8 @@ object form_Config: Tform_Config
         AlignWithMargins = True
         Left = 5
         Top = 18
-        Width = 592
-        Height = 182
+        Width = 649
+        Height = 159
         Align = alClient
         Columns = <
           item
@@ -165,6 +182,10 @@ object form_Config: Tform_Config
           item
             AutoSize = True
             Caption = 'URL (Keyword will be appended)'
+          end
+          item
+            Caption = 'Trim Namespaces'
+            Width = 80
           end>
         HideSelection = False
         ReadOnly = True
@@ -177,15 +198,15 @@ object form_Config: Tform_Config
       end
       object Panel2: TPanel
         Left = 2
-        Top = 203
-        Width = 598
-        Height = 72
+        Top = 180
+        Width = 655
+        Height = 95
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
         DesignSize = (
-          598
-          72)
+          655
+          95)
         object Label1: TLabel
           Left = 6
           Top = 6
@@ -207,10 +228,17 @@ object form_Config: Tform_Config
           Height = 13
           Caption = 'URL/Path'
         end
+        object Label8: TLabel
+          Left = 6
+          Top = 73
+          Width = 82
+          Height = 13
+          Caption = 'Trim namespaces'
+        end
         object edName: TEdit
           Left = 65
           Top = 3
-          Width = 530
+          Width = 587
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           Enabled = False
@@ -220,7 +248,7 @@ object form_Config: Tform_Config
         object edDesc: TEdit
           Left = 65
           Top = 26
-          Width = 530
+          Width = 587
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           Enabled = False
@@ -230,7 +258,7 @@ object form_Config: Tform_Config
         object edURL: TEdit
           Left = 65
           Top = 48
-          Width = 530
+          Width = 587
           Height = 21
           Hint = 
             '- URL to a webbased search provider (e.g. koders.com)'#13#10'- Path to' +
@@ -242,6 +270,16 @@ object form_Config: Tform_Config
           ShowHint = True
           TabOrder = 2
           OnChange = edURLChange
+        end
+        object cbTrimNamespacesOHS: TComboBox
+          Left = 94
+          Top = 70
+          Width = 145
+          Height = 21
+          Style = csDropDownList
+          ItemHeight = 0
+          TabOrder = 3
+          OnChange = cbTrimNamespacesOHSChange
         end
       end
     end
