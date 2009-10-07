@@ -100,7 +100,7 @@ type
     procedure DoGetHintSize(Node: PVirtualNode; Column: TColumnIndex; var R: TRect); override;
 
     procedure Click; override;
-    procedure HandleMouseDown(var Message: TWMMouse; const HitInfo: THitInfo); override;
+    procedure HandleMouseDown(var Message: TWMMouse; var HitInfo: THitInfo); override;
     procedure HandleMouseUp(var Message: TWMMouse; const HitInfo: THitInfo); override;
     function DoKeyAction(var CharCode: Word; var Shift: TShiftState): Boolean; override;
     procedure DoExit; override;
@@ -606,7 +606,7 @@ begin
 end;
 
 procedure TVirtualActionTree.HandleMouseDown(var Message: TWMMouse;
-  const HitInfo: THitInfo);
+  var HitInfo: THitInfo);
 begin
   inherited;
   FLeftMousePressed:=True;

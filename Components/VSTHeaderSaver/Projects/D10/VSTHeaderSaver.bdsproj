@@ -170,7 +170,9 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>  <Excluded_Packages>
+		</VersionInfoKeys>  
+    
+    <Excluded_Packages>
       <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\dclfs10.bpl">FastScript 1.9 Components</Excluded_Packages>
       <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\Fastreport_Components_D100.bpl">Fastreport Components</Excluded_Packages>
       <Excluded_Packages Name="d:\programme\borland\bds\4.0\Bin\dclbcbsmp100.bpl">Datei d:\programme\borland\bds\4.0\Bin\dclbcbsmp100.bpl nicht gefunden</Excluded_Packages>

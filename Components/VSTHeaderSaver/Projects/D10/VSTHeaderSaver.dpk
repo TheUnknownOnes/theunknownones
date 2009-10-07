@@ -40,7 +40,7 @@ requires
   vclx,
   vcldb,
   dbrtl,
-  XMLTools;
+  XMLTools_D100R;
 
 contains
   uVSTHeaderSaver in '..\..\uVSTHeaderSaver.pas';
