@@ -727,10 +727,15 @@ begin
 end;
 
 procedure TSetting.SetName(const Value: TSettingName);
+var
+  idx : Integer;
 begin
   FName := Value;
 
-  FIndex.Delete(FIndex.IndexOfObject(Self));
+  idx := FIndex.IndexOfObject(Self);
+  if idx > -1 then
+    FIndex.Delete(idx);
+    
   FIndex.AddObject(CalculatePath, Self);
 end;
 
