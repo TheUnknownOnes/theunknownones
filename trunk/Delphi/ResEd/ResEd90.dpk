@@ -1,0 +1,129 @@
+{ResEd ---- Project Resource Editor Expert for Delphi 2005 (2005-08-23)}
+
+{Version 1.1}
+
+{Copyright 2005 by Marco Warm, Germany, MarcoWarm@gmx.net}
+{        Editor by Benjamin Schwarze, Germany, chaosben@web.de}
+
+{
+ This is an expert designed for viewing editing 'all' .res files that are linked
+ to the active project. It will automatically search for all occurrences of
+ '$R xyz.res' lines and will open/create resourcefiles for them.
+
+ Don't be surprised since this Expert doesn't care of *.res :-(
+ This file is handled by the IDE and changing the underlying file at runtime will
+ srew it up.
+}
+
+{
+ you will need VirtualTreeView by Mike Lischke
+ you get it at http://www.delphi-gems.com/
+
+ if you decide to use the integrated resource editor you will need TMPHexEditor
+ by markus stephany http://www.mirkes.de/
+}
+
+{
+ The following list describes the units I used in this project.... please be sure
+ to read the credits in each unit since I didn't want to repeate them here.
+
+-- Essential Units for Res Ed ..... don't remove these ;-)
+
+      UnitResEdExpert, UnitResEdDataModule UnitResEdMain
+
+-- This one I need for some grepping fun ;-)
+   by Andrey V. Sorokin
+
+      RegExpr
+
+-- Units for Handling *.res Files
+   you may want to replace these with the package ResourceUtils90.dpk
+   by Colin Wilson http://www.wilsonc.demon.co.uk/
+   ... so, go ahead :-)
+
+      unitResFile, unitResourceDetails, unitResourceGIF, unitResourceGraphics,
+      unitResourceJPEG, unitResourcePNG, unitResourceRCData
+
+-- The following Image Format Units are also part of the package ImageTypes90.dpk
+   by Colin Wilson .... you can replace this one as well. But be aware of the note
+   below
+
+ -  Unit for handling GIF-Images by Anders Melander, anders@melander.dk
+
+        GIFImage
+
+ -  Units for handling PNG Images
+
+        PngImage, pnglang, pngzlib
+
+ -  Unit for handling Icon and Cursor Files
+    NOTE: I had to edit this one and I added a spoof class for TSharedImage named
+    TEXSharedImage. While running in a designtime package you must never never never
+    override the standard Icon class or the whole IDE gets screwed up (at least the
+    icon handling ;-)
+
+        unitExIcon
+}     
+
+package ResEd90;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'ResEd (Project Ressource Editor)'}
+{$DESIGNONLY}
+{$IMPLICITBUILD ON}
+{%File 'Source\defines.inc'}
+
+requires
+  designide,
+  vcljpg,
+  rtl,
+  vcl,
+  xmlrtl;
+
+contains
+  UnitResEdExpert in 'Source\UnitResEdExpert.pas',
+  UnitResEdDataModule in 'Source\UnitResEdDataModule.pas' {ResEdDataModule},
+  UnitResEdMain in 'Source\UnitResEdMain.pas' {FormWizardResEd},
+  unitResFile in 'ResourceUtils\unitResFile.pas',
+  unitResourceDetails in 'ResourceUtils\unitResourceDetails.pas',
+  unitResourceGIF in 'ResourceUtils\unitResourceGIF.pas',
+  unitResourceGraphics in 'ResourceUtils\unitResourceGraphics.pas',
+  unitResourceJPEG in 'ResourceUtils\unitResourceJPEG.pas',
+  unitResourcePNG in 'ResourceUtils\unitResourcePNG.pas',
+  unitResourceRCData in 'ResourceUtils\unitResourceRCData.pas',
+  RESEDRegExpr in 'Helper\RESEDRegExpr.pas',
+  ResEd_GIFImage in 'reImageTypes\ResEd_GIFImage.pas',
+  ResEd_PngImage in 'reImageTypes\ResEd_PngImage.pas',
+  ResEd_pnglang in 'reImageTypes\ResEd_pnglang.pas',
+  ResEd_pngzlib in 'reImageTypes\ResEd_pngzlib.pas',
+  ResEd_unitExIcon in 'reImageTypes\ResEd_unitExIcon.pas',
+  unitResourceMessages in 'ResourceUtils\unitResourceMessages.pas',
+  UnitResEdSLEditor in 'Source\UnitResEdSLEditor.pas' {FormResEdSLEditor},
+  ResEdVirtualTrees in 'VirtualTree\ResEdVirtualTrees.pas',
+  unitResourceDotNet in 'ResourceUtils\unitResourceDotNet.pas',
+  resx in 'ResourceUtils\resx.pas',
+  UnitResEdDotNetEditor in 'Source\UnitResEdDotNetEditor.pas',
+  UnitResEdListForm in 'Source\UnitResEdListForm.pas';
+
+end.

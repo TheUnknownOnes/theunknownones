@@ -1,0 +1,63 @@
+package CNA2_D120;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'CNA2 - Component Naming Assistant V.2 by TUO'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  designide,
+  Settings_D120R,
+  CommonTools_D120R,
+  vcl,
+  xmlrtl,
+  vclactnband,
+  vclx,
+  RTTIHelper_D120R;
+
+contains
+  uCNA2Settings in 'uCNA2Settings.pas',
+  uCNA2Main in 'uCNA2Main.pas',
+  uCNA2Visualizers in 'uCNA2Visualizers.pas',
+  uCNA2ConfigDialog in 'uCNA2ConfigDialog.pas' {CNA2ConfigDialog},
+  uCNA2Profiles in 'uCNA2Profiles.pas',
+  uCNA2Actions in 'uCNA2Actions.pas',
+  uCNA2ActSetValue in 'Actions\uCNA2ActSetValue.pas',
+  uCNA2ActSetValueConfig in 'Actions\uCNA2ActSetValueConfig.pas' {form_ConfigSetValue},
+  uCNA2ValueEditors in 'uCNA2ValueEditors.pas' {cna2ValueEditor: TFrame},
+  uCNA2ValueEditorString in 'ValueEditors\uCNA2ValueEditorString.pas' {cna2ValueEditorString: TFrame},
+  uCNA2ValueEditorChar in 'ValueEditors\uCNA2ValueEditorChar.pas' {cna2ValueEditorChar: TFrame},
+  uCNA2ValueEditorInteger in 'ValueEditors\uCNA2ValueEditorInteger.pas' {cna2ValueEditorInteger: TFrame},
+  uCNA2ValueEditorInt64 in 'ValueEditors\uCNA2ValueEditorInt64.pas' {cna2ValueEditorInt64: TFrame},
+  uCNA2ValueEditorFloat in 'ValueEditors\uCNA2ValueEditorFloat.pas' {cna2ValueEditorFloat: TFrame},
+  uCNA2ValueEditorEnum in 'ValueEditors\uCNA2ValueEditorEnum.pas' {cna2ValueEditorEnum: TFrame},
+  uCNA2ValueEditorSet in 'ValueEditors\uCNA2ValueEditorSet.pas' {cna2ValueEditorSet: TFrame},
+  uCNA2FormEditorHooks in 'uCNA2FormEditorHooks.pas',
+  uCNA2IDENotifier in 'uCNA2IDENotifier.pas',
+  uCNA2Worker in 'uCNA2Worker.pas',
+  uCNA2ValueEditorColor in 'ValueEditors\uCNA2ValueEditorColor.pas' {cna2ValueEditorColor: TFrame},
+  uCNA2ActCreateObject in 'Actions\uCNA2ActCreateObject.pas';
+
+end.

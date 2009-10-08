@@ -1,0 +1,42 @@
+package CustomHelp_D100;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'CustomHelp Expert ... by TUO'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  designide,
+  vclie;
+
+contains
+  uCustomHelpMain in '..\..\uCustomHelpMain.pas',
+  uCustomHelpSelector in '..\..\uCustomHelpSelector.pas' {FormHelpSelector},
+  uFormConfigCustomHelp in '..\..\uFormConfigCustomHelp.pas' {form_Config},
+  uCustomHelpIDEIntegration in '..\..\uCustomHelpIDEIntegration.pas',
+  uMSHelpServices in '..\..\uMSHelpServices.pas',
+  uHtmlHelp in '..\..\uHtmlHelp.pas';
+
+end.
