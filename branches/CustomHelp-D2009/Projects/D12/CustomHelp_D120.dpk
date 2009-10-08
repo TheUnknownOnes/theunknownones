@@ -11,12 +11,12 @@ package CustomHelp_D120;
 {$LOCALSYMBOLS ON}
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
-{$OPTIMIZATION ON}
+{$OPTIMIZATION OFF}
 {$OVERFLOWCHECKS OFF}
 {$RANGECHECKS OFF}
-{$REFERENCEINFO ON}
+{$REFERENCEINFO OFF}
 {$SAFEDIVIDE OFF}
-{$STACKFRAMES OFF}
+{$STACKFRAMES ON}
 {$TYPEDADDRESS OFF}
 {$VARSTRINGCHECKS ON}
 {$WRITEABLECONST OFF}
@@ -25,6 +25,7 @@ package CustomHelp_D120;
 {$DESCRIPTION 'CustomHelp Expert ... by TUO'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
+{$DEFINE DEBUG}
 
 requires
   rtl,
@@ -41,6 +42,7 @@ contains
   uFormConfigCustomHelp in '..\..\uFormConfigCustomHelp.pas' {form_Config},
   uCustomHelpIDEIntegration in '..\..\uCustomHelpIDEIntegration.pas',
   uHtmlHelp in '..\..\uHtmlHelp.pas',
+  uUtils in '..\..\uUtils.pas',
   uMSHelpServices in '..\..\uMSHelpServices.pas';
 
 end.
