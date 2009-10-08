@@ -48,9 +48,6 @@ type
   protected
     function SelectKeyword(Keywords: TStrings) : Integer;
     function TableOfContents(Contents: TStrings): Integer;
-  public
-    constructor Create; 
-    destructor destroy; override;
   end;
 
 implementation
@@ -217,16 +214,6 @@ begin
   end;
 end;
 
-constructor THelpSelector.Create;
-begin
-  
-end;
-
-destructor THelpSelector.destroy;
-begin
-  inherited;
-end;
-
 function THelpSelector.SelectKeyword(Keywords: TStrings): Integer;
 var
   idx : integer;
@@ -239,7 +226,7 @@ end;
 
 function THelpSelector.TableOfContents(Contents: TStrings): Integer;
 begin
-  Result:=0;
+  Result:=-1;
 end;
 
 procedure TFormHelpSelector.FormClose(Sender: TObject;
