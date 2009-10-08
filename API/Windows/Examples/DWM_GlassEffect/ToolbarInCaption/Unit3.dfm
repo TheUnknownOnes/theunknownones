@@ -1,0 +1,69 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 259
+  ClientWidth = 591
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  OnActivate = FormActivate
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnPaint = FormPaint
+  PixelsPerInch = 96
+  TextHeight = 13
+  object btn1: TToolBar
+    Left = 200
+    Top = 3
+    Width = 75
+    Height = 29
+    Align = alNone
+    ButtonHeight = 25
+    ButtonWidth = 25
+    Caption = 'btn1'
+    Color = clBlack
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentColor = False
+    ParentFont = False
+    TabOrder = 0
+    OnAdvancedCustomDrawButton = btn1AdvancedCustomDrawButton
+    OnCustomDraw = btn1CustomDraw
+    OnMouseMove = btn1MouseMove
+    object ToolButton1: TToolButton
+      Left = 0
+      Top = 0
+      Caption = 'kaffee'
+      ImageIndex = 0
+    end
+    object ToolButton2: TToolButton
+      Left = 25
+      Top = 0
+      Caption = 'kanne'
+      ImageIndex = 1
+      OnClick = ToolButton2Click
+    end
+    object ToolButton3: TToolButton
+      Left = 50
+      Top = 0
+      Caption = 'bohne'
+      ImageIndex = 2
+    end
+  end
+  object Button1: TButton
+    Left = 168
+    Top = 56
+    Width = 75
+    Height = 25
+    Caption = 'Button1'
+    TabOrder = 1
+  end
+end

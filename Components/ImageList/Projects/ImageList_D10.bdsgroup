@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{CA80DE91-504D-4CC7-9C71-BC518338A60A}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  
+    
+    <Projects>
+      <Projects Name="BaseImageList_D100R.bpl">D10\BaseImageList_D100R.bdsproj</Projects>
+      <Projects Name="ImageListProvider_D100R.bpl">D10\ImageListProvider_D100R.bdsproj</Projects>
+      <Projects Name="PNGImageList_D100R.bpl">D10\PNGImageList_D100R.bdsproj</Projects>
+      <Projects Name="ImageListProvider_D100D.bpl">D10\ImageListProvider_D100D.bdsproj</Projects>
+      <Projects Name="PNGImageList_D100D.bpl">D10\PNGImageList_D100D.bdsproj</Projects>
+      <Projects Name="PNGImageListDesigner_D100D.bpl">D10\PNGImageListDesigner_D100D.bdsproj</Projects>
+      <Projects Name="Targets">BaseImageList_D100R.bpl ImageListProvider_D100R.bpl PNGImageList_D100R.bpl ImageListProvider_D100D.bpl PNGImageList_D100D.bpl PNGImageListDesigner_D100D.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

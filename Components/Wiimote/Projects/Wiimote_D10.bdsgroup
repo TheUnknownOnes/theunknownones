@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{58986EE5-F6E7-4278-9140-E271616033D6}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="Wiimote_D100R.bpl">D10\Wiimote_D100R.bdsproj</Projects>
+      <Projects Name="Wiimote_D100D.bpl">D10\Wiimote_D100D.bdsproj</Projects>
+      <Projects Name="Example.exe">Example\Example.bdsproj</Projects>
+      <Projects Name="Targets">Wiimote_D100R.bpl Wiimote_D100D.bpl Example.exe</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

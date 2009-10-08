@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{3FE1F020-6F89-489F-A60A-6942C5BFF197}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="ConsoleTools_D100R.bpl">ConsoleTools\Projects\D10\ConsoleTools_D100R.bdsproj</Projects>
+      <Projects Name="ConsoleTools_D100D.bpl">ConsoleTools\Projects\D10\ConsoleTools_D100D.bdsproj</Projects>
+      <Projects Name="PNGUtils_D100R.bpl">PNGUtils\Projects\D10\PNGUtils_D100R.bdsproj</Projects>
+      <Projects Name="SearchEdit_D100R.bpl">SearchEdit\Projects\D10\SearchEdit_D100R.bdsproj</Projects>
+      <Projects Name="SearchEdit_D100D.bpl">SearchEdit\Projects\D10\SearchEdit_D100D.bdsproj</Projects>
+      <Projects Name="Settings_D100R.bpl">Settings\Projects\D10\Settings_D100R.bdsproj</Projects>
+      <Projects Name="Settings_D100D.bpl">Settings\Projects\D10\Settings_D100D.bdsproj</Projects>
+      <Projects Name="Settings_VirtualTrees_D100R.bpl">Settings\Projects\D10\Settings_VirtualTrees_D100R.bdsproj</Projects>
+      <Projects Name="Settings_VirtualTrees_D100D.bpl">Settings\Projects\D10\Settings_VirtualTrees_D100D.bdsproj</Projects>
+      <Projects Name="Wiimote_D100R.bpl">Wiimote\Projects\D10\Wiimote_D100R.bdsproj</Projects>
+      <Projects Name="Wiimote_D100D.bpl">Wiimote\Projects\D10\Wiimote_D100D.bdsproj</Projects>
+      <Projects Name="BaseImageList_D100R.bpl">ImageList\Projects\D10\BaseImageList_D100R.bdsproj</Projects>
+      <Projects Name="ImageListProvider_D100R.bpl">ImageList\Projects\D10\ImageListProvider_D100R.bdsproj</Projects>
+      <Projects Name="ImageListProvider_D100D.bpl">ImageList\Projects\D10\ImageListProvider_D100D.bdsproj</Projects>
+      <Projects Name="PNGImageList_D100R.bpl">ImageList\Projects\D10\PNGImageList_D100R.bdsproj</Projects>
+      <Projects Name="PNGImageList_D100D.bpl">ImageList\Projects\D10\PNGImageList_D100D.bdsproj</Projects>
+      <Projects Name="PNGImageListDesigner_D100D.bpl">ImageList\Projects\D10\PNGImageListDesigner_D100D.bdsproj</Projects>
+      <Projects Name="EffectPNG_D100R.bpl">EffectPNG\Projects\D10\EffectPNG_D100R.bdsproj</Projects>
+      <Projects Name="EffectPNGEdit_D100R.bpl">EffectPNG\Projects\D10\EffectPNGEdit_D100R.bdsproj</Projects>
+      <Projects Name="EffectPNGEdit_D100D.bpl">EffectPNG\Projects\D10\EffectPNGEdit_D100D.bdsproj</Projects>
+      <Projects Name="EffectPNGImage_D100R.bpl">EffectPNG\Projects\D10\EffectPNGImage_D100R.bdsproj</Projects>
+      <Projects Name="EffectPNGImage_D100D.bpl">EffectPNG\Projects\D10\EffectPNGImage_D100D.bdsproj</Projects>
+      <Projects Name="EffectPNGImageList_D100R.bpl">EffectPNG\Projects\D10\EffectPNGImageList_D100R.bdsproj</Projects>
+      <Projects Name="EffectPNGImageList_D100D.bpl">EffectPNG\Projects\D10\EffectPNGImageList_D100D.bdsproj</Projects>
+      <Projects Name="EffectPNGToolbar_D100R.bpl">EffectPNG\Projects\D10\EffectPNGToolbar_D100R.bdsproj</Projects>
+      <Projects Name="EffectPNGToolbar_D100D.bpl">EffectPNG\Projects\D10\EffectPNGToolbar_D100D.bdsproj</Projects>
+      <Projects Name="GroupListView_D100R.bpl">GroupListView\Projects\D10\GroupListView_D100R.bdsproj</Projects>
+      <Projects Name="GroupListView_D100D.bpl">GroupListView\Projects\D10\GroupListView_D100D.bdsproj</Projects>
+      <Projects Name="VirtualActionTree_D100R.bpl">VirtualActionTree\Projects\D10\VirtualActionTree_D100R.bdsproj</Projects>
+      <Projects Name="VirtualActionTree_D100D.bpl">VirtualActionTree\Projects\D10\VirtualActionTree_D100D.bdsproj</Projects>
+      <Projects Name="VSTSearchEdit_D100R.bpl">VSTSearchEdit\Projects\D10\VSTSearchEdit_D100R.bdsproj</Projects>
+      <Projects Name="VSTSearchEdit_D100D.bpl">VSTSearchEdit\Projects\D10\VSTSearchEdit_D100D.bdsproj</Projects>
+      <Projects Name="PSBuzz_D100R.bpl">PSBuzz\Projects\D10\PSBuzz_D100R.bdsproj</Projects>
+      <Projects Name="PSBuzz_D100D.bpl">PSBuzz\Projects\D10\PSBuzz_D100D.bdsproj</Projects>
+      <Projects Name="Targets">ConsoleTools_D100R.bpl ConsoleTools_D100D.bpl PNGUtils_D100R.bpl SearchEdit_D100R.bpl SearchEdit_D100D.bpl Settings_D100R.bpl Settings_D100D.bpl Settings_VirtualTrees_D100R.bpl Settings_VirtualTrees_D100D.bpl Wiimote_D100R.bpl Wiimote_D100D.bpl BaseImageList_D100R.bpl ImageListProvider_D100R.bpl ImageListProvider_D100D.bpl PNGImageList_D100R.bpl PNGImageList_D100D.bpl PNGImageListDesigner_D100D.bpl EffectPNG_D100R.bpl EffectPNGEdit_D100R.bpl EffectPNGEdit_D100D.bpl EffectPNGImage_D100R.bpl EffectPNGImage_D100D.bpl EffectPNGImageList_D100R.bpl EffectPNGImageList_D100D.bpl EffectPNGToolbar_D100R.bpl EffectPNGToolbar_D100D.bpl GroupListView_D100R.bpl GroupListView_D100D.bpl VirtualActionTree_D100R.bpl VirtualActionTree_D100D.bpl VSTSearchEdit_D100R.bpl VSTSearchEdit_D100D.bpl PSBuzz_D100R.bpl PSBuzz_D100D.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

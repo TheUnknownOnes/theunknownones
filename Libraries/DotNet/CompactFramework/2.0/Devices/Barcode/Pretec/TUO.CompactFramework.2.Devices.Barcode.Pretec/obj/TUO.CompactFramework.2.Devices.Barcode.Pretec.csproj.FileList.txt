@@ -1,0 +1,8 @@
+obj\Debug\ResolveAssemblyReference.cache
+bin\Debug\TUO.CompactFramework.2.Devices.Barcode.Pretec.dll
+bin\Debug\TUO.CompactFramework.2.Devices.Barcode.Pretec.pdb
+obj\Debug\TUO.CompactFramework.2.Devices.Barcode.Pretec.dll
+obj\Debug\TUO.CompactFramework.2.Devices.Barcode.Pretec.pdb
+bin\Release\TUO.CompactFramework.2.Devices.Barcode.Pretec.dll
+obj\Release\ResolveAssemblyReference.cache
+obj\Release\TUO.CompactFramework.2.Devices.Barcode.Pretec.dll

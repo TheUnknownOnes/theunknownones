@@ -1,0 +1,444 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{FE2C6C87-997E-4809-8C9A-0EF556F1AD6E}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="ConsoleTools\Projects\D12\ConsoleTools_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ConsoleTools\Projects\D12\ConsoleTools_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\D12\EffectPNGEdit_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\D12\EffectPNGEdit_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\D12\EffectPNGImage_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\D12\EffectPNGImage_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\D12\EffectPNGImageList_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\D12\EffectPNGImageList_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\D12\EffectPNGToolbar_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\D12\EffectPNGToolbar_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\D12\EffectPNG_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="GroupListView\Projects\D12\GroupListView_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="GroupListView\Projects\D12\GroupListView_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ImageList\Projects\D12\PNGImageList_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ImageList\Projects\D12\PNGImageList_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ImageList\Projects\D12\PNGImageListDesigner_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ImageList\Projects\D12\BaseImageList_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ImageList\Projects\D12\ImageListProvider_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ImageList\Projects\D12\ImageListProvider_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="NPipe\packages\NPipe_D120.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="PNGUtils\Projects\D12\PNGUtils_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="SearchEdit\Projects\D12\SearchEdit_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="SearchEdit\Projects\D12\SearchEdit_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Settings\Projects\D12\Settings_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Settings\Projects\D12\Settings_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Settings\Projects\D12\Settings_VirtualTrees_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Settings\Projects\D12\Settings_VirtualTrees_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="VirtualActionTree\Projects\D12\VirtualActionTree_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="VirtualActionTree\Projects\D12\VirtualActionTree_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="VSTSearchEdit\Projects\D12\VSTSearchEdit_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="VSTSearchEdit\Projects\D12\VSTSearchEdit_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Wiimote\Projects\D12\Wiimote_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Wiimote\Projects\D12\Wiimote_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="YearCalendar\Projects\D12\YearCalendar_D120.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="VNCWrapper\projects\D120\VNCWrapper_D120.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="ConsoleTools_D120D">
+			<MSBuild Projects="ConsoleTools\Projects\D12\ConsoleTools_D120D.dproj"/>
+		</Target>
+		<Target Name="ConsoleTools_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="ConsoleTools\Projects\D12\ConsoleTools_D120D.dproj"/>
+		</Target>
+		<Target Name="ConsoleTools_D120D:Make">
+			<MSBuild Targets="Make" Projects="ConsoleTools\Projects\D12\ConsoleTools_D120D.dproj"/>
+		</Target>
+		<Target Name="ConsoleTools_D120R">
+			<MSBuild Projects="ConsoleTools\Projects\D12\ConsoleTools_D120R.dproj"/>
+		</Target>
+		<Target Name="ConsoleTools_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="ConsoleTools\Projects\D12\ConsoleTools_D120R.dproj"/>
+		</Target>
+		<Target Name="ConsoleTools_D120R:Make">
+			<MSBuild Targets="Make" Projects="ConsoleTools\Projects\D12\ConsoleTools_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNGEdit_D120D">
+			<MSBuild Projects="EffectPNG\Projects\D12\EffectPNGEdit_D120D.dproj"/>
+		</Target>
+		<Target Name="EffectPNGEdit_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="EffectPNG\Projects\D12\EffectPNGEdit_D120D.dproj"/>
+		</Target>
+		<Target Name="EffectPNGEdit_D120D:Make">
+			<MSBuild Targets="Make" Projects="EffectPNG\Projects\D12\EffectPNGEdit_D120D.dproj"/>
+		</Target>
+		<Target Name="EffectPNGEdit_D120R">
+			<MSBuild Projects="EffectPNG\Projects\D12\EffectPNGEdit_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNGEdit_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="EffectPNG\Projects\D12\EffectPNGEdit_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNGEdit_D120R:Make">
+			<MSBuild Targets="Make" Projects="EffectPNG\Projects\D12\EffectPNGEdit_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImage_D120D">
+			<MSBuild Projects="EffectPNG\Projects\D12\EffectPNGImage_D120D.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImage_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="EffectPNG\Projects\D12\EffectPNGImage_D120D.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImage_D120D:Make">
+			<MSBuild Targets="Make" Projects="EffectPNG\Projects\D12\EffectPNGImage_D120D.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImage_D120R">
+			<MSBuild Projects="EffectPNG\Projects\D12\EffectPNGImage_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImage_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="EffectPNG\Projects\D12\EffectPNGImage_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImage_D120R:Make">
+			<MSBuild Targets="Make" Projects="EffectPNG\Projects\D12\EffectPNGImage_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImageList_D120D">
+			<MSBuild Projects="EffectPNG\Projects\D12\EffectPNGImageList_D120D.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImageList_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="EffectPNG\Projects\D12\EffectPNGImageList_D120D.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImageList_D120D:Make">
+			<MSBuild Targets="Make" Projects="EffectPNG\Projects\D12\EffectPNGImageList_D120D.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImageList_D120R">
+			<MSBuild Projects="EffectPNG\Projects\D12\EffectPNGImageList_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImageList_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="EffectPNG\Projects\D12\EffectPNGImageList_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImageList_D120R:Make">
+			<MSBuild Targets="Make" Projects="EffectPNG\Projects\D12\EffectPNGImageList_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNGToolbar_D120D">
+			<MSBuild Projects="EffectPNG\Projects\D12\EffectPNGToolbar_D120D.dproj"/>
+		</Target>
+		<Target Name="EffectPNGToolbar_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="EffectPNG\Projects\D12\EffectPNGToolbar_D120D.dproj"/>
+		</Target>
+		<Target Name="EffectPNGToolbar_D120D:Make">
+			<MSBuild Targets="Make" Projects="EffectPNG\Projects\D12\EffectPNGToolbar_D120D.dproj"/>
+		</Target>
+		<Target Name="EffectPNGToolbar_D120R">
+			<MSBuild Projects="EffectPNG\Projects\D12\EffectPNGToolbar_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNGToolbar_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="EffectPNG\Projects\D12\EffectPNGToolbar_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNGToolbar_D120R:Make">
+			<MSBuild Targets="Make" Projects="EffectPNG\Projects\D12\EffectPNGToolbar_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNG_D120R">
+			<MSBuild Projects="EffectPNG\Projects\D12\EffectPNG_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNG_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="EffectPNG\Projects\D12\EffectPNG_D120R.dproj"/>
+		</Target>
+		<Target Name="EffectPNG_D120R:Make">
+			<MSBuild Targets="Make" Projects="EffectPNG\Projects\D12\EffectPNG_D120R.dproj"/>
+		</Target>
+		<Target Name="GroupListView_D120D">
+			<MSBuild Projects="GroupListView\Projects\D12\GroupListView_D120D.dproj"/>
+		</Target>
+		<Target Name="GroupListView_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="GroupListView\Projects\D12\GroupListView_D120D.dproj"/>
+		</Target>
+		<Target Name="GroupListView_D120D:Make">
+			<MSBuild Targets="Make" Projects="GroupListView\Projects\D12\GroupListView_D120D.dproj"/>
+		</Target>
+		<Target Name="GroupListView_D120R">
+			<MSBuild Projects="GroupListView\Projects\D12\GroupListView_D120R.dproj"/>
+		</Target>
+		<Target Name="GroupListView_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="GroupListView\Projects\D12\GroupListView_D120R.dproj"/>
+		</Target>
+		<Target Name="GroupListView_D120R:Make">
+			<MSBuild Targets="Make" Projects="GroupListView\Projects\D12\GroupListView_D120R.dproj"/>
+		</Target>
+		<Target Name="PNGImageList_D120D">
+			<MSBuild Projects="ImageList\Projects\D12\PNGImageList_D120D.dproj"/>
+		</Target>
+		<Target Name="PNGImageList_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="ImageList\Projects\D12\PNGImageList_D120D.dproj"/>
+		</Target>
+		<Target Name="PNGImageList_D120D:Make">
+			<MSBuild Targets="Make" Projects="ImageList\Projects\D12\PNGImageList_D120D.dproj"/>
+		</Target>
+		<Target Name="PNGImageList_D120R">
+			<MSBuild Projects="ImageList\Projects\D12\PNGImageList_D120R.dproj"/>
+		</Target>
+		<Target Name="PNGImageList_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="ImageList\Projects\D12\PNGImageList_D120R.dproj"/>
+		</Target>
+		<Target Name="PNGImageList_D120R:Make">
+			<MSBuild Targets="Make" Projects="ImageList\Projects\D12\PNGImageList_D120R.dproj"/>
+		</Target>
+		<Target Name="PNGImageListDesigner_D120D">
+			<MSBuild Projects="ImageList\Projects\D12\PNGImageListDesigner_D120D.dproj"/>
+		</Target>
+		<Target Name="PNGImageListDesigner_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="ImageList\Projects\D12\PNGImageListDesigner_D120D.dproj"/>
+		</Target>
+		<Target Name="PNGImageListDesigner_D120D:Make">
+			<MSBuild Targets="Make" Projects="ImageList\Projects\D12\PNGImageListDesigner_D120D.dproj"/>
+		</Target>
+		<Target Name="BaseImageList_D120R">
+			<MSBuild Projects="ImageList\Projects\D12\BaseImageList_D120R.dproj"/>
+		</Target>
+		<Target Name="BaseImageList_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="ImageList\Projects\D12\BaseImageList_D120R.dproj"/>
+		</Target>
+		<Target Name="BaseImageList_D120R:Make">
+			<MSBuild Targets="Make" Projects="ImageList\Projects\D12\BaseImageList_D120R.dproj"/>
+		</Target>
+		<Target Name="ImageListProvider_D120D">
+			<MSBuild Projects="ImageList\Projects\D12\ImageListProvider_D120D.dproj"/>
+		</Target>
+		<Target Name="ImageListProvider_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="ImageList\Projects\D12\ImageListProvider_D120D.dproj"/>
+		</Target>
+		<Target Name="ImageListProvider_D120D:Make">
+			<MSBuild Targets="Make" Projects="ImageList\Projects\D12\ImageListProvider_D120D.dproj"/>
+		</Target>
+		<Target Name="ImageListProvider_D120R">
+			<MSBuild Projects="ImageList\Projects\D12\ImageListProvider_D120R.dproj"/>
+		</Target>
+		<Target Name="ImageListProvider_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="ImageList\Projects\D12\ImageListProvider_D120R.dproj"/>
+		</Target>
+		<Target Name="ImageListProvider_D120R:Make">
+			<MSBuild Targets="Make" Projects="ImageList\Projects\D12\ImageListProvider_D120R.dproj"/>
+		</Target>
+		<Target Name="NPipe_D120">
+			<MSBuild Projects="NPipe\packages\NPipe_D120.dproj"/>
+		</Target>
+		<Target Name="NPipe_D120:Clean">
+			<MSBuild Targets="Clean" Projects="NPipe\packages\NPipe_D120.dproj"/>
+		</Target>
+		<Target Name="NPipe_D120:Make">
+			<MSBuild Targets="Make" Projects="NPipe\packages\NPipe_D120.dproj"/>
+		</Target>
+		<Target Name="PNGUtils_D120R">
+			<MSBuild Projects="PNGUtils\Projects\D12\PNGUtils_D120R.dproj"/>
+		</Target>
+		<Target Name="PNGUtils_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="PNGUtils\Projects\D12\PNGUtils_D120R.dproj"/>
+		</Target>
+		<Target Name="PNGUtils_D120R:Make">
+			<MSBuild Targets="Make" Projects="PNGUtils\Projects\D12\PNGUtils_D120R.dproj"/>
+		</Target>
+		<Target Name="SearchEdit_D120D">
+			<MSBuild Projects="SearchEdit\Projects\D12\SearchEdit_D120D.dproj"/>
+		</Target>
+		<Target Name="SearchEdit_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="SearchEdit\Projects\D12\SearchEdit_D120D.dproj"/>
+		</Target>
+		<Target Name="SearchEdit_D120D:Make">
+			<MSBuild Targets="Make" Projects="SearchEdit\Projects\D12\SearchEdit_D120D.dproj"/>
+		</Target>
+		<Target Name="SearchEdit_D120R">
+			<MSBuild Projects="SearchEdit\Projects\D12\SearchEdit_D120R.dproj"/>
+		</Target>
+		<Target Name="SearchEdit_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="SearchEdit\Projects\D12\SearchEdit_D120R.dproj"/>
+		</Target>
+		<Target Name="SearchEdit_D120R:Make">
+			<MSBuild Targets="Make" Projects="SearchEdit\Projects\D12\SearchEdit_D120R.dproj"/>
+		</Target>
+		<Target Name="Settings_D120D">
+			<MSBuild Projects="Settings\Projects\D12\Settings_D120D.dproj"/>
+		</Target>
+		<Target Name="Settings_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="Settings\Projects\D12\Settings_D120D.dproj"/>
+		</Target>
+		<Target Name="Settings_D120D:Make">
+			<MSBuild Targets="Make" Projects="Settings\Projects\D12\Settings_D120D.dproj"/>
+		</Target>
+		<Target Name="Settings_D120R">
+			<MSBuild Projects="Settings\Projects\D12\Settings_D120R.dproj"/>
+		</Target>
+		<Target Name="Settings_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="Settings\Projects\D12\Settings_D120R.dproj"/>
+		</Target>
+		<Target Name="Settings_D120R:Make">
+			<MSBuild Targets="Make" Projects="Settings\Projects\D12\Settings_D120R.dproj"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees_D120D">
+			<MSBuild Projects="Settings\Projects\D12\Settings_VirtualTrees_D120D.dproj"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="Settings\Projects\D12\Settings_VirtualTrees_D120D.dproj"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees_D120D:Make">
+			<MSBuild Targets="Make" Projects="Settings\Projects\D12\Settings_VirtualTrees_D120D.dproj"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees_D120R">
+			<MSBuild Projects="Settings\Projects\D12\Settings_VirtualTrees_D120R.dproj"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="Settings\Projects\D12\Settings_VirtualTrees_D120R.dproj"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees_D120R:Make">
+			<MSBuild Targets="Make" Projects="Settings\Projects\D12\Settings_VirtualTrees_D120R.dproj"/>
+		</Target>
+		<Target Name="VirtualActionTree_D120D">
+			<MSBuild Projects="VirtualActionTree\Projects\D12\VirtualActionTree_D120D.dproj"/>
+		</Target>
+		<Target Name="VirtualActionTree_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="VirtualActionTree\Projects\D12\VirtualActionTree_D120D.dproj"/>
+		</Target>
+		<Target Name="VirtualActionTree_D120D:Make">
+			<MSBuild Targets="Make" Projects="VirtualActionTree\Projects\D12\VirtualActionTree_D120D.dproj"/>
+		</Target>
+		<Target Name="VirtualActionTree_D120R">
+			<MSBuild Projects="VirtualActionTree\Projects\D12\VirtualActionTree_D120R.dproj"/>
+		</Target>
+		<Target Name="VirtualActionTree_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="VirtualActionTree\Projects\D12\VirtualActionTree_D120R.dproj"/>
+		</Target>
+		<Target Name="VirtualActionTree_D120R:Make">
+			<MSBuild Targets="Make" Projects="VirtualActionTree\Projects\D12\VirtualActionTree_D120R.dproj"/>
+		</Target>
+		<Target Name="VSTSearchEdit_D120D">
+			<MSBuild Projects="VSTSearchEdit\Projects\D12\VSTSearchEdit_D120D.dproj"/>
+		</Target>
+		<Target Name="VSTSearchEdit_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="VSTSearchEdit\Projects\D12\VSTSearchEdit_D120D.dproj"/>
+		</Target>
+		<Target Name="VSTSearchEdit_D120D:Make">
+			<MSBuild Targets="Make" Projects="VSTSearchEdit\Projects\D12\VSTSearchEdit_D120D.dproj"/>
+		</Target>
+		<Target Name="VSTSearchEdit_D120R">
+			<MSBuild Projects="VSTSearchEdit\Projects\D12\VSTSearchEdit_D120R.dproj"/>
+		</Target>
+		<Target Name="VSTSearchEdit_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="VSTSearchEdit\Projects\D12\VSTSearchEdit_D120R.dproj"/>
+		</Target>
+		<Target Name="VSTSearchEdit_D120R:Make">
+			<MSBuild Targets="Make" Projects="VSTSearchEdit\Projects\D12\VSTSearchEdit_D120R.dproj"/>
+		</Target>
+		<Target Name="Wiimote_D120D">
+			<MSBuild Projects="Wiimote\Projects\D12\Wiimote_D120D.dproj"/>
+		</Target>
+		<Target Name="Wiimote_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="Wiimote\Projects\D12\Wiimote_D120D.dproj"/>
+		</Target>
+		<Target Name="Wiimote_D120D:Make">
+			<MSBuild Targets="Make" Projects="Wiimote\Projects\D12\Wiimote_D120D.dproj"/>
+		</Target>
+		<Target Name="Wiimote_D120R">
+			<MSBuild Projects="Wiimote\Projects\D12\Wiimote_D120R.dproj"/>
+		</Target>
+		<Target Name="Wiimote_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="Wiimote\Projects\D12\Wiimote_D120R.dproj"/>
+		</Target>
+		<Target Name="Wiimote_D120R:Make">
+			<MSBuild Targets="Make" Projects="Wiimote\Projects\D12\Wiimote_D120R.dproj"/>
+		</Target>
+		<Target Name="YearCalendar_D120">
+			<MSBuild Projects="YearCalendar\Projects\D12\YearCalendar_D120.dproj"/>
+		</Target>
+		<Target Name="YearCalendar_D120:Clean">
+			<MSBuild Targets="Clean" Projects="YearCalendar\Projects\D12\YearCalendar_D120.dproj"/>
+		</Target>
+		<Target Name="YearCalendar_D120:Make">
+			<MSBuild Targets="Make" Projects="YearCalendar\Projects\D12\YearCalendar_D120.dproj"/>
+		</Target>
+		<Target Name="VNCWrapper_D120">
+			<MSBuild Projects="VNCWrapper\projects\D120\VNCWrapper_D120.dproj"/>
+		</Target>
+		<Target Name="VNCWrapper_D120:Clean">
+			<MSBuild Targets="Clean" Projects="VNCWrapper\projects\D120\VNCWrapper_D120.dproj"/>
+		</Target>
+		<Target Name="VNCWrapper_D120:Make">
+			<MSBuild Targets="Make" Projects="VNCWrapper\projects\D120\VNCWrapper_D120.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="ConsoleTools_D120D;ConsoleTools_D120R;EffectPNGEdit_D120D;EffectPNGEdit_D120R;EffectPNGImage_D120D;EffectPNGImage_D120R;EffectPNGImageList_D120D;EffectPNGImageList_D120R;EffectPNGToolbar_D120D;EffectPNGToolbar_D120R;EffectPNG_D120R;GroupListView_D120D;GroupListView_D120R;PNGImageList_D120D;PNGImageList_D120R;PNGImageListDesigner_D120D;BaseImageList_D120R;ImageListProvider_D120D;ImageListProvider_D120R;NPipe_D120;PNGUtils_D120R;SearchEdit_D120D;SearchEdit_D120R;Settings_D120D;Settings_D120R;Settings_VirtualTrees_D120D;Settings_VirtualTrees_D120R;VirtualActionTree_D120D;VirtualActionTree_D120R;VSTSearchEdit_D120D;VSTSearchEdit_D120R;Wiimote_D120D;Wiimote_D120R;YearCalendar_D120;VNCWrapper_D120"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="ConsoleTools_D120D:Clean;ConsoleTools_D120R:Clean;EffectPNGEdit_D120D:Clean;EffectPNGEdit_D120R:Clean;EffectPNGImage_D120D:Clean;EffectPNGImage_D120R:Clean;EffectPNGImageList_D120D:Clean;EffectPNGImageList_D120R:Clean;EffectPNGToolbar_D120D:Clean;EffectPNGToolbar_D120R:Clean;EffectPNG_D120R:Clean;GroupListView_D120D:Clean;GroupListView_D120R:Clean;PNGImageList_D120D:Clean;PNGImageList_D120R:Clean;PNGImageListDesigner_D120D:Clean;BaseImageList_D120R:Clean;ImageListProvider_D120D:Clean;ImageListProvider_D120R:Clean;NPipe_D120:Clean;PNGUtils_D120R:Clean;SearchEdit_D120D:Clean;SearchEdit_D120R:Clean;Settings_D120D:Clean;Settings_D120R:Clean;Settings_VirtualTrees_D120D:Clean;Settings_VirtualTrees_D120R:Clean;VirtualActionTree_D120D:Clean;VirtualActionTree_D120R:Clean;VSTSearchEdit_D120D:Clean;VSTSearchEdit_D120R:Clean;Wiimote_D120D:Clean;Wiimote_D120R:Clean;YearCalendar_D120:Clean;VNCWrapper_D120:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="ConsoleTools_D120D:Make;ConsoleTools_D120R:Make;EffectPNGEdit_D120D:Make;EffectPNGEdit_D120R:Make;EffectPNGImage_D120D:Make;EffectPNGImage_D120R:Make;EffectPNGImageList_D120D:Make;EffectPNGImageList_D120R:Make;EffectPNGToolbar_D120D:Make;EffectPNGToolbar_D120R:Make;EffectPNG_D120R:Make;GroupListView_D120D:Make;GroupListView_D120R:Make;PNGImageList_D120D:Make;PNGImageList_D120R:Make;PNGImageListDesigner_D120D:Make;BaseImageList_D120R:Make;ImageListProvider_D120D:Make;ImageListProvider_D120R:Make;NPipe_D120:Make;PNGUtils_D120R:Make;SearchEdit_D120D:Make;SearchEdit_D120R:Make;Settings_D120D:Make;Settings_D120R:Make;Settings_VirtualTrees_D120D:Make;Settings_VirtualTrees_D120R:Make;VirtualActionTree_D120D:Make;VirtualActionTree_D120R:Make;VSTSearchEdit_D120D:Make;VSTSearchEdit_D120R:Make;Wiimote_D120D:Make;Wiimote_D120R:Make;YearCalendar_D120:Make;VNCWrapper_D120:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>
