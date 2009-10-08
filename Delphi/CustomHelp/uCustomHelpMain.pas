@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, Forms, Dialogs, ToolsAPI, Menus, Registry, HelpIntfs, Windows,
-  uMSHelpServices, uHtmlHelp, WinHelpViewer;
+  uMSHelpServices, uHtmlHelp;
 
 type
   TNamespaceTrimOption = (nstoNoTrim=0, nstoTrimFirst, nstoTrimAll);
@@ -22,8 +22,6 @@ type
   TCustomHelp = class
   private
     FLastKeyword: String;
-    FViewer: TCustomHelpViewer;
-    FViewerIntf: ICustomHelpViewer;
 
     function GetNamespaces: IHxRegNamespaceList;
     procedure SetFullTextSearch(const Value: Boolean);
@@ -86,6 +84,8 @@ type
     function TrimNamespace(var s: string; ATrimOption: TNamespaceTrimOption): Boolean;
     procedure InternalShutDown;
   protected
+    constructor Create;
+    destructor Destroy; override;
     {$REGION 'ICustomHelpViewer'}
     function  GetViewerName : String;
     function  UnderstandsKeyword(const HelpString: String): Integer;
@@ -140,6 +140,9 @@ const
 
 var
   GlobalCustomHelp : TCustomHelp;
+
+  HelpViewer: TCustomHelpViewer;
+  HelpViewerIntf: ICustomHelpViewer;
 
 implementation
 
@@ -312,6 +315,18 @@ begin
   finally
     sl.Free;
   end;                 
+end;
+
+constructor TCustomHelpViewer.Create;
+begin
+  inherited Create;
+  HelpViewerIntf := Self;
+end;
+
+destructor TCustomHelpViewer.Destroy;
+begin
+  HelpViewer := nil;
+  inherited Destroy;
 end;
 
 function TCustomHelpViewer.ForceSelector(const HelpString: String): String;
@@ -513,9 +528,8 @@ begin
   FEnabledhxSessions:=TInterfaceList.Create;
   FProvider := TStringList.Create;
 
-  FViewer:=TCustomHelpViewer.Create;
-  FViewerIntf:=FViewer;
-  RegisterViewer(FViewerIntf, FViewer.FHelpManager);
+  HelpViewer:=TCustomHelpViewer.Create;
+  RegisterViewer(HelpViewerIntf, HelpViewer.FHelpManager);
 
   ConnectToIDE;
   LoadProviderFromRegistry;
@@ -576,10 +590,10 @@ begin
   FEnabledhxSessions.Free;
   FProvider.Free;
 
-  if Assigned(FViewer.FHelpManager) then
-    FViewer.InternalShutDown;
-  FViewerIntf := nil;
-             
+  if Assigned(HelpViewer.FHelpManager) then
+    HelpViewer.InternalShutDown; 
+  HelpViewer := nil;
+
   inherited;
 end;
 

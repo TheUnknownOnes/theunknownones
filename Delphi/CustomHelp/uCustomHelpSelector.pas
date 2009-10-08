@@ -126,11 +126,13 @@ var
   idx : Integer;
   c, d, u, g : String;
   o : Integer;
+  selector : TFormHelpSelector;
 begin
   Result:=False;
   SelectedIndex:=-1;
   SelectedUrl:='';
-  with TFormHelpSelector.Create(nil) do
+  Selector:=TFormHelpSelector.Create(nil);
+  with Selector do
   begin
     InitList(Keywords);
 
