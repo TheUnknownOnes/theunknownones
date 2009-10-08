@@ -218,13 +218,12 @@ begin
 end;
 
 constructor THelpSelector.Create;
-begin     
-  ShowMessage('abc');
+begin
+  
 end;
 
 destructor THelpSelector.destroy;
 begin
-  ShowMessage('xyz');
   inherited;
 end;
 
