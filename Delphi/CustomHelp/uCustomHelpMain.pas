@@ -449,8 +449,14 @@ begin
 end;
 
 procedure TCustomHelpViewer.InternalShutDown;
+var
+  hs : IHelpSystem;
 begin
   SoftShutDown;
+  if GetHelpSystem(hs) then
+  begin
+    hs.AssignHelpSelector(nil);
+  end;
   if Assigned(FHelpManager) then
   begin
     HelpManager.Release(FViewerID);
