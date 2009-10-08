@@ -11,22 +11,25 @@ interface
 
 uses
   Classes, Forms, Dialogs, ToolsAPI, Menus, Registry, HelpIntfs, Windows,
-  uMSHelpServices, uHtmlHelp;
+  uMSHelpServices, uHtmlHelp, WinHelpViewer;
 
 type
   TNamespaceTrimOption = (nstoNoTrim=0, nstoTrimFirst, nstoTrimAll);
+
+  TCustomHelpViewer = class;
 
   //Das Hauptobjekt
   TCustomHelp = class
   private
     FLastKeyword: String;
+    FViewer: TCustomHelpViewer;
+    FViewerIntf: ICustomHelpViewer;
+
     function GetNamespaces: IHxRegNamespaceList;
     procedure SetFullTextSearch(const Value: Boolean);
     procedure SetShowCustomHelpOnWP(const Value: Boolean);
     procedure SetTrimNamespaces(const Value: TNamespaceTrimOption);
   protected
-    FHelpManager : IHelpManager;
-
     FMenuItem : TMenuItem;
 
     FProvider : TStringList;
@@ -69,8 +72,10 @@ type
     class procedure ReadSettingsFromRegistry(const ANameValueList: TStrings);
   end;
 
-  TMyViewer = class(TInterfacedObject, ICustomHelpViewer)
+  TCustomHelpViewer = class(TInterfacedObject, ICustomHelpViewer)
   private
+    FHelpManager: IHelpManager;
+    FViewerID: Integer;
     procedure ShowHTMLHelp(AURL: String);
     function ForceSelector(const HelpString: String): String;
     function GetNamespaceTitle(Session : IHxSession) : String;
@@ -79,6 +84,8 @@ type
     function QueryInHxSession(hxSession: IHxSession; const HelpString: string;
       var AResult: TStringList): Boolean;
     function TrimNamespace(var s: string; ATrimOption: TNamespaceTrimOption): Boolean;
+    procedure InternalShutDown;
+  protected
     {$REGION 'ICustomHelpViewer'}
     function  GetViewerName : String;
     function  UnderstandsKeyword(const HelpString: String): Integer;
@@ -90,6 +97,8 @@ type
     procedure SoftShutDown;
     procedure ShutDown;
     {$ENDREGION}
+
+    property HelpManager : IHelpManager read FHelpManager write FHelpManager;
   end;
 
 const
@@ -128,6 +137,7 @@ const
   SETTINGS_TRIMNAMESPACES = 'TrimNamespaces';
 
   GROUP_LABEL_DEFAULT = 'Available Search engines';
+
 var
   GlobalCustomHelp : TCustomHelp;
 
@@ -137,17 +147,14 @@ uses
   SysUtils, uCustomHelpSelector, StrUtils, ShellAPI, uFormConfigCustomHelp,
   uCustomHelpIDEIntegration, Graphics;
 
-var
-  vi : Integer;
+{ TCustomHelpViewer }
 
-{ TMyViewer }
-
-function TMyViewer.CanShowTableOfContents: Boolean;
+function TCustomHelpViewer.CanShowTableOfContents: Boolean;
 begin      
   Result := false;
 end;
 
-function TMyViewer.GetHelpStrings(const HelpString: String): TStringList;
+function TCustomHelpViewer.GetHelpStrings(const HelpString: String): TStringList;
 var
   idx, idy : Integer;
   c, d, u, g : String;
@@ -249,7 +256,7 @@ begin
   end;
 end;
 
-function TMyViewer.GetNamespaceTitle(Session: IHxSession): String;
+function TCustomHelpViewer.GetNamespaceTitle(Session: IHxSession): String;
 var
   NamespaceName : String;
   idx : integer;
@@ -265,19 +272,19 @@ begin
   end;
 end;
 
-function TMyViewer.GetViewerName: String;
+function TCustomHelpViewer.GetViewerName: String;
 begin
   Result := 'CustomHelpViewer';
 end;
 
-procedure TMyViewer.NotifyID(const ViewerID: Integer);
+procedure TCustomHelpViewer.NotifyID(const ViewerID: Integer);
 begin
   //Das Hilfesystem sagt uns, welche ID wir bekommen haben
   //Die brauchen wir am Ende zum freigeben
-  vi := ViewerID;
+  FViewerID := ViewerID;
 end;
 
-procedure TMyViewer.ShowHTMLHelp(AURL: String);
+procedure TCustomHelpViewer.ShowHTMLHelp(AURL: String);
 var
   SearchRecord : tagHH_AKLINK;
   sl : TStringList;
@@ -307,7 +314,7 @@ begin
   end;                 
 end;
 
-function TMyViewer.ForceSelector(const HelpString: String): String;
+function TCustomHelpViewer.ForceSelector(const HelpString: String): String;
 var
   sl : TStringList;
   i : integer;
@@ -319,7 +326,7 @@ begin
     Result:=u;
 end;
 
-procedure TMyViewer.ShowHelp(const HelpString: String);
+procedure TCustomHelpViewer.ShowHelp(const HelpString: String);
 var
   c,d,u,g: String;
   o: Integer;
@@ -376,15 +383,18 @@ begin
   end;
 end;
 
-procedure TMyViewer.ShowTableOfContents;
+procedure TCustomHelpViewer.ShowTableOfContents;
 begin
 end;
 
-procedure TMyViewer.ShutDown;
+procedure TCustomHelpViewer.ShutDown;
 begin
+  SoftShutDown;
+  if Assigned(FHelpManager) then
+    HelpManager := nil;
 end;
 
-function TMyViewer.TrimNamespace(var s: string; ATrimOption: TNamespaceTrimOption): Boolean;
+function TCustomHelpViewer.TrimNamespace(var s: string; ATrimOption: TNamespaceTrimOption): Boolean;
 begin
   Result:=True;
   if ATrimOption=nstoNoTrim then
@@ -398,7 +408,7 @@ begin
     TrimNamespace(s, nstoTrimAll);
 end;
 
-function TMyViewer.SearchInHxSession(hxSession: IHxSession;
+function TCustomHelpViewer.SearchInHxSession(hxSession: IHxSession;
   const HelpString: string; var AResult: TStringList;
   hxIndex: IHxIndex): Boolean;
 var
@@ -423,7 +433,17 @@ begin
   end;
 end;
 
-function TMyViewer.QueryInHxSession(hxSession: IHxSession;
+procedure TCustomHelpViewer.InternalShutDown;
+begin
+  SoftShutDown;
+  if Assigned(FHelpManager) then
+  begin
+    HelpManager.Release(FViewerID);
+    HelpManager := nil;
+  end;
+end;
+
+function TCustomHelpViewer.QueryInHxSession(hxSession: IHxSession;
   const HelpString: string; var AResult: TStringList): Boolean;
 var
   Topics: IHxTopicList;
@@ -443,11 +463,11 @@ begin
   end;
 end;
 
-procedure TMyViewer.SoftShutDown;
+procedure TCustomHelpViewer.SoftShutDown;
 begin  
 end;
 
-function TMyViewer.UnderstandsKeyword(const HelpString: String): Integer;
+function TCustomHelpViewer.UnderstandsKeyword(const HelpString: String): Integer;
 var
   hs : IHelpSystem;
 begin
@@ -487,17 +507,15 @@ begin
 end;
 
 constructor TCustomHelp.Create;
-var
-  intf : ICustomHelpViewer;
+var                               
   hs : IHelpSystem;
 begin
   FEnabledhxSessions:=TInterfaceList.Create;
-  FHelpManager := nil;
-  intf:=TMyViewer.Create;
-
   FProvider := TStringList.Create;
 
-  RegisterViewer(intf, FHelpManager);
+  FViewer:=TCustomHelpViewer.Create;
+  FViewerIntf:=FViewer;
+  RegisterViewer(FViewerIntf, FViewer.FHelpManager);
 
   ConnectToIDE;
   LoadProviderFromRegistry;
@@ -548,7 +566,7 @@ begin
     TrimOption:=TNamespaceTrimOption(StrToIntDef(sl[4],0));
     sl.Free;
     Result:=True;
-  end;           
+  end;
 end;
 
 destructor TCustomHelp.Destroy;
@@ -558,9 +576,10 @@ begin
   FEnabledhxSessions.Free;
   FProvider.Free;
 
-  if Assigned(FHelpManager) then
-    FHelpManager.Release(vi);
-  
+  if Assigned(FViewer.FHelpManager) then
+    FViewer.InternalShutDown;
+  FViewerIntf := nil;
+             
   inherited;
 end;
 
