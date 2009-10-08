@@ -27,8 +27,9 @@ or
   * Other Help Sources
     You may add URLs of your favourite online help provider (e.g. google codesearch) be aware that the keyword is appended to the URL. You may as well add a path to a `*`.hlp or `*`.chm file. Those help sources will be searched using the index. If the help file does not support index queries the help will not work.
 
-A full description as well as a demo video can be found here-> http://www.delphipraxis.net/topic165769_ideexperte+customhelp.html&highlight=
+A full description can be found here-> http://www.delphipraxis.net/topic165769_ideexperte+customhelp.html&highlight=
 it's German ... sorry ;-)
+A short demo video is available here -> http://theunknownones.googlecode.com/svn/Videos/
 
 Have fun with it
 by TUO
