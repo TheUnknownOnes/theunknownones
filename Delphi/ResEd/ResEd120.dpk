@@ -1,0 +1,136 @@
+{ResEd ---- Project Resource Editor Expert for Delphi 2005 (2005-08-23)}
+
+{Version 1.1}
+
+{Copyright 2005 by Marco Warm, Germany, MarcoWarm@gmx.net}
+{        Editor by Benjamin Schwarze, Germany, chaosben@web.de}
+
+{
+ This is an expert designed for viewing editing 'all' .res files that are linked
+ to the active project. It will automatically search for all occurrences of
+ '$R xyz.res' lines and will open/create resourcefiles for them.
+
+ Don't be surprised since this Expert doesn't care of *.res :-(
+ This file is handled by the IDE and changing the underlying file at runtime will
+ srew it up.
+
+ Additionally it supports ResX Files under .Net personalities. (not as perfect
+ as I would want it to)
+}
+
+{
+ The following list describes the units I used in this project.... please be sure
+ to read the credits in each unit since I didn't want to repeate them here.
+
+-- Essential Units for Res Ed ..... don't remove these ;-)
+
+      UnitResEdExpert, UnitResEdDataModule UnitResEdMain
+
+-- This one I need for some grepping fun ;-)
+   by Andrey V. Sorokin
+
+      RegExpr
+
+-- For some visual fun we need VirtualTreeView by Mike Lischke
+   http://www.delphi-gems.com/
+
+      ResEdVirtualTrees
+
+-- Units for Handling *.res and *.resx Files
+   are partly based on the package ResourceUtils90.dpk by Colin Wilson
+   http://www.wilsonc.demon.co.uk/ but I reworked them and added dotNet ResX
+   support. I fixed a lot of bugs especially in the VersionInfo resource
+   Element. But I would not pretend it to be bug free now.
+
+      unitResFile, unitResourceElement, unitResourceGIF, unitResourceGraphics,
+      unitResourceJPEG, unitResourcePNG, unitResourceRCData,
+      dotNet: unitResourceDotNet, resx
+
+-- The following Image Format Units are part of the package ImageTypes90.dpk
+   by Colin Wilson .... you can replace this one as well. But be aware of the note
+   below
+
+ -  Unit for handling GIF-Images by Anders Melander, anders@melander.dk
+
+        GIFImage
+
+ -  Units for handling PNG Images
+
+        PngImage, pnglang, pngzlib
+
+ -  Unit for handling Icon and Cursor Files
+    NOTE: I had to edit this one and removed the registration of TExIcon as
+    default handler for *.ico files.. While running in a designtime package you
+    must never never never override the standard Icon class or the whole IDE
+    gets screwed up (at least the icon handling ;-). Additionally it now supports
+    256x256 pixel PNG icons (Vista like)
+
+        unitExIcon
+}     
+
+package ResEd120;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'ResEd (Project Ressource Editor)'}
+{$DESIGNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  designide,
+  rtl,
+  vcl,
+  tuoscript120,
+  VirtualTreesD12,
+  vclx,
+  vclimg;
+
+contains
+  UnitResEdExpert in 'Source\UnitResEdExpert.pas',
+  UnitResEdDataModule in 'Source\UnitResEdDataModule.pas' {ResEdDataModule},
+  UnitResEdMain in 'Source\UnitResEdMain.pas' {FormWizardResEd},
+  unitResFile in 'ResourceUtils\unitResFile.pas',
+  unitResourceElement in 'ResourceUtils\unitResourceElement.pas',
+  unitResourceGIF in 'ResourceUtils\unitResourceGIF.pas',
+  unitResourceGraphics in 'ResourceUtils\unitResourceGraphics.pas',
+  unitResourceJPEG in 'ResourceUtils\unitResourceJPEG.pas',
+  unitResourcePNG in 'ResourceUtils\unitResourcePNG.pas',
+  unitResourceRCData in 'ResourceUtils\unitResourceRCData.pas',
+  RESEDRegExpr in 'Helper\RESEDRegExpr.pas',
+  ResEd_unitExIcon in 'reImageTypes\ResEd_unitExIcon.pas',
+  unitResourceMessages in 'ResourceUtils\unitResourceMessages.pas',
+  UnitResEdSLEditor in 'Source\UnitResEdSLEditor.pas' {FormResEdSLEditor},
+  UnitResEdListForm in 'Source\UnitResEdListForm.pas' {ResEdListForm},
+  unitResourceDotNet in 'ResourceUtils\unitResourceDotNet.pas',
+  resx in 'ResourceUtils\resx.pas',
+  UnitResEdDotNetEditor in 'Source\UnitResEdDotNetEditor.pas' {ResEdDotNetEdit},
+  unitResourceVersionInfo in 'ResourceUtils\unitResourceVersionInfo.pas',
+  UnitResEdVIEditor in 'Source\UnitResEdVIEditor.pas' {FormResEdVIEditor},
+  unitResourceXPManifests in 'ResourceUtils\unitResourceXPManifests.pas',
+  UnitResEdManifestEditor in 'Source\UnitResEdManifestEditor.pas' {FormResEdManifestEditor},
+  UnitMSXML2_TLB in 'Source\UnitMSXML2_TLB.pas',
+  ResEdVirtualTrees in 'VirtualTree\ResEdVirtualTrees.pas',
+  ResEdVTAccessibility in 'VirtualTree\ResEdVTAccessibility.pas',
+  ResEdVTAccessibilityFactory in 'VirtualTree\ResEdVTAccessibilityFactory.pas';
+
+end.

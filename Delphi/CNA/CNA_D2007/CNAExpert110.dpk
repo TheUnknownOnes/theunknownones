@@ -1,0 +1,47 @@
+package CNAExpert110;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'CNA (Component Naming Assistent)'}
+{$IMPLICITBUILD OFF}
+
+requires
+  designide,
+  rtl,
+  vcl;
+
+contains
+  UnitCNAMain in 'UnitCNAMain.pas',
+  UnitCNAData in '..\CNA_D2005\UnitCNAData.pas' {CNADataModule},
+  UnitCNATypes in '..\CNA_D2005\UnitCNATypes.pas',
+  unitCNALangs in '..\CNA_D2005\unitCNALangs.pas',
+  unitCNAConfig in '..\CNA_D2005\unitCNAConfig.pas' {formConfig},
+  UnitCNAEditProperty in '..\CNA_D2005\UnitCNAEditProperty.pas' {FormCNAPropEdBase},
+  UnitCNAEditPropertyEnumeration in '..\CNA_D2005\UnitCNAEditPropertyEnumeration.pas' {FormCNAPropEdEnum},
+  UnitCNAEditPropertySet in '..\CNA_D2005\UnitCNAEditPropertySet.pas' {FormCNAPropEdSet},
+  UnitCNAEditPropertyInteger in '..\CNA_D2005\UnitCNAEditPropertyInteger.pas' {FormCNAPropEdInteger},
+  UnitCNAEditPropertyString in '..\CNA_D2005\UnitCNAEditPropertyString.pas' {FormCNAPropEdString},
+  UnitCNAEditPropertyFloat in '..\CNA_D2005\UnitCNAEditPropertyFloat.pas' {FormCNAPropEdFloat},
+  UnitCNAEditName in '..\CNA_D2005\UnitCNAEditName.pas' {formName};
+
+end.
