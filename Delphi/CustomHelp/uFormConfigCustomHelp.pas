@@ -230,12 +230,13 @@ end;
 procedure Tform_Config.ListView1DblClick(Sender: TObject);
 var
   item : TListItem;
+  idx : Integer;
 begin
   if ListView1.Selected = FInsertItem  then
   begin
     item:=ListView1.Items.Add;
-    item.SubItems.Add('');
-    item.SubItems.Add('');
+    for idx := 0 to ListView1.Columns.Count - 2 do
+      item.SubItems.Add('');
 
     ListView1.Selected:=item;
     ListView1.ItemFocused:=item;
