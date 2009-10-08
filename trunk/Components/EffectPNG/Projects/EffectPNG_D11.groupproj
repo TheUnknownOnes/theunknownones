@@ -1,0 +1,114 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{1e6ae9dd-1832-4034-98f3-c321549b8dd6}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="D11\EffectPNGEdit_D110D.dproj" />
+    <Projects Include="D11\EffectPNGEdit_D110R.dproj" />
+    <Projects Include="D11\EffectPNGImageList_D110D.dproj" />
+    <Projects Include="D11\EffectPNGImageList_D110R.dproj" />
+    <Projects Include="D11\EffectPNGImage_D110D.dproj" />
+    <Projects Include="D11\EffectPNGImage_D110R.dproj" />
+    <Projects Include="D11\EffectPNGToolbar_D110D.dproj" />
+    <Projects Include="D11\EffectPNGToolbar_D110R.dproj" />
+    <Projects Include="D11\EffectPNG_D110R.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="EffectPNG_D110R">
+    <MSBuild Projects="D11\EffectPNG_D110R.dproj" Targets="" />
+  </Target>
+  <Target Name="EffectPNG_D110R:Clean">
+    <MSBuild Projects="D11\EffectPNG_D110R.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="EffectPNG_D110R:Make">
+    <MSBuild Projects="D11\EffectPNG_D110R.dproj" Targets="Make" />
+  </Target>
+  <Target Name="EffectPNGEdit_D110R">
+    <MSBuild Projects="D11\EffectPNGEdit_D110R.dproj" Targets="" />
+  </Target>
+  <Target Name="EffectPNGEdit_D110R:Clean">
+    <MSBuild Projects="D11\EffectPNGEdit_D110R.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="EffectPNGEdit_D110R:Make">
+    <MSBuild Projects="D11\EffectPNGEdit_D110R.dproj" Targets="Make" />
+  </Target>
+  <Target Name="EffectPNGImage_D110R">
+    <MSBuild Projects="D11\EffectPNGImage_D110R.dproj" Targets="" />
+  </Target>
+  <Target Name="EffectPNGImage_D110R:Clean">
+    <MSBuild Projects="D11\EffectPNGImage_D110R.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="EffectPNGImage_D110R:Make">
+    <MSBuild Projects="D11\EffectPNGImage_D110R.dproj" Targets="Make" />
+  </Target>
+  <Target Name="EffectPNGImageList_D110R">
+    <MSBuild Projects="D11\EffectPNGImageList_D110R.dproj" Targets="" />
+  </Target>
+  <Target Name="EffectPNGImageList_D110R:Clean">
+    <MSBuild Projects="D11\EffectPNGImageList_D110R.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="EffectPNGImageList_D110R:Make">
+    <MSBuild Projects="D11\EffectPNGImageList_D110R.dproj" Targets="Make" />
+  </Target>
+  <Target Name="EffectPNGToolbar_D110R">
+    <MSBuild Projects="D11\EffectPNGToolbar_D110R.dproj" Targets="" />
+  </Target>
+  <Target Name="EffectPNGToolbar_D110R:Clean">
+    <MSBuild Projects="D11\EffectPNGToolbar_D110R.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="EffectPNGToolbar_D110R:Make">
+    <MSBuild Projects="D11\EffectPNGToolbar_D110R.dproj" Targets="Make" />
+  </Target>
+  <Target Name="EffectPNGEdit_D110D">
+    <MSBuild Projects="D11\EffectPNGEdit_D110D.dproj" Targets="" />
+  </Target>
+  <Target Name="EffectPNGEdit_D110D:Clean">
+    <MSBuild Projects="D11\EffectPNGEdit_D110D.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="EffectPNGEdit_D110D:Make">
+    <MSBuild Projects="D11\EffectPNGEdit_D110D.dproj" Targets="Make" />
+  </Target>
+  <Target Name="EffectPNGImage_D110D">
+    <MSBuild Projects="D11\EffectPNGImage_D110D.dproj" Targets="" />
+  </Target>
+  <Target Name="EffectPNGImage_D110D:Clean">
+    <MSBuild Projects="D11\EffectPNGImage_D110D.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="EffectPNGImage_D110D:Make">
+    <MSBuild Projects="D11\EffectPNGImage_D110D.dproj" Targets="Make" />
+  </Target>
+  <Target Name="EffectPNGImageList_D110D">
+    <MSBuild Projects="D11\EffectPNGImageList_D110D.dproj" Targets="" />
+  </Target>
+  <Target Name="EffectPNGImageList_D110D:Clean">
+    <MSBuild Projects="D11\EffectPNGImageList_D110D.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="EffectPNGImageList_D110D:Make">
+    <MSBuild Projects="D11\EffectPNGImageList_D110D.dproj" Targets="Make" />
+  </Target>
+  <Target Name="EffectPNGToolbar_D110D">
+    <MSBuild Projects="D11\EffectPNGToolbar_D110D.dproj" Targets="" />
+  </Target>
+  <Target Name="EffectPNGToolbar_D110D:Clean">
+    <MSBuild Projects="D11\EffectPNGToolbar_D110D.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="EffectPNGToolbar_D110D:Make">
+    <MSBuild Projects="D11\EffectPNGToolbar_D110D.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="EffectPNG_D110R;EffectPNGEdit_D110R;EffectPNGImage_D110R;EffectPNGImageList_D110R;EffectPNGToolbar_D110R;EffectPNGEdit_D110D;EffectPNGImage_D110D;EffectPNGImageList_D110D;EffectPNGToolbar_D110D" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="EffectPNG_D110R:Clean;EffectPNGEdit_D110R:Clean;EffectPNGImage_D110R:Clean;EffectPNGImageList_D110R:Clean;EffectPNGToolbar_D110R:Clean;EffectPNGEdit_D110D:Clean;EffectPNGImage_D110D:Clean;EffectPNGImageList_D110D:Clean;EffectPNGToolbar_D110D:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="EffectPNG_D110R:Make;EffectPNGEdit_D110R:Make;EffectPNGImage_D110R:Make;EffectPNGImageList_D110R:Make;EffectPNGToolbar_D110R:Make;EffectPNGEdit_D110D:Make;EffectPNGImage_D110D:Make;EffectPNGImageList_D110D:Make;EffectPNGToolbar_D110D:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

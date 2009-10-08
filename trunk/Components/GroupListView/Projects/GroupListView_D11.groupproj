@@ -1,0 +1,44 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{c0493beb-c892-4b28-8542-c1afb7ed923d}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="D11\GroupListView_D110D.dproj" />
+    <Projects Include="D11\GroupListView_D110R.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="GroupListView_D110R">
+    <MSBuild Projects="D11\GroupListView_D110R.dproj" Targets="" />
+  </Target>
+  <Target Name="GroupListView_D110R:Clean">
+    <MSBuild Projects="D11\GroupListView_D110R.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="GroupListView_D110R:Make">
+    <MSBuild Projects="D11\GroupListView_D110R.dproj" Targets="Make" />
+  </Target>
+  <Target Name="GroupListView_D110D">
+    <MSBuild Projects="D11\GroupListView_D110D.dproj" Targets="" />
+  </Target>
+  <Target Name="GroupListView_D110D:Clean">
+    <MSBuild Projects="D11\GroupListView_D110D.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="GroupListView_D110D:Make">
+    <MSBuild Projects="D11\GroupListView_D110D.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="GroupListView_D110R;GroupListView_D110D" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="GroupListView_D110R:Clean;GroupListView_D110D:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="GroupListView_D110R:Make;GroupListView_D110D:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

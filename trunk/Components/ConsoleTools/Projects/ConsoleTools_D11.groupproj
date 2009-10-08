@@ -1,0 +1,44 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{fe74d2aa-d576-4db9-aa9b-d9cd73a39e31}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="D11\ConsoleTools_D110D.dproj" />
+    <Projects Include="D11\ConsoleTools_D110R.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="ConsoleTools_D110R">
+    <MSBuild Projects="D11\ConsoleTools_D110R.dproj" Targets="" />
+  </Target>
+  <Target Name="ConsoleTools_D110R:Clean">
+    <MSBuild Projects="D11\ConsoleTools_D110R.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ConsoleTools_D110R:Make">
+    <MSBuild Projects="D11\ConsoleTools_D110R.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ConsoleTools_D110D">
+    <MSBuild Projects="D11\ConsoleTools_D110D.dproj" Targets="" />
+  </Target>
+  <Target Name="ConsoleTools_D110D:Clean">
+    <MSBuild Projects="D11\ConsoleTools_D110D.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ConsoleTools_D110D:Make">
+    <MSBuild Projects="D11\ConsoleTools_D110D.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="ConsoleTools_D110R;ConsoleTools_D110D" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="ConsoleTools_D110R:Clean;ConsoleTools_D110D:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="ConsoleTools_D110R:Make;ConsoleTools_D110D:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>
