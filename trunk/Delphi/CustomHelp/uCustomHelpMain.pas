@@ -90,22 +90,26 @@ type
     FHandledSchemes: TStringList;
     FReplaceDefaultViewer: boolean;
     FShowOHSAtTop: boolean;
+    FCheckWinHelpGid: Boolean;
     procedure SetReplaceDefaultViewer(const Value: boolean);
     function GetRedirectSchemes: string;
     procedure SetRedirectSchemes(const Value: string);
     procedure SetShowOHSAtTop(const Value: boolean);
+    procedure SetCheckWinHelpGid(const Value: Boolean);
   public
 //    function HelpFile: string;
     procedure InitHelpSelector(const HelpString: string);
     function IsHandledByDefaultViewer(const AKeyword: string): boolean;
     property ReplaceDefaultViewer: boolean read FReplaceDefaultViewer write SetReplaceDefaultViewer;
     property ShowOHSAtTop: boolean read FShowOHSAtTop write SetShowOHSAtTop;
+    property CheckWinHelpGid: Boolean read FCheckWinHelpGid write SetCheckWinHelpGid;
     property RedirectSchemes: string read GetRedirectSchemes write SetRedirectSchemes;
     class function GetTopicFromURL(const URL: string; var Group: string): IHxTopic; overload;
     class function GetTopicFromURL(hxHierarchy: IHxHierarchy; const URL: string): IHxTopic; overload;
     class function GetTopicInfo(const URL: string; out Caption, Description, Link, Group: string;
       out TrimOption: TNamespaceTrimOption): boolean;
     class function DecodeURL(const URL: String; out Link: String): boolean; overload;
+    class function CheckGidFile(AWinHelpFile: String): Boolean; static;
   end;
 
   TCustomHelpViewer = class(TInterfacedObject, ICustomHelpViewer)
@@ -170,6 +174,7 @@ const
   SETTINGS_FULLTEXTSEARCH = 'FullTextSearch';
   SETTINGS_TRIMNAMESPACES = 'TrimNamespaces';
   SETTINGS_OHSATTOP = 'DisplayOHSAtTop';
+  SETTING_WINHELPGIDCHECK = 'CheckWinHelpGID';
   SETTINGS_HANDLEDSCHEMES = 'HandledSchemes';
   SETTINGS_REPLACEDEFAULT = 'ReplaceDefaultViewer';
 
@@ -276,19 +281,30 @@ begin
         if not TCustomHelp.DecodeURL(GlobalCustomHelp.ProviderList.Strings[idx], c, d, u, g, TrimOption) then
           Continue;
 
+        ShortHelpString:=HelpString;
+        TCustomHelp.TrimNamespace(ShortHelpString, TrimOption);
+
         if Pos('://', u)>0 then
         begin
-          HelpStrings.Add(TCustomHelp.EncodeURL(c,d,u+EncodedHelpString(HelpString), g, TrimOption))
+          HelpStrings.Add(TCustomHelp.EncodeURL(c,d,u+EncodedHelpString(ShortHelpString), g, TrimOption))
         end
         else
         if AnsiSameText(ExtractFileExt(u),'.hlp') then
         begin
-          HelpStrings.Add(TCustomHelp.EncodeURL(c,d,'winhlp://-k '+HelpString+' '+u, g, TrimOption))
+          ShortHelpString:=AnsiReplaceStr(ShortHelpString, '.', ',');
+
+          if (not GlobalCustomHelp.CheckWinHelpGid) or
+             TCustomHelp.CheckGidFile(u) then
+          begin
+            if (not GlobalCustomHelp.CheckWinHelpGid) or
+               FileContainsText(u, ShortHelpString) then
+              HelpStrings.Add(TCustomHelp.EncodeURL(c,d,'winhlp://-k '+ShortHelpString+' '+u, g, TrimOption));
+          end;
         end
         else
         if AnsiSameText(ExtractFileExt(u),'.chm') then
         begin
-          HelpStrings.Add(TCustomHelp.EncodeURL(c,d,'htmlhlp://'+HelpString+URL_SPLITTER+u, g, TrimOption));
+          HelpStrings.Add(TCustomHelp.EncodeURL(c,d,'htmlhlp://'+ShortHelpString+URL_SPLITTER+u, g, TrimOption));
         end;
       end;
 
@@ -1046,6 +1062,12 @@ begin
   end;
 end;
 
+procedure TCustomHelp.SetCheckWinHelpGid(const Value: Boolean);
+begin
+  FCheckWinHelpGid := Value;
+  TCustomHelp.WriteSettingToRegistry(SETTING_WINHELPGIDCHECK, IntToStr(byte(Value)));
+end;
+
 procedure TCustomHelp.SetFullTextSearch(const Value: Boolean);
 begin
   FFullTextSearch := Value;
@@ -1080,6 +1102,18 @@ procedure TCustomHelp.SetTrimNamespaces(const Value: TNamespaceTrimOption);
 begin
   FTrimNamespaces := Value;
   TCustomHelp.WriteSettingToRegistry(SETTINGS_TRIMNAMESPACES, IntToStr(byte(Value)));
+end;
+
+class function TCustomHelp.CheckGidFile(AWinHelpFile: String): Boolean;
+var
+  GIDFile : String;
+begin
+  GIDFile:=ChangeFileExt(AWinHelpFile, '.gid');
+
+  Result:=FileExists(GIDFile);
+  if not Result then
+    ShowMessage('No *.gid file available for '+AWinHelpFile+' no help query possible.'+
+                #13#10'Please open the help file using winhlp32.exe and generate indes manually');
 end;
 
 class procedure TCustomHelp.WriteSettingToRegistry(AName, AValue: String);

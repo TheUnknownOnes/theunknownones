@@ -3,7 +3,7 @@ object form_Config: Tform_Config
   Top = 0
   BorderStyle = bsSizeToolWin
   Caption = 'Configure Custom Help'
-  ClientHeight = 607
+  ClientHeight = 578
   ClientWidth = 743
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -23,10 +23,11 @@ object form_Config: Tform_Config
     Left = 668
     Top = 3
     Width = 72
-    Height = 601
+    Height = 572
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitHeight = 601
     object Button1: TButton
       AlignWithMargins = True
       Left = 3
@@ -55,10 +56,11 @@ object form_Config: Tform_Config
     Left = 3
     Top = 3
     Width = 659
-    Height = 601
+    Height = 572
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitHeight = 601
     object grpHelpNamespaces: TGroupBox
       Left = 0
       Top = 81
@@ -189,20 +191,21 @@ object form_Config: Tform_Config
       Left = 0
       Top = 295
       Width = 659
-      Height = 265
+      Height = 277
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2
       Margins.Bottom = 2
-      Align = alTop
+      Align = alClient
       Caption = 'Other Help Sources'
       TabOrder = 2
+      ExplicitHeight = 265
       object ListView1: TListView
         AlignWithMargins = True
         Left = 5
-        Top = 41
+        Top = 64
         Width = 649
-        Height = 125
+        Height = 114
         Align = alClient
         Columns = <
           item
@@ -229,15 +232,18 @@ object form_Config: Tform_Config
         OnChange = ListView1Change
         OnDblClick = ListView1DblClick
         OnKeyDown = ListView1KeyDown
+        ExplicitTop = 41
+        ExplicitHeight = 125
       end
       object pnlOHSItem: TPanel
         Left = 2
-        Top = 169
+        Top = 181
         Width = 655
         Height = 94
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
+        ExplicitTop = 169
         DesignSize = (
           655
           94)
@@ -325,6 +331,21 @@ object form_Config: Tform_Config
         Align = alTop
         Caption = 'Display other help sources at the top of the result list'
         TabOrder = 2
+        ExplicitLeft = 7
+        ExplicitTop = 5
+      end
+      object cbCheckGID: TCheckBox
+        AlignWithMargins = True
+        Left = 5
+        Top = 41
+        Width = 649
+        Height = 17
+        Align = alTop
+        Caption = 
+          'check winhelp sources (*.hlp files) if keyword is valid (help re' +
+          'quest may be a bit slower)'
+        TabOrder = 3
+        ExplicitLeft = 10
       end
     end
   end

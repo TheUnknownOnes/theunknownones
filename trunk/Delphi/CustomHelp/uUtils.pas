@@ -40,7 +40,7 @@ implementation
 
 uses
   StrUtils,
-  Windows;
+  Windows, Classes;
 
 {$if not Defined(PosStr) OR not Defined(PosText)}
 function SearchBuf(const s: String; const delim: String;
@@ -197,7 +197,7 @@ var
   procedure LowerLastChar();
   begin
     if FileBufferLastChar^ in ['A'..'Z'] then
-      FileBufferLastChar^ := Chr(Ord(FileBufferLastChar^) + $20);
+      FileBufferLastChar^ := AnsiChar(Ord(FileBufferLastChar^) + $20);
   end;
 begin
   Result := false;
