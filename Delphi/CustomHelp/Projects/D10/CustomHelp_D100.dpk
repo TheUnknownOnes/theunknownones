@@ -38,7 +38,6 @@ contains
   uCustomHelpIDEIntegration in '..\..\uCustomHelpIDEIntegration.pas',
   uMSHelpServices in '..\..\uMSHelpServices.pas',
   uHtmlHelp in '..\..\uHtmlHelp.pas',
-  uUtils in '..\..\uUtils.pas',
-  uWinHelpViewer in '..\..\uWinHelpViewer.pas';
+  uUtils in '..\..\uUtils.pas';
 
 end.
