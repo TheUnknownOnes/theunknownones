@@ -243,6 +243,8 @@ begin
     item:=ListView1.Items.Add;
     item.SubItems.Add('');
     item.SubItems.Add('');
+    item.SubItems.Add('');
+    item.SubItems.Add('');
 
     ListView1.Selected:=item;
     ListView1.ItemFocused:=item;
