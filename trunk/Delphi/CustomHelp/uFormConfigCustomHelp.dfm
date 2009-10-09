@@ -3,7 +3,7 @@ object form_Config: Tform_Config
   Top = 0
   BorderStyle = bsSizeToolWin
   Caption = 'Configure Custom Help'
-  ClientHeight = 539
+  ClientHeight = 607
   ClientWidth = 743
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -13,6 +13,7 @@ object form_Config: Tform_Config
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  ShowHint = True
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
@@ -22,7 +23,7 @@ object form_Config: Tform_Config
     Left = 668
     Top = 3
     Width = 72
-    Height = 533
+    Height = 601
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 0
@@ -54,13 +55,13 @@ object form_Config: Tform_Config
     Left = 3
     Top = 3
     Width = 659
-    Height = 533
+    Height = 601
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
-    object GroupBox1: TGroupBox
+    object grpHelpNamespaces: TGroupBox
       Left = 0
-      Top = 42
+      Top = 81
       Width = 659
       Height = 214
       Margins.Left = 2
@@ -70,7 +71,7 @@ object form_Config: Tform_Config
       Align = alTop
       Caption = 'Help Namespaces'
       TabOrder = 0
-      object ListView2: TListView
+      object lvNamespaces: TListView
         AlignWithMargins = True
         Left = 5
         Top = 18
@@ -123,16 +124,16 @@ object form_Config: Tform_Config
           Width = 145
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 1
         end
       end
     end
-    object Panel3: TGroupBox
+    object grpHelpDisplay: TGroupBox
       Left = 0
       Top = 0
       Width = 659
-      Height = 42
+      Height = 81
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2
@@ -140,35 +141,68 @@ object form_Config: Tform_Config
       Align = alTop
       Caption = 'Help Display'
       TabOrder = 1
+      DesignSize = (
+        659
+        81)
+      object Label5: TLabel
+        Left = 8
+        Top = 57
+        Width = 84
+        Height = 13
+        Caption = 'Redirect schemes'
+      end
       object cbcusthelpwp: TCheckBox
-        Left = 6
+        Left = 8
         Top = 16
         Width = 438
         Height = 18
         Caption = 
           'use WelcomePage to display help (otherwise system browser is use' +
           'd)'
+        Checked = True
+        State = cbChecked
         TabOrder = 0
       end
+      object cbReplaceDefaultViewer: TCheckBox
+        Left = 8
+        Top = 34
+        Width = 438
+        Height = 18
+        Caption = 'replace default viewer for MS Help2 topics'
+        Checked = True
+        State = cbChecked
+        TabOrder = 1
+      end
+      object edRedirectSchemes: TEdit
+        Left = 98
+        Top = 53
+        Width = 556
+        Height = 21
+        Hint = 
+          'Specify the schemes to show with the WelcomePage/system browser.' +
+          #13#10'Use '#39';'#39' as delimiter, e.g. file://;http://'
+        Anchors = [akLeft, akTop, akRight]
+        TabOrder = 2
+      end
     end
-    object GroupBox2: TGroupBox
+    object grpOtherHelpSources: TGroupBox
       Left = 0
-      Top = 256
+      Top = 295
       Width = 659
-      Height = 277
+      Height = 265
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2
       Margins.Bottom = 2
-      Align = alClient
+      Align = alTop
       Caption = 'Other Help Sources'
       TabOrder = 2
       object ListView1: TListView
         AlignWithMargins = True
         Left = 5
-        Top = 18
+        Top = 41
         Width = 649
-        Height = 159
+        Height = 125
         Align = alClient
         Columns = <
           item
@@ -196,17 +230,17 @@ object form_Config: Tform_Config
         OnDblClick = ListView1DblClick
         OnKeyDown = ListView1KeyDown
       end
-      object Panel2: TPanel
+      object pnlOHSItem: TPanel
         Left = 2
-        Top = 180
+        Top = 169
         Width = 655
-        Height = 95
+        Height = 94
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
         DesignSize = (
           655
-          95)
+          94)
         object Label1: TLabel
           Left = 6
           Top = 6
@@ -236,9 +270,9 @@ object form_Config: Tform_Config
           Caption = 'Trim namespaces'
         end
         object edName: TEdit
-          Left = 65
+          Left = 94
           Top = 3
-          Width = 587
+          Width = 559
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           Enabled = False
@@ -246,9 +280,9 @@ object form_Config: Tform_Config
           OnChange = edNameChange
         end
         object edDesc: TEdit
-          Left = 65
+          Left = 94
           Top = 26
-          Width = 587
+          Width = 559
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           Enabled = False
@@ -256,9 +290,9 @@ object form_Config: Tform_Config
           OnChange = edDescChange
         end
         object edURL: TEdit
-          Left = 65
+          Left = 94
           Top = 48
-          Width = 587
+          Width = 559
           Height = 21
           Hint = 
             '- URL to a webbased search provider (e.g. koders.com)'#13#10'- Path to' +
@@ -277,10 +311,20 @@ object form_Config: Tform_Config
           Width = 145
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 3
           OnChange = cbTrimNamespacesOHSChange
         end
+      end
+      object cbOHSAtTop: TCheckBox
+        AlignWithMargins = True
+        Left = 5
+        Top = 18
+        Width = 649
+        Height = 17
+        Align = alTop
+        Caption = 'Display other help sources at the top of the result list'
+        TabOrder = 2
       end
     end
   end

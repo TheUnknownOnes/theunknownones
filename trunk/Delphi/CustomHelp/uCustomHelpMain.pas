@@ -1,5 +1,5 @@
 {-----------------------------------------------------------------------------
- Purpose: The main unit of the custom help expert 
+ Purpose: The main unit of the custom help expert
 
  (c) by TheUnknownOnes
  see http://www.TheUnknownOnes.net
@@ -11,19 +11,20 @@ interface
 
 uses
   Classes, Forms, Dialogs, ToolsAPI, Menus, Registry, HelpIntfs, Windows,
-  uMSHelpServices, uHtmlHelp;
+  uMSHelpServices, uHtmlHelp, SyncObjs, uCustomHelpSelector;
 
 type
   TNamespaceTrimOption = (nstoNoTrim=0, nstoTrimFirst, nstoTrimAll);
 
   TCustomHelpViewer = class;
 
-  //Das Hauptobjekt
+  //Main object
   TCustomHelp = class
   private
     FLastKeyword: String;
-
-    function GetNamespaces: IHxRegNamespaceList;
+    FLastHelpErrors: string;
+    class function GetNamespaces: IHxRegNamespaceList;
+    function GetEnabledhxSession(Index: Integer): IHxSession;
     procedure SetFullTextSearch(const Value: Boolean);
     procedure SetShowCustomHelpOnWP(const Value: Boolean);
     procedure SetTrimNamespaces(const Value: TNamespaceTrimOption);
@@ -36,7 +37,7 @@ type
     FEnabledhxSessions : TInterfaceList;
     FTrimNamespaces: TNamespaceTrimOption;
 
-    //In die IDE einhacken (Menu-Eintrag, ...)
+    //hack into the IDE (Menu-entry, ...)
     procedure ConnectToIDE;
     procedure DisconnectFromIDE;
     function GetHelpMenu : TMenuItem;
@@ -60,7 +61,8 @@ type
     property TrimNamespacesUntilResultFound: TNamespaceTrimOption read FTrimNamespaces write SetTrimNamespaces;
 
     class function DecodeURL(const URL: String; out Caption: String;
-      out Description: String; out Link: String; out Group: String; out TrimOption: TNamespaceTrimOption): boolean;
+      out Description: String; out Link: String; out Group: String;
+      out TrimOption: TNamespaceTrimOption): boolean; overload;
     class function EncodeURL(Caption, Description, Link, Group: String; TrimOption: TNamespaceTrimOption): String;
 
     class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String; ATrimNamespaces: TNamespaceTrimOption);
@@ -68,6 +70,42 @@ type
     class procedure ReadEnabledNamespacesFromRegistry(const ANamesList: TStrings);
     class procedure WriteSettingToRegistry(AName, AValue: String);
     class procedure ReadSettingsFromRegistry(const ANameValueList: TStrings);
+  protected
+    class function GetNamespaceTitle(Session : IHxSession) : String;
+    class function GetNamespaceName(Session: IHxSession): string;
+    class procedure TrimNamespace(var s: string; ATrimOption: TNamespaceTrimOption);
+    class function CheckIndexInHxSession(hxSession: IHxSession; var hxIndex: IHxIndex): boolean;
+    function SearchInHxSession(hxSession: IHxSession;
+      const HelpString: string; AResult: TStringList;
+      hxIndex: IHxIndex): Boolean;
+    function QueryInHxSession(hxSession: IHxSession;
+      const HelpString: string; const AResult: TStringList): Boolean;
+    function PerformInHxSession(HelpString: string; SessionIndex: integer; const AResult: TStringList): Boolean;
+  public
+    property EnabledhxSession[Index: integer]: IHxSession read GetEnabledhxSession;
+    property LastHelpErrors: string read FLastHelpErrors write FLastHelpErrors;
+  private
+    FSessionLock: TCriticalSection;
+    FCustomHelpViewer:TCustomHelpViewer;
+    FHandledSchemes: TStringList;
+    FReplaceDefaultViewer: boolean;
+    FShowOHSAtTop: boolean;
+    procedure SetReplaceDefaultViewer(const Value: boolean);
+    function GetRedirectSchemes: string;
+    procedure SetRedirectSchemes(const Value: string);
+    procedure SetShowOHSAtTop(const Value: boolean);
+  public
+//    function HelpFile: string;
+    procedure InitHelpSelector(const HelpString: string);
+    function IsHandledByDefaultViewer(const AKeyword: string): boolean;
+    property ReplaceDefaultViewer: boolean read FReplaceDefaultViewer write SetReplaceDefaultViewer;
+    property ShowOHSAtTop: boolean read FShowOHSAtTop write SetShowOHSAtTop;
+    property RedirectSchemes: string read GetRedirectSchemes write SetRedirectSchemes;
+    class function GetTopicFromURL(const URL: string; var Group: string): IHxTopic; overload;
+    class function GetTopicFromURL(hxHierarchy: IHxHierarchy; const URL: string): IHxTopic; overload;
+    class function GetTopicInfo(const URL: string; out Caption, Description, Link, Group: string;
+      out TrimOption: TNamespaceTrimOption): boolean;
+    class function DecodeURL(const URL: String; out Link: String): boolean; overload;
   end;
 
   TCustomHelpViewer = class(TInterfacedObject, ICustomHelpViewer)
@@ -76,29 +114,24 @@ type
     FViewerID: Integer;
     procedure ShowHTMLHelp(AURL: String);
     function ForceSelector(const HelpString: String): String;
-    function GetNamespaceTitle(Session : IHxSession) : String;
-    function SearchInHxSession(hxSession: IHxSession; const HelpString: string;
-      var AResult: TStringList; hxIndex: IHxIndex): Boolean;
-    function QueryInHxSession(hxSession: IHxSession; const HelpString: string;
-      var AResult: TStringList): Boolean;
-    function TrimNamespace(var s: string; ATrimOption: TNamespaceTrimOption): Boolean;
-    procedure InternalShutDown;
   protected
-    constructor Create;
-    destructor Destroy; override;
     {$REGION 'ICustomHelpViewer'}
     function  GetViewerName : String;
     function  UnderstandsKeyword(const HelpString: String): Integer;
     function  GetHelpStrings(const HelpString: String): TStringList;
     function  CanShowTableOfContents : Boolean;
-    procedure ShowTableOfContents;
-    procedure ShowHelp(const HelpString: String);
+    procedure ShowTableOfContents;     
     procedure NotifyID(const ViewerID: Integer);
     procedure SoftShutDown;
     procedure ShutDown;
     {$ENDREGION}
-
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure ShowHelp(const HelpString: String);
     property HelpManager : IHelpManager read FHelpManager write FHelpManager;
+    property ViewerID: Integer read FViewerID;
+    property Name: String read GetViewerName;
   end;
 
 const
@@ -118,7 +151,8 @@ const
     REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER210\CustomHelp';
   {$EndIf}
 
-  CPROT = 'CustomHelp://';
+  PROTPREFIX_CUSTOMHELP = 'CustomHelp://';
+  PROTPREFIX_MSHELP = 'ms-help://';
 
   VALUE_NAME = 'Name';
   VALUE_DESCR = 'Description';
@@ -135,38 +169,39 @@ const
   SETTINGS_CUSTHELPWP = 'CustomHelpOnWP';
   SETTINGS_FULLTEXTSEARCH = 'FullTextSearch';
   SETTINGS_TRIMNAMESPACES = 'TrimNamespaces';
+  SETTINGS_OHSATTOP = 'DisplayOHSAtTop';
+  SETTINGS_HANDLEDSCHEMES = 'HandledSchemes';
+  SETTINGS_REPLACEDEFAULT = 'ReplaceDefaultViewer';
 
   GROUP_LABEL_DEFAULT = 'Available Search engines';
+  GROUP_LABEL_STANDARD = 'Other Help Providers';
 
 var
   GlobalCustomHelp : TCustomHelp;
 
+  //We keep these global ... as it is done in WinHelpViewer.pas
   HelpViewer: TCustomHelpViewer;
   HelpViewerIntf: ICustomHelpViewer;
 
 implementation
 
 uses
-  SysUtils, uCustomHelpSelector, StrUtils, ShellAPI, uFormConfigCustomHelp,
-  uCustomHelpIDEIntegration, Graphics;
+  SysUtils, StrUtils, ShellAPI, uFormConfigCustomHelp,
+  uCustomHelpIDEIntegration, Graphics, ActiveX, Variants, Types, uUtils;
 
 { TCustomHelpViewer }
 
 function TCustomHelpViewer.CanShowTableOfContents: Boolean;
-begin      
+begin
   Result := false;
 end;
 
 function TCustomHelpViewer.GetHelpStrings(const HelpString: String): TStringList;
 var
-  idx, idy : Integer;
+  idx : Integer;
   c, d, u, g : String;
-  hxSession : IHxSession;
-  hxIndex : IHxIndex;
-  Topics : IHxTopicList;
-  slot : integer;
-  s : String;
-  loop : byte;
+  ShortHelpString : String;
+  HelpStrings, errmsgs: TStringList;
   TrimOption: TNamespaceTrimOption;
 
   function EncodedHelpString(AHelpString: String): String;
@@ -178,106 +213,146 @@ var
       Result:=Result + '%'+Format('%.2x', [Ord(AHelpString[i])]);
   end;
 
+  function PerformSearch(AHelpString: string): Boolean;
+  var
+    idx: Integer;
+  begin
+    GlobalCustomHelp.LastHelpCallKeyword := AHelpString;
+    for idx := 0 to GlobalCustomHelp.EnabledhxSessions.Count - 1 do
+    begin
+      try
+        GlobalCustomHelp.PerformInHxSession(AHelpString, idx, HelpStrings);
+      except on e: Exception do
+        errmsgs.Add(GlobalCustomHelp.GetNamespaceName(GlobalCustomHelp.EnabledhxSession[idx]) + ': '+ e.Message);
+      end;
+    end;
+    Result := HelpStrings.Count > 0;
+  end;
+
 begin
-  GlobalCustomHelp.LastHelpCallKeyword:=HelpString;
+  Result := NIL;
+  GlobalCustomHelp.LastHelpCallKeyword := HelpString;
 
   //Weil wir bei UnderstandsKeyword gesagt haben, das wir das Keyword verstehen (Result = 1)
   //werden wir jetzt gefragt, welche Hilfethemen wir zu diesem Keyword liefern können
   //Die StringList wird vom Hilfesystem wieder freigegeben
 
-  Result := TStringList.Create;
-  Result.Duplicates:=dupIgnore;
-  //Result.Sorted:=True;
-  Result.Assign(GlobalCustomHelp.ProviderList);
+  HelpStrings := TStringList.Create;
+  try
+    HelpStrings.Duplicates:=dupIgnore;
 
-  for idx := 0 to Result.Count - 1 do
-  begin
-    TCustomHelp.DecodeURL(Result[idx], c, d, u, g, TrimOption);
-    s:=HelpString;
-    TrimNamespace(s, TrimOption);
-
-    if Pos('://', u)>0 then
-    begin
-      Result[idx] := TCustomHelp.EncodeURL(c,d,u+EncodedHelpString(s), g, TrimOption);
-    end
-    else
-    if AnsiSameText(ExtractFileExt(u),'.hlp') then
-    begin
-      Result[idx] := TCustomHelp.EncodeURL(c,d,'winhlp://-k '+s+' '+u, g, TrimOption);
-    end
-    else
-    if AnsiSameText(ExtractFileExt(u),'.chm') then
-    begin
-      Result[idx] := TCustomHelp.EncodeURL(c,d,'htmlhlp://'+s+URL_SPLITTER+u, g, TrimOption);
-    end;
-  end;
-
-  //Und jetzt noch die eigentlichen Hilfe-Namespaces durchsuchen
-  for idx := 0 to GlobalCustomHelp.EnabledhxSessions.Count-1 do
-  begin
-    if Supports(GlobalCustomHelp.EnabledhxSessions[idx], IHxSession, hxSession) then
-    begin
-      //Soll nach dem kompletten Text gesucht werden?
-      if GlobalCustomHelp.PerformFullTextSearch then
+    errmsgs := TStringList.Create;
+    try
+      errmsgs.Sorted := True;
+      errmsgs.Duplicates:=dupIgnore;
+      // Und jetzt noch die eigentlichen Hilfe-Namespaces
+      for idx := 0 to GlobalCustomHelp.EnabledhxSessions.Count - 1 do
       begin
-        s:=HelpString;
-        loop:=0;
-        if (not QueryInHxSession(hxSession, s, Result)) and
-           (GlobalCustomHelp.TrimNamespacesUntilResultFound<>nstoNoTrim) then
-        repeat
-          inc(loop);
-
-          if (loop>1) and (GlobalCustomHelp.TrimNamespacesUntilResultFound<>nstoTrimAll) then
-            break;
-
-          if not TrimNamespace(s, nstoTrimFirst) then
-            break;
-        until QueryInHxSession(hxSession, s, Result);
-      end
-      else
-      //oder nur im Index der Hilfe
-      begin
-        if Supports(hxSession.GetNavigationObject('!DefaultKeywordIndex',''),
-                    IID_IHxIndex,
-                    hxIndex) then
-        begin
-          loop:=0;
-          s:=HelpString;
-          if (not SearchInHxSession(hxSession, s, Result, hxIndex)) and
-             (GlobalCustomHelp.TrimNamespacesUntilResultFound<>nstoNoTrim) then
-          repeat
-            inc(loop);
-
-            if (loop>1) and (GlobalCustomHelp.TrimNamespacesUntilResultFound<>nstoTrimAll) then
-              break;
-            if not TrimNamespace(s, nstoTrimFirst) then
-              break;
-          until SearchInHxSession(hxSession, s, Result, hxIndex);
+        try
+          if not GlobalCustomHelp.PerformInHxSession(HelpString, idx, HelpStrings) then
+            if GlobalCustomHelp.TrimNamespacesUntilResultFound <> nstoNoTrim then
+            begin
+              ShortHelpString:=HelpString;
+              while Pos('.', ShortHelpString) > 0 do
+              begin
+                Delete(ShortHelpString, 1, Pos('.', ShortHelpString));
+                if ((ShortHelpString<>'') and (ShortHelpString<>HelpString)) then
+                begin // Und jetzt noch das verkürzte Suchwort in den eigentlichen Hilfe-Namespaces suchen
+                  if GlobalCustomHelp.PerformInHxSession(ShortHelpString, idx, HelpStrings) then
+                    Break;
+                end;
+                if GlobalCustomHelp.TrimNamespacesUntilResultFound = nstoTrimFirst then
+                  Break;
+              end;
+            end;
+        except
+          on e: Exception do
+            errmsgs.Add(GlobalCustomHelp.GetNamespaceName(GlobalCustomHelp.EnabledhxSession[idx]) + ': '+ e.Message);
         end;
       end;
+
+      for idx := 0 to GlobalCustomHelp.ProviderList.Count - 1 do
+      begin
+        if not TCustomHelp.DecodeURL(GlobalCustomHelp.ProviderList.Strings[idx], c, d, u, g, TrimOption) then
+          Continue;
+
+        if Pos('://', u)>0 then
+        begin
+          HelpStrings.Add(TCustomHelp.EncodeURL(c,d,u+EncodedHelpString(HelpString), g, TrimOption))
+        end
+        else
+        if AnsiSameText(ExtractFileExt(u),'.hlp') then
+        begin
+          HelpStrings.Add(TCustomHelp.EncodeURL(c,d,'winhlp://-k '+HelpString+' '+u, g, TrimOption))
+        end
+        else
+        if AnsiSameText(ExtractFileExt(u),'.chm') then
+        begin
+          HelpStrings.Add(TCustomHelp.EncodeURL(c,d,'htmlhlp://'+HelpString+URL_SPLITTER+u, g, TrimOption));
+        end;
+      end;
+
+      Result := HelpStrings;
+      GlobalCustomHelp.LastHelpErrors := errmsgs.Text;
+    finally
+      errmsgs.Free;
     end;
+  finally
+    if not Assigned(Result) then
+      FreeAndNil(HelpStrings);
   end;
 end;
 
-function TCustomHelpViewer.GetNamespaceTitle(Session: IHxSession): String;
+class function TCustomHelp.GetNamespaceTitle(Session: IHxSession): String;
 var
   NamespaceName : String;
   idx : integer;
+  nsList: IHxRegNamespaceList;
 begin
-  NamespaceName:=Session.Collection.GetProperty(HxCollectionProp_NamespaceName);
-  for idx := 1 to GlobalCustomHelp.GetNamespaces.Count do
+  NamespaceName:=GetNamespaceName(Session);
+  nsList := GetNamespaces;
+  for idx := 1 to nsList.Count do
   begin
-    if GlobalCustomHelp.GetNamespaces.Item(idx).Name=NamespaceName then
+    if nsList.Item(idx).Name=NamespaceName then
     begin
-      Result:=GlobalCustomHelp.GetNamespaces.Item(idx).GetProperty(HxRegNamespaceDescription);
+      Result:=nsList.Item(idx).GetProperty(HxRegNamespaceDescription);
       break;
     end;
   end;
 end;
 
+function TCustomHelp.GetRedirectSchemes: string;
+begin
+  Result := FHandledSchemes.DelimitedText;
+end;
+
+procedure TCustomHelp.InitHelpSelector(const HelpString: string);
+var
+  hs: IHelpSystem;
+begin
+  LastHelpCallKeyword:=HelpString;
+  //the selector has to be constructed every time
+  //if not the second help call will crash under BDS2006
+  if GetHelpSystem(hs) then
+    hs.AssignHelpSelector(THelpSelector.Create);
+end;
+
+function TCustomHelp.IsHandledByDefaultViewer(const AKeyword: string): boolean;
+var
+  idx: Integer;
+begin
+  Result := true;
+  for idx := 0 to FHandledSchemes.Count - 1 do
+    if AnsiStartsText(FHandledSchemes[idx], AKeyword) then
+    begin
+      Result := false;
+      Break;
+    end;
+end;
+
 function TCustomHelpViewer.GetViewerName: String;
 begin
-  Result := 'CustomHelpViewer';
+  Result := 'Custom Help Viewer (TUO)';
 end;
 
 procedure TCustomHelpViewer.NotifyID(const ViewerID: Integer);
@@ -334,19 +409,17 @@ var
   sl : TStringList;
   i : integer;
   u : String;
-begin                    
+begin
   Result:='';
   sl:=GetHelpStrings(HelpString);
-  if TFormHelpSelector.Execute(sl, i, u) then
+  if TFormHelpSelector.Execute(GlobalCustomHelp.LastHelpCallKeyword, sl, i, u) then
     Result:=u;
 end;
 
 procedure TCustomHelpViewer.ShowHelp(const HelpString: String);
 var
-  c,d,u,g: String;
-  o: Integer;
+  u: String;
   alternativeNavigate : boolean;
-  TrimOption : TNamespaceTrimOption;
 begin
   if HelpString<>'' then
   begin
@@ -355,7 +428,7 @@ begin
     //Nutzer aus der Liste, die wir bei GetHelpStrings gebaut haben,
     //gewählt hat. Natürlich bekommen wir hier nur die, die wir auch definiert haben
 
-    if TCustomHelp.DecodeURL(HelpString, c, d, u, g, TrimOption) then
+    if TCustomHelp.DecodeURL(HelpString, u) then
     begin
       if Pos('winhlp://', u)=1 then
       begin
@@ -406,25 +479,31 @@ procedure TCustomHelpViewer.ShutDown;
 begin
   SoftShutDown;
   if Assigned(FHelpManager) then
+  begin
+    HelpManager.Release(FViewerID);
     HelpManager := nil;
+  end;
 end;
 
-function TCustomHelpViewer.TrimNamespace(var s: string; ATrimOption: TNamespaceTrimOption): Boolean;
+class procedure TCustomHelp.TrimNamespace(var s: string; ATrimOption: TNamespaceTrimOption);
+var
+  idx: integer;
 begin
-  Result:=True;
-  if ATrimOption=nstoNoTrim then
-    exit;
+  case ATrimOption of
+    nstoNoTrim: idx := 0;
+    nstoTrimFirst: idx := PosStr('.', s, 1, MaxInt);
+    nstoTrimAll: idx := PosStr('.', s, MaxInt, 1);
+  else
+    Assert(false, 'ATrimOption #'+IntToStr(Ord(ATrimOption)));
+    idx := -1;
+  end;
 
-  Result:=Pos('.', s) > 0;
-  if Result then
-    Delete(s, 1, Pos('.', s));
-
-  if Result and (ATrimOption=nstoTrimAll) then
-    TrimNamespace(s, nstoTrimAll);
+  if idx > 0 then
+    Delete(s, 1, idx);
 end;
 
-function TCustomHelpViewer.SearchInHxSession(hxSession: IHxSession;
-  const HelpString: string; var AResult: TStringList;
+function TCustomHelp.SearchInHxSession(hxSession: IHxSession;
+  const HelpString: string; AResult: TStringList;
   hxIndex: IHxIndex): Boolean;
 var
   Topics: IHxTopicList;
@@ -434,84 +513,85 @@ var
   g: string;
 begin
   Result:=False;
-  slot := hxIndex.GetSlotFromString(HelpString);
-  if AnsiContainsText(hxIndex.GetStringFromSlot(slot), HelpString) then
-  begin
-    Topics := hxIndex.GetTopicsFromSlot(slot);
-    g := GetNamespaceTitle(hxSession);
-    for idx := 1 to Topics.Count do
+  FSessionLock.Acquire;
+  try
+    slot := hxIndex.GetSlotFromString(HelpString);
+    if AnsiContainsText(hxIndex.GetStringFromSlot(slot), HelpString) then
     begin
-      s:=TCustomHelp.EncodeURL(Topics.Item(idx).Title[HxTopicGetRLTitle, 0], Topics.Item(idx).Location, Topics.Item(idx).URL, g, nstoNoTrim);
-      AResult.Add(s);
-      Result:=True;
+      Topics := hxIndex.GetTopicsFromSlot(slot);
+      g := GetNamespaceTitle(hxSession);
+      for idx := 1 to Topics.Count do
+      begin
+        with Topics.Item(idx) do
+          s:=TCustomHelp.EncodeURL(Title[HxTopicGetRLTitle, 0], Location, URL, g, nstoNoTrim);
+        AResult.Add(s);
+        Result:=True;
+      end;
     end;
+  finally
+    FSessionLock.Release;
   end;
 end;
 
-procedure TCustomHelpViewer.InternalShutDown;
-var
-  hs : IHelpSystem;
-begin
-  SoftShutDown;
-  if GetHelpSystem(hs) then
-  begin
-    hs.AssignHelpSelector(nil);
-  end;
-  if Assigned(FHelpManager) then
-  begin
-    HelpManager.Release(FViewerID);
-    HelpManager := nil;
-  end;
-end;
-
-function TCustomHelpViewer.QueryInHxSession(hxSession: IHxSession;
-  const HelpString: string; var AResult: TStringList): Boolean;
+function TCustomHelp.QueryInHxSession(hxSession: IHxSession;
+  const HelpString: string; const AResult: TStringList): Boolean;
 var
   Topics: IHxTopicList;
   idx: Integer;
   s : String;
   g: string;
 begin
-  Result:=False;
-  Topics:=hxSession.Query(HelpString, '!DefaultFullTextSearch', HxQuery_No_Option, '');
+  Result := false;
+  FSessionLock.Acquire;
+  try
+    Topics:=hxSession.Query(HelpString, '!DefaultFullTextSearch', HxQuery_No_Option, '');
 
-  g := GetNamespaceTitle(hxSession);
-  for idx := 1 to Topics.Count do
-  begin
-    s:=TCustomHelp.EncodeURL(Topics.Item(idx).Title[HxTopicGetRLTitle, 0], Topics.Item(idx).Location, Topics.Item(idx).URL, g, nstoNoTrim);
-    AResult.Add(s);
-    Result:=True;
+    g := GetNamespaceTitle(hxSession);
+    for idx := 1 to Topics.Count do
+    begin
+      with Topics.Item(idx) do
+        s:=TCustomHelp.EncodeURL(Title[HxTopicGetRLTitle, 0], Location, URL, g, nstoNoTrim);
+      AResult.Add(s);
+      Result:=True;
+    end;
+  finally
+    FSessionLock.Release;
   end;
 end;
 
 procedure TCustomHelpViewer.SoftShutDown;
-begin  
-end;
-
-function TCustomHelpViewer.UnderstandsKeyword(const HelpString: String): Integer;
 var
   hs : IHelpSystem;
 begin
-  //Das Hilfesystem fragt uns: Verstehst du dieses Keyword (der Begriff unter dem Cursor)?
-
-  if AnsiContainsText(HelpString, 'erroneous type') then
-  begin
-    Result := 0;
-    Exit;
-  end;
-
-  Result := 1; //ja!
-
   if GetHelpSystem(hs) then
   begin
-    //Noch schnell dem Hilfesystem sagen, das wir einen eigenen Auswahldialog für die
-    //verschiedenen Hilfethemen haben
-
-    hs.AssignHelpSelector(THelpSelector.Create);
+    hs.AssignHelpSelector(nil);
   end;
 end;
 
+function TCustomHelpViewer.UnderstandsKeyword(const HelpString: String): Integer;
+begin
+  //Das Hilfesystem fragt uns: Verstehst du dieses Keyword (der Begriff unter dem Cursor)?
+  Result := 0;
+  if AnsiContainsText(HelpString, 'erroneous type') then
+    Exit;
+
+  with GetHelpStrings(HelpString) do
+  begin
+    Result := Count;
+    Free;
+  end;
+
+  GlobalCustomHelp.InitHelpSelector(HelpString);
+end;
+
 { TCustomHelp }
+
+class function TCustomHelp.CheckIndexInHxSession(hxSession: IHxSession;
+  var hxIndex: IHxIndex): boolean;
+begin
+  Result := Supports(hxSession.GetNavigationObject('!DefaultKeywordIndex', ''), IID_IHxIndex, hxIndex);
+end;
 
 procedure TCustomHelp.ConnectToIDE;
 var
@@ -529,11 +609,14 @@ begin
 end;
 
 constructor TCustomHelp.Create;
-var                               
-  hs : IHelpSystem;
 begin
   FEnabledhxSessions:=TInterfaceList.Create;
+  FSessionLock := TCriticalSection.Create;
   FProvider := TStringList.Create;
+  FHandledSchemes := TStringList.Create;
+  FHandledSchemes.QuoteChar:='"';
+  FHandledSchemes.Delimiter:=';';
+  FHandledSchemes.StrictDelimiter:=True;
 
   HelpViewer:=TCustomHelpViewer.Create;
   RegisterViewer(HelpViewerIntf, HelpViewer.FHelpManager);
@@ -562,7 +645,84 @@ begin
                             'http://www.google.com/codesearch?btnG=Code+suchen&hl=de&as_lang=pascal&as_license_restrict=i&as_license=&as_package=&as_filename=&as_case=&as_q=',
                             nstoTrimFirst);
 
+    WriteProviderToRegistry('3',
+                            'MSDN Online',
+                            'Search using MSDN Online',
+                            'http://search.msdn.microsoft.com/Default.aspx?locale=en-US&Query=',
+                            nstoTrimFirst);
+
     LoadProviderFromRegistry;
+  end;
+end;
+
+class function TCustomHelp.GetTopicFromURL(hxHierarchy: IHxHierarchy; const URL: string): IHxTopic;
+var
+  si: PSafeArray;
+  ari: TIntegerDynArray;
+  hNode: integer;
+begin
+  try
+    si := hxHierarchy.GetSyncInfo(URL);
+    ari := SafeArrayToIntArray(si);
+    hNode := ari[Length(ari)-1];
+    Result := hxHierarchy.GetTopic(hNode);
+  except
+    try
+      hNode := hxHierarchy.GetNextFromNode(hxHierarchy.GetPrevFromUrl(URL));
+      Result := hxHierarchy.GetTopic(hNode);
+    except
+      hNode := hxHierarchy.GetPrevFromNode(hxHierarchy.GetNextFromUrl(URL));
+      Result := hxHierarchy.GetTopic(hNode);
+    end;
+  end;
+end;
+
+class function TCustomHelp.GetTopicFromURL(const URL: string; var Group: string): IHxTopic;
+var
+  idx: Integer;
+  hxSession: IHxSession;
+  hxHierarchy: IHxHierarchy;
+begin
+  Result := nil;
+  for idx := 0 to GlobalCustomHelp.FEnabledhxSessions.Count - 1 do
+  begin
+    hxSession := GlobalCustomHelp.EnabledhxSession[idx];
+    if hxSession <> nil then
+    begin
+      if not AnsiStartsText(PROTPREFIX_MSHELP+GlobalCustomHelp.GetNamespaceName(hxSession), URL) then
+        Continue;
+      try
+        if Supports(hxSession.GetNavigationObject('!DefaultToc', ''), IHxHierarchy, hxHierarchy) then
+        begin
+          Result := GetTopicFromURL(hxHierarchy, URL);
+          Group := GlobalCustomHelp.GetNamespaceTitle(hxSession);
+        end;
+      except
+      end;
+    end;
+  end;
+end;
+
+class function TCustomHelp.GetTopicInfo(const URL: string;
+  out Caption, Description, Link, Group: string;
+  out TrimOption: TNamespaceTrimOption): boolean;
+var
+  tp: IHxTopic;
+begin
+  tp := GetTopicFromURL(URL, Group);
+  Result := tp <> nil;
+  if Result then
+  begin
+    Caption := tp.Title[HxTopicGetHTMTitle, 0];
+    Description := tp.Location;
+    Link := URL;
+    TrimOption := nstoNoTrim;
+  end else
+  begin
+    Caption := URL;
+    Description := '';
+    Link := URL;
+    TrimOption := nstoNoTrim;
   end;
 end;
 
@@ -573,20 +733,72 @@ var
   sl : TStringList;
 begin
   Result:=False;
-  if AnsiStartsText(CPROT, URL) then
+  if AnsiStartsText(PROTPREFIX_CUSTOMHELP, URL) then
   begin
     sl:=TStringList.Create;
-    sl.QuoteChar:=#0;
-    sl.Delimiter:='|';
-    sl.StrictDelimiter:=True;
-    sl.DelimitedText:=Copy(URL, Length(CProt)+1, Length(URL));
-    Caption:=Sl[0];
-    Description:=sl[1];
-    Link:=sl[2];
-    Group:=sl[3];
-    TrimOption:=TNamespaceTrimOption(StrToIntDef(sl[4],0));
-    sl.Free;
+    try
+      sl.QuoteChar:=#0;
+      sl.Delimiter:='|';
+      sl.StrictDelimiter:=True;
+      sl.DelimitedText:=Copy(URL, Length(PROTPREFIX_CUSTOMHELP)+1, Length(URL));
+      Caption:=Sl[0];
+      Description:=sl[1];
+      Link:=sl[2];
+      Group:=sl[3];
+      TrimOption:=TNamespaceTrimOption(StrToIntDef(sl[4],0));
+    finally
+      sl.Free;
+    end;
     Result:=True;
+  end
+  else if AnsiStartsText(PROTPREFIX_MSHELP, URL) then
+  begin
+    Result := GetTopicInfo(URL, Caption, Description, Link, Group, TrimOption);
+    if not Result then
+    begin
+      TrimOption:=nstoNoTrim;
+      sl:=TStringList.Create;
+      try
+        sl.QuoteChar:=#0;
+        sl.Delimiter:='/';
+        sl.StrictDelimiter:=True;
+        sl.DelimitedText:=Copy(URL, Length(PROTPREFIX_MSHELP)+1, Length(URL));
+        if sl.Count >= 2 then
+        begin
+          Description:=sl[0];
+          Caption:=sl[sl.Count - 1];
+          Link:=URL;
+          Group := GROUP_LABEL_STANDARD;
+          Result := True;
+        end else
+        begin
+          Description:='';
+          Caption:=URL;
+          Link:=URL;
+          Group := GROUP_LABEL_STANDARD;
+          Result := True;
+        end;
+      finally
+        sl.Free;
+      end;
+    end;
+  end;
+end;
+
+class function TCustomHelp.DecodeURL(const URL: String; out Link: String): boolean;
+var
+  Caption, Description, Group: string;
+  TrimOption: TNamespaceTrimOption;
+begin
+  Result:=False;
+  if AnsiStartsText(PROTPREFIX_CUSTOMHELP, URL) then
+  begin
+    Result := DecodeURL(URL, Caption, Description, Link, Group, TrimOption);
+  end
+  else if AnsiStartsText(PROTPREFIX_MSHELP, URL) then
+  begin
+    Link := URL;
+    Result := True;
   end;
 end;
 
@@ -596,9 +808,12 @@ begin
 
   FEnabledhxSessions.Free;
   FProvider.Free;
+  FSessionLock.Free;
+
+  FCustomHelpViewer := nil;
 
   if Assigned(HelpViewer.FHelpManager) then
-    HelpViewer.InternalShutDown; 
+    HelpViewer.ShutDown;
   HelpViewer := nil;
 
   inherited;
@@ -612,7 +827,13 @@ end;
 
 class function TCustomHelp.EncodeURL(Caption, Description, Link, Group: String; TrimOption: TNamespaceTrimOption): String;
 begin
-  Result:=CPROT+Caption+'|'+Description+'|'+Link+'|'+Group+'|'+IntToStr(Integer(TrimOption));
+  Result:=PROTPREFIX_CUSTOMHELP+Caption+'|'+Description+'|'+Link+'|'+Group+'|'+IntToStr(Integer(TrimOption));
+end;
+
+function TCustomHelp.GetEnabledhxSession(Index: Integer): IHxSession;
+begin
+  if not Supports(EnabledhxSessions[Index], IHxSession, Result) then
+    Result := nil;
 end;
 
 function TCustomHelp.GetHelpMenu: TMenuItem;
@@ -636,7 +857,12 @@ begin
 
 end;
 
-function TCustomHelp.GetNamespaces: IHxRegNamespaceList;
+class function TCustomHelp.GetNamespaceName(Session: IHxSession): string;
+begin
+  Result:=Session.Collection.GetProperty(HxCollectionProp_NamespaceName);
+end;
+
+class function TCustomHelp.GetNamespaces: IHxRegNamespaceList;
 begin
   Result:=CoHxRegistryWalker.Create.RegisteredNamespaceList[''];
 end;
@@ -691,22 +917,36 @@ var
   sl : TStringList;
   idx : integer;      
   hxSession: IHxSession;
+  hxIndex: IHxIndex;
+  errmsg: string;
+  nsList: IHxRegNamespaceList;
 begin
   FEnabledhxSessions.Clear;
   sl:=TStringList.Create;
+  errmsg := '';
   try
     ReadEnabledNamespacesFromRegistry(sl);
-    
-    for idx := 1 to Namespaces.Count do
+
+    nsList := Namespaces;
+    for idx := 1 to nsList.Count do
     begin
-      if sl.IndexOf(Namespaces.Item(idx).Name)>=0 then
+      if sl.IndexOf(nsList.Item(idx).Name)>=0 then
       begin
         hxSession:=CoHxSession.Create;
-        hxSession.Initialize('ms-help://'+Namespaces.Item(idx).Name,0);
-
+        hxSession.Initialize(PROTPREFIX_MSHELP+nsList.Item(idx).Name,0);
+        try
+          CheckIndexInHxSession(hxSession, hxIndex);
+        except on e: Exception do
+          begin
+            errmsg := errmsg + nsList.Item(idx).Name + ': '+ e.Message + #13#10;
+            // WriteNamespacesToRegistry(nsList.Item(idx).Name, false);
+          end;
+        end;
         FEnabledhxSessions.Add(hxSession);
       end;
     end;
+    if errmsg <> '' then
+      ShowMessage('The following namespaces had errors:'#13#10#13#10 + errmsg);
   finally
     sl.Free;
   end;
@@ -720,8 +960,11 @@ begin
   try
     ReadSettingsFromRegistry(sl);
     FShowCustHelpOnWP:=sl.Values[SETTINGS_CUSTHELPWP]='1';
+    FShowOHSAtTop:=sl.Values[SETTINGS_OHSATTOP]='1';
     FFullTextSearch:=sl.Values[SETTINGS_FULLTEXTSEARCH]='1';
     FTrimNamespaces:=TNamespaceTrimOption(StrToIntDef(sl.Values[SETTINGS_TRIMNAMESPACES], 0));
+    FHandledSchemes.DelimitedText:=sl.Values[SETTINGS_HANDLEDSCHEMES];
+    FReplaceDefaultViewer:=sl.Values[SETTINGS_REPLACEDEFAULT]='1';
   finally
     sl.Free;
   end;
@@ -729,8 +972,30 @@ end;
 
 procedure TCustomHelp.OnMenuItemClick(Sender: TObject);
 begin
-  Tform_Config.Execute;
-  LoadProviderFromRegistry;
+  if Tform_Config.Execute then
+    LoadProviderFromRegistry;
+end;
+
+function TCustomHelp.PerformInHxSession(HelpString: string;
+  SessionIndex: integer; const AResult: TStringList): Boolean;
+var
+  hxSession: IHxSession;
+  hxIndex: IHxIndex;
+begin
+  Result:=False;
+  hxSession := EnabledhxSession[SessionIndex];
+  if hxSession <> nil then
+  begin
+    //Soll nach dem kompletten Text gesucht werden?
+    if PerformFullTextSearch then
+    begin
+      Result:=QueryInHxSession(hxSession, HelpString, AResult);
+    end //oder nur im Index der Hilfe
+    else if CheckIndexInHxSession(hxSession, hxIndex) then
+    begin
+      Result:=SearchInHxSession(hxSession, HelpString, AResult, hxIndex);
+    end;
+  end;
 end;
 
 class procedure TCustomHelp.ReadEnabledNamespacesFromRegistry(
@@ -787,10 +1052,28 @@ begin
   TCustomHelp.WriteSettingToRegistry(SETTINGS_FULLTEXTSEARCH, IntToStr(byte(Value)));
 end;
 
+procedure TCustomHelp.SetRedirectSchemes(const Value: string);
+begin
+  FHandledSchemes.DelimitedText := Value;
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_HANDLEDSCHEMES, Value);
+end;
+
+procedure TCustomHelp.SetReplaceDefaultViewer(const Value: boolean);
+begin
+  FReplaceDefaultViewer := Value;
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_REPLACEDEFAULT, IntToStr(byte(Value)));
+end;
+
 procedure TCustomHelp.SetShowCustomHelpOnWP(const Value: Boolean);
 begin
   FShowCustHelpOnWP := Value;
   TCustomHelp.WriteSettingToRegistry(SETTINGS_CUSTHELPWP, IntToStr(byte(Value)));
+end;
+
+procedure TCustomHelp.SetShowOHSAtTop(const Value: boolean);
+begin
+  FShowOHSAtTop := Value;
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_OHSATTOP, IntToStr(byte(Value)));
 end;
 
 procedure TCustomHelp.SetTrimNamespaces(const Value: TNamespaceTrimOption);

@@ -20,25 +20,29 @@ type
     Button1: TButton;
     Button2: TButton;
     ListView1: TListView;
-    Panel2: TPanel;
+    pnlOHSItem: TPanel;
     edName: TEdit;
     edDesc: TEdit;
     edURL: TEdit;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
-    Panel3: TGroupBox;
+    grpHelpDisplay: TGroupBox;
     cbcusthelpwp: TCheckBox;
-    GroupBox1: TGroupBox;
-    GroupBox2: TGroupBox;
-    ListView2: TListView;
+    grpHelpNamespaces: TGroupBox;
+    grpOtherHelpSources: TGroupBox;
+    lvNamespaces: TListView;
     Panel4: TPanel;
     Panel5: TPanel;
     cbFullTextSearch: TCheckBox;
+    cbReplaceDefaultViewer: TCheckBox;
+    Label5: TLabel;
+    edRedirectSchemes: TEdit;
     cbTrimNamespacesHX: TComboBox;
     Label4: TLabel;
     cbTrimNamespacesOHS: TComboBox;
     Label8: TLabel;
+    cbOHSAtTop: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure ListView1Change(Sender: TObject; Item: TListItem;
@@ -131,7 +135,7 @@ begin
     nsl:=GlobalCustomHelp.Namespaces;
     for idx := 1 to nsl.Count do
     begin
-      with ListView2.Items.Add do
+      with lvNamespaces.Items.Add do
       begin
         Caption:=nsl.Item(idx).Name;
         SubItems.Add(nsl.Item(idx).GetProperty(HxRegNamespaceDescription));
@@ -179,9 +183,12 @@ begin
   sl := TStringList.Create;
   try
     TCustomHelp.ReadSettingsFromRegistry(sl);
-    cbcusthelpwp.Checked:=sl.Values[SETTINGS_CUSTHELPWP]='1';
-    cbFullTextSearch.Checked:=sl.Values[SETTINGS_FULLTEXTSEARCH]='1';
+    cbcusthelpwp.Checked:=GlobalCustomHelp.ShowCustomHelpOnWelcomePage;
+    cbFullTextSearch.Checked:=GlobalCustomHelp.PerformFullTextSearch;
+    cbReplaceDefaultViewer.Checked := GlobalCustomHelp.ReplaceDefaultViewer;
+    edRedirectSchemes.Text := GlobalCustomHelp.RedirectSchemes;
     cbTrimNamespacesHX.ItemIndex:=StrToIntDef(sl.Values[SETTINGS_TRIMNAMESPACES], 0);
+    cbOHSAtTop.Checked:=GlobalCustomHelp.ShowOHSAtTop;
 
     if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY, true) then
     begin
@@ -230,13 +237,12 @@ end;
 procedure Tform_Config.ListView1DblClick(Sender: TObject);
 var
   item : TListItem;
-  idx : Integer;
 begin
   if ListView1.Selected = FInsertItem  then
   begin
     item:=ListView1.Items.Add;
-    for idx := 0 to ListView1.Columns.Count - 2 do
-      item.SubItems.Add('');
+    item.SubItems.Add('');
+    item.SubItems.Add('');
 
     ListView1.Selected:=item;
     ListView1.ItemFocused:=item;
@@ -258,7 +264,7 @@ function Tform_Config.TrimOptionFromString(AString: String): TNamespaceTrimOptio
 var
   idx: TNamespaceTrimOption;
 begin
-  idx:=nstoNoTrim;
+  Result:=nstoNoTrim;
   for idx := Low(OPTIONS_NAMESPACETRIM) to High(OPTIONS_NAMESPACETRIM) do
     if OPTIONS_NAMESPACETRIM[idx]=AString then
     begin
@@ -295,9 +301,13 @@ begin
   GlobalCustomHelp.ShowCustomHelpOnWelcomePage:=cbcusthelpwp.Checked;
   GlobalCustomHelp.PerformFullTextSearch:=cbFullTextSearch.Checked;
   GlobalCustomHelp.TrimNamespacesUntilResultFound:=TNamespaceTrimOption(cbTrimNamespacesHX.ItemIndex);
+  GlobalCustomHelp.ReplaceDefaultViewer := cbReplaceDefaultViewer.Checked;
+  GlobalCustomHelp.RedirectSchemes := edRedirectSchemes.Text;
+  GlobalCustomHelp.ShowOHSAtTop := cbOHSAtTop.Checked;
 
-  for idx := 0 to ListView2.Items.Count-1 do
-    GlobalCustomHelp.WriteNamespacesToRegistry(ListView2.Items[idx].Caption, ListView2.Items[idx].Checked);
+  with lvNamespaces do
+    for idx := 0 to Items.Count-1 do
+      GlobalCustomHelp.WriteNamespacesToRegistry(Items[idx].Caption, Items[idx].Checked);
     
 end;
 

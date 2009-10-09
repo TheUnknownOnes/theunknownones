@@ -16,21 +16,24 @@ uses
 
 type
   TFormHelpSelector = class(TForm)
-    CategoryButtons1: TCategoryButtons;
-    Panel1: TPanel;
+    catbtnTopics: TCategoryButtons;
+    pnlOptions: TPanel;
     cbFullTextSearch: TCheckBox;
+    grpErrors: TGroupBox;
+    mmoErrors: TMemo;
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ListBox1Compare(Sender: TObject; Item1, Item2: TListItem;
       Data: Integer; var Compare: Integer);
     procedure ListBox1Editing(Sender: TObject; Item: TListItem;
       var AllowEdit: Boolean);
-    procedure CategoryButtons1DrawText(Sender: TObject;
+    procedure catbtnTopicsDrawText(Sender: TObject;
       const Button: TButtonItem; Canvas: TCanvas; Rect: TRect;
       State: TButtonDrawState);
-    procedure CategoryButtons1ButtonClicked(Sender: TObject;
+    procedure catbtnTopicsButtonClicked(Sender: TObject;
       const Button: TButtonItem);
-    procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     FURL : String;
     FHelpIndex : Integer;
@@ -40,14 +43,17 @@ type
     property URL : String read FURL;
     property SelectedHelpIndex : Integer read FHelpIndex;
 
-    class function Execute(Keywords: TStrings; out SelectedIndex: Integer;
+    class function Execute(HelpString: string; Keywords: TStrings; out SelectedIndex: Integer;
       out SelectedUrl: String): Boolean; static;
   end;
 
-  THelpSelector = class(TInterfacedObject, IHelpSelector)
+  //This class must not contain any local fields
+  //applies only to BDS 2006
+  THelpSelector = class(TInterfacedObject, IHelpSelector, IHelpSelector2)
   protected
     function SelectKeyword(Keywords: TStrings) : Integer;
     function TableOfContents(Contents: TStrings): Integer;
+    function SelectContext(Viewers: TStrings): Integer;
   end;
 
 implementation
@@ -76,30 +82,42 @@ type
     property TrimOption: TNamespaceTrimOption read FTO write FTO;
   end;
 
-procedure TFormHelpSelector.CategoryButtons1ButtonClicked(Sender: TObject;
+type
+  THelpViewerNodeAccess = class(TObject)
+  private
+    FViewer: ICustomHelpViewer;
+    FViewerID: Integer;
+  end;
+
+var
+  GlobalCustomHelpViewerNode: THelpViewerNodeAccess;
+
+procedure TFormHelpSelector.catbtnTopicsButtonClicked(Sender: TObject;
   const Button: TButtonItem);
+var
+  CustomButton: TCustomHelpButtonItem;
 begin
-  if CategoryButtons1.SelectedItem<>Button then
+  if catbtnTopics.SelectedItem<>Button then
     exit;
 
   if Button.Category.Collapsed then
     Button.Category.Collapsed:=False
-  else
-  if Button is TCustomHelpButtonItem then
+  else if Button is TCustomHelpButtonItem then
   begin
-    FHelpIndex:=TCustomHelpButtonItem(Button).HelpIndex;
-    FURL:=TCustomHelp.EncodeURL(TCustomHelpButtonItem(Button).Caption,
-                                TCustomHelpButtonItem(Button).Description,
-                                TCustomHelpButtonItem(Button).URL,
-                                '',
-                                TCustomHelpButtonItem(Button).FTO);
-
+    CustomButton := TCustomHelpButtonItem(Button);
+    FHelpIndex:=CustomButton.HelpIndex;
+    FURL:= CustomButton.URL;
+//    FURL:=TCustomHelp.EncodeURL(CustomButton.Caption,
+//                                CustomButton.Description,
+//                                CustomButton.URL,
+//                                '',
+//                                TCustomHelpButtonItem(Button).FTO);
     SaveExpanded;
     ModalResult:=mrOk;
   end;
 end;
 
-procedure TFormHelpSelector.CategoryButtons1DrawText(Sender: TObject;
+procedure TFormHelpSelector.catbtnTopicsDrawText(Sender: TObject;
   const Button: TButtonItem; Canvas: TCanvas; Rect: TRect;
   State: TButtonDrawState);
 var
@@ -109,40 +127,58 @@ begin
   drawrect:=Rect;
   Canvas.Font.Style:=[fsBold];
   txt:=TCustomHelpButtonItem(Button).Caption;
-  drawRect.Right:=drawrect.Left+(CategoryButtons1.Width div 3);
+  drawRect.Right:=drawrect.Left+(catbtnTopics.Width * 2 div 3);
   Canvas.TextRect(drawrect, txt, [tfEndEllipsis]);
 
   drawrect:=Rect;
   Canvas.Font.Style:=[];
   txt:=TCustomHelpButtonItem(Button).Description;
-  drawRect.Left:=drawrect.Left+(CategoryButtons1.Width div 3);
+  drawRect.Left:=drawrect.Left+(catbtnTopics.Width * 2 div 3);
   Canvas.TextRect(drawrect, txt, [tfEndEllipsis]);
 end;
 
-class function TFormHelpSelector.Execute(Keywords: TStrings;
+class function TFormHelpSelector.Execute(HelpString: string; Keywords: TStrings;
                                    out SelectedIndex: Integer;
                                    out SelectedUrl: String): Boolean;
-var
-  idx : Integer;
-  c, d, u, g : String;
-  o : Integer;
-  selector : TFormHelpSelector;
 begin
   Result:=False;
   SelectedIndex:=-1;
   SelectedUrl:='';
-  Selector:=TFormHelpSelector.Create(nil);
-  with Selector do
-  begin
-    InitList(Keywords);
 
-    if (ShowModal=mrOk)  then
-    begin
-      Result:=True;
-      SelectedIndex:=SelectedHelpIndex;
-      SelectedUrl:=URL;
+  with TFormHelpSelector.Create(Application.MainForm) do
+  begin
+    try
+      if GlobalCustomHelp.LastHelpCallKeyword <> HelpString then
+      begin
+        if Pos('.'+GlobalCustomHelp.LastHelpCallKeyword, HelpString) > 0 then
+          HelpString := GlobalCustomHelp.LastHelpCallKeyword
+      end;
+
+      Caption := StringReplace(Caption, '@@HELPSTRING@@', HelpString, [rfReplaceAll]);
+
+      GlobalCustomHelpViewerNode.FViewer := HelpViewer;
+      GlobalCustomHelpViewerNode.FViewerID := HelpViewer.ViewerID;
+      InitList(Keywords);
+
+      with catbtnTopics.Categories[0] do
+      begin
+        if Items.Count > 0 then
+        begin
+          ScrollIntoView;
+          catbtnTopics.SelectedItem := Items[0];
+          catbtnTopics.FocusedItem := Items[0];
+        end;
+      end;
+
+      if (ShowModal=mrOk)  then
+      begin
+        Result:=True;
+        SelectedIndex:=SelectedHelpIndex;
+        SelectedUrl:=URL;
+      end;
+    finally
+      Free;
     end;
-    Free;
   end;
 end;
 
@@ -150,28 +186,29 @@ procedure TFormHelpSelector.InitList(Keywords: TStrings);
 var
   cat : TButtonCategory;
   idx : integer;
-  c, d, u, g: string;
+  c, d, u, g, kw: string;
   item : TCustomHelpButtonItem;
   Reg : TRegistry;
   CheckExpanded: Boolean;
   TrimOption: TNamespaceTrimOption;
+  ANode: THelpViewerNodeAccess;
 
-  function GetCategoryFromLabel(ALabel: String): TButtonCategory;
+  function GetCategoryFromLabel(ALabel: String; ACreate: Boolean = true): TButtonCategory;
   var
     i : Integer;
   begin
     Result:=nil;
 
-    for i := 0 to CategoryButtons1.Categories.Count - 1 do
-      if CategoryButtons1.Categories[i].Caption=ALabel then
+    for i := 0 to catbtnTopics.Categories.Count - 1 do
+      if catbtnTopics.Categories[i].Caption=ALabel then
       begin
-        Result:=CategoryButtons1.Categories[i];
+        Result:=catbtnTopics.Categories[i];
         break;
       end;
 
-    if not Assigned(Result) then
+    if not Assigned(Result) and ACreate then
     begin
-      Result:=CategoryButtons1.Categories.Add;
+      Result:=catbtnTopics.Categories.Add;
       Result.Caption:=ALabel;
       Result.Color:=clActiveCaption;
       Result.TextColor:=clCaptionText;
@@ -179,6 +216,30 @@ var
       if CheckExpanded then
         Result.Collapsed:=Reg.ReadString(ALabel)='0';
     end;
+  end;
+  function CustomURLExists(AURL: string): Boolean;
+  var
+    jdx: Integer;
+  begin
+    Result := False;
+    if AURL = '' then
+      Exit;
+    AURL := '|' + AURL + '|';
+    for jdx := 0 to Keywords.Count - 1 do
+      if Pos(AURL, Keywords[jdx]) > 0 then
+      begin
+        Result := True;
+        Exit;
+      end;
+  end;
+  function GetNode(Index: integer): THelpViewerNodeAccess;
+  begin
+    Result := THelpViewerNodeAccess(Keywords.Objects[Index]);
+  end;
+  procedure GetViewerName(ANode: THelpViewerNodeAccess; var Group: string);
+  begin
+    if ANode.FViewer <> nil then
+      Group := ANode.FViewer.GetViewerName;
   end;
 
 begin
@@ -188,25 +249,61 @@ begin
 
     CheckExpanded:=Reg.OpenKey(REG_ROOT_KEY + EXPANDEDITEMS_SUB_KEY, true);
 
-    GetCategoryFromLabel(GROUP_LABEL_DEFAULT);
-
-    for idx := 0 to KeyWords.Count - 1 do
+    for idx := 0 to Keywords.Count - 1 do
     begin
-      if not AnsiStartsText('ms-help://',KeyWords[idx]) then
+      kw := Keywords[idx];
+      ANode := GetNode(idx);
+      if AnsiStartsText(PROTPREFIX_CUSTOMHELP, kw) then
       begin
-        if TCustomHelp.DecodeURL(Keywords[idx], c, d, u, g, TrimOption) then
-        begin
-          cat:=GetCategoryFromLabel(g);
-
-          item:=TCustomHelpButtonItem.Create(cat.Items);
-          item.Caption:=c;
-          item.Description:=d;
-          item.URL:=u;
-          item.HelpIndex:=idx;
-          item.TrimOption:=TrimOption;
-        end;
+        if not TCustomHelp.DecodeURL(kw, c, d, u, g, TrimOption) then
+          Continue;
+      end else if CustomURLExists(kw) then
+      begin
+        // ignore duplicate url
+        Continue;
+      end else if AnsiStartsText(PROTPREFIX_MSHELP, kw) then
+      begin
+        if not TCustomHelp.DecodeURL(kw, c, d, u, g, TrimOption) then
+          Continue;
+        if g = GROUP_LABEL_STANDARD then
+          GetViewerName(ANode, g);
+        // replace default viewer?
+        if GlobalCustomHelp.ReplaceDefaultViewer then
+          Keywords.Objects[idx] := GlobalCustomHelpViewerNode;
+      end else
+      begin
+        c := kw;
+        d := '';
+        u := kw;
+        g := GROUP_LABEL_STANDARD;
+        GetViewerName(ANode, g);
+        TrimOption := nstoNoTrim;
       end;
+
+      cat:=GetCategoryFromLabel(g);
+      item:=TCustomHelpButtonItem.Create(cat.Items);
+      item.Caption:=c;
+      item.Description:=d;
+      item.URL:=kw;
+      item.HelpIndex:=idx;
+      item.TrimOption:=TrimOption;
     end;
+
+
+
+    // move standard group to end of category button list
+    // if the user wishes so
+    cat := GetCategoryFromLabel(GROUP_LABEL_DEFAULT, False);
+    if (cat <> nil) then
+      if not GlobalCustomHelp.ShowOHSAtTop then
+        cat.Index := catbtnTopics.Categories.Count - 1
+      else
+        cat.Index := 0;
+
+    // move default group to end of category button list
+    cat := GetCategoryFromLabel(GROUP_LABEL_STANDARD, False);
+    if cat <> nil then
+      cat.Index := 0; //catbtnTopics.Categories.Count - 1;
 
     Reg.CloseKey;
   finally
@@ -214,25 +311,66 @@ begin
   end;
 end;
 
+function THelpSelector.SelectContext(Viewers: TStrings): Integer;
+begin
+  Result:=Viewers.IndexOf(HelpViewer.Name);
+end;
+
 function THelpSelector.SelectKeyword(Keywords: TStrings): Integer;
 var
-  idx : integer;
   u : String;
+  hv: IExtendedHelpViewer;
 begin
-  Result:=-1;
-  if TFormHelpSelector.Execute(Keywords, idx, u) then
-    Result:=idx;
+  if not TFormHelpSelector.Execute(GlobalCustomHelp.LastHelpCallKeyword, Keywords, Result, u) then
+  begin
+    Result:=-1;
+    Exit;
+  end;
+
+  if not GlobalCustomHelp.IsHandledByDefaultViewer(Keywords[Result]) then
+  begin
+    HelpViewer.ShowHelp(Keywords[Result]);
+    Result := -1;
+    Exit;
+  end;
+
+  with THelpViewerNodeAccess(Keywords.Objects[Result]) do
+  begin
+    if FViewer = HelpViewerIntf then
+      Exit
+    else if Supports(FViewer, IExtendedHelpViewer, hv) then
+    begin // fix call of viewer by default help system ...
+      hv.DisplayTopic(Keywords[Result]);
+      Result := -1;
+      Exit;
+    end;
+  end;
 end;
 
 function THelpSelector.TableOfContents(Contents: TStrings): Integer;
 begin
-  Result:=-1;
+  Result:=Contents.IndexOf(HelpViewer.Name);
 end;
 
 procedure TFormHelpSelector.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
   GlobalCustomHelp.PerformFullTextSearch:=cbFullTextSearch.Checked;
+  Action := caHide;
+end;
+
+procedure TFormHelpSelector.FormCreate(Sender: TObject);
+begin
+  cbFullTextSearch.Checked:=GlobalCustomHelp.PerformFullTextSearch;
+  if cbFullTextSearch.Checked then
+    cbFullTextSearch.Caption:=CAPTION_FULLTEXTCHECK
+  else
+    cbFullTextSearch.Caption:=CAPTION_INDEXCHECK;
+
+  mmoErrors.Text := GlobalCustomHelp.LastHelpErrors;
+  grpErrors.Visible := mmoErrors.Text <> '';
+  if not grpErrors.Visible then
+    Height := Height - grpErrors.Height;
 end;
 
 procedure TFormHelpSelector.FormKeyUp(Sender: TObject; var Key: Word;
@@ -244,13 +382,7 @@ end;
 
 procedure TFormHelpSelector.FormShow(Sender: TObject);
 begin
-  cbFullTextSearch.Checked:=GlobalCustomHelp.PerformFullTextSearch;
-  if cbFullTextSearch.Checked then
-    cbFullTextSearch.Caption:=CAPTION_FULLTEXTCHECK
-  else
-    cbFullTextSearch.Caption:=CAPTION_INDEXCHECK;
-
-  Caption:=Caption+' (you searched for "'+GlobalCustomHelp.LastHelpCallKeyword+'")';
+  catbtnTopics.FocusedItem := catbtnTopics.SelectedItem;
 end;
 
 procedure TFormHelpSelector.ListBox1Compare(Sender: TObject; Item1,
@@ -276,8 +408,8 @@ begin
 
     if Reg.OpenKey(REG_ROOT_KEY + EXPANDEDITEMS_SUB_KEY, true) then
     begin
-      for idx := 0 to CategoryButtons1.Categories.Count - 1 do
-        Reg.WriteString(CategoryButtons1.Categories[idx].Caption, ifthen(CategoryButtons1.Categories[idx].Collapsed,'0','1'));
+      for idx := 0 to catbtnTopics.Categories.Count - 1 do
+        Reg.WriteString(catbtnTopics.Categories[idx].Caption, ifthen(catbtnTopics.Categories[idx].Collapsed,'0','1'));
 
       Reg.CloseKey;
     end;
@@ -285,5 +417,11 @@ begin
     Reg.Free;
   end;
 end;
+
+initialization
+  GlobalCustomHelpViewerNode := THelpViewerNodeAccess.Create;
+
+finalization
+  GlobalCustomHelpViewerNode.Free;
 
 end.
