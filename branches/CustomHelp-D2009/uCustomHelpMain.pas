@@ -97,6 +97,7 @@ type
     procedure SetReplaceDefaultViewer(const Value: boolean);
     function GetRedirectSchemes: string;
     procedure SetRedirectSchemes(const Value: string);
+    class procedure CheckGidFile(AWinHelpFile: String); static;
   public
     function HelpFile: string;
     procedure InitHelpSelector(const HelpString: string);
@@ -268,6 +269,7 @@ begin
         else
         if AnsiSameText(ExtractFileExt(u),'.hlp') then
         begin
+          TCustomHelp.CheckGidFile(u);
           HelpStrings.Add(TCustomHelp.EncodeURL(c,d,'winhlp://-k '+HelpString+' '+u, g, TrimOption))
         end
         else
@@ -286,6 +288,17 @@ begin
     if not Assigned(Result) then
       FreeAndNil(HelpStrings);
   end;
+end;
+
+class procedure TCustomHelp.CheckGidFile(AWinHelpFile: String);
+var
+  GIDFile : String;
+begin
+  GIDFile:=ChangeFileExt(AWinHelpFile, '.gid');
+
+  if not FileExists(GIDFile) then
+    ShowMessage('No *.gid file available for '+AWinHelpFile+' no help query possible.'+
+                #13#10'Please open the help file using winhlp32.exe and generate indes manually');
 end;
 
 class function TCustomHelp.GetNamespaceTitle(Session: IHxSession): String;
