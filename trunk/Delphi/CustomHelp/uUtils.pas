@@ -34,6 +34,8 @@ function SafeArrayToCardArray(const si: PSafeArray): TCardinalDynArray;
 function BytesToIntArray(const b: TBytes): TIntegerDynArray;
 function BytesToCardArray(const b: TBytes): TCardinalDynArray;
 
+function FileContainsText(AFileName : String; AText : AnsiString) : Boolean;
+
 implementation
 
 uses
@@ -181,6 +183,64 @@ end;
 function SafeArrayToCardArray(const si: PSafeArray): TCardinalDynArray;
 begin
   Result := BytesToCardArray(SafeArrayToBytes(si));
+end;
+
+function FileContainsText(AFileName: String; AText: AnsiString): Boolean;
+var
+  MS : TMemoryStream;
+  TextBuffer : PAnsiChar;
+  TextLen : Integer;
+  FileBuffer : PAnsiChar;
+  FileBufferLastChar : PAnsiChar;
+  PosInMemory : Integer;
+
+  procedure LowerLastChar();
+  begin
+    if FileBufferLastChar^ in ['A'..'Z'] then
+      FileBufferLastChar^ := Chr(Ord(FileBufferLastChar^) + $20);
+  end;
+begin
+  Result := false;
+
+  Ms := TMemoryStream.Create;
+  Ms.LoadFromFile(AFileName);
+
+  TextLen := Length(AText);
+  GetMem(TextBuffer, TextLen);
+  try
+    StrPCopy(TextBuffer, LowerCase(AText));
+
+    FileBufferLastChar := Ms.Memory;
+    for PosInMemory := 0 to TextLen - 2 do
+    begin
+      LowerLastChar;
+      Inc(FileBufferLastChar);
+    end;
+
+    FileBuffer := Ms.Memory;
+    PosInMemory := TextLen - 1;
+    FileBufferLastChar := Pointer(Integer(FileBuffer) + PosInMemory);
+
+    while PosInMemory < Ms.Size do
+    begin
+      LowerLastChar;
+
+      if CompareMem(TextBuffer, FileBuffer, TextLen) then
+      begin
+        Result := true;
+        break;
+      end;
+
+      Inc(PosInMemory);
+      Inc(FileBuffer);
+      Inc(FileBufferLastChar);
+    end;
+    
+
+  finally
+    Ms.Free;
+    FreeMem(TextBuffer, TextLen);
+  end;
 end;
 
 end.
