@@ -43,6 +43,7 @@ type
     cbTrimNamespacesOHS: TComboBox;
     Label8: TLabel;
     cbOHSAtTop: TCheckBox;
+    cbCheckGID: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure ListView1Change(Sender: TObject; Item: TListItem;
@@ -189,6 +190,7 @@ begin
     edRedirectSchemes.Text := GlobalCustomHelp.RedirectSchemes;
     cbTrimNamespacesHX.ItemIndex:=StrToIntDef(sl.Values[SETTINGS_TRIMNAMESPACES], 0);
     cbOHSAtTop.Checked:=GlobalCustomHelp.ShowOHSAtTop;
+    cbCheckGID.Checked:=GlobalCustomHelp.CheckWinHelpGid;
 
     if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY, true) then
     begin
@@ -306,6 +308,7 @@ begin
   GlobalCustomHelp.ReplaceDefaultViewer := cbReplaceDefaultViewer.Checked;
   GlobalCustomHelp.RedirectSchemes := edRedirectSchemes.Text;
   GlobalCustomHelp.ShowOHSAtTop := cbOHSAtTop.Checked;
+  GlobalCustomHelp.CheckWinHelpGid := cbCheckGID.Checked;
 
   with lvNamespaces do
     for idx := 0 to Items.Count-1 do
