@@ -143,10 +143,11 @@ const
     REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER170\CustomHelp';
   {$EndIf}
   {$IfDef VER180}
-    REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER180\CustomHelp';
-  {$EndIf}
-  {$IfDef VER185}
-    REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER185\CustomHelp';
+    {$IfDef VER185}
+      REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER185\CustomHelp';
+    {$Else}
+      REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER180\CustomHelp';
+    {$EndIf}
   {$EndIf}
   {$IfDef VER200}
     REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER200\CustomHelp';
