@@ -37,8 +37,7 @@ implementation
 
 uses
   StrUtils, Windows, Dialogs;
-
-
+           
 procedure ExpandEnvVars(var AString : String; const AStartToken, AEndToken: String; const ACustomEnvVars: TStrings; Options: TExpandEnvVarsOptions);
 var
   EnvVarStartIdx,
@@ -245,7 +244,7 @@ begin
   TextLen := Length(AText);
   GetMem(TextBuffer, TextLen);
   try
-    StrPCopy(TextBuffer, LowerCase(AText));
+    StrPCopy(TextBuffer, AnsiString(LowerCase(String(AText))));
 
     FileBufferLastChar := Ms.Memory;
     for PosInMemory := 0 to TextLen - 2 do
