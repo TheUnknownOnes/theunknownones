@@ -490,9 +490,7 @@ begin
             command:='"'+sl[0]+'"';
             sl.Delete(0);
             params:=sl.DelimitedText;
-            showmessage(command);
-            showmessage(params);
-
+            
             ShellExecute(Application.Handle,
                      'open',
                      PChar(Command),
