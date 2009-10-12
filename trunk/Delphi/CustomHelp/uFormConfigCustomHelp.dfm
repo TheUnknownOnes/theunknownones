@@ -45,6 +45,7 @@ object form_Config: Tform_Config
       Width = 66
       Height = 26
       Align = alTop
+      Cancel = True
       Caption = '&Cancel'
       ModalResult = 2
       TabOrder = 1
