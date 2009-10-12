@@ -4,6 +4,7 @@
  (c) by TheUnknownOnes
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
+{.$DEFINE DEBUG_CUSTOMHELP}
 
 unit uCustomHelpMain;
 
@@ -102,15 +103,19 @@ type
     class procedure ReadEnabledNamespacesFromRegistry(const ANamesList: TStrings);
     class procedure WriteSettingToRegistry(AName, AValue: String);
     class procedure ReadSettingsFromRegistry(const ANameValueList: TStrings);
-    class function GetTopicFromURL(const URL: string; var Group: string): IHxTopic; overload;
+    class function GetSessionFromURL(const URL: string; var Group: string): IHxSession;
     class function GetTopicFromURL(hxHierarchy: IHxHierarchy; const URL: string): IHxTopic; overload;
     class function GetTopicInfo(const URL: string; out Caption, Description, Link, Group: string;
       out TrimOption: TNamespaceTrimOption): boolean;
     class function DecodeURL(const URL: String; out Link: String): boolean; overload;
-    class function CheckGidFile(AWinHelpFile: String): Boolean; static;
+    class function CheckGidFile(AWinHelpFile: String; const ARaiseError: Boolean): Boolean; static;
   end;
 
-  TCustomHelpViewer = class(TInterfacedObject, ICustomHelpViewer)
+  TCustomHelpViewer = class(TInterfacedObject,
+{$IFDEF DEBUG_CUSTOMHELP}
+    IExtendedHelpViewer, IHelpSystemFlags,
+{$ENDIF}
+    ICustomHelpViewer)
   private
     FHelpManager: IHelpManager;
     FViewerID: Integer;
@@ -127,6 +132,25 @@ type
     procedure SoftShutDown;
     procedure ShutDown;
     {$ENDREGION}
+{$IFDEF DEBUG_CUSTOMHELP}
+
+    {$region 'IExtendedHelpViewer'}
+    function UnderstandsTopic(const Topic: string): Boolean;
+    procedure DisplayTopic(const Topic: string);
+    function UnderstandsContext(const ContextID: Integer;
+      const HelpFileName: string): Boolean;
+    procedure DisplayHelpByContext(const ContextID: Integer;
+      const HelpFileName: string);
+    {$endregion}
+
+    {$region 'IHelpSystemFlags'}
+    function GetUseDefaultTopic: Boolean;
+    procedure SetUseDefaultTopic(AValue: Boolean);
+    {$endregion}
+    procedure DebugLog(method, msg: string);
+  private
+    FUseDefaultTopic: Boolean;
+{$ENDIF}
   public
     constructor Create;
     destructor Destroy; override;
@@ -183,11 +207,7 @@ const
   GROUP_LABEL_DEFAULT = 'Available Search engines';
   GROUP_LABEL_STANDARD = 'Other Help Providers';
 
-  ENVVAR_TOKEN_START = '$(';
-  ENVVAR_TOKEN_END = ')';
   ENVVAR_NAME_KEYWORD = 'HelpString';
-
-  ENVVAR_NAME_FORMATTED_KEYWORD = ENVVAR_TOKEN_START+ENVVAR_NAME_KEYWORD+ENVVAR_TOKEN_END;
 
 var
   GlobalCustomHelp : TCustomHelp;
@@ -201,6 +221,18 @@ implementation
 uses
   SysUtils, StrUtils, ShellAPI, uFormConfigCustomHelp,
   uCustomHelpIDEIntegration, Graphics, ActiveX, Variants, Types, uUtils;
+
+{$IFDEF DEBUG_CUSTOMHELP}
+var
+  Debug__CustomHelp: Boolean;
+
+{$ENDIF}
+{$WARN SYMBOL_PLATFORM OFF}
+procedure DebugLog(method, msg: string);
+begin
+  if DebugHook <> 0 then
+    OutputDebugString(PChar(FormatDateTime('',Now)+': Custom Help ['+method+']: ' + msg));
+end;
 
 { TCustomHelpViewer }
 
@@ -227,22 +259,11 @@ var
       Result:=Result + '%'+Format('%.2x', [Ord(AHelpString[i])]);
   end;
 
-  function PerformSearch(AHelpString: string): Boolean;
-  var
-    idx: Integer;
+  procedure AddEnvVar(sl: TStringList; const AName, AValue: string);
   begin
-    GlobalCustomHelp.LastHelpCallKeyword := AHelpString;
-    for idx := 0 to GlobalCustomHelp.EnabledhxSessions.Count - 1 do
-    begin
-      try
-        GlobalCustomHelp.PerformInHxSession(AHelpString, idx, HelpStrings);
-      except on e: Exception do
-        errmsgs.Add(GlobalCustomHelp.GetNamespaceName(GlobalCustomHelp.EnabledhxSession[idx]) + ': '+ e.Message);
-      end;
-    end;
-    Result := HelpStrings.Count > 0;
+    sl.Values['_'+AName] := AValue;
+    sl.Values[AName] := EncodedHelpString(AValue);
   end;
-
 begin
   Result := NIL;
   GlobalCustomHelp.LastHelpCallKeyword := HelpString;
@@ -255,6 +276,7 @@ begin
   sl := TStringList.Create;
   try
     HelpStrings.Duplicates:=dupIgnore;
+    sl.CaseSensitive := False;
 
     errmsgs := TStringList.Create;
     try
@@ -264,21 +286,19 @@ begin
       for idx := 0 to GlobalCustomHelp.EnabledhxSessions.Count - 1 do
       begin
         try
-          if not GlobalCustomHelp.PerformInHxSession(HelpString, idx, HelpStrings) then
+          ShortHelpString := HelpString;
+          if not GlobalCustomHelp.PerformInHxSession(ShortHelpString, idx, HelpStrings) then
             if GlobalCustomHelp.TrimNamespacesUntilResultFound <> nstoNoTrim then
             begin
-              ShortHelpString:=HelpString;
-              while Pos('.', ShortHelpString) > 0 do
-              begin
-                Delete(ShortHelpString, 1, Pos('.', ShortHelpString));
-                if ((ShortHelpString<>'') and (ShortHelpString<>HelpString)) then
-                begin // Und jetzt noch das verkürzte Suchwort in den eigentlichen Hilfe-Namespaces suchen
-                  if GlobalCustomHelp.PerformInHxSession(ShortHelpString, idx, HelpStrings) then
-                    Break;
-                end;
+              repeat
+                LeftToken(ShortHelpString, '.', true);
+                if ShortHelpString = '' then
+                  Break;
+                if GlobalCustomHelp.PerformInHxSession(ShortHelpString, idx, HelpStrings) then
+                  Break;
                 if GlobalCustomHelp.TrimNamespacesUntilResultFound = nstoTrimFirst then
                   Break;
-              end;
+              until ShortHelpString = '';
             end;
         except
           on e: Exception do
@@ -294,41 +314,44 @@ begin
         ShortHelpString:=HelpString;
         TCustomHelp.TrimNamespace(ShortHelpString, TrimOption);
 
-        if Pos('://', u)>0 then
-        begin
-          if PosText(ENVVAR_NAME_FORMATTED_KEYWORD,u)=0 then
-            u:=u+ENVVAR_NAME_FORMATTED_KEYWORD;
+        AddEnvVar(sl, ENVVAR_NAME_KEYWORD, ShortHelpString);
 
-          sl.Values[ENVVAR_NAME_KEYWORD]:=EncodedHelpString(ShortHelpString);
-          ExpandEnvVars(u,ENVVAR_TOKEN_START,ENVVAR_TOKEN_END, sl);
-
-          HelpStrings.Add(TCustomHelp.EncodeURL(c,d,u, g, TrimOption))
-        end
-        else
-        if AnsiSameText(ExtractFileExt(u),'.hlp') then
-        begin
-          ShortHelpString:=AnsiReplaceStr(ShortHelpString, '.', ',');
-
-          if (not GlobalCustomHelp.CheckWinHelpGid) or
-             TCustomHelp.CheckGidFile(u) then
+        try
+          if Pos('://', u)>0 then
           begin
-            if (not GlobalCustomHelp.CheckWinHelpGid) or
-               FileContainsText(u, ShortHelpString) then
-              HelpStrings.Add(TCustomHelp.EncodeURL(c,d,PROTPREFIX_WINHELP+'-k '+ShortHelpString+' '+u, g, TrimOption));
-          end;
-        end
-        else
-        if AnsiSameText(ExtractFileExt(u),'.chm') then
-        begin
-          HelpStrings.Add(TCustomHelp.EncodeURL(c,d,PROTPREFIX_HTMLHELP+ShortHelpString+URL_SPLITTER+u, g, TrimOption));
-        end
-        else
-        begin
-          //we got something we don't know. So let's try our best to execute that stuff
-          sl.Values[ENVVAR_NAME_KEYWORD]:=ShortHelpString;
-          ExpandEnvVars(u, ENVVAR_TOKEN_START, ENVVAR_TOKEN_END, sl);
+            if PosText(EnvVarToken(ENVVAR_NAME_KEYWORD),u)=0 then
+              u:=u+EnvVarToken(ENVVAR_NAME_KEYWORD);
 
-          HelpStrings.Add(TCustomHelp.EncodeURL(c,d,PROTPREFIX_UNKNOWNHELP+u, g, TrimOption));
+            ExpandEnvVars(u, sl);
+            HelpStrings.Add(TCustomHelp.EncodeURL(c,d,u, g, TrimOption))
+          end
+          else
+          if AnsiSameText(ExtractFileExt(u),'.hlp') then
+          begin
+            ShortHelpString:=AnsiReplaceStr(ShortHelpString, '.', ',');
+
+            if (not GlobalCustomHelp.CheckWinHelpGid) or
+               TCustomHelp.CheckGidFile(u, True) then
+            begin
+              if (not GlobalCustomHelp.CheckWinHelpGid) or
+                 FileContainsText(u, ShortHelpString) then
+                HelpStrings.Add(TCustomHelp.EncodeURL(c,d,PROTPREFIX_WINHELP+'-k '+ShortHelpString+' '+u, g, TrimOption));
+            end;
+          end
+          else
+          if AnsiSameText(ExtractFileExt(u),'.chm') then
+          begin
+            HelpStrings.Add(TCustomHelp.EncodeURL(c,d,PROTPREFIX_HTMLHELP+ShortHelpString+URL_SPLITTER+u, g, TrimOption));
+          end
+          else
+          begin
+            //we got something we don't know. So let's try our best to execute that stuff
+            ExpandEnvVars(u, sl);
+            HelpStrings.Add(TCustomHelp.EncodeURL(c,d,PROTPREFIX_UNKNOWNHELP+u, g, TrimOption));
+          end;
+        except
+          on e: Exception do
+            errmsgs.Add(u + ': '+ e.Message);
         end;
       end;
 
@@ -430,13 +453,16 @@ begin
   HtmlHelp(Application.Handle, PChar(sl[1]), HH_KEYWORD_LOOKUP, cardinal(@SearchRecord));
   finally
     sl.Free;
-  end;                 
+  end;
 end;
 
 constructor TCustomHelpViewer.Create;
 begin
   inherited Create;
   HelpViewerIntf := Self;
+{$IFDEF DEBUG_CUSTOMHELP}
+  FUseDefaultTopic := True;
+{$ENDIF}
 end;
 
 destructor TCustomHelpViewer.Destroy;
@@ -463,9 +489,11 @@ var
   alternativeNavigate : boolean;
   sl : TStringList;
   command, params : String;
+  hs: IHelpSystem;
 begin
   if HelpString<>'' then
   begin
+    GetHelpSystem(hs);
     //Hier gehts dann wirklich um die Wurst
     //Wir bekommen den Hilfestring übergeben, den der
     //Nutzer aus der Liste, die wir bei GetHelpStrings gebaut haben,
@@ -473,7 +501,7 @@ begin
 
     if TCustomHelp.DecodeURL(HelpString, u) then
     begin
-      if Pos(PROTPREFIX_UNKNOWNHELP, u)=1 then
+      if AnsiStartsText(PROTPREFIX_UNKNOWNHELP, u) then
       begin
         Delete(u,1,Length(PROTPREFIX_UNKNOWNHELP));
         // we got some unknown help format... just try to execute it ;-)
@@ -488,7 +516,7 @@ begin
             command:='"'+sl[0]+'"';
             sl.Delete(0);
             params:=sl.DelimitedText;
-            
+
             ShellExecute(Application.Handle,
                      'open',
                      PChar(Command),
@@ -501,7 +529,7 @@ begin
         end;
       end
       else
-      if Pos(PROTPREFIX_WINHELP, u)=1 then
+      if AnsiStartsText(PROTPREFIX_WINHELP, u) then
       begin
         Delete(u,1,Length(PROTPREFIX_WINHELP));
         ShellExecute(Application.Handle,
@@ -512,21 +540,22 @@ begin
                      SW_SHOWNORMAL);
       end
       else
-      if Pos(PROTPREFIX_HTMLHELP, u)=1 then
+      if AnsiStartsText(PROTPREFIX_HTMLHELP, u) then
       begin
         Delete(u,1,Length(PROTPREFIX_HTMLHELP));
         ShowHTMLHelp(u);
       end
       else
+      if Assigned(hs) and not GlobalCustomHelp.ReplaceDefaultViewer and AnsiStartsText(PROTPREFIX_MSHELP, u) then
       begin
-        alternativeNavigate := False;                                
+        hs.ShowTopicHelp(u, '');
+      end
+      else
+      begin
+        alternativeNavigate := True;
         if GlobalCustomHelp.ShowCustomHelpOnWelcomePage then
-        begin
-          if not WelcomePageNavigate(u) then
-            alternativeNavigate:=True;
-        end
-        else
-          alternativeNavigate:=True;
+          if WelcomePageNavigate(u) then
+            alternativeNavigate:=False;
 
         if alternativeNavigate then
           ShellExecute(Application.Handle, 'open', PChar(u), '', '', SW_SHOWNORMAL);
@@ -535,7 +564,7 @@ begin
     else
     begin
       //oops das haben wir jetzt nicht verstanden....
-      //das heißt wir sind die letzte instanz Doch noch Hilfe zu bekommen.
+      //das heißt wir sind die einzige Instanz, die Hilfe angemeldet hat.
       //Wir erzwingen einen Selektor und rufen uns selbst noch mal auf
       ShowHelp(ForceSelector(HelpString));
     end;
@@ -644,12 +673,56 @@ function TCustomHelpViewer.UnderstandsKeyword(const HelpString: String): Integer
 begin
   //Das Hilfesystem fragt uns: Verstehst du dieses Keyword (der Begriff unter dem Cursor)?
   Result := 0;
+  DebugLog('UnderstandsKeyword', HelpString + '=' + IntToStr(Result));
+{$IFDEF DEBUG_CUSTOMHELP}
+  if Debug__CustomHelp then
+  begin
+    Result := 0;
+    Exit;
+  end;
+
+{$ENDIF}
+  // Die Abfrage auf 'erroneous type' ist nur eine Teillösung, weil das Delphi-Hilfesystem
+  // mehrere Abfragen mit unterschiedlichen HelpStrings, allerdings nur dann
+  // wenn bis dahin keine Ergebnisse gefunden wurden.
+  // PROBLEM: Wie erzwingt man die Anzeige des Selectors, auch wenn "keine"
+  // Ergebnisse vorliegen, damit man ggf. alle Varianten prüfen kann?
+  // ----- START Delphi 2009 ------
+  // Im Formulareditor (Pseudo-Code):
+  //    class := typeof(comp);
+  //    while class <> nil do
+  //    begin
+  //      if UnderStandsKeyword(unitofcomp.class.prop) > 0 then Break;
+  //      if UnderStandsKeyword(class.prop) > 0 then Break;
+  //      class := class.parent;
+  //    end;
+  //
+  // Im Objektinspektor (Pseudo-Code):
+  //    class := typeof(comp);
+  //    while class <> nil do
+  //    begin
+  //      if UnderStandsKeyword(unitofcomp.class.prop) > 0 then Break;
+  //      if UnderStandsKeyword(class.prop) > 0 then Break;
+  //      class := class.parent;
+  //    end;
+  // Im Codeeditor:
+  //    0. Wenn Selektion, dann gehe zu 2.
+  //    1. Abfrage mit durch Kibitz-Compiler
+  //    1a. Abfrage mit ermittelten Symbol analog zu oben.
+  //       (bei Compilierfehler gibt es das untenstehende 'erroneous type'
+  //    1b. Bei Properties: Analog zu oben mit Klasse des Symbols.
+  //    2. Abfrage des aktuellen Wortes / der Selektion
+  //    3. Schleife: Abfrage des am Anfang gekürzten Wortes / der Selektion
+  //    4. Schleife: Abfrage des am Ende gekürzten Wortes / der Selektion
+  // ----- ENDE Delphi 2009 ------
   if AnsiContainsText(HelpString, 'erroneous type') then
     Exit;
 
   with GetHelpStrings(HelpString) do
   begin
     Result := Count;
+    if Pos('.', HelpString) > 0 then
+      Dec(Result, GlobalCustomHelp.ProviderList.Count);
     Free;
   end;
 
@@ -701,25 +774,25 @@ begin
     WriteProviderToRegistry('1',
                             'DP DelphiReference',
                             'Search with Daniels Cool Tool',
-                            'http://ref.dp200x.de/dp_reference.php?securitytoken=guest&tabbed=1&sbutton=Search&query='+ENVVAR_NAME_FORMATTED_KEYWORD,
+                            'http://ref.dp200x.de/dp_reference.php?securitytoken=guest&tabbed=1&sbutton=Search&query='+EnvVarToken(ENVVAR_NAME_KEYWORD),
                             nstoTrimFirst);
 
     WriteProviderToRegistry('2',
                             'Koders.com',
                             'Search at koders.com',
-                            'http://www.koders.com/default.aspx?submit=Search&la=Delphi&li=*&s='+ENVVAR_NAME_FORMATTED_KEYWORD,
+                            'http://www.koders.com/default.aspx?submit=Search&la=Delphi&li=*&s='+EnvVarToken(ENVVAR_NAME_KEYWORD),
                             nstoTrimFirst);
 
     WriteProviderToRegistry('3',
                             'Google Codesearch',
                             'Search using Google Codesearch',
-                            'http://www.google.com/codesearch?btnG=Code+suchen&hl=de&as_lang=pascal&as_license_restrict=i&as_license=&as_package=&as_filename=&as_case=&as_q='+ENVVAR_NAME_FORMATTED_KEYWORD,
+                            'http://www.google.com/codesearch?btnG=Code+suchen&hl=de&as_lang=pascal&as_license_restrict=i&as_license=&as_package=&as_filename=&as_case=&as_q='+EnvVarToken(ENVVAR_NAME_KEYWORD),
                             nstoTrimFirst);
 
     WriteProviderToRegistry('3',
                             'MSDN Online',
                             'Search using MSDN Online',
-                            'http://search.msdn.microsoft.com/Default.aspx?locale=en-US&Query='+ENVVAR_NAME_FORMATTED_KEYWORD,
+                            'http://search.msdn.microsoft.com/Default.aspx?locale=en-US&Query='+EnvVarToken(ENVVAR_NAME_KEYWORD),
                             nstoTrimFirst);
 
     LoadProviderFromRegistry;
@@ -748,39 +821,41 @@ begin
   end;
 end;
 
-class function TCustomHelp.GetTopicFromURL(const URL: string; var Group: string): IHxTopic;
+class function TCustomHelp.GetSessionFromURL(const URL: string; var Group: string): IHxSession;
 var
-  idx: Integer;
-  hxSession: IHxSession;
-  hxHierarchy: IHxHierarchy;
+  idx: integer;
+  nsName: string;
 begin
   Result := nil;
-  for idx := 0 to GlobalCustomHelp.FEnabledhxSessions.Count - 1 do
-  begin
-    hxSession := GlobalCustomHelp.EnabledhxSession[idx];
-    if hxSession <> nil then
-    begin
-      if not AnsiStartsText(PROTPREFIX_MSHELP+GlobalCustomHelp.GetNamespaceName(hxSession), URL) then
-        Continue;
-      try
-        if Supports(hxSession.GetNavigationObject('!DefaultToc', ''), IHxHierarchy, hxHierarchy) then
-        begin
-          Result := GetTopicFromURL(hxHierarchy, URL);
-          Group := GlobalCustomHelp.GetNamespaceTitle(hxSession);
-        end;
-      except
-      end;
-    end;
-  end;
+  if not AnsiStartsText(PROTPREFIX_MSHELP, URL) then
+    Exit;
+  idx := PosEx('/', URL, Length(PROTPREFIX_MSHELP)+1) - 1;
+  if idx < 0 then
+    nsName := URL
+  else
+    nsName := Copy(URL, 1, idx);
+
+  Result := CoHxSession.Create;
+  Result.Initialize(nsName, 0);
+  Group := GlobalCustomHelp.GetNamespaceTitle(Result);
 end;
 
 class function TCustomHelp.GetTopicInfo(const URL: string;
   out Caption, Description, Link, Group: string;
   out TrimOption: TNamespaceTrimOption): boolean;
 var
+  hxSession: IHxSession;
+  hxHierarchy: IHxHierarchy;
   tp: IHxTopic;
 begin
-  tp := GetTopicFromURL(URL, Group);
+  tp := nil;
+  hxSession := GetSessionFromURL(URL, Group);
+  if hxSession <> nil then
+    try
+      if Supports(hxSession.GetNavigationObject('!DefaultToc', ''), IHxHierarchy, hxHierarchy) then
+        tp := GetTopicFromURL(hxHierarchy, URL);
+    except
+    end;
   Result := tp <> nil;
   if Result then
   begin
@@ -1159,16 +1234,22 @@ begin
   TCustomHelp.WriteSettingToRegistry(SETTINGS_TRIMNAMESPACES, IntToStr(byte(Value)));
 end;
 
-class function TCustomHelp.CheckGidFile(AWinHelpFile: String): Boolean;
+class function TCustomHelp.CheckGidFile(AWinHelpFile: String; const ARaiseError: Boolean): Boolean;
+const
+  msg = 'No gid file%1:s available. No help query possible.%0:s'+
+        'Please open the help file using winhlp32.exe and generate index manually.';
 var
   GIDFile : String;
 begin
   GIDFile:=ChangeFileExt(AWinHelpFile, '.gid');
 
-  Result:=FileExists(GIDFile);
+  Result := FileExists(GIDFile);
   if not Result then
-    ShowMessage('No *.gid file available for '+AWinHelpFile+' no help query possible.'+
-                #13#10'Please open the help file using winhlp32.exe and generate indes manually');
+  begin
+    if ARaiseError then
+      raise EHelpSystemException.CreateFmt(msg, [ ' ', '' ]);
+    ShowMessageFmt(msg, [ sLineBreak, 'for "'+AWinHelpFile+'"' ]);
+  end;
 end;
 
 class procedure TCustomHelp.WriteSettingToRegistry(AName, AValue: String);
@@ -1251,7 +1332,54 @@ begin
 
 end;
 
+{$IFDEF DEBUG_CUSTOMHELP}
+procedure TCustomHelpViewer.DebugLog(method, msg: string);
+begin
+  uCustomHelpMain.DebugLog(method + '{' + BoolToStr(FUseDefaultTopic, True) + '}', msg);
+end;
+{$region 'IHelpSystemFlags'}
+
+function TCustomHelpViewer.GetUseDefaultTopic: Boolean;
+begin
+  Result := FUseDefaultTopic;
+end;
+
+function TCustomHelpViewer.UnderstandsTopic(const Topic: string): Boolean;
+begin
+  Result := False;
+  DebugLog('UnderstandsTopic', Topic + '=' + BoolToStr(Result, true));
+end;
+
+procedure TCustomHelpViewer.DisplayTopic(const Topic: string);
+begin
+  DebugLog('DisplayTopic', Topic);
+end;
+
+procedure TCustomHelpViewer.SetUseDefaultTopic(AValue: Boolean);
+begin
+  FUseDefaultTopic := AValue;
+end;
+
+function TCustomHelpViewer.UnderstandsContext(const ContextID: Integer;
+  const HelpFileName: string): Boolean;
+begin
+  Result := False;
+  DebugLog('UnderstandsContext', '('+IntToStr(ContextID)+', '+HelpFileName+')='+BoolToStr(Result));
+end;
+
+procedure TCustomHelpViewer.DisplayHelpByContext(const ContextID: Integer;
+  const HelpFileName: string);
+begin
+  DebugLog('DisplayHelpByContext', '('+IntToStr(ContextID)+', '+HelpFileName);
+end;
+
+{$endregion}
+{$ENDIF}
+
 initialization
+{$IFDEF DEBUG_CUSTOMHELP}
+  Debug__CustomHelp := True;
+{$ENDIF}
   GlobalCustomHelp:=TCustomHelp.Create;
   AddSpashBitmap;
 

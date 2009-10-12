@@ -5,8 +5,10 @@ interface
 uses
   Types, ActiveX, SysUtils, Classes;
 
+{$if not Defined(TBytes)}
 type
   TBytes = array of Byte;
+{$ifend}
 
 {$if not Defined(PosStr)}
 function PosStr(const subStr: string; const str: string; fromPos: cardinal = 1;
@@ -18,6 +20,9 @@ function PosText(const subStr: string; const str: string; fromPos: cardinal = 1;
   toPos: cardinal = maxInt): integer;
 {$ifend}
 
+FUNCTION LeftToken(VAR s: string; CONST delim: string; CONST IgnoreCase: boolean): string;
+FUNCTION RightToken(VAR s: string; CONST delim: string; CONST IgnoreCase: boolean): string;
+
 function SafeArrayToBytes(const si: PSafeArray): TBytes;
 function SafeArrayToIntArray(const si: PSafeArray): TIntegerDynArray;
 function SafeArrayToCardArray(const si: PSafeArray): TCardinalDynArray;
@@ -25,19 +30,58 @@ function SafeArrayToCardArray(const si: PSafeArray): TCardinalDynArray;
 function BytesToIntArray(const b: TBytes): TIntegerDynArray;
 function BytesToCardArray(const b: TBytes): TCardinalDynArray;
 
-function FileContainsText(AFileName : String; AText : AnsiString) : Boolean;
+function FileContainsText(AFileName : String; AText : String) : Boolean;
 
 type
   TExpandEnvVarsOption = (eevoPreferSystemValues);
   TExpandEnvVarsOptions = set of TExpandEnvVarsOption;
 
-procedure ExpandEnvVars(var AString : String; const AStartToken, AEndToken: String; const ACustomEnvVars: TStrings = nil; Options: TExpandEnvVarsOptions = []);
+const
+  ENVVAR_TOKEN_START = '$(';
+  ENVVAR_TOKEN_END = ')';
+
+function EnvVarToken(const Name: string; const AStartToken: string = ENVVAR_TOKEN_START; AEndToken: String = ENVVAR_TOKEN_END): string;
+function GetEnvironmentVariable(const Name: string; out Value: string): Boolean; overload;
+
+procedure ExpandEnvVars(var AString : String; const AStartToken, AEndToken: String; const ACustomEnvVars: TStrings = nil; Options: TExpandEnvVarsOptions = []); overload;
+procedure ExpandEnvVars(var AString : String; const ACustomEnvVars: TStrings = nil; Options: TExpandEnvVarsOptions = []); overload;
 
 implementation
 
 uses
   StrUtils, Windows, Dialogs;
-           
+
+function GetEnvironmentVariable(const Name: string; out Value: string): Boolean;
+const
+  BufSize = 1024;
+var
+  Len: Integer;
+  Buffer: array[0..BufSize - 1] of Char;
+begin
+  Result := false;
+  Len := GetEnvironmentVariable(PChar(Name), @Buffer, BufSize);
+  if GetLastError = ERROR_ENVVAR_NOT_FOUND then
+    Exit;
+  if Len < BufSize then
+    SetString(Value, PChar(@Buffer), Len)
+  else
+  begin
+    SetLength(Value, Len - 1);
+    GetEnvironmentVariable(PChar(Name), PChar(Value), Len);
+  end;
+  Result := true;
+end;
+
+function EnvVarToken(const Name: string; const AStartToken: string; AEndToken: String): string;
+begin
+  Result := AStartToken + Name + AEndToken;
+end;
+
+procedure ExpandEnvVars(var AString : String; const ACustomEnvVars: TStrings = nil; Options: TExpandEnvVarsOptions = []);
+begin
+  ExpandEnvVars(AString, ENVVAR_TOKEN_START, ENVVAR_TOKEN_END, ACustomEnvVars, Options);
+end;
+
 procedure ExpandEnvVars(var AString : String; const AStartToken, AEndToken: String; const ACustomEnvVars: TStrings; Options: TExpandEnvVarsOptions);
 var
   EnvVarStartIdx,
@@ -47,7 +91,6 @@ var
   EnvVarName     : String;
   cevIndex : Integer;
 
-  Buffer : Array [0..255] of Char;
   SysValue : String;
   CustomValue : String;
 
@@ -56,9 +99,6 @@ var
   UseCustomValue: Boolean;
   UseSystemValue: Boolean;
 begin
-  UseCustomValue:=False;
-  UseSystemValue:=False;
-
   StartTokenLen:=Length(AStartToken);
   EndTokenLen:=Length(AEndToken);
 
@@ -77,43 +117,31 @@ begin
       //let's get the variable name
       EnvVarName:=Copy(AString, EnvVarStartIdx+StartTokenLen, EnvVarEndIdx-EnvVarStartIdx-StartTokenLen);
 
-      UseSystemValue:=GetEnvironmentVariable(PChar(EnvVarName), PChar(@Buffer), Length(Buffer))>0;
-      SysValue:=Buffer;
+      UseSystemValue:=GetEnvironmentVariable(EnvVarName, SysValue);
+      UseCustomValue:=False;
       if Assigned(ACustomEnvVars) then
       begin
         cevIndex:=ACustomEnvVars.IndexOfName(EnvVarName);
-        if cevIndex>=0 then
-        begin
+        UseCustomValue:= cevIndex>=0;
+        if UseCustomValue then
           CustomValue:=ACustomEnvVars.ValueFromIndex[cevIndex];
-          UseCustomValue:=True;
-        end;
       end;
 
-      if eevoPreferSystemValues in Options then
-      begin
-        if UseSystemValue then
-          Value:=SysValue
-        else
-        if UseCustomValue then
-          Value:=CustomValue
-        else
-          Value:='';
-      end
+      if UseSystemValue and (eevoPreferSystemValues in Options) then
+        Value:=SysValue
+      else if UseCustomValue then
+        Value:=CustomValue
       else
-      begin
-        if UseCustomValue then
-          Value:=CustomValue
-        else
-        if UseSystemValue then
-          Value:=SysValue
-        else
-          Value:='';
-      end;
+      if UseSystemValue then
+        Value:=SysValue
+      else
+        Value:='';
 
       Delete(AString, EnvVarStartIdx, EndTokenLen+EnvVarEndIdx-EnvVarStartIdx);
       Insert(Value, AString, EnvVarStartIdx);
+      Inc(EnvVarStartIdx, Length(AString) + 1); // do not replace variables recursivly
 
-      EnvVarStartIdx:=Pos(AStartToken, AString);
+      EnvVarStartIdx:=PosEx(AStartToken, AString, EnvVarStartIdx);
     end
     else
       break;  //we didn't find a matching end token... AString is broken
@@ -171,6 +199,48 @@ end;
 {$ifend}
 {$ifend}
 
+FUNCTION LeftToken(VAR s: string; CONST delim: string;
+  CONST IgnoreCase: boolean): string;
+VAR
+  idx: integer;
+BEGIN
+  IF IgnoreCase THEN
+    idx := PosText(delim, s, 1, MaxInt)
+  ELSE
+    idx := PosStr(delim, s, 1, MaxInt);
+  IF idx < 1 THEN
+  BEGIN
+    Result := s;
+    s := '';
+  END
+  ELSE
+  BEGIN
+    Result := Copy(s, 1, idx - 1);
+    Delete(s, 1, idx - 1 + Length(delim));
+  END;
+END;
+
+FUNCTION RightToken(VAR s: string; CONST delim: string;
+  CONST IgnoreCase: boolean): string;
+VAR
+  idx: integer;
+BEGIN
+  IF IgnoreCase THEN
+    idx := PosText(delim, s, MaxInt, 1)
+  ELSE
+    idx := PosStr(delim, s, MaxInt, 1);
+  IF idx < 1 THEN
+  BEGIN
+    Result := s;
+    s := '';
+  END
+  ELSE
+  BEGIN
+    Result := Copy(s, idx + Length(delim));
+    Delete(s, idx, MaxInt);
+  END;
+END;
+
 function SafeArrayToBytes(const si: PSafeArray): TBytes;
 var
   nLow, nHigh, nSize: integer;
@@ -221,7 +291,7 @@ begin
   Result := BytesToCardArray(SafeArrayToBytes(si));
 end;
 
-function FileContainsText(AFileName: String; AText: AnsiString): Boolean;
+function FileContainsText(AFileName: String; AText:String): Boolean;
 var
   MS : TMemoryStream;
   TextBuffer : PAnsiChar;
@@ -244,7 +314,7 @@ begin
   TextLen := Length(AText);
   GetMem(TextBuffer, TextLen);
   try
-    StrPCopy(TextBuffer, AnsiString(LowerCase(String(AText))));
+    StrPCopy(TextBuffer, AnsiString(LowerCase(AText)));
 
     FileBufferLastChar := Ms.Memory;
     for PosInMemory := 0 to TextLen - 2 do
