@@ -8,7 +8,6 @@ uses
 type
   TBytes = array of Byte;
 
-
 function LeftToken(var s: string; const delim: string;
   const IgnoreCase: boolean): string;
 

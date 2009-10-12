@@ -23,6 +23,18 @@ type
   private
     FLastKeyword: String;
     FLastHelpErrors: string;
+    FSessionLock: TCriticalSection;
+    FCustomHelpViewer:TCustomHelpViewer;
+    FHandledSchemes: TStringList;
+    FReplaceDefaultViewer: boolean;
+    FShowOHSAtTop: boolean;
+    FCheckWinHelpGid: Boolean;
+
+    procedure SetReplaceDefaultViewer(const Value: boolean);
+    function GetRedirectSchemes: string;
+    procedure SetRedirectSchemes(const Value: string);
+    procedure SetShowOHSAtTop(const Value: boolean);
+    procedure SetCheckWinHelpGid(const Value: Boolean);
     class function GetNamespaces: IHxRegNamespaceList;
     function GetEnabledhxSession(Index: Integer): IHxSession;
     procedure SetFullTextSearch(const Value: Boolean);
@@ -47,6 +59,17 @@ type
     procedure LoadEnabledNamespacesFromRegistry;
 
     procedure OnMenuItemClick(Sender : TObject);
+
+    class function GetNamespaceTitle(Session : IHxSession) : String;
+    class function GetNamespaceName(Session: IHxSession): string;
+    class procedure TrimNamespace(var s: string; ATrimOption: TNamespaceTrimOption);
+    class function CheckIndexInHxSession(hxSession: IHxSession; var hxIndex: IHxIndex): boolean;
+    function SearchInHxSession(hxSession: IHxSession;
+      const HelpString: string; AResult: TStringList;
+      hxIndex: IHxIndex): Boolean;
+    function QueryInHxSession(hxSession: IHxSession;
+      const HelpString: string; const AResult: TStringList): Boolean;
+    function PerformInHxSession(HelpString: string; SessionIndex: integer; const AResult: TStringList): Boolean;
   public
     constructor Create();
     destructor Destroy(); override;
@@ -60,50 +83,25 @@ type
     property LastHelpCallKeyword: String read FLastKeyword write FLastKeyword;
     property TrimNamespacesUntilResultFound: TNamespaceTrimOption read FTrimNamespaces write SetTrimNamespaces;
 
-    class function DecodeURL(const URL: String; out Caption: String;
-      out Description: String; out Link: String; out Group: String;
-      out TrimOption: TNamespaceTrimOption): boolean; overload;
-    class function EncodeURL(Caption, Description, Link, Group: String; TrimOption: TNamespaceTrimOption): String;
-
-    class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String; ATrimNamespaces: TNamespaceTrimOption);
-    class procedure WriteNamespacesToRegistry(ANamespace: String; AEnabled: Boolean);
-    class procedure ReadEnabledNamespacesFromRegistry(const ANamesList: TStrings);
-    class procedure WriteSettingToRegistry(AName, AValue: String);
-    class procedure ReadSettingsFromRegistry(const ANameValueList: TStrings);
-  protected
-    class function GetNamespaceTitle(Session : IHxSession) : String;
-    class function GetNamespaceName(Session: IHxSession): string;
-    class procedure TrimNamespace(var s: string; ATrimOption: TNamespaceTrimOption);
-    class function CheckIndexInHxSession(hxSession: IHxSession; var hxIndex: IHxIndex): boolean;
-    function SearchInHxSession(hxSession: IHxSession;
-      const HelpString: string; AResult: TStringList;
-      hxIndex: IHxIndex): Boolean;
-    function QueryInHxSession(hxSession: IHxSession;
-      const HelpString: string; const AResult: TStringList): Boolean;
-    function PerformInHxSession(HelpString: string; SessionIndex: integer; const AResult: TStringList): Boolean;
-  public
     property EnabledhxSession[Index: integer]: IHxSession read GetEnabledhxSession;
     property LastHelpErrors: string read FLastHelpErrors write FLastHelpErrors;
-  private
-    FSessionLock: TCriticalSection;
-    FCustomHelpViewer:TCustomHelpViewer;
-    FHandledSchemes: TStringList;
-    FReplaceDefaultViewer: boolean;
-    FShowOHSAtTop: boolean;
-    FCheckWinHelpGid: Boolean;
-    procedure SetReplaceDefaultViewer(const Value: boolean);
-    function GetRedirectSchemes: string;
-    procedure SetRedirectSchemes(const Value: string);
-    procedure SetShowOHSAtTop(const Value: boolean);
-    procedure SetCheckWinHelpGid(const Value: Boolean);
-  public
-//    function HelpFile: string;
+
     procedure InitHelpSelector(const HelpString: string);
     function IsHandledByDefaultViewer(const AKeyword: string): boolean;
     property ReplaceDefaultViewer: boolean read FReplaceDefaultViewer write SetReplaceDefaultViewer;
     property ShowOHSAtTop: boolean read FShowOHSAtTop write SetShowOHSAtTop;
     property CheckWinHelpGid: Boolean read FCheckWinHelpGid write SetCheckWinHelpGid;
     property RedirectSchemes: string read GetRedirectSchemes write SetRedirectSchemes;
+
+    class function DecodeURL(const URL: String; out Caption: String;
+      out Description: String; out Link: String; out Group: String;
+      out TrimOption: TNamespaceTrimOption): boolean; overload;
+    class function EncodeURL(Caption, Description, Link, Group: String; TrimOption: TNamespaceTrimOption): String;
+    class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String; ATrimNamespaces: TNamespaceTrimOption);
+    class procedure WriteNamespacesToRegistry(ANamespace: String; AEnabled: Boolean);
+    class procedure ReadEnabledNamespacesFromRegistry(const ANamesList: TStrings);
+    class procedure WriteSettingToRegistry(AName, AValue: String);
+    class procedure ReadSettingsFromRegistry(const ANameValueList: TStrings);
     class function GetTopicFromURL(const URL: string; var Group: string): IHxTopic; overload;
     class function GetTopicFromURL(hxHierarchy: IHxHierarchy; const URL: string): IHxTopic; overload;
     class function GetTopicInfo(const URL: string; out Caption, Description, Link, Group: string;
