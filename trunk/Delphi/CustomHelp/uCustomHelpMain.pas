@@ -104,12 +104,12 @@ type
     property ShowOHSAtTop: boolean read FShowOHSAtTop write SetShowOHSAtTop;
     property CheckWinHelpGid: Boolean read FCheckWinHelpGid write SetCheckWinHelpGid;
     property RedirectSchemes: string read GetRedirectSchemes write SetRedirectSchemes;
-    class function GetTopicFromURL(const URL: string; var Group: string): IHxTopic; overload;
+    class function GetSessionFromURL(const URL: string; var Group: string): IHxSession;
     class function GetTopicFromURL(hxHierarchy: IHxHierarchy; const URL: string): IHxTopic; overload;
     class function GetTopicInfo(const URL: string; out Caption, Description, Link, Group: string;
       out TrimOption: TNamespaceTrimOption): boolean;
     class function DecodeURL(const URL: String; out Link: String): boolean; overload;
-    class function CheckGidFile(AWinHelpFile: String): Boolean; static;
+    class function CheckGidFile(AWinHelpFile: String; const ARaiseError: Boolean): Boolean; static;
   end;
 
   TCustomHelpViewer = class(TInterfacedObject, ICustomHelpViewer)
@@ -293,13 +293,17 @@ begin
         if AnsiSameText(ExtractFileExt(u),'.hlp') then
         begin
           ShortHelpString:=AnsiReplaceStr(ShortHelpString, '.', ',');
-
-          if (not GlobalCustomHelp.CheckWinHelpGid) or
-             TCustomHelp.CheckGidFile(u) then
-          begin
+          try
             if (not GlobalCustomHelp.CheckWinHelpGid) or
-               FileContainsText(u, ShortHelpString) then
-              HelpStrings.Add(TCustomHelp.EncodeURL(c,d,'winhlp://-k '+ShortHelpString+' '+u, g, TrimOption));
+             TCustomHelp.CheckGidFile(u, true) then
+            begin
+              if (not GlobalCustomHelp.CheckWinHelpGid) or
+                 FileContainsText(u, ShortHelpString) then
+                HelpStrings.Add(TCustomHelp.EncodeURL(c,d,'winhlp://-k '+ShortHelpString+' '+u, g, TrimOption));
+            end;
+          except
+            on e: Exception do
+              errmsgs.Add(u + ': '+ e.Message);
           end;
         end
         else
@@ -341,6 +345,26 @@ end;
 function TCustomHelp.GetRedirectSchemes: string;
 begin
   Result := FHandledSchemes.DelimitedText;
+end;
+
+class function TCustomHelp.GetSessionFromURL(const URL: string;
+  var Group: string): IHxSession;
+var
+  idx: integer;
+  nsName: string;
+begin
+  Result := nil;
+  if not AnsiStartsText(PROTPREFIX_MSHELP, URL) then
+    Exit;
+  idx := PosEx('/', URL, Length(PROTPREFIX_MSHELP)+1) - 1;
+  if idx < 0 then
+    nsName := URL
+  else
+    nsName := Copy(URL, 1, idx);
+
+  Result := CoHxSession.Create;
+  Result.Initialize(nsName, 0);
+  Group := GlobalCustomHelp.GetNamespaceTitle(Result);
 end;
 
 procedure TCustomHelp.InitHelpSelector(const HelpString: string);
@@ -437,9 +461,11 @@ procedure TCustomHelpViewer.ShowHelp(const HelpString: String);
 var
   u: String;
   alternativeNavigate : boolean;
+  hs: IHelpSystem;
 begin
   if HelpString<>'' then
   begin
+    GetHelpSystem(hs);
     //Hier gehts dann wirklich um die Wurst
     //Wir bekommen den Hilfestring übergeben, den der
     //Nutzer aus der Liste, die wir bei GetHelpStrings gebaut haben,
@@ -447,7 +473,7 @@ begin
 
     if TCustomHelp.DecodeURL(HelpString, u) then
     begin
-      if Pos('winhlp://', u)=1 then
+      if AnsiStartsText('winhlp://', u) then
       begin
         Delete(u,1,9);
         ShellExecute(Application.Handle,
@@ -458,21 +484,22 @@ begin
                      SW_SHOWNORMAL);
       end
       else
-      if Pos('htmlhlp://', u)=1 then
+      if AnsiStartsText('htmlhlp://', u) then
       begin
         Delete(u,1,10);
         ShowHTMLHelp(u);
       end
       else
+      if Assigned(hs) and not GlobalCustomHelp.ReplaceDefaultViewer and AnsiStartsText(PROTPREFIX_MSHELP, u) then
       begin
-        alternativeNavigate := False;                                
+        hs.ShowTopicHelp(u, '');
+      end
+      else
+      begin
+        alternativeNavigate := True;
         if GlobalCustomHelp.ShowCustomHelpOnWelcomePage then
-        begin
-          if not WelcomePageNavigate(u) then
-            alternativeNavigate:=True;
-        end
-        else
-          alternativeNavigate:=True;
+          if WelcomePageNavigate(u) then
+            alternativeNavigate:=False;
 
         if alternativeNavigate then
           ShellExecute(Application.Handle, 'open', PChar(u), '', '', SW_SHOWNORMAL);
@@ -694,39 +721,22 @@ begin
   end;
 end;
 
-class function TCustomHelp.GetTopicFromURL(const URL: string; var Group: string): IHxTopic;
-var
-  idx: Integer;
-  hxSession: IHxSession;
-  hxHierarchy: IHxHierarchy;
-begin
-  Result := nil;
-  for idx := 0 to GlobalCustomHelp.FEnabledhxSessions.Count - 1 do
-  begin
-    hxSession := GlobalCustomHelp.EnabledhxSession[idx];
-    if hxSession <> nil then
-    begin
-      if not AnsiStartsText(PROTPREFIX_MSHELP+GlobalCustomHelp.GetNamespaceName(hxSession), URL) then
-        Continue;
-      try
-        if Supports(hxSession.GetNavigationObject('!DefaultToc', ''), IHxHierarchy, hxHierarchy) then
-        begin
-          Result := GetTopicFromURL(hxHierarchy, URL);
-          Group := GlobalCustomHelp.GetNamespaceTitle(hxSession);
-        end;
-      except
-      end;
-    end;
-  end;
-end;
-
 class function TCustomHelp.GetTopicInfo(const URL: string;
   out Caption, Description, Link, Group: string;
   out TrimOption: TNamespaceTrimOption): boolean;
 var
+  hxSession: IHxSession;
+  hxHierarchy: IHxHierarchy;
   tp: IHxTopic;
 begin
-  tp := GetTopicFromURL(URL, Group);
+  tp := nil;
+  hxSession := GetSessionFromURL(URL, Group);
+  if hxSession <> nil then
+    try
+      if Supports(hxSession.GetNavigationObject('!DefaultToc', ''), IHxHierarchy, hxHierarchy) then
+        tp := GetTopicFromURL(hxHierarchy, URL);
+    except
+    end;
   Result := tp <> nil;
   if Result then
   begin
@@ -1105,16 +1115,21 @@ begin
   TCustomHelp.WriteSettingToRegistry(SETTINGS_TRIMNAMESPACES, IntToStr(byte(Value)));
 end;
 
-class function TCustomHelp.CheckGidFile(AWinHelpFile: String): Boolean;
+class function TCustomHelp.CheckGidFile(AWinHelpFile: String; const ARaiseError: Boolean): Boolean;
 var
   GIDFile : String;
 begin
   GIDFile:=ChangeFileExt(AWinHelpFile, '.gid');
 
-  Result:=FileExists(GIDFile);
+  Result := FileExists(GIDFile);
   if not Result then
-    ShowMessage('No *.gid file available for '+AWinHelpFile+' no help query possible.'+
-                #13#10'Please open the help file using winhlp32.exe and generate indes manually');
+  begin
+  if ARaiseError then
+    raise Exception.Create('No gid file available. No help query possible.'+
+                #13#10'Please open the help file using winhlp32.exe and generate index manually.');
+    ShowMessage('No gid file available for '+AWinHelpFile+'. No help query possible.'+
+                #13#10'Please open the help file using winhlp32.exe and generate index manually.');
+  end;
 end;
 
 class procedure TCustomHelp.WriteSettingToRegistry(AName, AValue: String);
