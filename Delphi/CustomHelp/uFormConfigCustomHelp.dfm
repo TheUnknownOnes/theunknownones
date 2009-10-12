@@ -341,13 +341,4 @@ object form_Config: Tform_Config
       end
     end
   end
-  object Edit1: TEdit
-    Left = 352
-    Top = 312
-    Width = 281
-    Height = 21
-    TabOrder = 2
-    Text = 'Edit1'
-    OnDblClick = Edit1DblClick
-  end
 end
