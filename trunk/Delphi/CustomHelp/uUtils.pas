@@ -8,12 +8,6 @@ uses
 type
   TBytes = array of Byte;
 
-function LeftToken(var s: string; const delim: string;
-  const IgnoreCase: boolean): string;
-
-function RightToken(var s: string; const delim: string;
-  const IgnoreCase: boolean): string;
-
 {$if not Defined(PosStr)}
 function PosStr(const subStr: string; const str: string; fromPos: cardinal = 1;
   toPos: cardinal = maxInt): integer;
@@ -177,48 +171,6 @@ end;
 
 {$ifend}
 {$ifend}
-
-function LeftToken(var s: string; const delim: string;
-  const IgnoreCase: boolean): string;
-var
-  idx: integer;
-begin
-  if IgnoreCase then
-    idx := PosText(delim, s, 1, MaxInt)
-  else
-    idx := PosStr(delim, s, 1, MaxInt);
-  if idx < 1 then
-  begin
-    Result := s;
-    s := '';
-  end
-  else
-  begin
-    Result := Copy(s, 1, idx - 1);
-    Delete(s, 1, idx - 1 + Length(delim));
-  end;
-end;
-
-function RightToken(var s: string; const delim: string;
-  const IgnoreCase: boolean): string;
-var
-  idx: integer;
-begin
-  if IgnoreCase then
-    idx := PosText(delim, s, MaxInt, 1)
-  else
-    idx := PosStr(delim, s, MaxInt, 1);
-  if idx < 1 then
-  begin
-    Result := s;
-    s := '';
-  end
-  else
-  begin
-    Result := Copy(s, idx + Length(delim));
-    Delete(s, idx, MaxInt);
-  end;
-end;
 
 function SafeArrayToBytes(const si: PSafeArray): TBytes;
 var
