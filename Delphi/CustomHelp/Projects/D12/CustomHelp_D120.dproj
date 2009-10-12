@@ -22,7 +22,7 @@
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 			<ImageDebugInfo>true</ImageDebugInfo>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp_D120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>$(BDSCOMMONDIR)\Bpl\CustomHelp_D120.bpl</DCC_DependencyCheckOutputName>
 			<DesignOnlyPackage>true</DesignOnlyPackage>
 			<DCC_Optimize>false</DCC_Optimize>
 			<DCC_Description>CustomHelp Expert ... by TUO</DCC_Description>
@@ -125,6 +125,7 @@
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
 					<Excluded_Packages>
+						<Excluded_Packages Name="$(BDSCOMMONDIR)\Bpl\CustomHelp_D120.bpl">CustomHelp Expert ... by TUO</Excluded_Packages>
 						<Excluded_Packages Name="$(BDS)\bin\bcboffice2k120.bpl">CodeGear C++Builder Office 2000-Server-Package</Excluded_Packages>
 						<Excluded_Packages Name="$(BDS)\bin\bcbofficexp120.bpl">CodeGear C++Builder Office XP-Server-Package</Excluded_Packages>
 						<Excluded_Packages Name="$(BDS)\bin\dcloffice2k120.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
