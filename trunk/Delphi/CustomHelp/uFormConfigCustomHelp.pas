@@ -44,6 +44,7 @@ type
     Label8: TLabel;
     cbOHSAtTop: TCheckBox;
     cbCheckGID: TCheckBox;
+    Edit1: TEdit;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure ListView1Change(Sender: TObject; Item: TListItem;
@@ -56,6 +57,9 @@ type
       Shift: TShiftState);
     procedure FormCreate(Sender: TObject);
     procedure cbTrimNamespacesOHSChange(Sender: TObject);
+    procedure ListView1InfoTip(Sender: TObject; Item: TListItem;
+      var InfoTip: string);
+    procedure Edit1DblClick(Sender: TObject);
   private
     FInsertItem : TListItem;
     procedure Save;
@@ -66,6 +70,8 @@ type
   end;
 
 implementation
+
+uses uUtils;
 
 {$R *.dfm}
 
@@ -95,6 +101,15 @@ begin
   if (ListView1.ItemFocused<>FInsertItem) and
      Assigned(ListView1.ItemFocused) then
     ListView1.ItemFocused.SubItems[0]:=edDesc.Text;
+end;
+
+procedure Tform_Config.Edit1DblClick(Sender: TObject);
+var
+s : string;
+begin
+  s:=Edit1.Text;
+  ExpandEnvVars(s, '$(',')');
+  Edit1.Text:=s;
 end;
 
 procedure Tform_Config.edNameChange(Sender: TObject);
@@ -251,6 +266,14 @@ begin
     ListView1.Selected:=item;
     ListView1.ItemFocused:=item;
   end;
+end;
+
+procedure Tform_Config.ListView1InfoTip(Sender: TObject; Item: TListItem;
+  var InfoTip: string);
+begin
+  InfoTip:='Name: Name of your search provider' + #13#10 +
+           'Desription: some descriptive hint for your searchprovider' + #13#10 +
+           'URL: URL or filename of your search provider. URLs must start with http://. ';
 end;
 
 procedure Tform_Config.ListView1KeyDown(Sender: TObject; var Key: Word;

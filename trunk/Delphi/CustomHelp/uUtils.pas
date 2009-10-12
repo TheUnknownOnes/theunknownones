@@ -3,9 +3,7 @@ unit uUtils;
 interface
 
 uses
-  Types,
-  ActiveX,
-  SysUtils;
+  Types, ActiveX, SysUtils, Classes;
 
 type
   TBytes = array of Byte;
@@ -36,11 +34,99 @@ function BytesToCardArray(const b: TBytes): TCardinalDynArray;
 
 function FileContainsText(AFileName : String; AText : AnsiString) : Boolean;
 
+type
+  TExpandEnvVarsOption = (eevoPreferSystemValues);
+  TExpandEnvVarsOptions = set of TExpandEnvVarsOption;
+
+procedure ExpandEnvVars(var AString : String; const AStartToken, AEndToken: String; const ACustomEnvVars: TStrings = nil; Options: TExpandEnvVarsOptions = []);
+
 implementation
 
 uses
-  StrUtils,
-  Windows, Classes;
+  StrUtils, Windows, Dialogs;
+
+
+procedure ExpandEnvVars(var AString : String; const AStartToken, AEndToken: String; const ACustomEnvVars: TStrings; Options: TExpandEnvVarsOptions);
+var
+  EnvVarStartIdx,
+  EnvVarEndIdx   : Integer;
+  StartTokenLen,
+  EndTokenLen   : Integer;
+  EnvVarName     : String;
+  cevIndex : Integer;
+
+  Buffer : Array [0..255] of Char;
+  SysValue : String;
+  CustomValue : String;
+
+  Value : String;
+
+  UseCustomValue: Boolean;
+  UseSystemValue: Boolean;
+begin
+  UseCustomValue:=False;
+  UseSystemValue:=False;
+
+  StartTokenLen:=Length(AStartToken);
+  EndTokenLen:=Length(AEndToken);
+
+  if (StartTokenLen=0) or (EndTokenLen=0) then
+    raise Exception.Create('No start token or end token supplied');
+
+  //find the first occurence of StartToken
+  EnvVarStartIdx:=Pos(AStartToken, AString);
+  //yeah we found our start token
+  while EnvVarStartIdx>0 do
+  begin
+    //is there an end token, too?
+    EnvVarEndIdx:=PosEx(AEndToken, AString, EnvVarStartIdx);
+    if EnvVarEndIdx>EnvVarStartIdx then
+    begin
+      //let's get the variable name
+      EnvVarName:=Copy(AString, EnvVarStartIdx+StartTokenLen, EnvVarEndIdx-EnvVarStartIdx-StartTokenLen);
+
+      UseSystemValue:=GetEnvironmentVariable(PChar(EnvVarName), PChar(@Buffer), Length(Buffer))>0;
+      SysValue:=Buffer;
+      if Assigned(ACustomEnvVars) then
+      begin
+        cevIndex:=ACustomEnvVars.IndexOfName(EnvVarName);
+        if cevIndex>=0 then
+        begin
+          CustomValue:=ACustomEnvVars.ValueFromIndex[cevIndex];
+          UseCustomValue:=True;
+        end;
+      end;
+
+      if eevoPreferSystemValues in Options then
+      begin
+        if UseSystemValue then
+          Value:=SysValue
+        else
+        if UseCustomValue then
+          Value:=CustomValue
+        else
+          Value:='';
+      end
+      else
+      begin
+        if UseCustomValue then
+          Value:=CustomValue
+        else
+        if UseSystemValue then
+          Value:=SysValue
+        else
+          Value:='';
+      end;
+
+      Delete(AString, EnvVarStartIdx, EndTokenLen+EnvVarEndIdx-EnvVarStartIdx);
+      Insert(Value, AString, EnvVarStartIdx);
+
+      EnvVarStartIdx:=Pos(AStartToken, AString);
+    end
+    else
+      break;  //we didn't find a matching end token... AString is broken
+  end;
+end;
 
 {$if not Defined(PosStr) OR not Defined(PosText)}
 function SearchBuf(const s: String; const delim: String;
