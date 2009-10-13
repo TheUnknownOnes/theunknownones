@@ -201,17 +201,19 @@ end;
 function TBaseVirtualTreeHelper.GetVisibleRecursive(
   Node: PVirtualNode): Boolean;
 
-// Returns true if all parent nodes of Node are visible.
+// Returns true if all child nodes of Node are visible.
 
 begin
   Assert(Assigned(Node) and (Node <> RootNode), 'Invalid parameters.');
 
   Result := (vsVisible in Node.States);
 
-  while (Result) and (Node <> RootNode) do
+  Node := GetFirstChild(Node);
+
+  while (Result) and Assigned(Node) do
   begin
-    Node := Node.Parent;
-    Result := (vsVisible in Node.States);
+    Result := VisibleRecursive[Node];
+    Node := GetNextSibling(Node);
   end;
 end;
 
@@ -311,19 +313,21 @@ end;
 procedure TBaseVirtualTreeHelper.SetVisibleRecursive(Node: PVirtualNode;
   const Value: Boolean);
 
-// If Value is True then all parent nodes of Node are made visible.
+// If Value is True then all child nodes of Node are made visible.
 
 begin
   Assert(Assigned(Node) and (Node <> RootNode), 'Invalid parameter.');
 
-  repeat
-    if ((vsVisible in Node.States) <> Value) then
-      IsVisible[Node] := Value;
+  if ((vsVisible in Node.States) <> Value) then
+    IsVisible[Node] := Value;
 
-    Node := Node.Parent;
-    if Node = RootNode then
-      Break;
-  until False;
+    Node := GetFirstChild(Node);
+
+    while Assigned(Node) do
+    begin
+      SetVisibleRecursive(Node, Value);
+      Node := GetNextSibling(Node);
+    end;
 end;
 
 initialization
