@@ -7,11 +7,6 @@ USES
   ActiveX,
   SysUtils;
 
-{$if not Defined(TBytes)}
-type
-  TBytes = array of Byte;
-{$ifend}
-
 FUNCTION LeftToken(VAR s: string; CONST delim: string;
   CONST IgnoreCase: boolean): string;
 
