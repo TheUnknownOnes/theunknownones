@@ -44,7 +44,7 @@ type
 implementation
 
 uses
-  Forms, Controls {$ifndef DELPHI12_UP}, TntStdCtrls{$endif};
+  Forms, uVirtualTreeHelpers, Controls {$ifndef DELPHI12_UP}, TntStdCtrls{$endif};
 
 { TVSTSearchEdit }
 
@@ -62,7 +62,9 @@ end;
 
 procedure TVSTSearchEdit.DoSearch(const AWords: TStrings);
 var
-  Node : PVirtualNode;
+  Node,
+  NewNode : PVirtualNode;
+  Matches : Boolean;
 begin
   FTree.BeginUpdate;
   try
@@ -73,17 +75,32 @@ begin
     end;
 
     Node:=FTree.GetFirst;
+
     while Assigned(Node) do
     begin
       if Assigned(FProgress) then
         FProgress.Position:=FProgress.Position+1;
 
       if AWords.Count>0 then
-        FTree.FullyVisible[Node]:=NodeMatches(Node, AWords)
+        Matches := NodeMatches(Node, AWords)
       else
-        FTree.IsVisible[Node]:=true;
+        Matches := true;
 
-      Node:=FTree.GetNext(Node);
+        
+      FTree.FullyVisible[Node] := Matches;
+
+      if not Matches then
+        NewNode := FTree.GetFirstChild(Node)
+      else
+      begin
+        FTree.VisibleRecursive[Node] := true;
+        NewNode := FTree.GetNextSibling(Node);
+      end;
+
+      if not Assigned(NewNode) then
+        NewNode := FTree.GetNext(Node);
+
+      Node := NewNode;
     end;
   finally
     FTree.EndUpdate;
