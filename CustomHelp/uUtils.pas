@@ -46,10 +46,39 @@ function GetEnvironmentVariable(const Name: string; out Value: string): Boolean;
 procedure ExpandEnvVars(var AString : String; const AStartToken, AEndToken: String; const ACustomEnvVars: TStrings = nil; Options: TExpandEnvVarsOptions = []); overload;
 procedure ExpandEnvVars(var AString : String; const ACustomEnvVars: TStrings = nil; Options: TExpandEnvVarsOptions = []); overload;
 
+function CtrlDown : Boolean;
+function ShiftDown : Boolean;
+function AltDown : Boolean;
+
 implementation
 
 uses
   StrUtils, Windows, Dialogs;
+
+function CtrlDown : Boolean;
+var
+   State : TKeyboardState;
+begin
+   GetKeyboardState(State);
+   Result := ((State[vk_Control] And 128) <> 0);
+end;
+
+function ShiftDown : Boolean;
+var
+   State : TKeyboardState;
+begin
+   GetKeyboardState(State);
+   Result := ((State[vk_Shift] and 128) <> 0);
+end;
+
+function AltDown : Boolean;
+var
+   State : TKeyboardState;
+begin
+   GetKeyboardState(State);
+   Result := ((State[vk_Menu] and 128) <> 0);
+end;
+
 
 function GetEnvironmentVariable(const Name: string; out Value: string): Boolean;
 const
