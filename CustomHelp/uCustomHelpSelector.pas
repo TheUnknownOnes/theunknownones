@@ -60,7 +60,7 @@ implementation
 
 uses
   UrlMon, StrUtils, ComObj, ShellAPI, uCustomHelpMain, uCustomHelpIDEIntegration,
-  Math, Registry;
+  Math, Registry, uCustomHelpKeywordRecorder;
 
 {$R *.dfm}
 
@@ -169,6 +169,9 @@ begin
           catbtnTopics.FocusedItem := Items[0];
         end;
       end;
+
+      // clear keyword history before showing help select form ...
+      CustomHelpKeywordRecorder.Reset;
 
       if (ShowModal=mrOk)  then
       begin
