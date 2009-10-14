@@ -1,6 +1,6 @@
 UNIT uCustomHelpDebug;
 
-{.$DEFINE DEBUG_CUSTOMHELP}
+{$DEFINE DEBUG_CUSTOMHELP}
 
 INTERFACE
 
@@ -14,6 +14,8 @@ CONST
 TYPE
   {$TYPEINFO ON}
   TCustomHelpDebugViewer = CLASS(TInterfacedObject,
+    IExtendedHelpViewer,
+    IHelpSystemFlags,
     ICustomHelpViewer)
   PUBLIC
     {$REGION 'ICustomHelpViewer'}
@@ -218,11 +220,15 @@ BEGIN
 END;
 
 PROCEDURE TCustomHelpDebugViewer.DoUnregister;
+VAR
+  hm: IHelpManager;
 BEGIN
   IF Assigned(FHelpManager) THEN
   BEGIN
-    FHelpManager.Release(FViewerID);
+    hm := FHelpManager;
     FHelpManager := NIL;
+    FViewer := NIL;
+    hm.Release(FViewerID);
   END;
 END;
 
@@ -340,7 +346,10 @@ INITIALIZATION
 
 FINALIZATION
   IF CustomHelpDebugViewer <> NIL THEN
-    FreeAndNil(CustomHelpDebugViewer);
+  begin
+    CustomHelpDebugViewer.FViewer := nil;
+    CustomHelpDebugViewer := nil;
+  end;
 
 END.
 

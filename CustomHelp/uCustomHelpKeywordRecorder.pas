@@ -24,6 +24,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Reset;
+    procedure AddKeyword(HelpString: string);
   private
     FViewer: ICustomHelpViewer;
     FViewerID: Integer;
@@ -31,15 +32,18 @@ type
     FKeywords: TStringList;
     FHelpStrings: TStringList;
     FShowHelpStrings: TStringList;
+    FEnabled: Boolean;
     procedure DoUnregister;
     procedure DoRegister;
     procedure SetKeywords(const Value: TStringList);
     procedure SetHelpStrings(const Value: TStringList);
     procedure SetShowHelpStrings(const Value: TStringList);
+    procedure SetEnabled(const Value: Boolean);
   published
     property Keywords: TStringList read FKeywords write SetKeywords;
     property HelpStrings: TStringList read FHelpStrings write SetHelpStrings;
     property ShowHelpStrings: TStringList read FShowHelpStrings write SetShowHelpStrings;
+    property Enabled: Boolean read FEnabled write SetEnabled;
   end;
 
 var
@@ -51,6 +55,13 @@ uses
   SysUtils, ToolsApi;
 
 { TKeywordsHelpViewer }
+
+procedure TCustomHelpKeywordRecorder.AddKeyword(HelpString: string);
+begin
+  with FKeywords do
+    if (Count = 0) or (Strings[Count-1] <> HelpString) then
+      Add(HelpString);
+end;
 
 function TCustomHelpKeywordRecorder.CanShowTableOfContents: Boolean;
 begin
@@ -67,6 +78,7 @@ begin
   inherited;
   FHelpManager := nil;
   FViewer := Self;
+  FEnabled := False;
   Action(self.FKeywords);
   Action(self.FHelpStrings);
   Action(self.FShowHelpStrings);
@@ -93,6 +105,8 @@ function TCustomHelpKeywordRecorder.GetHelpStrings(
 begin
   Result := TStringList.Create;
   Result.Values[GetViewerName] := HelpString;
+  if not Enabled then
+    Exit;
   FHelpStrings.Add(HelpString);
 end;
 
@@ -115,6 +129,7 @@ begin
   begin
     hm := FHelpManager;
     FHelpManager := nil;
+    FViewer := NIL;
     hm.Release(FViewerID);
   end;
 end;
@@ -137,6 +152,9 @@ end;
 
 procedure TCustomHelpKeywordRecorder.ShowHelp(const HelpString: string);
 begin
+  if not Enabled then
+    Exit;
+
   // do nothing
   FShowHelpStrings.Add(HelpString);
 end;
@@ -161,9 +179,16 @@ function TCustomHelpKeywordRecorder.UnderstandsKeyword(
   const HelpString: string): Integer;
 begin
   Result := 0;
-  with FKeywords do
-    if (Count = 0) or (Strings[Count-1] <> HelpString) then
-      Add(HelpString);
+  if not Enabled then
+    Exit;
+  AddKeyword(HelpString);
+end;
+
+procedure TCustomHelpKeywordRecorder.SetEnabled(const Value: Boolean);
+begin
+  FEnabled := Value;
+  if not FEnabled then
+    Reset;
 end;
 
 procedure TCustomHelpKeywordRecorder.SetHelpStrings(const Value: TStringList);
@@ -187,6 +212,9 @@ initialization
 
 finalization
   if Assigned(CustomHelpKeywordRecorder) then
-    FreeAndNil(CustomHelpKeywordRecorder);
+  begin
+    CustomHelpKeywordRecorder.FViewer := nil;
+    CustomHelpKeywordRecorder := nil;
+  end;
 
 end.
