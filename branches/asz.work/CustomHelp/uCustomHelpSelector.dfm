@@ -4,7 +4,7 @@ object FormHelpSelector: TFormHelpSelector
   Caption = 'Select Help Topic for "@@HELPSTRING@@" ...'
   ClientHeight = 495
   ClientWidth = 617
-  Color = clBtnFace
+  Color = clGradientActiveCaption
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -23,7 +23,7 @@ object FormHelpSelector: TFormHelpSelector
     Left = 0
     Top = 0
     Width = 617
-    Height = 372
+    Height = 345
     Align = alClient
     BorderStyle = bsNone
     ButtonFlow = cbfVertical
@@ -35,28 +35,6 @@ object FormHelpSelector: TFormHelpSelector
     OnButtonClicked = catbtnTopicsButtonClicked
     OnDrawText = catbtnTopicsDrawText
   end
-  object pnlOptions: TPanel
-    Left = 0
-    Top = 372
-    Width = 617
-    Height = 23
-    Align = alBottom
-    BevelOuter = bvNone
-    Color = clGradientActiveCaption
-    ParentBackground = False
-    TabOrder = 1
-    object cbFullTextSearch: TCheckBox
-      AlignWithMargins = True
-      Left = 3
-      Top = 3
-      Width = 611
-      Height = 17
-      Align = alTop
-      Color = clGradientActiveCaption
-      ParentColor = False
-      TabOrder = 0
-    end
-  end
   object grpErrors: TGroupBox
     Left = 0
     Top = 395
@@ -67,7 +45,7 @@ object FormHelpSelector: TFormHelpSelector
     Color = clGradientActiveCaption
     ParentBackground = False
     ParentColor = False
-    TabOrder = 2
+    TabOrder = 3
     object mmoErrors: TMemo
       AlignWithMargins = True
       Left = 5
@@ -79,6 +57,50 @@ object FormHelpSelector: TFormHelpSelector
       ScrollBars = ssBoth
       TabOrder = 0
       WantReturns = False
+    end
+  end
+  object cbFullTextSearch: TCheckBox
+    AlignWithMargins = True
+    Left = 3
+    Top = 375
+    Width = 611
+    Height = 17
+    Align = alBottom
+    Color = clGradientActiveCaption
+    ParentColor = False
+    TabOrder = 2
+  end
+  object pnlSearchKeyword: TPanel
+    AlignWithMargins = True
+    Left = 3
+    Top = 348
+    Width = 611
+    Height = 21
+    Align = alBottom
+    Alignment = taLeftJustify
+    BevelOuter = bvNone
+    Caption = 'Keyword used in search providers:'
+    ShowCaption = False
+    TabOrder = 1
+    object lblSearchKeyword: TLabel
+      Left = 0
+      Top = 0
+      Width = 203
+      Height = 21
+      Align = alLeft
+      Caption = 'Keyword used in custom search providers:'
+      Layout = tlCenter
+    end
+    object cbbSearchKeyword: TComboBox
+      Left = 203
+      Top = 0
+      Width = 408
+      Height = 21
+      Align = alClient
+      AutoDropDown = True
+      AutoCloseUp = True
+      ItemHeight = 13
+      TabOrder = 0
     end
   end
 end
