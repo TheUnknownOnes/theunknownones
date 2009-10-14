@@ -4,8 +4,6 @@
  (c) by TheUnknownOnes
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
-{.$DEFINE DEBUG_CUSTOMHELP}
-
 unit uCustomHelpMain;
 
 interface
@@ -112,9 +110,6 @@ type
   end;
 
   TCustomHelpViewer = class(TInterfacedObject,
-{$IFDEF DEBUG_CUSTOMHELP}
-    IExtendedHelpViewer, IHelpSystemFlags,
-{$ENDIF}
     ICustomHelpViewer)
   private
     FHelpManager: IHelpManager;
@@ -133,25 +128,6 @@ type
     procedure ShutDown;
     {$ENDREGION}
     function  InternalGetHelpStrings(const HelpString: String; const AddProviders: Boolean): TStringList;
-{$IFDEF DEBUG_CUSTOMHELP}
-  private
-    FUseDefaultTopic: Boolean;
-  protected
-    procedure DebugLog(method, msg: string);
-    {$region 'IExtendedHelpViewer'}
-    function UnderstandsTopic(const Topic: string): Boolean;
-    procedure DisplayTopic(const Topic: string);
-    function UnderstandsContext(const ContextID: Integer;
-      const HelpFileName: string): Boolean;
-    procedure DisplayHelpByContext(const ContextID: Integer;
-      const HelpFileName: string);
-    {$endregion}
-
-    {$region 'IHelpSystemFlags'}
-    function GetUseDefaultTopic: Boolean;
-    procedure SetUseDefaultTopic(AValue: Boolean);
-    {$endregion}
-{$ENDIF}
   private
     FEnabled: Boolean;
   public
@@ -225,13 +201,9 @@ implementation
 
 uses
   SysUtils, StrUtils, ShellAPI, uFormConfigCustomHelp,
-  uCustomHelpIDEIntegration, Graphics, ActiveX, Variants, Types, uUtils;
+  uCustomHelpIDEIntegration, Graphics, ActiveX, Variants, Types, uUtils,
+  uCustomHelpKeywordRecorder;
 
-{$IFDEF DEBUG_CUSTOMHELP}
-var
-  Debug__CustomHelp: Boolean;
-
-{$ENDIF}
 {$WARN SYMBOL_PLATFORM OFF}
 procedure DebugLog(method, msg: string);
 begin
@@ -243,11 +215,7 @@ end;
 
 function TCustomHelpViewer.CanShowTableOfContents: Boolean;
 begin
-{$IFDEF DEBUG_CUSTOMHELP}
-  Result := Debug__CustomHelp;
-{$ELSE}
   Result := false;
-{$ENDIF}
 end;
 
 function TCustomHelpViewer.GetHelpStrings(
@@ -503,9 +471,6 @@ begin
   inherited Create;
   HelpViewerIntf := Self;
   FEnabled := True;
-{$IFDEF DEBUG_CUSTOMHELP}
-  FUseDefaultTopic := True;
-{$ENDIF}
 end;
 
 destructor TCustomHelpViewer.Destroy;
@@ -718,11 +683,11 @@ var
   dontCheck: Boolean;
   dontAddDefault: Boolean;
 begin
+  Result := 0;
   if not Enabled then
     Exit;
 
   dontCheck := ShiftDown;
-  Result := 0;
 
   // Das Hilfesystem fragt uns: Verstehst du dieses Keyword (der Begriff unter dem Cursor)?
   // Die Abfrage auf 'erroneous type' ist nur eine Teillösung, weil das Delphi-Hilfesystem
@@ -808,6 +773,7 @@ begin
 
   HelpViewer:=TCustomHelpViewer.Create;
   RegisterViewer(HelpViewerIntf, HelpViewer.FHelpManager);
+  CustomHelpKeywordRecorder.Reset;
 
   ConnectToIDE;
   LoadProviderFromRegistry;
@@ -1363,7 +1329,7 @@ end;
 var
   bmp : TBitmap;
 
-procedure AddSpashBitmap;
+procedure AddSplashBitmap;
 begin
   bmp:=TBitmap.Create;
   bmp.LoadFromResourceName(hinstance, 'Splash');
@@ -1376,60 +1342,13 @@ begin
 
 end;
 
-{$IFDEF DEBUG_CUSTOMHELP}
-procedure TCustomHelpViewer.DebugLog(method, msg: string);
-begin
-  uCustomHelpMain.DebugLog(method + '{' + BoolToStr(FUseDefaultTopic, True) + '}', msg);
-end;
-
-{$region 'IHelpSystemFlags'}
-
-function TCustomHelpViewer.GetUseDefaultTopic: Boolean;
-begin
-  Result := FUseDefaultTopic;
-end;
-
-function TCustomHelpViewer.UnderstandsTopic(const Topic: string): Boolean;
-begin
-  Result := False;
-  DebugLog('UnderstandsTopic', Topic + '=' + BoolToStr(Result, true));
-end;
-
-procedure TCustomHelpViewer.DisplayTopic(const Topic: string);
-begin
-  DebugLog('DisplayTopic', Topic);
-end;
-
-procedure TCustomHelpViewer.SetUseDefaultTopic(AValue: Boolean);
-begin
-  FUseDefaultTopic := AValue;
-end;
-
-function TCustomHelpViewer.UnderstandsContext(const ContextID: Integer;
-  const HelpFileName: string): Boolean;
-begin
-  Result := False;
-  DebugLog('UnderstandsContext', '('+IntToStr(ContextID)+', '+HelpFileName+')='+BoolToStr(Result));
-end;
-
-procedure TCustomHelpViewer.DisplayHelpByContext(const ContextID: Integer;
-  const HelpFileName: string);
-begin
-  DebugLog('DisplayHelpByContext', '('+IntToStr(ContextID)+', '+HelpFileName);
-end;
-
-{$endregion}
-{$ENDIF}
-
 initialization
-{$IFDEF DEBUG_CUSTOMHELP}
-  Debug__CustomHelp := True;
-{$ENDIF}
   GlobalCustomHelp:=TCustomHelp.Create;
-  AddSpashBitmap;
+  AddSplashBitmap;
 
 finalization
-  GlobalCustomHelp.Free;
+  If Assigned(GlobalCustomHelp) then
+    FreeAndNil(GlobalCustomHelp);
   If Assigned(bmp) then
     bmp.Free;
 
