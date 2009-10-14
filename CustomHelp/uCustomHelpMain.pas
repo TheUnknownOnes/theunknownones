@@ -127,6 +127,7 @@ type
     procedure SoftShutDown;
     procedure ShutDown;
     {$ENDREGION}
+
     function  InternalGetHelpStrings(const HelpString: String; const AddProviders: Boolean): TStringList;
   private
     FEnabled: Boolean;
@@ -597,7 +598,7 @@ begin
       //oops das haben wir jetzt nicht verstanden....
       //das heiﬂt wir sind die einzige Instanz, die Hilfe angemeldet hat.
       //Wir erzwingen einen Selektor!
-      if (HelpString = KIBITZ_IGNORED_HELPSTRING) or (SelectedKeyword <> '') then
+      if AnsiSameText(HelpString, KIBITZ_IGNORED_HELPSTRING) or (SelectedKeyword <> '') then
         ForceSelector(SelectedKeyword)
       else
         ForceSelector(HelpString);
@@ -769,7 +770,7 @@ begin
       AddKeyword(AHelpString);
       Delete(Count - 1);
       if Count > 0 then
-        AHelpString := Strings[Count -1];
+        AHelpString := Strings[Count - 1];
     end
     else
     begin
@@ -877,8 +878,12 @@ begin
       hNode := hxHierarchy.GetNextFromNode(hxHierarchy.GetPrevFromUrl(URL));
       Result := hxHierarchy.GetTopic(hNode);
     except
-      hNode := hxHierarchy.GetPrevFromNode(hxHierarchy.GetNextFromUrl(URL));
-      Result := hxHierarchy.GetTopic(hNode);
+      try
+        hNode := hxHierarchy.GetPrevFromNode(hxHierarchy.GetNextFromUrl(URL));
+        Result := hxHierarchy.GetTopic(hNode);
+      except
+        Result := nil;
+      end;
     end;
   end;
 end;

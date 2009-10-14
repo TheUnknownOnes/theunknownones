@@ -101,6 +101,7 @@ object FormHelpSelector: TFormHelpSelector
       AutoCloseUp = True
       ItemHeight = 13
       TabOrder = 0
+      OnCloseUp = cbbSearchKeywordCloseUp
     end
   end
 end

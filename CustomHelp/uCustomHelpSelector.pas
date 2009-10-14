@@ -36,6 +36,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure cbbSearchKeywordCloseUp(Sender: TObject);
   private
     FURL : String;
     FHelpIndex : Integer;
@@ -141,6 +142,11 @@ begin
   Canvas.TextRect(drawrect, txt, [tfEndEllipsis]);
 end;
 
+procedure TFormHelpSelector.cbbSearchKeywordCloseUp(Sender: TObject);
+begin
+  catbtnTopics.SetFocus;
+end;
+
 class function TFormHelpSelector.Execute(HelpString: string; Keywords: TStrings;
   out SelectedIndex: Integer; out SelectedUrl: string): Boolean;
 var
@@ -192,6 +198,7 @@ begin
         cbbSearchKeyword.Text := SearchKeywords[cbbSearchKeyword.ItemIndex];
 
       // clear keyword history before showing help select form ...
+      CustomHelpKeywordRecorder.Reset;
       CustomHelpKeywordRecorder.Enabled := False;
 
       Caption := StringReplace(Caption, '@@HELPSTRING@@', HelpString, [rfReplaceAll]);
@@ -408,8 +415,28 @@ end;
 procedure TFormHelpSelector.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = VK_ESCAPE then
-    ModalResult := mrCancel;
+  if ActiveControl = cbbSearchKeyword then
+  begin
+    if (Key = VK_ESCAPE) then
+    begin
+      if cbbSearchKeyword.DroppedDown then
+        cbbSearchKeyword.DroppedDown := False;
+    Key := 0;
+    end;
+  end
+  else begin
+    if (Key = VK_ESCAPE) then
+    begin
+      ModalResult := mrCancel;
+      Key := 0;
+    end
+    else if (Key = VK_INSERT) and cbbSearchKeyword.Visible then
+    begin
+      cbbSearchKeyword.SetFocus;
+      cbbSearchKeyword.DroppedDown := True;
+      Key := 0;
+    end;
+  end;
 end;
 
 procedure TFormHelpSelector.FormShow(Sender: TObject);
