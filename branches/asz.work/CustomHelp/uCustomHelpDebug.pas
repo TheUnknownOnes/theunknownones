@@ -29,6 +29,7 @@ TYPE
     PROCEDURE SoftShutDown;
     PROCEDURE ShutDown;
     {$ENDREGION}
+
     {$region 'IExtendedHelpViewer'}
     FUNCTION UnderstandsTopic(CONST Topic: string): boolean;
     PROCEDURE DisplayTopic(CONST Topic: string);
@@ -42,6 +43,7 @@ TYPE
     FUNCTION GetUseDefaultTopic: boolean;
     PROCEDURE SetUseDefaultTopic(AValue: boolean);
     {$endregion}
+
     DESTRUCTOR Destroy; OVERRIDE;
     PROCEDURE AssignHelpSelector(AClear: boolean);
   PRIVATE
@@ -146,7 +148,7 @@ BEGIN
   INHERITED;
   DebugLog('Create', '', False);
   FHelpManager := NIL;
-  FUseDefaultTopic := True;
+  FUseDefaultTopic := False;
   FViewer := Self;
   CreateStringList(self.FKeywords);
   CreateStringList(self.FContents);

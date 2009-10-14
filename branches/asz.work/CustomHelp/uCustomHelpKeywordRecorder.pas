@@ -5,9 +5,18 @@ interface
 uses
   Classes, HelpIntfs;
 
+const
+  hcIDEStructureView = $49E;
+  hcIDEProjectExplorer = $550;
+  hcIDEFormDesigner = $4E2;
+  hcIDEToolPalette = $90E;
+  hcIDECodeEditor = $564;
+
 type
   {$TYPEINFO ON}
   TCustomHelpKeywordRecorder = class(TInterfacedObject,
+    IExtendedHelpViewer,
+    IHelpSystemFlags,
     ICustomHelpViewer)
   public
     {$REGION 'ICustomHelpViewer'}
@@ -21,6 +30,21 @@ type
     procedure SoftShutDown;
     procedure ShutDown;
     {$ENDREGION}
+
+    {$region 'IExtendedHelpViewer'}
+    FUNCTION UnderstandsTopic(CONST Topic: string): boolean;
+    PROCEDURE DisplayTopic(CONST Topic: string);
+    FUNCTION UnderstandsContext(CONST ContextID: integer;
+      CONST HelpFileName: string): boolean;
+    PROCEDURE DisplayHelpByContext(CONST ContextID: integer;
+      CONST HelpFileName: string);
+    {$endregion}
+
+    {$region 'IHelpSystemFlags'}
+    FUNCTION GetUseDefaultTopic: boolean;
+    PROCEDURE SetUseDefaultTopic(AValue: boolean);
+    {$endregion}
+
     constructor Create;
     destructor Destroy; override;
     procedure Reset;
@@ -33,6 +57,7 @@ type
     FHelpStrings: TStringList;
     FShowHelpStrings: TStringList;
     FEnabled: Boolean;
+    FUseDefaultTopic: Boolean;
     procedure DoUnregister;
     procedure DoRegister;
     procedure SetKeywords(const Value: TStringList);
@@ -52,12 +77,14 @@ var
 implementation
 
 uses
-  SysUtils, ToolsApi;
+  SysUtils, ToolsApi, uCustomHelpMain;
 
 { TKeywordsHelpViewer }
 
 procedure TCustomHelpKeywordRecorder.AddKeyword(HelpString: string);
 begin
+  if AnsiSameText(HelpString, KIBITZ_IGNORED_HELPSTRING) then
+    Exit;
   with FKeywords do
     if (Count = 0) or (Strings[Count-1] <> HelpString) then
       Add(HelpString);
@@ -79,6 +106,7 @@ begin
   FHelpManager := nil;
   FViewer := Self;
   FEnabled := False;
+  FUseDefaultTopic := True;
   Action(self.FKeywords);
   Action(self.FHelpStrings);
   Action(self.FShowHelpStrings);
@@ -206,6 +234,51 @@ procedure TCustomHelpKeywordRecorder.SetShowHelpStrings(
 begin
   FShowHelpStrings := Value;
 end;
+
+{$region 'IExtendedHelpViewer'}
+
+procedure TCustomHelpKeywordRecorder.DisplayHelpByContext(
+  const ContextID: integer; const HelpFileName: string);
+begin
+  if Keywords.Count > 0 then
+    HelpViewer.ShowHelp(Keywords[0], GlobalCustomHelp.LastHelpCallKeyword);
+end;
+
+procedure TCustomHelpKeywordRecorder.DisplayTopic(const Topic: string);
+begin
+  //
+end;
+
+function TCustomHelpKeywordRecorder.UnderstandsTopic(
+  const Topic: string): boolean;
+begin
+  Result := False;
+end;
+
+function TCustomHelpKeywordRecorder.UnderstandsContext(const ContextID: integer;
+  const HelpFileName: string): boolean;
+begin
+  Result := False;
+  if not Enabled then
+    Exit;
+  case ContextID of
+    hcIDEFormDesigner, hcIDECodeEditor:
+      Result := Keywords.Count > 0;
+  end;
+end;
+{$endregion}
+
+{$region 'IHelpSystemFlags'}
+function TCustomHelpKeywordRecorder.GetUseDefaultTopic: boolean;
+begin
+  Result := FUseDefaultTopic;
+end;
+
+procedure TCustomHelpKeywordRecorder.SetUseDefaultTopic(AValue: boolean);
+begin
+  FUseDefaultTopic := AValue;
+end;
+{$endregion}
 
 initialization
   CustomHelpKeywordRecorder := TCustomHelpKeywordRecorder.Create;
