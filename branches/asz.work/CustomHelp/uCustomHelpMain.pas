@@ -143,24 +143,30 @@ type
     property Enabled: boolean read FEnabled;
   end;
 
+function REG_ROOT_KEY: string;
+
 const
+    REG_ROOT_BASE = '\TheUnknownOnes\Delphi';
+    REG_ROOT_PROJECT = '\CustomHelp';
+
   {$IfDef VER170}
-    REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER170\CustomHelp';
+    OLD_REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER170' + REG_ROOT_PROJECT;
   {$EndIf}
   {$IfDef VER180}
     {$IfDef VER185}
-      REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER185\CustomHelp';
+      OLD_REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER185' + REG_ROOT_PROJECT;
     {$Else}
-      REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER180\CustomHelp';
+      OLD_REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER180' + REG_ROOT_PROJECT;
     {$EndIf}
   {$EndIf}
   {$IfDef VER200}
-    REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER200\CustomHelp';
+    OLD_REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER2000' + REG_ROOT_PROJECT;
   {$EndIf}
   {$IfDef VER210}
-    REG_ROOT_KEY = '\Software\TheUnknownOnes\Delphi\VER210\CustomHelp';
+    OLD_REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER210' + REG_ROOT_PROJECT;
   {$EndIf}
 
+const
   PROTPREFIX_CUSTOMHELP = 'CustomHelp://';
   PROTPREFIX_MSHELP = 'ms-help://';
   PROTPREFIX_HTMLHELP = 'htmlhlp://';
@@ -204,8 +210,8 @@ implementation
 
 uses
   SysUtils, StrUtils, ShellAPI, uFormConfigCustomHelp,
-  uCustomHelpIDEIntegration, Graphics, ActiveX, Variants, Types, uUtils,
-  uCustomHelpKeywordRecorder;
+  Graphics, ActiveX, Variants, Types, uUtils,
+  uCustomHelpKeywordRecorder, uCustomHelpIDEIntegration;
 
 {$WARN SYMBOL_PLATFORM OFF}
 procedure DebugLog(method, msg: string);
@@ -578,7 +584,7 @@ begin
         ShowHTMLHelp(u);
       end
       else
-      if Assigned(hs) and not GlobalCustomHelp.ReplaceDefaultViewer and AnsiStartsText(PROTPREFIX_MSHELP, u) then
+      if Assigned(hs) and not GlobalCustomHelp.ReplaceDefaultViewer and AnsiStartsText([PROTPREFIX_MSHELP, 'http://', 'https://', 'file://', 'bds://'], u) then
       begin
         hs.ShowTopicHelp(u, '');
       end
@@ -1399,7 +1405,50 @@ begin
 
 end;
 
+var
+  F_REG_ROOT_KEY: string;
+
+function REG_ROOT_KEY: string;
+begin
+  Result := F_REG_ROOT_KEY;
+end;
+
+procedure InitializeRegRootKey;
+var
+  reg: TRegistry;
+  ATempFileName: TFileName;
+begin
+  F_REG_ROOT_KEY := GetIdeBaseRegistryKey + REG_ROOT_BASE + REG_ROOT_PROJECT;
+
+  if OLD_REG_ROOT_KEY = F_REG_ROOT_KEY then
+    Exit;
+
+  reg := TRegistry.Create;
+  try
+    reg.RootKey := HKEY_CURRENT_USER;
+    if reg.KeyExists(F_REG_ROOT_KEY) then // new settings exist?
+      Exit;
+    if not reg.KeyExists(OLD_REG_ROOT_KEY) then // old settings do not exist?
+      Exit;
+    // migrate old settings ...
+    ATempFileName := uUtils.GetTempFileName('tuo-ch');
+    if reg.SaveKey(OLD_REG_ROOT_KEY, ATempFileName) then
+      try
+        if reg.RestoreKey(F_REG_ROOT_KEY, ATempFileName) then
+        begin
+//          DeleteRegKey(reg.RootKey, OLD_REG_ROOT_KEY);
+        end;
+      finally
+        DeleteFile(ATempFileName);
+      end;
+  finally
+    reg.Free;
+  end;
+end;
+
 initialization
+  InitializeRegRootKey;
+
   GlobalCustomHelp:=TCustomHelp.Create;
   AddSplashBitmap;
 

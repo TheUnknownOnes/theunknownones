@@ -6,11 +6,25 @@ uses
   Windows, WebBrowserEx, ExtCtrls;
 
 function WelcomePageNavigate(AURL: WideString): Boolean;
+function GetIdeBaseRegistryKey: string;
 
 implementation
 
 uses
   ToolsAPI, ActnList, SysUtils, Dialogs, Forms, Classes;
+
+function GetIdeBaseRegistryKey: string;
+var
+  IServices: IOTAServices;
+begin
+  Assert(BorlandIDEServices <> nil);
+  IServices := (BorlandIDEServices as IOTAServices);
+  Assert(IServices <> nil);
+  Result := IServices.GetBaseRegistryKey;
+
+  Assert(Length(Result) > 0);
+  Assert(Result[Length(Result)] <> '\');
+end;
 
 type
   IURLModule = interface
