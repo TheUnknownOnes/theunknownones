@@ -3,7 +3,7 @@ unit uUtils;
 interface
 
 uses
-  Types, ActiveX, SysUtils, Classes;
+  Types, ActiveX, SysUtils, Classes, Windows;
 
 {$if not Defined(TBytes)}
 type
@@ -50,10 +50,99 @@ function CtrlDown : Boolean;
 function ShiftDown : Boolean;
 function AltDown : Boolean;
 
+function AnsiStartsText(const ASubTexts: array of string; const AText: string): Boolean; overload;
+
+Function GetTempPath: WideString; overload;
+Function CreateTempFileName(FileName: WideString): WideString; overload;
+Function GetTempFileName(prefix: WideString): WideString; overload;
+
+procedure DeleteRegKey(aRoot : HKey; aPath : String);
+
 implementation
 
 uses
-  StrUtils, Windows, Dialogs;
+  StrUtils, Dialogs, Registry;
+
+procedure DeleteRegKey(aRoot : HKey; aPath : String);
+var
+  SL : TStringList;
+  X : Integer;
+begin
+  SL := TStringList.Create;
+  try
+    with TRegistry.Create do
+      try
+        RootKey := aRoot;
+        if OpenKey(aPath, False) then
+        begin
+          GetKeyNames(SL);
+          For X:=0 to SL.Count-1 do
+            DeleteRegKey(aRoot, aPath + '\' + SL[X]);
+          CloseKey;
+          DeleteKey(aPath);
+        end;
+      finally
+        Free;
+      end;
+  finally
+    SL.Free
+  end;
+end;
+
+Function GetTempPath: WideString;
+Var i: Integer;
+Begin
+  SetLength(Result, MAX_PATH);
+  i := Windows.GetTempPath(MAX_PATH, PWideChar(Result));
+  SetLength(Result, i);
+  If (Result <> '') and (Result[i] <> '\') Then
+    Result := Result + '\';
+End;
+
+Function GetTempFileName(prefix: WideString): WideString;
+var
+  tempPath: WideString;
+begin
+  tempPath := GetTempPath;
+  SetLength(Result, MAX_PATH);
+  SetLength(Result, Windows.GetTempFileName(PWideChar(TempPath), PWideChar(prefix), 1, PWideChar(Result)));
+end;
+
+Function CreateTempFileName(FileName: WideString): WideString;
+Var
+  i, i2: Integer;
+  F: THandle;
+Begin
+  If Pos('\', FileName) = 0 Then
+    FileName := GetTempPath + FileName;
+  If Pos('*', FileName) = 0 Then
+    FileName := ChangeFileExt(FileName, '*.' + Copy(ExtractFileExt(FileName), 2, MAX_PATH));
+  i := GetTickCount;
+  i2 := i;
+  Repeat
+    If i - i2 > 10000 Then
+      Raise Exception.CreateFmt('Temporäre Datei "%s" konnte nicht erstellt werden.',
+        [StringReplace(FileName, '*', '{UniqueID}', [])]);
+    Result := StringReplace(FileName, '*', IntToHex(i, 8), []);
+    F := CreateFile(PWideChar(Result), GENERIC_WRITE, 0, nil, CREATE_NEW,
+      FILE_ATTRIBUTE_TEMPORARY or FILE_ATTRIBUTE_NOT_CONTENT_INDEXED, 0);
+    Inc(i);
+  Until F <> INVALID_HANDLE_VALUE;
+  CloseHandle(F);
+End;
+
+function AnsiStartsText(const ASubTexts: array of string; const AText: string): Boolean; overload;
+var
+  idx: integer;
+begin
+  Result := False;
+  for idx := 0 to Length(ASubTexts) - 1 do
+    if AnsiStartsText(ASubTexts[idx], AText) then
+    begin
+      Result := True;
+      Break;
+    end;
+end;
 
 function CtrlDown : Boolean;
 var
