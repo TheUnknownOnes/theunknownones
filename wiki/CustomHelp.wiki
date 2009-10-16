@@ -8,7 +8,9 @@
   * Search using Index of fulltext
 
 = How to get it and installation =
-  * Download the package at: http://theunknownones.googlecode.com/svn/trunk/Delphi/CustomHelp/
+  * Download the latest stable realease at: http://theunknownones.googlecode.com/svn/tags/Release/CustomHelp/
+or 
+  * Get the development package at: http://theunknownones.googlecode.com/svn/trunk/Delphi/CustomHelp/
 or 
   * Checkout the whole repository at: http://theunknownones.googlecode.com/svn/trunk/ using a SVN client ... 
   * Simply load the package and install it
