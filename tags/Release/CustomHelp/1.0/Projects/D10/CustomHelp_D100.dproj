@@ -1,0 +1,128 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{A928228F-1C8F-4D4D-82FB-FF106F653E51}</ProjectGuid>
+			<MainSource>CustomHelp_D100.dpk</MainSource>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Basis' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DesignOnlyPackage>true</DesignOnlyPackage>
+			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp_D100.bpl</DCC_DependencyCheckOutputName>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_Platform>x86</DCC_Platform>
+			<DCC_Description>CustomHelp Expert ... by TUO</DCC_Description>
+			<GenPackage>true</GenPackage>
+			<DCC_S>false</DCC_S>
+			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
+			<GenDll>true</GenDll>
+			<DCC_N>true</DCC_N>
+			<DCC_E>false</DCC_E>
+			<DCC_F>false</DCC_F>
+			<DCC_K>false</DCC_K>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DCC_DebugInformation>false</DCC_DebugInformation>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="CustomHelp_D100.dpk">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="designide.dcp"/>
+			<DCCReference Include="vclie.dcp"/>
+			<DCCReference Include="..\..\uCustomHelpMain.pas"/>
+			<DCCReference Include="..\..\uCustomHelpSelector.pas">
+				<Form>FormHelpSelector</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\uFormConfigCustomHelp.pas">
+				<Form>form_Config</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\uCustomHelpIDEIntegration.pas"/>
+			<DCCReference Include="..\..\uMSHelpServices.pas"/>
+			<DCCReference Include="..\..\uHtmlHelp.pas"/>
+			<DCCReference Include="..\..\uUtils.pas"/>
+			<BuildConfiguration Include="Basis">
+				<Key>Base</Key>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<ProjectExtensions>
+			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
+			<Borland.ProjectType>Package</Borland.ProjectType>
+			<BorlandProject>
+				<Delphi.Personality>
+					<Source>
+						<Source Name="MainSource">CustomHelp_D100.dpk</Source>
+					</Source>
+					<Parameters>
+						<Parameters Name="UseLauncher">False</Parameters>
+						<Parameters Name="LoadAllSymbols">True</Parameters>
+						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+					</Parameters>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+						<VersionInfo Name="MajorVer">1</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">0</VersionInfo>
+						<VersionInfo Name="Build">0</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">1031</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName"/>
+						<VersionInfoKeys Name="FileDescription"/>
+						<VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName"/>
+						<VersionInfoKeys Name="LegalCopyright"/>
+						<VersionInfoKeys Name="LegalTrademarks"/>
+						<VersionInfoKeys Name="OriginalFilename"/>
+						<VersionInfoKeys Name="ProductName"/>
+						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="Comments"/>
+					</VersionInfoKeys>
+					<Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxFlatPack_D10.bpl">Max&apos;s Flat Component Pack</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxCalendar_d10.bpl">Max&apos;s Calendar Component Suite</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxCaptionBarButtons_d10.bpl">Max&apos;s Caption Bar Buttons Component</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxLinkLabel_d10.bpl">Max&apos;s LinkLabel Component</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxOneInstance_D10.bpl">Max&apos;s One Instance Component</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxOutlookBar_D10.bpl">Max&apos;s Outlook Style Sidebar Component</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxPlugIn_D10.bpl">Max&apos;s Plug-In Component</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxProtector_d10.bpl">Max&apos;s Protector Component</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxStorage_d10.bpl">Max&apos;s Resource Storage Component</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxWebUpdate_d10.bpl">Max&apos;s Web Update Component</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxTipDialog_d10.bpl">Max&apos;s Tip Dialog Component</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxSymbolDlg_d10.bpl">Max&apos;s Symbol Dialog Component</Excluded_Packages>
+					</Excluded_Packages>
+				</Delphi.Personality>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>
