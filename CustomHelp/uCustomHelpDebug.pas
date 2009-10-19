@@ -1,5 +1,5 @@
 UNIT uCustomHelpDebug;
-
+// Remove the . to enable debugging ...
 {.$DEFINE DEBUG_CUSTOMHELP}
 
 INTERFACE
