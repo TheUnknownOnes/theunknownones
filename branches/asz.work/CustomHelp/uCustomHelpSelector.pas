@@ -65,7 +65,7 @@ implementation
 
 uses
   UrlMon, StrUtils, ComObj, ShellAPI, uCustomHelpMain, uCustomHelpIDEIntegration,
-  Math, Registry, uCustomHelpKeywordRecorder;
+  Math, Registry, uCustomHelpKeywordRecorder, uCustomHelpIntfs;
 
 {$R *.dfm}
 
@@ -226,6 +226,7 @@ var
   CheckExpanded: Boolean;
   TrimOption: TNamespaceTrimOption;
   ANode: THelpViewerNodeAccess;
+  AProvider: ICustomHelpProvider;
 
   function GetCategoryFromLabel(ALabel: String; ACreate: Boolean = true): TButtonCategory;
   var
@@ -304,6 +305,13 @@ begin
         // replace default viewer?
         if GlobalCustomHelp.ReplaceDefaultViewer then
           Keywords.Objects[idx] := GlobalCustomHelpViewerNode;
+      end else if Supports(ANode.FViewer, ICustomHelpProvider, AProvider) then
+      begin
+        // imeexception, madCollection
+        if not AProvider.TranslateHelpString(kw, c, d, u, g) then
+          Continue;
+        TrimOption := nstoNoTrim;
+        kw := GlobalCustomHelp.EncodeURL(c, d, u, g, TrimOption);
       end else
       begin
         c := kw;
@@ -352,9 +360,10 @@ end;
 
 function THelpSelector.SelectKeyword(Keywords: TStrings): Integer;
 var
-  u : String;
+  u, l : String;
   SearchKeyword: string;
   hv: IExtendedHelpViewer;
+  prv: ICustomHelpProvider;
 begin
   if not TFormHelpSelector.Execute(GlobalCustomHelp.LastHelpCallKeyword, Keywords, Result, u, SearchKeyword) then
   begin
@@ -376,8 +385,20 @@ begin
       HelpViewer.ShowHelp(Keywords[Result], SearchKeyword);
       Result := -1;
       Exit;
-    end
-    else if Supports(FViewer, IExtendedHelpViewer, hv) then
+    end;
+    if GlobalCustomHelp.DecodeURL(u, l) then
+    begin
+      HelpViewer.ShowHelp(u, SearchKeyword);
+      Result := -1;
+      Exit;
+    end;
+    if Supports(FViewer, ICustomHelpProvider, prv) then
+    begin
+      prv.ShowCustomHelp(Keywords[Result]);
+      Result := -1;
+      Exit;
+    end;
+    if Supports(FViewer, IExtendedHelpViewer, hv) then
     begin // fix call of viewer by default help system ...
       hv.DisplayTopic(Keywords[Result]);
       Result := -1;

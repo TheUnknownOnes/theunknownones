@@ -584,7 +584,9 @@ begin
         ShowHTMLHelp(u);
       end
       else
-      if Assigned(hs) and not GlobalCustomHelp.ReplaceDefaultViewer and AnsiStartsText([PROTPREFIX_MSHELP, 'http://', 'https://', 'file://', 'bds://'], u) then
+      if Assigned(hs) and not GlobalCustomHelp.ReplaceDefaultViewer and
+        ( GlobalCustomHelp.IsHandledByDefaultViewer(u) OR
+          AnsiStartsText([PROTPREFIX_MSHELP, 'http://', 'https://', 'file://', 'bds://'], u)) then
       begin
         hs.ShowTopicHelp(u, '');
       end
