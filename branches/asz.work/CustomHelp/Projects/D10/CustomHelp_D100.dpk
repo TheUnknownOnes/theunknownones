@@ -36,8 +36,11 @@ contains
   uCustomHelpSelector in '..\..\uCustomHelpSelector.pas' {FormHelpSelector},
   uFormConfigCustomHelp in '..\..\uFormConfigCustomHelp.pas' {form_Config},
   uCustomHelpIDEIntegration in '..\..\uCustomHelpIDEIntegration.pas',
-  uMSHelpServices in '..\..\uMSHelpServices.pas',
   uHtmlHelp in '..\..\uHtmlHelp.pas',
-  uUtils in '..\..\uUtils.pas';
+  uUtils in '..\..\uUtils.pas',
+  uCustomHelpIntfs in '..\..\uCustomHelpIntfs.pas',
+  uCustomHelpKeywordRecorder in '..\..\uCustomHelpKeywordRecorder.pas',
+  uCustomHelpDebug in '..\..\uCustomHelpDebug.pas',
+  uMSHelpServices in '..\..\uMSHelpServices.pas';
 
 end.
