@@ -11,6 +11,18 @@ USES
 CONST
   DEBUG_CUSTOMHELP: boolean = {$IFDEF DEBUG_CUSTOMHELP}True{$ELSE}False{$ENDIF};
 
+VAR
+  //We keep these global ... as it is done in WinHelpViewer.pas
+  //and keep the reference to the object in the implementation section.
+  CustomHelpDebugViewerIntf: ICustomHelpViewer;
+
+IMPLEMENTATION
+
+USES
+  SysUtils,
+  ToolsApi,
+  Windows;
+
 TYPE
   {$TYPEINFO ON}
   TCustomHelpDebugViewer = CLASS(TInterfacedObject,
@@ -45,10 +57,8 @@ TYPE
     {$endregion}
 
     DESTRUCTOR Destroy; OVERRIDE;
-    PROCEDURE AssignHelpSelector(AClear: boolean);
   PRIVATE
     FUseDefaultTopic: boolean;
-    FViewer:          ICustomHelpViewer;
     FViewerID:        integer;
     FHelpManager:     IHelpManager;
     FKeywords:        TStringList;
@@ -58,6 +68,7 @@ TYPE
     FUnderstandsKeywords: TStringList;
     FShowHelpStrings: TStringList;
     CONSTRUCTOR Create;
+    PROCEDURE AssignHelpSelector(AClear: boolean);
     PROCEDURE DoUnregister;
     PROCEDURE DoRegister;
     PROCEDURE SetContents(CONST Value: TStringList);
@@ -91,15 +102,7 @@ TYPE
   END;
 
 VAR
-  //We keep these global ... as it is done in WinHelpViewer.pas
   CustomHelpDebugViewer: TCustomHelpDebugViewer;
-
-IMPLEMENTATION
-
-USES
-  SysUtils,
-  ToolsApi,
-  Windows;
 
 { TKeywordsHelpSelector }
 
@@ -149,7 +152,6 @@ BEGIN
   DebugLog('Create', '', False);
   FHelpManager := NIL;
   FUseDefaultTopic := False;
-  FViewer := Self;
   CreateStringList(self.FKeywords);
   CreateStringList(self.FContents);
   CreateStringList(self.FViewers);
@@ -157,6 +159,7 @@ BEGIN
   CreateStringList(self.FUnderstandsKeywords);
   CreateStringList(self.FShowHelpStrings);
   DoRegister;
+  CustomHelpDebugViewer := self;
 END;
 
 PROCEDURE TCustomHelpDebugViewer.DebugLog(method, msg: string);
@@ -178,15 +181,17 @@ END;
 DESTRUCTOR TCustomHelpDebugViewer.Destroy;
 BEGIN
   DebugLog('Destroy', '', False);
-  ShutDown;
+
   FreeAndNil(self.FKeywords);
   FreeAndNil(self.FContents);
   FreeAndNil(self.FViewers);
   FreeAndNil(self.FHelpStrings);
   FreeAndNil(self.FUnderstandsKeywords);
   FreeAndNil(self.FShowHelpStrings);
+
   IF CustomHelpDebugViewer = Self THEN
     CustomHelpDebugViewer := NIL;
+
   INHERITED;
 END;
 
@@ -218,7 +223,10 @@ END;
 PROCEDURE TCustomHelpDebugViewer.DoRegister;
 BEGIN
   IF NOT Assigned(FHelpManager) THEN
+  begin
+
     RegisterViewer(Self, FHelpManager);
+  end;
 END;
 
 PROCEDURE TCustomHelpDebugViewer.DoUnregister;
@@ -229,7 +237,6 @@ BEGIN
   BEGIN
     hm := FHelpManager;
     FHelpManager := NIL;
-    FViewer := NIL;
     hm.Release(FViewerID);
   END;
 END;
@@ -342,18 +349,14 @@ END;
 
 INITIALIZATION
   IF DEBUG_CUSTOMHELP THEN
-    CustomHelpDebugViewer := TCustomHelpDebugViewer.Create
+    CustomHelpDebugViewerIntf := TCustomHelpDebugViewer.Create
   ELSE
-    CustomHelpDebugViewer := NIL;
+    CustomHelpDebugViewerIntf := NIL;
 
 FINALIZATION
-  if Assigned(CustomHelpDebugViewer) then
-  begin
-    if Assigned(CustomHelpDebugViewer.FHelpManager) then
-      CustomHelpDebugViewer.ShutDown
-    else
-      FreeAndNil(CustomHelpDebugViewer);
-  end;
+  CustomHelpDebugViewerIntf := nil; // This will automatically clear HelpViewer if object is destroyed.
+  if CustomHelpDebugViewer <> nil then // This will unregister the viewer from the help system
+    CustomHelpDebugViewer.ShutDown;
 
 END.
 
