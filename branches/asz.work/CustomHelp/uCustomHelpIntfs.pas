@@ -1,11 +1,12 @@
-unit uCustomHelpIntfs;
+UNIT uCustomHelpIntfs;
 
-interface
+INTERFACE
 
-uses
-  Classes, HelpIntfs;
+USES
+  Classes,
+  HelpIntfs;
 
-type
+TYPE
   { ICustomHelpProvider.
     TranslateHelpString() is used to get information about a HelpString
     provided by GetHelpStrings().
@@ -15,13 +16,29 @@ type
     Otherwise, the link given in the selected uri will be used to show help
     with the default viewing system.
      }
-  ICustomHelpProvider = interface(ICustomHelpViewer)
+  ICustomHelpProvider = INTERFACE(ICustomHelpViewer)
     ['{DFCBE0F2-B3AC-4D1D-B3FF-919FEAD3988B}']
-    function TranslateHelpString(const HelpString: string; var Caption, Description, Link, Group: string): Boolean;
-    function GetCustomHelpStrings(const HelpString: string) : TStringList;
-    procedure ShowCustomHelp(const HelpString: string);
-  end;
+    FUNCTION TranslateHelpString(CONST HelpString: string;
+      VAR Caption, Description, Link, Group: string): boolean;
+    FUNCTION GetCustomHelpStrings(CONST HelpString: string): TStringList;
+    PROCEDURE ShowCustomHelp(CONST HelpString: string);
+  END;
 
-implementation
+  ICustomHelpKeywordRecorder = INTERFACE(IInterface)
+    ['{2D69C7B6-0681-43CF-B995-F1A91C41E1BD}']
+    FUNCTION GetKeywordList: TStringList;
+    PROCEDURE SetKeywordList(CONST Value: TStringList);
+    FUNCTION GetHelpStringList: TStringList;
+    PROCEDURE SetHelpStringList(CONST Value: TStringList);
+    FUNCTION GetShowHelpStringList: TStringList;
+    PROCEDURE SetShowHelpStringList(CONST Value: TStringList);
+    FUNCTION GetEnabled: boolean;
+    PROCEDURE SetEnabled(CONST Value: boolean);
+    PROCEDURE AddKeyword(HelpString: string; AIgnoreDuplicate: boolean = False);
+    PROCEDURE Reset;
+  END;
 
-end.
+IMPLEMENTATION
+
+END.
+

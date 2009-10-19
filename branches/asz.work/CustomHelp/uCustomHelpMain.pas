@@ -15,15 +15,12 @@ uses
 type
   TNamespaceTrimOption = (nstoNoTrim=0, nstoTrimFirst, nstoTrimAll);
 
-  TCustomHelpViewer = class;
-
   //Main object
   TCustomHelp = class
   private
     FLastKeyword: String;
     FLastHelpErrors: string;
     FSessionLock: TCriticalSection;
-    FCustomHelpViewer:TCustomHelpViewer;
     FHandledSchemes: TStringList;
     FReplaceDefaultViewer: boolean;
     FShowOHSAtTop: boolean;
@@ -107,40 +104,8 @@ type
       out TrimOption: TNamespaceTrimOption): boolean;
     class function DecodeURL(const URL: String; out Link: String): boolean; overload;
     class function CheckGidFile(AWinHelpFile: String; const ARaiseError: Boolean): Boolean; static;
-  end;
-
-  TCustomHelpViewer = class(TInterfacedObject,
-    ICustomHelpViewer)
-  private
-    FHelpManager: IHelpManager;
-    FViewerID: Integer;
-    procedure ShowHTMLHelp(AURL: String);
-    procedure ForceSelector(const HelpString: String);
-  protected
-    {$REGION 'ICustomHelpViewer'}
-    function  GetViewerName : String;
-    function  UnderstandsKeyword(const HelpString: String): Integer;
-    function  GetHelpStrings(const HelpString: String): TStringList;
-    function  CanShowTableOfContents : Boolean;
-    procedure ShowTableOfContents;
-    procedure NotifyID(const ViewerID: Integer);
-    procedure SoftShutDown;
-    procedure ShutDown;
-    {$ENDREGION}
-
-    function  InternalGetHelpStrings(const HelpString: String; const AddProviders: Boolean): TStringList;
-  private
-    FEnabled: Boolean;
-  public
-    constructor Create;
-    destructor Destroy; override;
-    procedure ShowHelp(const HelpString: String); overload;
     procedure ShowHelp(const HelpString: String; const SelectedKeyword: string); overload;
-    property HelpManager : IHelpManager read FHelpManager write FHelpManager;
-    property ViewerID: Integer read FViewerID;
-    property Name: String read GetViewerName;
-    function CheckUnderstandsKeyword(const HelpString: String): Boolean;
-    property Enabled: boolean read FEnabled;
+    function GetViewerID: integer;
   end;
 
 function REG_ROOT_KEY: string;
@@ -203,7 +168,7 @@ var
   GlobalCustomHelp : TCustomHelp;
 
   //We keep these global ... as it is done in WinHelpViewer.pas
-  HelpViewer: TCustomHelpViewer;
+  //and keep the reference to the object in the implementation section.
   HelpViewerIntf: ICustomHelpViewer;
 
 implementation
@@ -212,6 +177,44 @@ uses
   SysUtils, StrUtils, ShellAPI, uFormConfigCustomHelp,
   Graphics, ActiveX, Variants, Types, uUtils,
   uCustomHelpKeywordRecorder, uCustomHelpIDEIntegration;
+
+type
+  TCustomHelpViewer = class(TInterfacedObject,
+    ICustomHelpViewer)
+  private
+    FHelpManager: IHelpManager;
+    FViewerID: Integer;
+    procedure ShowHTMLHelp(AURL: String);
+    procedure ForceSelector(const HelpString: String);
+  protected
+    {$REGION 'ICustomHelpViewer'}
+    function  GetViewerName : String;
+    function  UnderstandsKeyword(const HelpString: String): Integer;
+    function  GetHelpStrings(const HelpString: String): TStringList;
+    function  CanShowTableOfContents : Boolean;
+    procedure ShowTableOfContents;
+    procedure NotifyID(const ViewerID: Integer);
+    procedure SoftShutDown;
+    procedure ShutDown;
+    {$ENDREGION}
+
+    function  InternalGetHelpStrings(const HelpString: String; const AddProviders: Boolean): TStringList;
+  private
+    FEnabled: Boolean;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure ShowHelp(const HelpString: String); overload;
+    procedure ShowHelp(const HelpString: String; const SelectedKeyword: string); overload;
+    property HelpManager : IHelpManager read FHelpManager write FHelpManager;
+    property ViewerID: Integer read FViewerID;
+    property Name: String read GetViewerName;
+    function CheckUnderstandsKeyword(const HelpString: String): Boolean;
+    property Enabled: boolean read FEnabled;
+  end;
+
+var
+  HelpViewer: TCustomHelpViewer;
 
 {$WARN SYMBOL_PLATFORM OFF}
 procedure DebugLog(method, msg: string);
@@ -298,8 +301,8 @@ begin
       begin
         try
           ShortHelpString := HelpString;
-          if CustomHelpKeywordRecorder.Enabled then
-            CustomHelpKeywordRecorder.AddKeyword(ShortHelpString, true);
+          if CustomHelpKeywordRecorderIntf.GetEnabled then
+            CustomHelpKeywordRecorderIntf.AddKeyword(ShortHelpString, true);
           if not GlobalCustomHelp.PerformInHxSession(ShortHelpString, idx, HelpStrings) then
             if GlobalCustomHelp.TrimNamespacesUntilResultFound <> nstoNoTrim then
             begin
@@ -307,8 +310,8 @@ begin
                 LeftToken(ShortHelpString, '.', true);
                 if ShortHelpString = '' then
                   Break;
-                if CustomHelpKeywordRecorder.Enabled then
-                  CustomHelpKeywordRecorder.AddKeyword(ShortHelpString, true);
+                if CustomHelpKeywordRecorderIntf.GetEnabled then
+                  CustomHelpKeywordRecorderIntf.AddKeyword(ShortHelpString, true);
                 if GlobalCustomHelp.PerformInHxSession(ShortHelpString, idx, HelpStrings) then
                   Break;
                 if GlobalCustomHelp.TrimNamespacesUntilResultFound = nstoTrimFirst then
@@ -502,11 +505,9 @@ end;
 destructor TCustomHelpViewer.Destroy;
 begin
   if HelpViewer = self then
-  begin
     HelpViewer := nil;
-    HelpViewerIntf := nil;
-  end;
-  inherited Destroy;
+
+  inherited;
 end;
 
 procedure TCustomHelpViewer.ForceSelector(const HelpString: String);
@@ -781,7 +782,7 @@ begin
   // add default entries, if we are in a second call to the help system
   // with the same keyword and the first call did not yield any result
   // (otherwise Keywords.Count is empty)
-  with CustomHelpKeywordRecorder, Keywords do
+  with CustomHelpKeywordRecorderIntf, GetKeywordList do
     if dontAddDefault and (Count > 0) and (Strings[0] = AHelpString) then
     begin
       dontAddDefault := False;
@@ -796,7 +797,7 @@ begin
       AddKeyword(AHelpString);
     end;
   // Start recording of keywords and add "missing" keyword.
-  CustomHelpKeywordRecorder.Enabled := True;
+  CustomHelpKeywordRecorderIntf.SetEnabled(True);
 
   with InternalGetHelpStrings(AHelpString, not dontAddDefault) do
   begin
@@ -844,7 +845,7 @@ begin
   HelpViewer:=TCustomHelpViewer.Create;
   RegisterViewer(HelpViewerIntf, HelpViewer.FHelpManager);
   // clear keyword history ...
-  CustomHelpKeywordRecorder.Enabled := False;
+  CustomHelpKeywordRecorderIntf.SetEnabled(False);
 
   ConnectToIDE;
   LoadProviderFromRegistry;
@@ -957,6 +958,13 @@ begin
   end;
 end;
 
+function TCustomHelp.GetViewerID: integer;
+begin
+  Result := -1;
+  if Assigned(HelpViewerIntf) then
+    Result := HelpViewer.FViewerID;
+end;
+
 class function TCustomHelp.DecodeURL(const URL: String; out Caption,
   Description, Link: String; out Group: String;
   out TrimOption: TNamespaceTrimOption): boolean;
@@ -1041,14 +1049,9 @@ begin
   FProvider.Free;
   FSessionLock.Free;
 
-  FCustomHelpViewer := nil;
-  if Assigned(HelpViewer) then
-  begin
-    if Assigned(HelpViewer.FHelpManager) then
-      HelpViewer.ShutDown
-    else
-      FreeAndNil(HelpViewer);
-  end;
+  HelpViewerIntf := nil; // This will automatically clear HelpViewer if object is destroyed.
+  if HelpViewer <> nil then // This will unregister the viewer from the help system.
+    HelpViewer.ShutDown;
 
   if GlobalCustomHelp = self then
     GlobalCustomHelp := nil;
@@ -1323,6 +1326,12 @@ procedure TCustomHelp.SetTrimNamespaces(const Value: TNamespaceTrimOption);
 begin
   FTrimNamespaces := Value;
   TCustomHelp.WriteSettingToRegistry(SETTINGS_TRIMNAMESPACES, IntToStr(byte(Value)));
+end;
+
+procedure TCustomHelp.ShowHelp(const HelpString, SelectedKeyword: string);
+begin
+  if Assigned(HelpViewerIntf) then
+    HelpViewer.ShowHelp(HelpString, SelectedKeyword);
 end;
 
 class function TCustomHelp.CheckGidFile(AWinHelpFile: String; const ARaiseError: Boolean): Boolean;

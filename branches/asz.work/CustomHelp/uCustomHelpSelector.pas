@@ -171,8 +171,8 @@ begin
   with fhs do
   begin
     try
-      GlobalCustomHelpViewerNode.FViewer := HelpViewer;
-      GlobalCustomHelpViewerNode.FViewerID := HelpViewer.ViewerID;
+      GlobalCustomHelpViewerNode.FViewer := HelpViewerIntf;
+      GlobalCustomHelpViewerNode.FViewerID := GlobalCustomHelp.GetViewerID;
       InitList(Keywords);
 
       with catbtnTopics.Categories[0] do
@@ -185,7 +185,7 @@ begin
         end;
       end;
 
-      cbbSearchKeyword.Items.Assign(CustomHelpKeywordRecorder.Keywords);
+      cbbSearchKeyword.Items.Assign(CustomHelpKeywordRecorderIntf.GetKeywordList);
       SearchKeywords := cbbSearchKeyword.Items;
       pnlSearchKeyword.Visible := SearchKeywords.Count > 1;
       if SearchKeywords.Count = 0 then
@@ -198,8 +198,8 @@ begin
         cbbSearchKeyword.Text := SearchKeywords[cbbSearchKeyword.ItemIndex];
 
       // clear keyword history before showing help select form ...
-      CustomHelpKeywordRecorder.Reset;
-      CustomHelpKeywordRecorder.Enabled := False;
+      CustomHelpKeywordRecorderIntf.Reset;
+      CustomHelpKeywordRecorderIntf.SetEnabled(False);
 
       Caption := StringReplace(Caption, '@@HELPSTRING@@', HelpString, [rfReplaceAll]);
 
@@ -355,7 +355,7 @@ end;
 
 function THelpSelector.SelectContext(Viewers: TStrings): Integer;
 begin
-  Result:=Viewers.IndexOf(HelpViewer.Name);
+  Result:=Viewers.IndexOf(HelpViewerIntf.GetViewerName);
 end;
 
 function THelpSelector.SelectKeyword(Keywords: TStrings): Integer;
@@ -373,7 +373,7 @@ begin
 
   if not GlobalCustomHelp.IsHandledByDefaultViewer(Keywords[Result]) then
   begin
-    HelpViewer.ShowHelp(Keywords[Result], SearchKeyword);
+    GlobalCustomHelp.ShowHelp(Keywords[Result], SearchKeyword);
     Result := -1;
     Exit;
   end;
@@ -382,13 +382,13 @@ begin
   begin
     if FViewer = HelpViewerIntf then
     begin
-      HelpViewer.ShowHelp(Keywords[Result], SearchKeyword);
+      GlobalCustomHelp.ShowHelp(Keywords[Result], SearchKeyword);
       Result := -1;
       Exit;
     end;
     if GlobalCustomHelp.DecodeURL(u, l) then
     begin
-      HelpViewer.ShowHelp(u, SearchKeyword);
+      GlobalCustomHelp.ShowHelp(u, SearchKeyword);
       Result := -1;
       Exit;
     end;
@@ -409,7 +409,7 @@ end;
 
 function THelpSelector.TableOfContents(Contents: TStrings): Integer;
 begin
-  Result:=Contents.IndexOf(HelpViewer.Name);
+  Result:=Contents.IndexOf(HelpViewerIntf.GetViewerName);
 end;
 
 procedure TFormHelpSelector.FormClose(Sender: TObject;
