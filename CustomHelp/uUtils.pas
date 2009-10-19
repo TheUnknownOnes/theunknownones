@@ -51,6 +51,7 @@ function ShiftDown : Boolean;
 function AltDown : Boolean;
 
 function AnsiStartsText(const ASubTexts: array of string; const AText: string): Boolean; overload;
+function AnsiStartsText(const ASubText: string; const AText: string): Boolean; overload;
 
 Function GetTempPath: WideString; overload;
 Function CreateTempFileName(FileName: WideString): WideString; overload;
@@ -93,7 +94,7 @@ Function GetTempPath: WideString;
 Var i: Integer;
 Begin
   SetLength(Result, MAX_PATH);
-  i := Windows.GetTempPath(MAX_PATH, PWideChar(Result));
+  i := Windows.GetTempPathW(MAX_PATH, PWideChar(Result));
   SetLength(Result, i);
   If (Result <> '') and (Result[i] <> '\') Then
     Result := Result + '\';
@@ -105,7 +106,7 @@ var
 begin
   tempPath := GetTempPath;
   SetLength(Result, MAX_PATH);
-  SetLength(Result, Windows.GetTempFileName(PWideChar(TempPath), PWideChar(prefix), 1, PWideChar(Result)));
+  SetLength(Result, Windows.GetTempFileNameW(PWideChar(TempPath), PWideChar(prefix), 1, PWideChar(Result)));
 end;
 
 Function CreateTempFileName(FileName: WideString): WideString;
@@ -124,12 +125,17 @@ Begin
       Raise Exception.CreateFmt('Temporäre Datei "%s" konnte nicht erstellt werden.',
         [StringReplace(FileName, '*', '{UniqueID}', [])]);
     Result := StringReplace(FileName, '*', IntToHex(i, 8), []);
-    F := CreateFile(PWideChar(Result), GENERIC_WRITE, 0, nil, CREATE_NEW,
+    F := CreateFileW(PWideChar(Result), GENERIC_WRITE, 0, nil, CREATE_NEW,
       FILE_ATTRIBUTE_TEMPORARY or FILE_ATTRIBUTE_NOT_CONTENT_INDEXED, 0);
     Inc(i);
   Until F <> INVALID_HANDLE_VALUE;
   CloseHandle(F);
 End;
+
+function AnsiStartsText(const ASubText: string; const AText: string): Boolean; overload;
+begin
+  Result := StrUtils.AnsiStartsText(ASubText, AText);
+end;
 
 function AnsiStartsText(const ASubTexts: array of string; const AText: string): Boolean; overload;
 var
