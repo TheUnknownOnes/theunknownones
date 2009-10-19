@@ -51,7 +51,9 @@ function ShiftDown : Boolean;
 function AltDown : Boolean;
 
 function AnsiStartsText(const ASubTexts: array of string; const AText: string): Boolean; overload;
+{$IFNDEF UNICODE}
 function AnsiStartsText(const ASubText: string; const AText: string): Boolean; overload;
+{$ENDIF}
 
 Function GetTempPath: WideString; overload;
 Function CreateTempFileName(FileName: WideString): WideString; overload;
@@ -132,10 +134,12 @@ Begin
   CloseHandle(F);
 End;
 
+{$IFNDEF UNICODE}
 function AnsiStartsText(const ASubText: string; const AText: string): Boolean; overload;
 begin
   Result := StrUtils.AnsiStartsText(ASubText, AText);
 end;
+{$ENDIF}
 
 function AnsiStartsText(const ASubTexts: array of string; const AText: string): Boolean; overload;
 var
