@@ -701,7 +701,7 @@ begin
     WriteProviderToRegistry('1',
                             'DP DelphiReference',
                             'Search with Daniels Cool Tool',
-                            'http://ref.dp200x.de/dp_reference.php?securitytoken=guest&tabbed=1&sbutton=Search&query='+ENVVAR_NAME_FORMATTED_KEYWORD,
+                            'http://ref.dp200x.de/dp_reference.php?query='+ENVVAR_NAME_FORMATTED_KEYWORD,
                             nstoTrimFirst);
 
     WriteProviderToRegistry('2',
