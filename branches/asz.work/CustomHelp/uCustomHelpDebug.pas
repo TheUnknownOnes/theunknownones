@@ -1,6 +1,6 @@
 UNIT uCustomHelpDebug;
 
-{$DEFINE DEBUG_CUSTOMHELP}
+{.$DEFINE DEBUG_CUSTOMHELP}
 
 INTERFACE
 
@@ -347,10 +347,12 @@ INITIALIZATION
     CustomHelpDebugViewer := NIL;
 
 FINALIZATION
-  IF CustomHelpDebugViewer <> NIL THEN
+  if Assigned(CustomHelpDebugViewer) then
   begin
-    CustomHelpDebugViewer.FViewer := nil;
-    CustomHelpDebugViewer := nil;
+    if Assigned(CustomHelpDebugViewer.FHelpManager) then
+      CustomHelpDebugViewer.ShutDown
+    else
+      FreeAndNil(CustomHelpDebugViewer);
   end;
 
 END.
