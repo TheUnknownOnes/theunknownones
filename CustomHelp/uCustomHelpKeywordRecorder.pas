@@ -48,7 +48,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Reset;
-    procedure AddKeyword(HelpString: string);
+    procedure AddKeyword(HelpString: string; AIgnoreDuplicate: boolean = false);
   private
     FViewer: ICustomHelpViewer;
     FViewerID: Integer;
@@ -81,12 +81,14 @@ uses
 
 { TKeywordsHelpViewer }
 
-procedure TCustomHelpKeywordRecorder.AddKeyword(HelpString: string);
+procedure TCustomHelpKeywordRecorder.AddKeyword(HelpString: string; AIgnoreDuplicate: boolean);
 begin
   if AnsiSameText(HelpString, KIBITZ_IGNORED_HELPSTRING) then
     Exit;
   with FKeywords do
-    if (Count = 0) or (Strings[Count-1] <> HelpString) then
+    if AIgnoreDuplicate and (IndexOf(HelpString) > -1) then
+      Exit
+    else if (Count = 0) or (Strings[Count-1] <> HelpString) then
       Add(HelpString);
 end;
 
@@ -286,8 +288,10 @@ initialization
 finalization
   if Assigned(CustomHelpKeywordRecorder) then
   begin
-    CustomHelpKeywordRecorder.FViewer := nil;
-    CustomHelpKeywordRecorder := nil;
+    if Assigned(CustomHelpKeywordRecorder.FHelpManager) then
+      CustomHelpKeywordRecorder.ShutDown
+    else
+      FreeAndNil(CustomHelpKeywordRecorder);
   end;
 
 end.

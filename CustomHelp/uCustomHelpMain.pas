@@ -298,6 +298,8 @@ begin
       begin
         try
           ShortHelpString := HelpString;
+          if CustomHelpKeywordRecorder.Enabled then
+            CustomHelpKeywordRecorder.AddKeyword(ShortHelpString, true);
           if not GlobalCustomHelp.PerformInHxSession(ShortHelpString, idx, HelpStrings) then
             if GlobalCustomHelp.TrimNamespacesUntilResultFound <> nstoNoTrim then
             begin
@@ -305,6 +307,8 @@ begin
                 LeftToken(ShortHelpString, '.', true);
                 if ShortHelpString = '' then
                   Break;
+                if CustomHelpKeywordRecorder.Enabled then
+                  CustomHelpKeywordRecorder.AddKeyword(ShortHelpString, true);
                 if GlobalCustomHelp.PerformInHxSession(ShortHelpString, idx, HelpStrings) then
                   Break;
                 if GlobalCustomHelp.TrimNamespacesUntilResultFound = nstoTrimFirst then
@@ -497,8 +501,11 @@ end;
 
 destructor TCustomHelpViewer.Destroy;
 begin
-  HelpViewer := nil;
-  HelpViewerIntf := nil;
+  if HelpViewer = self then
+  begin
+    HelpViewer := nil;
+    HelpViewerIntf := nil;
+  end;
   inherited Destroy;
 end;
 
@@ -620,12 +627,15 @@ begin
 end;
 
 procedure TCustomHelpViewer.ShutDown;
+VAR
+  hm: IHelpManager;
 begin
   SoftShutDown;
   if Assigned(FHelpManager) then
   begin
-    HelpManager.Release(FViewerID);
-    HelpManager := nil;
+    hm := FHelpManager;
+    FHelpManager := NIL;
+    hm.Release(FViewerID);
   end;
 end;
 
@@ -1032,11 +1042,17 @@ begin
   FSessionLock.Free;
 
   FCustomHelpViewer := nil;
+  if Assigned(HelpViewer) then
+  begin
+    if Assigned(HelpViewer.FHelpManager) then
+      HelpViewer.ShutDown
+    else
+      FreeAndNil(HelpViewer);
+  end;
 
-  if Assigned(HelpViewer.FHelpManager) then
-    HelpViewer.ShutDown;
-  HelpViewer := nil;
-
+  if GlobalCustomHelp = self then
+    GlobalCustomHelp := nil;
+    
   inherited;
 end;
 

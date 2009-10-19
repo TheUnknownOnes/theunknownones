@@ -79,8 +79,6 @@ object FormHelpSelector: TFormHelpSelector
     Align = alBottom
     Alignment = taLeftJustify
     BevelOuter = bvNone
-    Caption = 'Keyword used in search providers:'
-    ShowCaption = False
     TabOrder = 1
     object lblSearchKeyword: TLabel
       Left = 0
