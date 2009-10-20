@@ -59,9 +59,12 @@
 				<Form>form_Config</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\uCustomHelpIDEIntegration.pas"/>
-			<DCCReference Include="..\..\uMSHelpServices.pas"/>
 			<DCCReference Include="..\..\uHtmlHelp.pas"/>
 			<DCCReference Include="..\..\uUtils.pas"/>
+			<DCCReference Include="..\..\uCustomHelpIntfs.pas"/>
+			<DCCReference Include="..\..\uCustomHelpKeywordRecorder.pas"/>
+			<DCCReference Include="..\..\uCustomHelpDebug.pas"/>
+			<DCCReference Include="..\..\uMSHelpServices.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

@@ -6,11 +6,25 @@ uses
   Windows, WebBrowserEx, ExtCtrls;
 
 function WelcomePageNavigate(AURL: WideString): Boolean;
+function GetIdeBaseRegistryKey: string;
 
 implementation
 
 uses
   ToolsAPI, ActnList, SysUtils, Dialogs, Forms, Classes;
+
+function GetIdeBaseRegistryKey: string;
+var
+  IServices: IOTAServices;
+begin
+  Assert(BorlandIDEServices <> nil);
+  IServices := (BorlandIDEServices as IOTAServices);
+  Assert(IServices <> nil);
+  Result := IServices.GetBaseRegistryKey;
+
+  Assert(Length(Result) > 0);
+  Assert(Result[Length(Result)] <> '\');
+end;
 
 type
   IURLModule = interface
@@ -19,7 +33,7 @@ type
     function GetURL: string;                    // tested
     procedure SetURL(const AURL: string);       // tested
     procedure SourceActivated;
-    function GetWindowClosingEvent: TWindowClosingEvent; // WARNING!!! DO NOT CALL!!!
+    function GetWindowClosingEvent: TWindowClosingEvent; // WARNING!!! do NOT CALL!!!
     procedure Proc1;
     procedure Proc2;
     procedure Proc3;
@@ -72,9 +86,9 @@ end;
 function TNavigateTimer.WPIsEnabled : boolean;
 begin
   result:= (GetModuleHandle( 'startpageide100.bpl' ) > 0)
-           OR
+           or
            (GetModuleHandle( 'startpageide120.bpl' ) > 0)
-           OR
+           or
            (GetModuleHandle( 'startpageide140.bpl' ) > 0); 
 end;
                                           
@@ -143,7 +157,7 @@ begin
     end;
   end;
 
-  if (mIdx > -1) AND (mIdx < ModuleServices.ModuleCount) then
+  if (mIdx > -1) and (mIdx < ModuleServices.ModuleCount) then
     ModuleServices.Modules[mIdx].Show;
 end;
 

@@ -2,19 +2,19 @@ package CustomHelp_D100;
 
 {$R *.res}
 {$ALIGN 8}
-{$ASSERTIONS ON}
+{$ASSERTIONS OFF}
 {$BOOLEVAL OFF}
-{$DEBUGINFO ON}
+{$DEBUGINFO OFF}
 {$EXTENDEDSYNTAX ON}
 {$IMPORTEDDATA ON}
 {$IOCHECKS ON}
-{$LOCALSYMBOLS ON}
+{$LOCALSYMBOLS OFF}
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
 {$OPTIMIZATION ON}
 {$OVERFLOWCHECKS OFF}
 {$RANGECHECKS OFF}
-{$REFERENCEINFO ON}
+{$REFERENCEINFO OFF}
 {$SAFEDIVIDE OFF}
 {$STACKFRAMES OFF}
 {$TYPEDADDRESS OFF}
@@ -36,8 +36,10 @@ contains
   uCustomHelpSelector in '..\..\uCustomHelpSelector.pas' {FormHelpSelector},
   uFormConfigCustomHelp in '..\..\uFormConfigCustomHelp.pas' {form_Config},
   uCustomHelpIDEIntegration in '..\..\uCustomHelpIDEIntegration.pas',
-  uMSHelpServices in '..\..\uMSHelpServices.pas',
   uHtmlHelp in '..\..\uHtmlHelp.pas',
-  uUtils in '..\..\uUtils.pas';
+  uUtils in '..\..\uUtils.pas',
+  uCustomHelpIntfs in '..\..\uCustomHelpIntfs.pas',
+  uCustomHelpKeywordRecorder in '..\..\uCustomHelpKeywordRecorder.pas',
+  uMSHelpServices in '..\..\uMSHelpServices.pas';
 
 end.

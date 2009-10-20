@@ -17,10 +17,12 @@ uses
 type
   TFormHelpSelector = class(TForm)
     catbtnTopics: TCategoryButtons;
-    pnlOptions: TPanel;
     cbFullTextSearch: TCheckBox;
     grpErrors: TGroupBox;
     mmoErrors: TMemo;
+    cbbSearchKeyword: TComboBox;
+    pnlSearchKeyword: TPanel;
+    lblSearchKeyword: TLabel;
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ListBox1Compare(Sender: TObject; Item1, Item2: TListItem;
       Data: Integer; var Compare: Integer);
@@ -34,6 +36,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure cbbSearchKeywordCloseUp(Sender: TObject);
   private
     FURL : String;
     FHelpIndex : Integer;
@@ -44,7 +47,9 @@ type
     property SelectedHelpIndex : Integer read FHelpIndex;
 
     class function Execute(HelpString: string; Keywords: TStrings; out SelectedIndex: Integer;
-      out SelectedUrl: String): Boolean; static;
+      out SelectedUrl: String): Boolean; overload; static;
+    class function Execute(HelpString: string; Keywords: TStrings; out SelectedIndex: Integer;
+      out SelectedUrl: String; out SelectedKeyword: string): Boolean; overload; static;
   end;
 
   //This class must not contain any local fields
@@ -60,7 +65,7 @@ implementation
 
 uses
   UrlMon, StrUtils, ComObj, ShellAPI, uCustomHelpMain, uCustomHelpIDEIntegration,
-  Math, Registry;
+  Math, Registry, uCustomHelpKeywordRecorder, uCustomHelpIntfs;
 
 {$R *.dfm}
 
@@ -137,27 +142,37 @@ begin
   Canvas.TextRect(drawrect, txt, [tfEndEllipsis]);
 end;
 
+procedure TFormHelpSelector.cbbSearchKeywordCloseUp(Sender: TObject);
+begin
+  catbtnTopics.SetFocus;
+end;
+
+class function TFormHelpSelector.Execute(HelpString: string; Keywords: TStrings;
+  out SelectedIndex: Integer; out SelectedUrl: string): Boolean;
+var
+  SelectedKeyword: string;
+begin
+  Result := TFormHelpSelector.Execute(HelpString, Keywords, SelectedIndex, selectedUrl, SelectedKeyword);
+end;
+
 class function TFormHelpSelector.Execute(HelpString: string; Keywords: TStrings;
                                    out SelectedIndex: Integer;
-                                   out SelectedUrl: String): Boolean;
+                                   out SelectedUrl: String;
+                                   out SelectedKeyword: string): Boolean;
+var
+  SearchKeywords: TStrings;
+  fhs: TFormHelpSelector;
 begin
   Result:=False;
   SelectedIndex:=-1;
   SelectedUrl:='';
 
-  with TFormHelpSelector.Create(Application.MainForm) do
+  fhs := TFormHelpSelector.Create(Application.MainForm);
+  with fhs do
   begin
     try
-      if GlobalCustomHelp.LastHelpCallKeyword <> HelpString then
-      begin
-        if Pos('.'+GlobalCustomHelp.LastHelpCallKeyword, HelpString) > 0 then
-          HelpString := GlobalCustomHelp.LastHelpCallKeyword
-      end;
-
-      Caption := StringReplace(Caption, '@@HELPSTRING@@', HelpString, [rfReplaceAll]);
-
-      GlobalCustomHelpViewerNode.FViewer := HelpViewer;
-      GlobalCustomHelpViewerNode.FViewerID := HelpViewer.ViewerID;
+      GlobalCustomHelpViewerNode.FViewer := HelpViewerIntf;
+      GlobalCustomHelpViewerNode.FViewerID := GlobalCustomHelp.GetViewerID;
       InitList(Keywords);
 
       with catbtnTopics.Categories[0] do
@@ -170,11 +185,30 @@ begin
         end;
       end;
 
+      cbbSearchKeyword.Items.Assign(CustomHelpKeywordRecorderIntf.GetKeywordList);
+      SearchKeywords := cbbSearchKeyword.Items;
+      pnlSearchKeyword.Visible := SearchKeywords.Count > 1;
+      if SearchKeywords.Count = 0 then
+        cbbSearchKeyword.Items.Add(HelpString);
+
+      cbbSearchKeyword.ItemIndex := cbbSearchKeyword.Items.IndexOf(HelpString);
+      if cbbSearchKeyword.ItemIndex < 0 then
+        cbbSearchKeyword.ItemIndex := 0;
+      if cbbSearchKeyword.ItemIndex >= 0 then
+        cbbSearchKeyword.Text := SearchKeywords[cbbSearchKeyword.ItemIndex];
+
+      // clear keyword history before showing help select form ...
+      CustomHelpKeywordRecorderIntf.Reset;
+      CustomHelpKeywordRecorderIntf.SetEnabled(False);
+
+      Caption := StringReplace(Caption, '@@HELPSTRING@@', HelpString, [rfReplaceAll]);
+
       if (ShowModal=mrOk)  then
       begin
         Result:=True;
         SelectedIndex:=SelectedHelpIndex;
         SelectedUrl:=URL;
+        SelectedKeyword := cbbSearchKeyword.Text;
       end;
     finally
       Free;
@@ -192,6 +226,7 @@ var
   CheckExpanded: Boolean;
   TrimOption: TNamespaceTrimOption;
   ANode: THelpViewerNodeAccess;
+  AProvider: ICustomHelpProvider;
 
   function GetCategoryFromLabel(ALabel: String; ACreate: Boolean = true): TButtonCategory;
   var
@@ -270,6 +305,13 @@ begin
         // replace default viewer?
         if GlobalCustomHelp.ReplaceDefaultViewer then
           Keywords.Objects[idx] := GlobalCustomHelpViewerNode;
+      end else if Supports(ANode.FViewer, ICustomHelpProvider, AProvider) then
+      begin
+        // imeexception, madCollection
+        if not AProvider.TranslateHelpString(kw, c, d, u, g) then
+          Continue;
+        TrimOption := nstoNoTrim;
+        kw := GlobalCustomHelp.EncodeURL(c, d, u, g, TrimOption);
       end else
       begin
         c := kw;
@@ -313,15 +355,17 @@ end;
 
 function THelpSelector.SelectContext(Viewers: TStrings): Integer;
 begin
-  Result:=Viewers.IndexOf(HelpViewer.Name);
+  Result:=Viewers.IndexOf(HelpViewerIntf.GetViewerName);
 end;
 
 function THelpSelector.SelectKeyword(Keywords: TStrings): Integer;
 var
-  u : String;
+  u, l : String;
+  SearchKeyword: string;
   hv: IExtendedHelpViewer;
+  prv: ICustomHelpProvider;
 begin
-  if not TFormHelpSelector.Execute(GlobalCustomHelp.LastHelpCallKeyword, Keywords, Result, u) then
+  if not TFormHelpSelector.Execute(GlobalCustomHelp.LastHelpCallKeyword, Keywords, Result, u, SearchKeyword) then
   begin
     Result:=-1;
     Exit;
@@ -329,7 +373,7 @@ begin
 
   if not GlobalCustomHelp.IsHandledByDefaultViewer(Keywords[Result]) then
   begin
-    HelpViewer.ShowHelp(Keywords[Result]);
+    GlobalCustomHelp.ShowHelp(Keywords[Result], SearchKeyword);
     Result := -1;
     Exit;
   end;
@@ -337,8 +381,24 @@ begin
   with THelpViewerNodeAccess(Keywords.Objects[Result]) do
   begin
     if FViewer = HelpViewerIntf then
-      Exit
-    else if Supports(FViewer, IExtendedHelpViewer, hv) then
+    begin
+      GlobalCustomHelp.ShowHelp(Keywords[Result], SearchKeyword);
+      Result := -1;
+      Exit;
+    end;
+    if GlobalCustomHelp.DecodeURL(u, l) then
+    begin
+      GlobalCustomHelp.ShowHelp(u, SearchKeyword);
+      Result := -1;
+      Exit;
+    end;
+    if Supports(FViewer, ICustomHelpProvider, prv) then
+    begin
+      prv.ShowCustomHelp(Keywords[Result]);
+      Result := -1;
+      Exit;
+    end;
+    if Supports(FViewer, IExtendedHelpViewer, hv) then
     begin // fix call of viewer by default help system ...
       hv.DisplayTopic(Keywords[Result]);
       Result := -1;
@@ -349,7 +409,7 @@ end;
 
 function THelpSelector.TableOfContents(Contents: TStrings): Integer;
 begin
-  Result:=Contents.IndexOf(HelpViewer.Name);
+  Result:=Contents.IndexOf(HelpViewerIntf.GetViewerName);
 end;
 
 procedure TFormHelpSelector.FormClose(Sender: TObject;
@@ -376,8 +436,28 @@ end;
 procedure TFormHelpSelector.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = VK_ESCAPE then
-    ModalResult := mrCancel;
+  if ActiveControl = cbbSearchKeyword then
+  begin
+    if (Key = VK_ESCAPE) then
+    begin
+      if cbbSearchKeyword.DroppedDown then
+        cbbSearchKeyword.DroppedDown := False;
+    Key := 0;
+    end;
+  end
+  else begin
+    if (Key = VK_ESCAPE) then
+    begin
+      ModalResult := mrCancel;
+      Key := 0;
+    end
+    else if (Key = VK_INSERT) and cbbSearchKeyword.Visible then
+    begin
+      cbbSearchKeyword.SetFocus;
+      cbbSearchKeyword.DroppedDown := True;
+      Key := 0;
+    end;
+  end;
 end;
 
 procedure TFormHelpSelector.FormShow(Sender: TObject);

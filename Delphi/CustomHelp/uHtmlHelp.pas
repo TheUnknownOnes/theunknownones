@@ -26,17 +26,17 @@
 { http://www.mozilla.org/MPL/MPL-1.1.html                                      }
 {                                                                              }
 { Software distributed under the License is distributed on an "AS IS" basis,   }
-{ WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for }
+{ withOUT WARRANTY OF ANY KIND, either express or implied. See the License for }
 { the specific language governing rights and limitations under the License.    }
 {                                                                              }
 { Alternatively, the contents of this file may be used under the terms of the  }
 { GNU Lesser General Public License (the  "LGPL License"), in which case the   }
 { provisions of the LGPL License are applicable instead of those above.        }
-{ If you wish to allow use of your version of this file only under the terms   }
+{ if you wish to allow use of your version of this file only under the terms   }
 { of the LGPL License and not to allow others to use your version of this file }
 { under the MPL, indicate your decision by deleting  the provisions above and  }
 { replace  them with the notice and other provisions required by the LGPL      }
-{ License.  If you do not delete the provisions above, a recipient may use     }
+{ License.  if you do not delete the provisions above, a recipient may use     }
 { your version of this file under either the MPL or the LGPL License.          }
 {                                                                              }
 { For more information about the LGPL: http://www.gnu.org/copyleft/lesser.html }
@@ -76,22 +76,22 @@ const
   {$EXTERNALSYM HH_SET_INFO_TYPE}
   HH_SYNC                    = $0009;
   {$EXTERNALSYM HH_SYNC}
-  {$IFDEF HTMLHELP11}
+  {$ifDEF HTMLHELP11}
   HH_ADD_NAV_UI              = $000A;      // not currently implemented
   {$EXTERNALSYM HH_ADD_NAV_UI}
   HH_ADD_BUTTON              = $000B;      // not currently implemented
   {$EXTERNALSYM HH_ADD_BUTTON}
   HH_GETBROWSER_APP          = $000C;      // not currently implemented
   {$EXTERNALSYM HH_GETBROWSER_APP}
-  {$ENDIF HTMLHELP11}
-  {$IFDEF HTMLHELP12}
+  {$ENDif HTMLHELP11}
+  {$ifDEF HTMLHELP12}
   HH_RESERVED1               = $000A;
   {$EXTERNALSYM HH_RESERVED1}
   HH_RESERVED2               = $000B;
   {$EXTERNALSYM HH_RESERVED2}
   HH_RESERVED3               = $000C;
   {$EXTERNALSYM HH_RESERVED3}
-  {$ENDIF HTMLHELP12}
+  {$ENDif HTMLHELP12}
   HH_KEYWORD_LOOKUP          = $000D;
   {$EXTERNALSYM HH_KEYWORD_LOOKUP}
   HH_DISPLAY_TEXT_POPUP      = $000E;      // display string resource id or text in a popup window
@@ -118,11 +118,11 @@ const
   {$EXTERNALSYM HH_SET_INCLUSIVE_FILTER}
   HH_SET_EXCLUSIVE_FILTER    = $0019;      // set exclusive filtering method for untyped topics to be excluded from display
   {$EXTERNALSYM HH_SET_EXCLUSIVE_FILTER}
-  {$IFDEF HTMLHELP11}
+  {$ifDEF HTMLHELP11}
   HH_SET_GUID                = $001A;      // For Microsoft Installer -- dwData is a pointer to the GUID string
   {$EXTERNALSYM HH_SET_GUID}
-  {$ENDIF HTMLHELP11}
-  {$IFDEF HTMLHELP12}
+  {$ENDif HTMLHELP11}
+  {$ifDEF HTMLHELP12}
   HH_INITIALIZE              = $001C;      // Initializes the help system.
   {$EXTERNALSYM HH_INITIALIZE}
   HH_UNINITIALIZE            = $001D;      // Uninitializes the help system.
@@ -131,17 +131,17 @@ const
   {$EXTERNALSYM HH_PRETRANSLATEMESSAGE}
   HH_SET_GLOBAL_PROPERTY     = $00FC;      // Set a global property. (NULL, NULL, HH_GPROP)
   {$EXTERNALSYM HH_SET_GLOBAL_PROPERTY}
-  {$ENDIF HTMLHELP12}
+  {$ENDif HTMLHELP12}
 
-  {$IFDEF HTMLHELP11}
+  {$ifDEF HTMLHELP11}
   HH_INTERNAL                = $00FF;      // Used internally.
   {$EXTERNALSYM HH_INTERNAL}
-  {$ENDIF HTMLHELP11}
+  {$ENDif HTMLHELP11}
 
-  {$IFDEF HTMLHELP12}
+  {$ifDEF HTMLHELP12}
   HHWIN_PROP_TAB_AUTOHIDESHOW = 1 shl 0; // Automatically hide/show tri-pane window
   {$EXTERNALSYM HHWIN_PROP_TAB_AUTOHIDESHOW}
-  {$ENDIF HTMLHELP12}
+  {$ENDif HTMLHELP12}
   HHWIN_PROP_ONTOP           = 1 shl 1;  // Top-most window (not currently implemented)
   {$EXTERNALSYM HHWIN_PROP_ONTOP}
   HHWIN_PROP_NOTITLEBAR      = 1 shl 2;  // no title bar
@@ -164,14 +164,14 @@ const
   {$EXTERNALSYM HHWIN_PROP_TAB_SEARCH}
   HHWIN_PROP_TAB_HISTORY     = 1 shl 11; // include history tab in navigation pane
   {$EXTERNALSYM HHWIN_PROP_TAB_HISTORY}
-  {$IFDEF HTMLHELP11}
+  {$ifDEF HTMLHELP11}
   HHWIN_PROP_TAB_BOOKMARKS   = 1 shl 12; // include bookmark tab in navigation pane
   {$EXTERNALSYM HHWIN_PROP_TAB_BOOKMARKS}
-  {$ENDIF HTMLHELP11}
-  {$IFDEF HTMLHELP12}
+  {$ENDif HTMLHELP11}
+  {$ifDEF HTMLHELP12}
   HHWIN_PROP_TAB_FAVORITES   = 1 shl 12; // include favorites tab in navigation pane
   {$EXTERNALSYM HHWIN_PROP_TAB_FAVORITES}
-  {$ENDIF HTMLHELP12}
+  {$ENDif HTMLHELP12}
   HHWIN_PROP_CHANGE_TITLE    = 1 shl 13; // Put current HTML title in title bar
   {$EXTERNALSYM HHWIN_PROP_CHANGE_TITLE}
   HHWIN_PROP_NAV_ONLY_WIN    = 1 shl 14; // Only display the navigation window
@@ -184,7 +184,7 @@ const
   {$EXTERNALSYM HHWIN_PROP_TAB_ADVSEARCH}
   HHWIN_PROP_USER_POS        = 1 shl 18; // After initial creation, user controls window size/Position
   {$EXTERNALSYM HHWIN_PROP_USER_POS}
-{$IFDEF HTMLHELP12}
+{$ifDEF HTMLHELP12}
   HHWIN_PROP_TAB_CUSTOM1     = 1 shl 19; // Use custom tab #1
   {$EXTERNALSYM HHWIN_PROP_TAB_CUSTOM1}
   HHWIN_PROP_TAB_CUSTOM2     = 1 shl 20; // Use custom tab #2
@@ -205,7 +205,7 @@ const
   {$EXTERNALSYM HHWIN_PROP_TAB_CUSTOM9}
   HHWIN_TB_MARGIN            = 1 shl 28; // the window type has a margin
   {$EXTERNALSYM HHWIN_TB_MARGIN}
-{$ENDIF HTMLHELP12}
+{$ENDif HTMLHELP12}
 
   HHWIN_PARAM_PROPERTIES     = 1 shl 1;  // valid fsWinProperties
   {$EXTERNALSYM HHWIN_PARAM_PROPERTIES}
@@ -266,14 +266,14 @@ const
   {$EXTERNALSYM HHWIN_BUTTON_SEARCH}
   HHWIN_BUTTON_HISTORY       = 1 shl 16; // not implemented
   {$EXTERNALSYM HHWIN_BUTTON_HISTORY}
-  {$IFDEF HTMLHELP11}
+  {$ifDEF HTMLHELP11}
   HHWIN_BUTTON_BOOKMARKS     = 1 shl 17; // not implemented
   {$EXTERNALSYM HHWIN_BUTTON_BOOKMARKS}
-  {$ENDIF HTMLHELP11}
-  {$IFDEF HTMLHELP12}
+  {$ENDif HTMLHELP11}
+  {$ifDEF HTMLHELP12}
   HHWIN_BUTTON_FAVORITES     = 1 shl 17; // not implemented
   {$EXTERNALSYM HHWIN_BUTTON_FAVORITES}
-  {$ENDIF HTMLHELP12}
+  {$ENDif HTMLHELP12}
   HHWIN_BUTTON_JUMP1         = 1 shl 18;
   {$EXTERNALSYM HHWIN_BUTTON_JUMP1}
   HHWIN_BUTTON_JUMP2         = 1 shl 19;
@@ -325,14 +325,14 @@ const
   {$EXTERNALSYM IDTB_SEARCH}
   IDTB_HISTORY      = 216;                 // not implemented
   {$EXTERNALSYM IDTB_HISTORY}
-  {$IFDEF HTMLHELP11}
+  {$ifDEF HTMLHELP11}
   IDTB_BOOKMARKS    = 217;                 // not implemented
   {$EXTERNALSYM IDTB_BOOKMARKS}
-  {$ENDIF HTMLHELP11}
-  {$IFDEF HTMLHELP12}
+  {$ENDif HTMLHELP11}
+  {$ifDEF HTMLHELP12}
   IDTB_FAVORITES    = 217;                 // not implemented
   {$EXTERNALSYM IDTB_FAVORITES}
-  {$ENDIF HTMLHELP12}
+  {$ENDif HTMLHELP12}
   IDTB_JUMP1        = 218;
   {$EXTERNALSYM IDTB_JUMP1}
   IDTB_JUMP2        = 219;
@@ -357,8 +357,8 @@ const
   {$EXTERNALSYM HHN_NAVCOMPLETE}
   HHN_TRACK         = HHN_FIRST - 1;
   {$EXTERNALSYM HHN_TRACK}
-  HHN_WINDOW_CREATE = HHN_FIRST - 2;
-  {$EXTERNALSYM HHN_WINDOW_CREATE}
+  HHN_WINdoW_CREATE = HHN_FIRST - 2;
+  {$EXTERNALSYM HHN_WINdoW_CREATE}
 
 type
   INT = Integer;   
@@ -391,14 +391,14 @@ type
   THHLastError = tagHH_LAST_ERROR;
 
   PHHNNotify = ^THHNNotify;
-  tagHHN_NOTIFY = packed record
+  tagHHN_NOTifY = packed record
     hdr: NMHDR;
     pszUrl: PCSTR;                         // multibyte null-terminated string
   end;
-  {$EXTERNALSYM tagHHN_NOTIFY}
-  HHN_NOTIFY = tagHHN_NOTIFY;
-  {$EXTERNALSYM HHN_NOTIFY}
-  THHNNotify = tagHHN_NOTIFY;
+  {$EXTERNALSYM tagHHN_NOTifY}
+  HHN_NOTifY = tagHHN_NOTifY;
+  {$EXTERNALSYM HHN_NOTifY}
+  THHNNotify = tagHHN_NOTifY;
 
   PHHPopup = ^THHPopup;
   tagHH_POPUP = packed record
@@ -440,13 +440,13 @@ const
   {$EXTERNALSYM HHWIN_NAVTYPE_INDEX}
   HHWIN_NAVTYPE_SEARCH       = 2;
   {$EXTERNALSYM HHWIN_NAVTYPE_SEARCH}
-  {$IFDEF HTMLHELP11}
+  {$ifDEF HTMLHELP11}
   HHWIN_NAVTYPE_BOOKMARKS    = 3;
   {$EXTERNALSYM HHWIN_NAVTYPE_BOOKMARKS}
   HHWIN_NAVTYPE_HISTORY      = 4;          //not implemented
   {$EXTERNALSYM HHWIN_NAVTYPE_HISTORY}
-  {$ENDIF HTMLHELP11}
-  {$IFDEF HTMLHELP12}
+  {$ENDif HTMLHELP11}
+  {$ifDEF HTMLHELP12}
   HHWIN_NAVTYPE_FAVORITES    = 3;
   {$EXTERNALSYM HHWIN_NAVTYPE_FAVORITES}
   HHWIN_NAVTYPE_HISTORY      = 4;          //not implemented
@@ -455,7 +455,7 @@ const
   {$EXTERNALSYM HHWIN_NAVTYPE_AUTHOR}
   HHWIN_NAVTYPE_CUSTOM_FIRST = 11;
   {$EXTERNALSYM HHWIN_NAVTYPE_CUSTOM_FIRST}
-{$ENDIF HTMLHELP12}
+{$ENDif HTMLHELP12}
 
   IT_INCLUSIVE = 0;
   {$EXTERNALSYM IT_INCLUSIVE}
@@ -530,13 +530,13 @@ const
   {$EXTERNALSYM HH_TAB_INDEX}
   HH_TAB_SEARCH       = 2;
   {$EXTERNALSYM HH_TAB_SEARCH}
-  {$IFDEF HTMLHELP11}
+  {$ifDEF HTMLHELP11}
   HH_TAB_BOOKMARKS    = 3;
   {$EXTERNALSYM HH_TAB_BOOKMARKS}
   HH_TAB_HISTORY      = 4;
   {$EXTERNALSYM HH_TAB_HISTORY}
-  {$ENDIF HTMLHELP11}
-  {$IFDEF HTMLHELP12}
+  {$ENDif HTMLHELP11}
+  {$ifDEF HTMLHELP12}
   HH_TAB_FAVORITES    = 3;
   {$EXTERNALSYM HH_TAB_FAVORITES}
   HH_TAB_HISTORY      = 4;
@@ -551,7 +551,7 @@ const
 
   HH_MAX_TABS_CUSTOM  = HH_TAB_CUSTOM_LAST - HH_TAB_CUSTOM_FIRST + 1;
   {$EXTERNALSYM HH_MAX_TABS_CUSTOM}
-{$ENDIF HTMLHELP12}
+{$ENDif HTMLHELP12}
 
 // HH_DISPLAY_SEARCH Command Related Structures and Constants
 
@@ -610,7 +610,7 @@ type
     fNotExpanded: BOOL;     // IN: TRUE/FALSE to contract or expand, OUT: current state
     curNavType: Integer;    // IN/OUT: UI to display in the navigational pane
     tabpos: Integer;        // IN/OUT: HHWIN_NAVTAB_TOP, HHWIN_NAVTAB_LEFT, or HHWIN_NAVTAB_BOTTOM
-    idNotify: Integer;      // IN: ID to use for WM_NOTIFY messages
+    idNotify: Integer;      // IN: ID to use for WM_NOTifY messages
     tabOrder: array[0..HH_MAX_TABS] of Byte; // IN/OUT: tab order: Contents, Index, Search, History, Favorites, Reserved 1-5, Custom tabs
     cHistory: Integer;      // IN/OUT: number of history items to keep (default is 30)
     pszJump1: LPCTSTR;      // Text for HHWIN_BUTTON_JUMP1
@@ -619,9 +619,9 @@ type
     pszUrlJump2: LPCTSTR;   // URL for HHWIN_BUTTON_JUMP2
     rcMinSize: tagRECT;        // Minimum size for window (ignored in version 1)
     cbInfoTypes: Integer;   // size of paInfoTypes;
-    {$IFDEF HTMLHELP12}
+    {$ifDEF HTMLHELP12}
     pszCustomTabs: LPCTSTR; // multiple zero-terminated Strings
-    {$ENDIF HTMLHELP12}
+    {$ENDif HTMLHELP12}
   end;
   {$EXTERNALSYM tagHH_WINTYPE}
   HH_WINTYPE = tagHH_WINTYPE;
@@ -718,11 +718,11 @@ const
   {$EXTERNALSYM HH_GPROPID_CONTENT_LANGUAGE}
 
 const
-  {$IFDEF UNICODE}
+  {$ifDEF UNICODE}
   AWSuffix = 'W';
-  {$ELSE}
+  {$else}
   AWSuffix = 'A';
-  {$ENDIF UNICODE}
+  {$ENDif UNICODE}
 
 type
   HH_GPROPID = HH_GPROPID_SINGLETHREAD..HH_GPROPID_CONTENT_LANGUAGE;

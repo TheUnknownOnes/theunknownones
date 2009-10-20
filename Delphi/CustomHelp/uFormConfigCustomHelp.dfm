@@ -4,7 +4,7 @@ object form_Config: Tform_Config
   BorderStyle = bsSizeToolWin
   Caption = 'Configure Custom Help'
   ClientHeight = 666
-  ClientWidth = 888
+  ClientWidth = 884
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,14 +20,13 @@ object form_Config: Tform_Config
   TextHeight = 13
   object Panel1: TPanel
     AlignWithMargins = True
-    Left = 813
+    Left = 809
     Top = 3
     Width = 72
     Height = 660
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 809
     object Button1: TButton
       AlignWithMargins = True
       Left = 3
@@ -56,16 +55,15 @@ object form_Config: Tform_Config
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 804
+    Width = 800
     Height = 660
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitWidth = 800
     object grpHelpNamespaces: TGroupBox
       Left = 0
       Top = 81
-      Width = 804
+      Width = 800
       Height = 214
       Margins.Left = 2
       Margins.Top = 2
@@ -74,12 +72,11 @@ object form_Config: Tform_Config
       Align = alTop
       Caption = 'Help Namespaces'
       TabOrder = 0
-      ExplicitWidth = 800
       object lvNamespaces: TListView
         AlignWithMargins = True
         Left = 5
         Top = 18
-        Width = 794
+        Width = 790
         Height = 148
         Align = alClient
         Checkboxes = True
@@ -96,17 +93,15 @@ object form_Config: Tform_Config
           end>
         TabOrder = 0
         ViewStyle = vsReport
-        ExplicitWidth = 790
       end
       object Panel4: TPanel
         Left = 2
         Top = 169
-        Width = 800
+        Width = 796
         Height = 43
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitWidth = 796
         object Label4: TLabel
           Left = 6
           Top = 22
@@ -138,7 +133,7 @@ object form_Config: Tform_Config
     object grpHelpDisplay: TGroupBox
       Left = 0
       Top = 0
-      Width = 804
+      Width = 800
       Height = 81
       Margins.Left = 2
       Margins.Top = 2
@@ -147,9 +142,8 @@ object form_Config: Tform_Config
       Align = alTop
       Caption = 'Help Display'
       TabOrder = 1
-      ExplicitWidth = 800
       DesignSize = (
-        804
+        800
         81)
       object Label5: TLabel
         Left = 8
@@ -183,20 +177,19 @@ object form_Config: Tform_Config
       object edRedirectSchemes: TEdit
         Left = 98
         Top = 53
-        Width = 701
+        Width = 697
         Height = 21
         Hint = 
           'Specify the schemes to show with the WelcomePage/system browser.' +
           #13#10'Use '#39';'#39' as delimiter, e.g. file://;http://'
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 2
-        ExplicitWidth = 697
       end
     end
     object grpOtherHelpSources: TGroupBox
       Left = 0
       Top = 295
-      Width = 804
+      Width = 800
       Height = 365
       Margins.Left = 2
       Margins.Top = 2
@@ -205,12 +198,11 @@ object form_Config: Tform_Config
       Align = alClient
       Caption = 'Other Help Sources'
       TabOrder = 2
-      ExplicitWidth = 800
       object ListView1: TListView
         AlignWithMargins = True
         Left = 5
         Top = 64
-        Width = 794
+        Width = 790
         Height = 202
         Align = alClient
         Columns = <
@@ -239,19 +231,17 @@ object form_Config: Tform_Config
         OnDblClick = ListView1DblClick
         OnInfoTip = ListView1InfoTip
         OnKeyDown = ListView1KeyDown
-        ExplicitWidth = 790
       end
       object pnlOHSItem: TPanel
         Left = 2
         Top = 269
-        Width = 800
+        Width = 796
         Height = 94
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitWidth = 796
         DesignSize = (
-          800
+          796
           94)
         object Label1: TLabel
           Left = 6
@@ -284,29 +274,27 @@ object form_Config: Tform_Config
         object edName: TEdit
           Left = 94
           Top = 3
-          Width = 704
+          Width = 700
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           Enabled = False
           TabOrder = 0
           OnChange = edNameChange
-          ExplicitWidth = 700
         end
         object edDesc: TEdit
           Left = 94
           Top = 26
-          Width = 704
+          Width = 700
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           Enabled = False
           TabOrder = 1
           OnChange = edDescChange
-          ExplicitWidth = 700
         end
         object edURL: TEdit
           Left = 94
           Top = 48
-          Width = 704
+          Width = 700
           Height = 21
           Hint = 
             '- URL to a webbased search provider (e.g. koders.com)'#13#10'- Path to' +
@@ -318,7 +306,6 @@ object form_Config: Tform_Config
           ShowHint = True
           TabOrder = 2
           OnChange = edURLChange
-          ExplicitWidth = 700
         end
         object cbTrimNamespacesOHS: TComboBox
           Left = 94
@@ -335,25 +322,23 @@ object form_Config: Tform_Config
         AlignWithMargins = True
         Left = 5
         Top = 18
-        Width = 794
+        Width = 790
         Height = 17
         Align = alTop
         Caption = 'Display other help sources at the top of the result list'
         TabOrder = 2
-        ExplicitWidth = 790
       end
       object cbCheckGID: TCheckBox
         AlignWithMargins = True
         Left = 5
         Top = 41
-        Width = 794
+        Width = 790
         Height = 17
         Align = alTop
         Caption = 
           'check winhelp sources (*.hlp files) if keyword is valid (help re' +
           'quest may be a bit slower)'
         TabOrder = 3
-        ExplicitWidth = 790
       end
     end
   end
