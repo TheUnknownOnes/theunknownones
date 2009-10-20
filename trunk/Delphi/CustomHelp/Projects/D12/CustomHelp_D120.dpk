@@ -43,6 +43,8 @@ contains
   uCustomHelpIDEIntegration in '..\..\uCustomHelpIDEIntegration.pas',
   uHtmlHelp in '..\..\uHtmlHelp.pas',
   uUtils in '..\..\uUtils.pas',
+  uCustomHelpIntfs in '..\..\uCustomHelpIntfs.pas',
+  uCustomHelpKeywordRecorder in '..\..\uCustomHelpKeywordRecorder.pas',
   uMSHelpServices in '..\..\uMSHelpServices.pas';
 
 end.
