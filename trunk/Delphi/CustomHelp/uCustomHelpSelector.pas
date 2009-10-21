@@ -42,6 +42,7 @@ type
     FHelpIndex : Integer;
     procedure InitList(Keywords: TStrings);
     procedure SaveExpanded;
+    procedure SortCategories;
   public
     property URL : String read FURL;
     property SelectedHelpIndex : Integer read FHelpIndex;
@@ -65,7 +66,8 @@ implementation
 
 uses
   UrlMon, StrUtils, ComObj, ShellAPI, uCustomHelpMain, uCustomHelpIDEIntegration,
-  Math, Registry, uCustomHelpKeywordRecorder, uCustomHelpIntfs;
+  Math, Registry, uCustomHelpKeywordRecorder, uCustomHelpIntfs,
+  uCustomHelpConsts;
 
 {$R *.dfm}
 
@@ -216,6 +218,40 @@ begin
   end;
 end;
 
+procedure TFormHelpSelector.SortCategories;
+var
+  i : Integer;
+  idx : integer;
+  toSort : TStringList;
+  s : string;
+begin
+  toSort:=TStringList.Create;
+  try
+    for i := 0 to catbtnTopics.Categories.Count - 1 do
+    begin
+      s:=catbtnTopics.Categories[i].Caption;
+      if  (s = GROUP_LABEL_WEB_BASED) or
+          (s = GROUP_LABEL_FILE_BASED) then
+      begin
+        idx:=GlobalCustomHelp.ResultOrderFromString[s];
+        toSort.AddObject(Format('%.4d', [idx]),catbtnTopics.Categories[i]);
+      end
+      else
+      begin
+        toSort.AddObject(Format('%.4d', [GlobalCustomHelp.ResultOrderFromString[GROUP_LABEL_DUMMY_MSHELP2]]), catbtnTopics.Categories[i]);
+      end;
+    end;
+
+    toSort.Sort;
+    for i := 0 to toSort.Count - 1 do
+    begin
+      TButtonCategory(toSort.Objects[i]).Index:=i;
+    end;
+  finally
+    toSort.Free;
+  end;
+end;
+
 procedure TFormHelpSelector.InitList(Keywords: TStrings);
 var
   cat : TButtonCategory;
@@ -245,7 +281,13 @@ var
     begin
       Result:=catbtnTopics.Categories.Add;
       Result.Caption:=ALabel;
-      Result.Color:=clActiveCaption;
+      if ALabel = GROUP_LABEL_WEB_BASED then
+        Result.Color:=GlobalCustomHelp.ColorWebProvider
+      else
+      if ALabel = GROUP_LABEL_FILE_BASED then
+        Result.Color:=GlobalCustomHelp.ColorFileProvider
+      else
+        Result.Color:=GlobalCustomHelp.ColorMSHelp;
       Result.TextColor:=clCaptionText;
       Result.Collapsed:=True;
       if CheckExpanded then
@@ -303,7 +345,7 @@ begin
         if g = GROUP_LABEL_STANDARD then
           GetViewerName(ANode, g);
         // replace default viewer?
-        if GlobalCustomHelp.ReplaceDefaultViewer then
+        if GlobalCustomHelp.DisplayLocation<>dloMSDocumentExplorer then
           Keywords.Objects[idx] := GlobalCustomHelpViewerNode;
       end else if Supports(ANode.FViewer, ICustomHelpProvider, AProvider) then
       begin
@@ -331,21 +373,20 @@ begin
       item.TrimOption:=TrimOption;
     end;
 
-
-
-    // move standard group to end of category button list
-    // if the user wishes so
-    cat := GetCategoryFromLabel(GROUP_LABEL_DEFAULT, False);
-    if (cat <> nil) then
-      if not GlobalCustomHelp.ShowOHSAtTop then
-        cat.Index := catbtnTopics.Categories.Count - 1
-      else
-        cat.Index := 0;
-
-    // move default group to end of category button list
-    cat := GetCategoryFromLabel(GROUP_LABEL_STANDARD, False);
-    if cat <> nil then
-      cat.Index := 0; //catbtnTopics.Categories.Count - 1;
+    SortCategories;
+//    // move standard group to end of category button list
+//    // if the user wishes so
+//    cat := GetCategoryFromLabel(GROUP_LABEL_WEB_BASED, False);
+//    if (cat <> nil) then
+//      if not GlobalCustomHelp.ShowOHSAtTop then
+//        cat.Index := catbtnTopics.Categories.Count - 1
+//      else
+//        cat.Index := 0;
+//
+//    // move default group to end of category button list
+//    cat := GetCategoryFromLabel(GROUP_LABEL_STANDARD, False);
+//    if cat <> nil then
+//      cat.Index := 0; //catbtnTopics.Categories.Count - 1;
 
     Reg.CloseKey;
   finally
@@ -371,12 +412,12 @@ begin
     Exit;
   end;
 
-  if not GlobalCustomHelp.IsHandledByDefaultViewer(Keywords[Result]) then
-  begin
-    GlobalCustomHelp.ShowHelp(Keywords[Result], SearchKeyword);
-    Result := -1;
-    Exit;
-  end;
+//  if not GlobalCustomHelp.IsHandledByDefaultViewer(Keywords[Result]) then
+//  begin
+//    GlobalCustomHelp.ShowHelp(Keywords[Result], SearchKeyword);
+//    Result := -1;
+//    Exit;
+//  end;
 
   with THelpViewerNodeAccess(Keywords.Objects[Result]) do
   begin

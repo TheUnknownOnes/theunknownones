@@ -70,6 +70,15 @@
 			<DCCReference Include="..\..\uCustomHelpIntfs.pas"/>
 			<DCCReference Include="..\..\uCustomHelpKeywordRecorder.pas"/>
 			<DCCReference Include="..\..\uMSHelpServices.pas"/>
+			<DCCReference Include="..\..\uFrameConfigProviders.pas">
+				<Form>FrameConfigProviders</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
+			<DCCReference Include="..\..\uCustomHelpConsts.pas"/>
+			<DCCReference Include="..\..\uFrameConfigColor.pas">
+				<Form>FrameConfigColor</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

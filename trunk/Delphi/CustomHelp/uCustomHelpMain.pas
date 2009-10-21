@@ -10,32 +10,32 @@ interface
 
 uses
   Classes, Forms, Dialogs, ToolsAPI, Menus, Registry, HelpIntfs, Windows,
-  uMSHelpServices, uHtmlHelp, SyncObjs, uCustomHelpSelector;
+  uMSHelpServices, uHtmlHelp, SyncObjs, uCustomHelpSelector, uCustomHelpConsts,
+  Graphics;
 
 type
-  TNamespaceTrimOption = (nstoNoTrim=0, nstoTrimFirst, nstoTrimAll);
-
   //Main object
   TCustomHelp = class
   private
     FLastKeyword: String;
     FLastHelpErrors: string;
     FSessionLock: TCriticalSection;
-    FHandledSchemes: TStringList;
     FReplaceDefaultViewer: boolean;
     FShowOHSAtTop: boolean;
     FCheckWinHelpGid: Boolean;
 
-    procedure SetReplaceDefaultViewer(const Value: boolean);
-    function GetRedirectSchemes: string;
-    procedure SetRedirectSchemes(const Value: string);
-    procedure SetShowOHSAtTop(const Value: boolean);
+   procedure SetShowOHSAtTop(const Value: boolean);
     procedure SetCheckWinHelpGid(const Value: Boolean);
     class function GetNamespaces: IHxRegNamespaceList;
     function GetEnabledhxSession(Index: Integer): IHxSession;
     procedure SetFullTextSearch(const Value: Boolean);
-    procedure SetShowCustomHelpOnWP(const Value: Boolean);
     procedure SetTrimNamespaces(const Value: TNamespaceTrimOption);
+    procedure SetDisplayLocation(const Value: TDisplayLocationOption);
+    function GetResultOrderOfIndex(AIndex: Integer): String;
+    function GetResultOrderOfGroupName(AGroup: String): Integer;
+    procedure SetColorFileProv(const Value: TColor);
+    procedure SetColorMSHelp(const Value: TColor);
+    procedure SetColorWebProv(const Value: TColor);
   protected
     FMenuItem : TMenuItem;
 
@@ -44,6 +44,12 @@ type
     FFullTextSearch : Boolean;
     FEnabledhxSessions : TInterfaceList;
     FTrimNamespaces: TNamespaceTrimOption;
+    FDisplayLocation: TDisplayLocationOption;
+    FResultOrder : TStringList;
+
+    FColorMSHelp : TColor;
+    FColorWebProv : TColor;
+    FColorFileProv : TColor;
 
     //hack into the IDE (Menu-entry, ...)
     procedure ConnectToIDE;
@@ -52,6 +58,7 @@ type
 
     procedure LoadProviderFromRegistry;
     procedure LoadSettingsFromRegistry;
+    procedure LoadResultOrderFromRegistry;
     procedure LoadEnabledNamespacesFromRegistry;
 
     procedure OnMenuItemClick(Sender : TObject);
@@ -74,20 +81,23 @@ type
     property Namespaces : IHxRegNamespaceList read GetNamespaces;
     property EnabledhxSessions : TInterfaceList read FEnabledhxSessions;
 
-    property ShowCustomHelpOnWelcomePage: Boolean read FShowCustHelpOnWP write SetShowCustomHelpOnWP;
+    property DisplayLocation: TDisplayLocationOption read FDisplayLocation write SetDisplayLocation;
+    property ResultOrderFromIndex[AIndex: Integer]: String read GetResultOrderOfIndex;
+    property ResultOrderFromString[AGroup: String]: Integer read GetResultOrderOfGroupName;
     property PerformFullTextSearch: Boolean read FFullTextSearch write SetFullTextSearch;
     property LastHelpCallKeyword: String read FLastKeyword write FLastKeyword;
     property TrimNamespacesUntilResultFound: TNamespaceTrimOption read FTrimNamespaces write SetTrimNamespaces;
+
+    property ColorMSHelp : TColor read FColorMSHelp write SetColorMSHelp;
+    property ColorWebProvider : TColor read FColorWebProv write SetColorWebProv;
+    property ColorFileProvider : TColor read FColorFileProv write SetColorFileProv;
 
     property EnabledhxSession[Index: integer]: IHxSession read GetEnabledhxSession;
     property LastHelpErrors: string read FLastHelpErrors write FLastHelpErrors;
 
     procedure InitHelpSelector(const HelpString: string);
-    function IsHandledByDefaultViewer(const AKeyword: string): boolean;
-    property ReplaceDefaultViewer: boolean read FReplaceDefaultViewer write SetReplaceDefaultViewer;
     property ShowOHSAtTop: boolean read FShowOHSAtTop write SetShowOHSAtTop;
     property CheckWinHelpGid: Boolean read FCheckWinHelpGid write SetCheckWinHelpGid;
-    property RedirectSchemes: string read GetRedirectSchemes write SetRedirectSchemes;
 
     class function DecodeURL(const URL: String; out Caption: String;
       out Description: String; out Link: String; out Group: String;
@@ -95,6 +105,7 @@ type
     class function EncodeURL(Caption, Description, Link, Group: String; TrimOption: TNamespaceTrimOption): String;
     class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String; ATrimNamespaces: TNamespaceTrimOption);
     class procedure WriteNamespacesToRegistry(ANamespace: String; AEnabled: Boolean);
+    class procedure WriteResultOrderToRegistry(AOrder: TStrings);
     class procedure ReadEnabledNamespacesFromRegistry(const ANamesList: TStrings);
     class procedure WriteSettingToRegistry(AName, AValue: String);
     class procedure ReadSettingsFromRegistry(const ANameValueList: TStrings);
@@ -108,62 +119,6 @@ type
     function GetViewerID: integer;
   end;
 
-const
-    REG_ROOT_BASE = '\TheUnknownOnes\Delphi';
-    REG_ROOT_PROJECT = '\CustomHelp';
-
-  {$ifDef VER170}
-     REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER170' + REG_ROOT_PROJECT;
-  {$Endif}
-  {$ifDef VER180}
-    {$ifDef VER185}
-      REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER185' + REG_ROOT_PROJECT;
-    {$Else}
-      REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER180' + REG_ROOT_PROJECT;
-    {$Endif}
-  {$Endif}
-  {$ifDef VER200}
-    REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER200' + REG_ROOT_PROJECT;
-  {$Endif}
-  {$ifDef VER210}
-    REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER210' + REG_ROOT_PROJECT;
-  {$Endif}
-
-const
-  PROTPREFIX_CUSTOMHELP = 'CustomHelp://';
-  PROTPREFIX_MSHELP = 'ms-help://';
-  PROTPREFIX_HTMLHELP = 'htmlhlp://';
-  PROTPREFIX_WINHELP = 'winhlp://';
-  PROTPREFIX_UNKNOWNHELP = 'unknown://';
-
-  VALUE_NAME = 'Name';
-  VALUE_DESCR = 'Description';
-  VALUE_URL = 'URL';
-  VALUE_TRIMNAMESPACE = 'TrimNamespaces';
-
-  PROVIDER_SUB_KEY = '\Provider';
-  SETTINGS_SUB_KEY= '\Settings';
-  NAMESPACES_SUB_KEY = SETTINGS_SUB_KEY + '\NAMESPACES';
-  EXPANDEDITEMS_SUB_KEY = SETTINGS_SUB_KEY + '\EXPANDED';
-
-  URL_SPLITTER = #1;
-
-  SETTINGS_CUSTHELPWP = 'CustomHelpOnWP';
-  SETTINGS_FULLTEXTSEARCH = 'FullTextSearch';
-  SETTINGS_TRIMNAMESPACES = 'TrimNamespaces';
-  SETTINGS_OHSATTOP = 'DisplayOHSAtTop';
-  SETTING_WINHELPGIDCHECK = 'CheckWinHelpGID';
-  SETTINGS_HANDLEDSCHEMES = 'HandledSchemes';
-  SETTINGS_REPLACEDEFAULT = 'ReplaceDefaultViewer';
-  SETTINGS_MIGRATION_COMPLETE = 'SettingsMigrated';
-
-  GROUP_LABEL_DEFAULT = 'Available Search engines';
-  GROUP_LABEL_STANDARD = 'Other Help Providers';
-
-  ENVVAR_NAME_KEYWORD = 'HelpString';
-  ENVVAR_NAME_KEYWORD_URL = 'HelpStringURLEncoded';
-  KIBITZ_IGNORED_HELPSTRING = 'erroneous type';
-
 var
   GlobalCustomHelp : TCustomHelp;
 
@@ -174,8 +129,7 @@ var
 implementation
 
 uses
-  SysUtils, StrUtils, ShellAPI, uFormConfigCustomHelp,
-  Graphics, ActiveX, Variants, Types, uUtils,
+  SysUtils, StrUtils, ShellAPI, uFormConfigCustomHelp, ActiveX, Variants, Types, uUtils,
   uCustomHelpKeywordRecorder, uCustomHelpIDEIntegration;
 
 type
@@ -396,9 +350,24 @@ begin
   end;
 end;
 
-function TCustomHelp.GetRedirectSchemes: string;
+function TCustomHelp.GetResultOrderOfGroupName(AGroup: String): Integer;
+var
+  idx : integer;
 begin
-  Result := FHandledSchemes.DelimitedText;
+  Result:=0;
+  for idx := 0 to FResultOrder.Count - 1 do
+  begin
+    if SameText(FResultOrder.ValueFromIndex[idx],AGroup) then
+    begin
+      Result:=StrToInt(FResultOrder.Names[idx]);
+      break;
+    end;
+  end;
+end;
+
+function TCustomHelp.GetResultOrderOfIndex(AIndex: Integer): String;
+begin
+  Result:=FResultOrder.Values[Format('%.4d', [AIndex])];
 end;
 
 procedure TCustomHelp.InitHelpSelector(const HelpString: string);
@@ -410,19 +379,6 @@ begin
   //if not the second help call will crash under BDS2006
   if GetHelpSystem(hs) then
     hs.AssignHelpSelector(THelpSelector.Create);
-end;
-
-function TCustomHelp.IsHandledByDefaultViewer(const AKeyword: string): boolean;
-var
-  idx: Integer;
-begin
-  Result := true;
-  for idx := 0 to FHandledSchemes.Count - 1 do
-    if StrUtils.AnsiStartsText(FHandledSchemes[idx], AKeyword) then
-    begin
-      Result := false;
-      Break;
-    end;
 end;
 
 function TCustomHelpViewer.GetViewerName: String;
@@ -583,22 +539,11 @@ begin
         ShowHTMLHelp(u);
       end
       else
-      if not GlobalCustomHelp.ReplaceDefaultViewer and
-        ( GlobalCustomHelp.IsHandledByDefaultViewer(u) or
-          AnsiStartsText([PROTPREFIX_MSHELP, 'http://', 'https://', 'file://', 'bds://'], u)) then
-      begin
-        if GetHelpSystem(hs) then
-          hs.ShowTopicHelp(u, '');
-      end
-      else
-      begin
-        alternativeNavigate := True;
-        if GlobalCustomHelp.ShowCustomHelpOnWelcomePage then
-          if WelcomePageNavigate(u) then
-            alternativeNavigate:=False;
-
-        if alternativeNavigate then
-          ShellExecute(Application.Handle, 'open', PChar(u), '', '', SW_SHOWNORMAL);
+      case GlobalCustomHelp.DisplayLocation of
+        dloWelcomePage : WelcomePageNavigate(u);
+        dloDefaultBrowser : ShellExecute(Application.Handle, 'open', PChar(u), '', '', SW_SHOWNORMAL);
+        dloMSDocumentExplorer : if GetHelpSystem(hs) then
+                                  hs.ShowTopicHelp(u, '');
       end;
     end
     else
@@ -831,10 +776,9 @@ begin
   FEnabledhxSessions:=TInterfaceList.Create;
   FSessionLock := TCriticalSection.Create;
   FProvider := TStringList.Create;
-  FHandledSchemes := TStringList.Create;
-  FHandledSchemes.QuoteChar:='"';
-  FHandledSchemes.Delimiter:=';';
-  FHandledSchemes.StrictDelimiter:=True;
+
+  FResultOrder:=TStringList.Create;
+  FResultOrder.Sorted:=True;
 
   HelpViewer:=TCustomHelpViewer.Create;
   RegisterViewer(HelpViewerIntf, HelpViewer.FHelpManager);
@@ -1106,7 +1050,9 @@ var
   Reg : TRegistry;
   sl : TStringList;
   s : String;
+  GroupLabel : String;
 begin
+  LoadResultOrderFromRegistry;
   LoadSettingsFromRegistry;
   LoadEnabledNamespacesFromRegistry;
 
@@ -1129,12 +1075,19 @@ begin
       if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY + '\' + s, false) then
       begin
         if trim(reg.ReadString(VALUE_NAME))<>EmptyStr then
+        begin
+          if AnsiContainsStr(Reg.ReadString(VALUE_URL),'://') then
+            GroupLabel:=GROUP_LABEL_WEB_BASED
+          else
+            GroupLabel:=GROUP_LABEL_FILE_BASED;
+
           FProvider.Add(TCustomHelp.EncodeURL(
                               Reg.ReadString(VALUE_NAME),
                               Reg.ReadString(VALUE_DESCR),
                               Reg.ReadString(VALUE_URL),
-                              GROUP_LABEL_DEFAULT,
+                              GroupLabel,
                               TNamespaceTrimOption(StrToIntDef(Reg.ReadString(VALUE_TRIMNAMESPACE),0))));
+        end;
 
         Reg.CloseKey;
       end;
@@ -1195,14 +1148,45 @@ begin
   sl:=TStringList.Create;
   try
     ReadSettingsFromRegistry(sl);
-    FShowCustHelpOnWP:=sl.Values[SETTINGS_CUSTHELPWP]='1';
     FShowOHSAtTop:=sl.Values[SETTINGS_OHSATTOP]='1';
     FFullTextSearch:=sl.Values[SETTINGS_FULLTEXTSEARCH]='1';
     FTrimNamespaces:=TNamespaceTrimOption(StrToIntDef(sl.Values[SETTINGS_TRIMNAMESPACES], 0));
-    FHandledSchemes.DelimitedText:=sl.Values[SETTINGS_HANDLEDSCHEMES];
-    FReplaceDefaultViewer:=sl.Values[SETTINGS_REPLACEDEFAULT]='1';
+    FDisplayLocation:=TDisplayLocationOption(StrToIntDef(sl.Values[SETTINGS_DISPLAY_LOCATION], 0));
+
+    FColorMSHelp:=StrToIntDef(sl.Values[SETTINGS_COLOR_MSHELP], clActiveCaption);
+    FColorFileProv:=StrToIntDef(sl.Values[SETTINGS_COLOR_FILE_PROVIDER], clActiveCaption);
+    FColorWebProv:=StrToIntDef(sl.Values[SETTINGS_COLOR_WEB_PROVIDER], clActiveCaption);
   finally
     sl.Free;
+  end;
+end;
+
+procedure TCustomHelp.LoadResultOrderFromRegistry;
+var
+  Reg : TRegistry;
+  idx: Integer;
+begin
+  Reg := TRegistry.Create;
+  FResultOrder.BeginUpdate;
+  FResultOrder.Sorted:=False;
+  try
+    FResultOrder.Clear;
+
+    Reg.RootKey := HKEY_CURRENT_USER;
+
+    if Reg.OpenKey(REG_ROOT_KEY + RESULT_ORDER_SUB_KEY, true) then
+    begin
+      Reg.GetValueNames(FResultOrder);
+
+      for idx := 0 to FResultOrder.count - 1 do
+        FResultOrder[idx]:=Format('%.4d',[Reg.ReadInteger(FResultOrder[idx])])+'='+FResultOrder[idx];
+
+      Reg.CloseKey;
+    end;
+  finally
+    FResultOrder.EndUpdate;
+    FResultOrder.Sorted:=True;
+    Reg.Free;
   end;
 end;
 
@@ -1265,7 +1249,7 @@ var
   idx: Integer;
 begin
   Reg := TRegistry.Create;
-  try                         
+  try
     Reg.RootKey := HKEY_CURRENT_USER;
 
     if Reg.OpenKey(REG_ROOT_KEY + SETTINGS_SUB_KEY, true) then
@@ -1288,28 +1272,34 @@ begin
   TCustomHelp.WriteSettingToRegistry(SETTING_WINHELPGIDCHECK, IntToStr(byte(Value)));
 end;
 
+procedure TCustomHelp.SetColorFileProv(const Value: TColor);
+begin
+  FColorFileProv := Value;
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_COLOR_FILE_PROVIDER, IntToStr(Value));
+end;
+
+procedure TCustomHelp.SetColorMSHelp(const Value: TColor);
+begin
+  FColorMSHelp := Value;
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_COLOR_MSHELP, IntToStr(Value));
+end;
+
+procedure TCustomHelp.SetColorWebProv(const Value: TColor);
+begin
+  FColorWebProv := Value;
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_COLOR_WEB_PROVIDER, IntToStr(Value));
+end;
+
+procedure TCustomHelp.SetDisplayLocation(const Value: TDisplayLocationOption);
+begin
+  FDisplayLocation:=Value;
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_DISPLAY_LOCATION, IntToStr(byte(Value)));
+end;
+
 procedure TCustomHelp.SetFullTextSearch(const Value: Boolean);
 begin
   FFullTextSearch := Value;
   TCustomHelp.WriteSettingToRegistry(SETTINGS_FULLTEXTSEARCH, IntToStr(byte(Value)));
-end;
-
-procedure TCustomHelp.SetRedirectSchemes(const Value: string);
-begin
-  FHandledSchemes.DelimitedText := Value;
-  TCustomHelp.WriteSettingToRegistry(SETTINGS_HANDLEDSCHEMES, Value);
-end;
-
-procedure TCustomHelp.SetReplaceDefaultViewer(const Value: boolean);
-begin
-  FReplaceDefaultViewer := Value;
-  TCustomHelp.WriteSettingToRegistry(SETTINGS_REPLACEDEFAULT, IntToStr(byte(Value)));
-end;
-
-procedure TCustomHelp.SetShowCustomHelpOnWP(const Value: Boolean);
-begin
-  FShowCustHelpOnWP := Value;
-  TCustomHelp.WriteSettingToRegistry(SETTINGS_CUSTHELPWP, IntToStr(byte(Value)));
 end;
 
 procedure TCustomHelp.SetShowOHSAtTop(const Value: boolean);
@@ -1408,6 +1398,29 @@ begin
   finally
     Reg.Free;
   end;
+end;
+
+class procedure TCustomHelp.WriteResultOrderToRegistry(AOrder: TStrings);
+var
+  Reg : TRegistry;
+  idx: Integer;
+begin
+  Reg := TRegistry.Create;
+  try
+    Reg.RootKey := HKEY_CURRENT_USER;
+
+    Reg.DeleteKey(REG_ROOT_KEY + RESULT_ORDER_SUB_KEY);
+    if Reg.OpenKey(REG_ROOT_KEY + RESULT_ORDER_SUB_KEY, true) then
+    begin
+      for idx := 0 to AOrder.Count - 1 do
+        Reg.WriteInteger(AOrder[idx], idx);
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
+  if Assigned(GlobalCustomHelp) then
+    GlobalCustomHelp.LoadResultOrderFromRegistry;
 end;
 
 {$R Images.res}

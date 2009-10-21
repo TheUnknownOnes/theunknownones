@@ -12,59 +12,49 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, Registry, CheckLst, uMSHelpServices,
-  uCustomHelpMain;
+  uCustomHelpMain, uCustomHelpConsts, uFrameConfigProviders, uFrameConfigColor;
 
 type
   Tform_Config = class(TForm)
     Panel1: TPanel;
     Button1: TButton;
     Button2: TButton;
-    ListView1: TListView;
-    pnlOHSItem: TPanel;
-    edName: TEdit;
-    edDesc: TEdit;
-    edURL: TEdit;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    grpHelpDisplay: TGroupBox;
-    cbcusthelpwp: TCheckBox;
-    grpHelpNamespaces: TGroupBox;
-    grpOtherHelpSources: TGroupBox;
     lvNamespaces: TListView;
     Panel4: TPanel;
-    Panel5: TPanel;
     cbFullTextSearch: TCheckBox;
-    cbReplaceDefaultViewer: TCheckBox;
-    Label5: TLabel;
-    edRedirectSchemes: TEdit;
     cbTrimNamespacesHX: TComboBox;
     Label4: TLabel;
-    cbTrimNamespacesOHS: TComboBox;
-    Label8: TLabel;
     cbOHSAtTop: TCheckBox;
     cbCheckGID: TCheckBox;
+    Tabs: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    TabSheet3: TTabSheet;
+    rgDisplayLocation: TRadioGroup;
+    TabSheet4: TTabSheet;
+    FrameConfigFileBasedProviders: TFrameConfigProviders;
+    FrameConfigWebBasedProviders: TFrameConfigProviders;
+    GroupBox1: TGroupBox;
+    GroupBox2: TGroupBox;
+    lbOrder: TListBox;
+    fccMSHelp: TFrameConfigColor;
+    fccWebProvider: TFrameConfigColor;
+    fccFileProvider: TFrameConfigColor;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure ListView1Change(Sender: TObject; Item: TListItem;
-      Change: TItemChange);
-    procedure ListView1DblClick(Sender: TObject);
-    procedure edNameChange(Sender: TObject);
-    procedure edDescChange(Sender: TObject);
-    procedure edURLChange(Sender: TObject);
-    procedure ListView1KeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
     procedure FormCreate(Sender: TObject);
-    procedure cbTrimNamespacesOHSChange(Sender: TObject);
     procedure ListView1InfoTip(Sender: TObject; Item: TListItem;
       var InfoTip: string);
+    procedure lbOrderDragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
+    procedure lbOrderDragDrop(Sender, Source: TObject; X, Y: Integer);
   private
-    FInsertItem : TListItem;
+    FLastDropRect: TRect;
     procedure Save;
     procedure BuildNamespaceList;
-    function TrimOptionFromString(AString: String): TNamespaceTrimOption;
+    procedure BuildResultOrderList;
   public
-    class function Execute : Boolean; 
+    class function Execute : Boolean;
   end;
 
 implementation
@@ -73,46 +63,12 @@ uses uUtils;
 
 {$R *.dfm}
 
-
-const
-  OPTIONS_NAMESPACETRIM : array [nstoNoTrim..nstoTrimAll] of string = ('no trim',
-                                                    'trim first namespace',
-                                                    'trim all namespaces');
-
 { Tform_Config }
 
 procedure Tform_Config.Button1Click(Sender: TObject);
 begin
   Save;
   ModalResult:=mrOk;
-end;
-
-procedure Tform_Config.cbTrimNamespacesOHSChange(Sender: TObject);
-begin
-  if (ListView1.ItemFocused<>FInsertItem) and
-     Assigned(ListView1.ItemFocused) then
-    ListView1.ItemFocused.SubItems[2]:=cbTrimNamespacesOHS.Text;
-end;
-
-procedure Tform_Config.edDescChange(Sender: TObject);
-begin
-  if (ListView1.ItemFocused<>FInsertItem) and
-     Assigned(ListView1.ItemFocused) then
-    ListView1.ItemFocused.SubItems[0]:=edDesc.Text;
-end;
-
-procedure Tform_Config.edNameChange(Sender: TObject);
-begin
-  if (ListView1.ItemFocused<>FInsertItem) and
-     Assigned(ListView1.ItemFocused) then
-    ListView1.ItemFocused.Caption:=edName.Text;
-end;
-
-procedure Tform_Config.edURLChange(Sender: TObject);
-begin
-  if (ListView1.ItemFocused<>FInsertItem) and
-     Assigned(ListView1.ItemFocused) then
-    ListView1.ItemFocused.SubItems[1]:=edURL.Text;
 end;
 
 class function Tform_Config.Execute: Boolean;
@@ -157,12 +113,53 @@ end;
 
 procedure Tform_Config.FormCreate(Sender: TObject);
 var
+  i : integer;
   idx : TNamespaceTrimOption;
+  jdx : TDisplayLocationOption;
 begin
   for idx := Low(OPTIONS_NAMESPACETRIM) to High(OPTIONS_NAMESPACETRIM) do
   begin
     cbTrimNamespacesHX.Items.Add(OPTIONS_NAMESPACETRIM[idx]);
-    cbTrimNamespacesOHS.Items.Add(OPTIONS_NAMESPACETRIM[idx]);
+  end;
+  for jdx := Low(OPTIONS_DISPLAY_LOCATIONS) to High(OPTIONS_DISPLAY_LOCATIONS) do
+  begin
+    i:=rgDisplayLocation.Items.Add(OPTIONS_DISPLAY_LOCATIONS[jdx]);
+    if GlobalCustomHelp.DisplayLocation=jdx then
+      rgDisplayLocation.ItemIndex:=i;
+  end;
+
+  BuildResultOrderList;
+end;
+
+procedure Tform_Config.BuildResultOrderList;
+var
+  idx: Integer;
+  s : string;
+  newItems : TStringList;
+  i2 : Integer;
+begin
+  newItems:=TStringList.Create;
+  try
+    newItems.Add(GROUP_LABEL_WEB_BASED);
+    newItems.Add(GROUP_LABEL_FILE_BASED);
+    newItems.Add(GROUP_LABEL_STANDARD);
+    newItems.Add(GROUP_LABEL_DUMMY_MSHELP2);
+
+    for idx := 0 to newItems.Count - 1 do
+    begin
+      s:=GlobalCustomHelp.ResultOrderFromIndex[idx];
+      if s<>EmptyStr then
+      begin
+        i2:=newItems.IndexOf(s);
+        lbOrder.Items.Add(s);
+        newItems.Delete(i2);
+      end;
+    end;
+
+    if newItems.Count>0 then
+      lbOrder.Items.AddStrings(newItems);
+  finally
+    newItems.Free;
   end;
 end;
 
@@ -173,87 +170,50 @@ var
   s : String;
 begin
   BuildNamespaceList;
-  
-  FInsertItem:=ListView1.Items.Add;
-
-  with FInsertItem do
-  begin
-    Caption:='<new Item>';
-    SubItems.Add('double click to add');
-    SubItems.Add('');
-    SubItems.Add('');
-  end;
 
   Reg := TRegistry.Create;
   sl := TStringList.Create;
   try
     TCustomHelp.ReadSettingsFromRegistry(sl);
-    cbcusthelpwp.Checked:=GlobalCustomHelp.ShowCustomHelpOnWelcomePage;
     cbFullTextSearch.Checked:=GlobalCustomHelp.PerformFullTextSearch;
-    cbReplaceDefaultViewer.Checked := GlobalCustomHelp.ReplaceDefaultViewer;
-    edRedirectSchemes.Text := GlobalCustomHelp.RedirectSchemes;
     cbTrimNamespacesHX.ItemIndex:=StrToIntDef(sl.Values[SETTINGS_TRIMNAMESPACES], 0);
     cbOHSAtTop.Checked:=GlobalCustomHelp.ShowOHSAtTop;
     cbCheckGID.Checked:=GlobalCustomHelp.CheckWinHelpGid;
 
-    if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY, true) then
-    begin
-      Reg.GetKeyNames(sl);
-      Reg.CloseKey;
-    end;
+    fccMSHelp.SelectedColor:=GlobalCustomHelp.ColorMSHelp;
+    fccWebProvider.SelectedColor:=GlobalCustomHelp.ColorWebProvider;
+    fccFileProvider.SelectedColor:=GlobalCustomHelp.ColorFileProvider;
 
-    for s in sl do
-    begin
-      if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY + '\' + s, false) then
-      begin
-        with ListView1.Items.Add do
-        begin
-          Caption:=Reg.ReadString(VALUE_NAME);
-          SubItems.Add(Reg.ReadString(VALUE_DESCR));
-          SubItems.Add(Reg.ReadString(VALUE_URL));
-          SubItems.Add(OPTIONS_NAMESPACETRIM[TNamespaceTrimOption(StrToIntDef(Reg.ReadString(VALUE_TRIMNAMESPACE),0))]);
-        end;
-
-        Reg.CloseKey;
-      end;
-    end;
+    FrameConfigFileBasedProviders.InitContent(cpfFileBased);
+    FrameConfigWebBasedProviders.InitContent(cpfWebBased);
   finally
     sl.free;
     Reg.Free;
   end;
 end;
 
-procedure Tform_Config.ListView1Change(Sender: TObject; Item: TListItem;
-  Change: TItemChange);
+procedure Tform_Config.lbOrderDragDrop(Sender, Source: TObject; X, Y: Integer);
+var
+  OldValue : String;
 begin
-  if Change = ctState then
-  begin                                        
-    edName.Text:=Item.Caption;
-    edDesc.Text:=Item.SubItems[0];
-    edURL.Text:=Item.SubItems[1];
-    cbTrimNamespacesOHS.ItemIndex:=Integer(TrimOptionFromString(Item.SubItems[2]));
-
-    edName.Enabled := Assigned(ListView1.Selected) and (ListView1.Selected <> FInsertItem);
-    edDesc.Enabled := edName.Enabled;
-    edURL.Enabled := edName.Enabled;
-    cbTrimNamespacesOHS.Enabled:= edName.Enabled;
-  end;
+  OldValue:=lbOrder.Items[lbOrder.ItemIndex];
+  lbOrder.Items.Delete(lbOrder.ItemIndex);
+  lbOrder.Items.Insert(lbOrder.ItemAtPos(Point(X,Y), False),OldValue);
+  FLastDropRect:=Rect(0,0,0,0);
 end;
 
-procedure Tform_Config.ListView1DblClick(Sender: TObject);
+procedure Tform_Config.lbOrderDragOver(Sender, Source: TObject; X, Y: Integer;
+  State: TDragState; var Accept: Boolean);
 var
-  item : TListItem;
+  R : TRect;
 begin
-  if ListView1.Selected = FInsertItem  then
+  Accept:=Sender=Source;
+  if Accept then
   begin
-    item:=ListView1.Items.Add;
-    item.SubItems.Add('');
-    item.SubItems.Add('');
-    item.SubItems.Add('');
-    item.SubItems.Add('');
-
-    ListView1.Selected:=item;
-    ListView1.ItemFocused:=item;
+    R:=lbOrder.ItemRect(lbOrder.ItemAtPos(Point(X,Y),False));
+    lbOrder.Canvas.DrawFocusRect(FLastDropRect);
+    lbOrder.Canvas.DrawFocusRect(R);
+    FLastDropRect:=R;
   end;
 end;
 
@@ -265,30 +225,6 @@ begin
            'URL: URL or filename of your search provider. URLs must start with http://. ';
 end;
 
-procedure Tform_Config.ListView1KeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
- if (ListView1.ItemFocused<>FInsertItem) and
-     Assigned(ListView1.ItemFocused) and
-     (Key=VK_DELETE) and
-     (MessageDlg('Are you sure to delete '+ListView1.ItemFocused.Caption+'?',
-     mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
-   ListView1.DeleteSelected;
-end;
-
-function Tform_Config.TrimOptionFromString(AString: String): TNamespaceTrimOption;
-var
-  idx: TNamespaceTrimOption;
-begin
-  Result:=nstoNoTrim;
-  for idx := Low(OPTIONS_NAMESPACETRIM) to High(OPTIONS_NAMESPACETRIM) do
-    if OPTIONS_NAMESPACETRIM[idx]=AString then
-    begin
-      Result:=idx;
-      break;
-    end;
-end;
-
 procedure Tform_Config.Save;
 var
   Reg : TRegistry;
@@ -297,35 +233,27 @@ begin
   Reg := TRegistry.Create;
   try
     Reg.DeleteKey(REG_ROOT_KEY);
-
-    for idx := 0 to ListView1.Items.Count - 1 do
-    begin
-      if (ListView1.Items[idx]<>FInsertItem) and
-         (Trim(ListView1.Items[Idx].Caption)<>EmptyStr) then
-      begin
-        TCustomHelp.WriteProviderToRegistry(IntToStr(idx),
-                                            ListView1.Items[Idx].Caption,
-                                            ListView1.Items[Idx].SubItems[0],
-                                            ListView1.Items[Idx].SubItems[1],
-                                            TrimOptionFromString(ListView1.Items[Idx].SubItems[2]));
-      end;
-    end; 
   finally
     Reg.Free;
   end;
 
-  GlobalCustomHelp.ShowCustomHelpOnWelcomePage:=cbcusthelpwp.Checked;
+  idx:=FrameConfigFileBasedProviders.Save(0);
+  FrameConfigWebBasedProviders.Save(idx);
+
   GlobalCustomHelp.PerformFullTextSearch:=cbFullTextSearch.Checked;
   GlobalCustomHelp.TrimNamespacesUntilResultFound:=TNamespaceTrimOption(cbTrimNamespacesHX.ItemIndex);
-  GlobalCustomHelp.ReplaceDefaultViewer := cbReplaceDefaultViewer.Checked;
-  GlobalCustomHelp.RedirectSchemes := edRedirectSchemes.Text;
   GlobalCustomHelp.ShowOHSAtTop := cbOHSAtTop.Checked;
   GlobalCustomHelp.CheckWinHelpGid := cbCheckGID.Checked;
+  GlobalCustomHelp.DisplayLocation:=TDisplayLocationOption(rgDisplayLocation.ItemIndex);
+  GlobalCustomHelp.ColorMSHelp:=fccMSHelp.SelectedColor;
+  GlobalCustomHelp.ColorWebProvider:=fccWebProvider.SelectedColor;
+  GlobalCustomHelp.ColorFileProvider:=fccFileProvider.SelectedColor;
 
   with lvNamespaces do
     for idx := 0 to Items.Count-1 do
       GlobalCustomHelp.WriteNamespacesToRegistry(Items[idx].Caption, Items[idx].Checked);
-    
+
+  GlobalCustomHelp.WriteResultOrderToRegistry(lbOrder.Items);
 end;
 
 end.

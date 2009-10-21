@@ -45,6 +45,9 @@ contains
   uUtils in '..\..\uUtils.pas',
   uCustomHelpIntfs in '..\..\uCustomHelpIntfs.pas',
   uCustomHelpKeywordRecorder in '..\..\uCustomHelpKeywordRecorder.pas',
-  uMSHelpServices in '..\..\uMSHelpServices.pas';
+  uMSHelpServices in '..\..\uMSHelpServices.pas',
+  uFrameConfigProviders in '..\..\uFrameConfigProviders.pas' {FrameConfigProviders: TFrame},
+  uCustomHelpConsts in '..\..\uCustomHelpConsts.pas',
+  uFrameConfigColor in '..\..\uFrameConfigColor.pas' {FrameConfigColor: TFrame};
 
 end.
