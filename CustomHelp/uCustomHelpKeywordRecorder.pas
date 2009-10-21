@@ -1,130 +1,130 @@
-UNIT uCustomHelpKeywordRecorder;
+unit uCustomHelpKeywordRecorder;
 
-INTERFACE
+interface
 
-USES
+uses
   Classes,
   HelpIntfs,
   uCustomHelpIntfs;
 
-CONST
+const
   hcIDEStructureView   = $49E;
   hcIDEProjectExplorer = $550;
   hcIDEFormDesigner    = $4E2;
   hcIDEToolPalette     = $90E;
   hcIDECodeEditor      = $564;
 
-VAR
+var
   //We keep these global ... as it is done in WinHelpViewer.pas
   //and keep the reference to the object in the implementation section.
   CustomHelpKeywordRecorderIntf: ICustomHelpKeywordRecorder;
 
-IMPLEMENTATION
+implementation
 
-USES
+uses
   SysUtils,
   ToolsApi,
   uCustomHelpMain;
 
-TYPE
+type
   {$TYPEINFO ON}
-  TCustomHelpKeywordRecorder = CLASS(TInterfacedObject,
+  TCustomHelpKeywordRecorder = class(TInterfacedObject,
     ICustomHelpKeywordRecorder,
     IExtendedHelpViewer,
     IHelpSystemFlags,
     ICustomHelpViewer)
-  PUBLIC
+  public
     {$REGION 'ICustomHelpViewer'}
-    FUNCTION GetViewerName: string;
-    FUNCTION UnderstandsKeyword(CONST HelpString: string): integer;
-    FUNCTION GetHelpStrings(CONST HelpString: string): TStringList;
-    FUNCTION CanShowTableOfContents: boolean;
-    PROCEDURE ShowTableOfContents;
-    PROCEDURE ShowHelp(CONST HelpString: string);
-    PROCEDURE NotifyID(CONST ViewerID: integer);
-    PROCEDURE SoftShutDown;
-    PROCEDURE ShutDown;
+    function GetViewerName: string;
+    function UnderstandsKeyword(const HelpString: string): Integer;
+    function GetHelpStrings(const HelpString: string): TStringList;
+    function CanShowTableOfContents: Boolean;
+    procedure ShowTableOfContents;
+    procedure ShowHelp(const HelpString: string);
+    procedure NotifyID(const ViewerID: Integer);
+    procedure SoftShutDown;
+    procedure ShutDown;
     {$ENDREGION}
 
     {$region 'IExtendedHelpViewer'}
-    FUNCTION UnderstandsTopic(CONST Topic: string): boolean;
-    PROCEDURE DisplayTopic(CONST Topic: string);
-    FUNCTION UnderstandsContext(CONST ContextID: integer;
-      CONST HelpFileName: string): boolean;
-    PROCEDURE DisplayHelpByContext(CONST ContextID: integer;
-      CONST HelpFileName: string);
+    function UnderstandsTopic(const Topic: string): Boolean;
+    procedure DisplayTopic(const Topic: string);
+    function UnderstandsContext(const ContextID: Integer;
+      const HelpFileName: string): Boolean;
+    procedure DisplayHelpByContext(const ContextID: Integer;
+      const HelpFileName: string);
     {$endregion}
 
     {$region 'IHelpSystemFlags'}
-    FUNCTION GetUseDefaultTopic: boolean;
-    PROCEDURE SetUseDefaultTopic(AValue: boolean);
+    function GetUseDefaultTopic: Boolean;
+    procedure SetUseDefaultTopic(AValue: Boolean);
     {$endregion}
 
     {$REGION 'ICustomHelpKeywordRecorder'}
-    FUNCTION GetKeywordList: TStringList;
-    PROCEDURE SetKeywordList(CONST Value: TStringList);
-    FUNCTION GetHelpStringList: TStringList;
-    PROCEDURE SetHelpStringList(CONST Value: TStringList);
-    FUNCTION GetShowHelpStringList: TStringList;
-    PROCEDURE SetShowHelpStringList(CONST Value: TStringList);
-    FUNCTION GetEnabled: boolean;
-    PROCEDURE SetEnabled(CONST Value: boolean);
-    PROCEDURE Reset;
-    PROCEDURE AddKeyword(HelpString: string; AIgnoreDuplicate: boolean = False);
+    function GetKeywordList: TStringList;
+    procedure SetKeywordList(const Value: TStringList);
+    function GetHelpStringList: TStringList;
+    procedure SetHelpStringList(const Value: TStringList);
+    function GetShowHelpStringList: TStringList;
+    procedure SetShowHelpStringList(const Value: TStringList);
+    function GetEnabled: Boolean;
+    procedure SetEnabled(const Value: Boolean);
+    procedure Reset;
+    procedure AddKeyword(HelpString: string; AIgnoreDuplicate: Boolean = False);
     {$ENDREGION}
 
-    CONSTRUCTOR Create;
-    DESTRUCTOR Destroy; OVERRIDE;
-  PRIVATE
-    FViewerID: integer;
+    constructor Create;
+    destructor Destroy; override;
+  private
+    FViewerID: Integer;
     FHelpManager: IHelpManager;
     FKeywords: TStringList;
     FHelpStrings: TStringList;
     FShowHelpStrings: TStringList;
-    FEnabled:  boolean;
-    FUseDefaultTopic: boolean;
-    PROCEDURE DoUnregister;
-    PROCEDURE DoRegister;
-  PUBLISHED
-    PROPERTY Keywords: TStringList Read GetKeywordList Write SetKeywordList;
-    PROPERTY HelpStrings: TStringList Read GetHelpStringList Write SetHelpStringList;
-    PROPERTY ShowHelpStrings: TStringList Read GetShowHelpStringList
-      Write SetShowHelpStringList;
-    PROPERTY Enabled: boolean Read GetEnabled Write SetEnabled;
-  END;
+    FEnabled:  Boolean;
+    FUseDefaultTopic: Boolean;
+    procedure DoUnregister;
+    procedure DoRegister;
+  published
+    property Keywords: TStringList read GetKeywordList write SetKeywordList;
+    property HelpStrings: TStringList read GetHelpStringList write SetHelpStringList;
+    property ShowHelpStrings: TStringList read GetShowHelpStringList
+      write SetShowHelpStringList;
+    property Enabled: Boolean read GetEnabled write SetEnabled;
+  end;
 
-VAR
+var
   CustomHelpKeywordRecorder: TCustomHelpKeywordRecorder;
 
 { TKeywordsHelpViewer }
 
-PROCEDURE TCustomHelpKeywordRecorder.AddKeyword(HelpString: string;
-  AIgnoreDuplicate: boolean);
-BEGIN
-  IF AnsiSameText(HelpString, KIBITZ_IGNORED_HELPSTRING) THEN
+procedure TCustomHelpKeywordRecorder.AddKeyword(HelpString: string;
+  AIgnoreDuplicate: Boolean);
+begin
+  if AnsiSameText(HelpString, KIBITZ_IGNORED_HELPSTRING) then
     Exit;
-  WITH FKeywords DO
-    IF AIgnoreDuplicate AND (IndexOf(HelpString) > -1) THEN
+  with FKeywords do
+    if AIgnoreDuplicate and (IndexOf(HelpString) > -1) then
       Exit
-    ELSE IF (Count = 0) OR (Strings[Count - 1] <> HelpString) THEN
+    else if (Count = 0) or (Strings[Count - 1] <> HelpString) then
       Add(HelpString);
-END;
+end;
 
-FUNCTION TCustomHelpKeywordRecorder.CanShowTableOfContents: boolean;
-BEGIN
+function TCustomHelpKeywordRecorder.CanShowTableOfContents: Boolean;
+begin
   Result := False;
-END;
+end;
 
-CONSTRUCTOR TCustomHelpKeywordRecorder.Create;
+constructor TCustomHelpKeywordRecorder.Create;
 
-  PROCEDURE Action(VAR sl: TStringList);
-  BEGIN
+  procedure Action(var sl: TStringList);
+  begin
     sl := TStringList.Create;
     sl.Duplicates := dupAccept;
-  END;
+  end;
 
-BEGIN
-  INHERITED;
+begin
+  inherited;
   FHelpManager := NIL;
   FEnabled := False;
   FUseDefaultTopic := True;
@@ -133,208 +133,207 @@ BEGIN
   Action(self.FShowHelpStrings);
   DoRegister;
   CustomHelpKeywordRecorder := Self;
-END;
+end;
 
-DESTRUCTOR TCustomHelpKeywordRecorder.Destroy;
+destructor TCustomHelpKeywordRecorder.Destroy;
 
-  PROCEDURE Action(VAR sl: TStringList);
-  BEGIN
+  procedure Action(var sl: TStringList);
+  begin
     FreeAndNil(sl);
-  END;
+  end;
 
-BEGIN
+begin
   Action(self.FKeywords);
   Action(self.FHelpStrings);
   Action(self.FShowHelpStrings);
 
-  IF CustomHelpKeywordRecorder = Self THEN
+  if CustomHelpKeywordRecorder = Self then
     CustomHelpKeywordRecorder := NIL;
 
-  INHERITED;
-END;
+  inherited;
+end;
 
-FUNCTION TCustomHelpKeywordRecorder.GetEnabled: boolean;
-BEGIN
+function TCustomHelpKeywordRecorder.GetEnabled: Boolean;
+begin
   Result := FEnabled;
-END;
+end;
 
-FUNCTION TCustomHelpKeywordRecorder.GetHelpStringList: TStringList;
-BEGIN
+function TCustomHelpKeywordRecorder.GetHelpStringList: TStringList;
+begin
   Result := FHelpStrings;
-END;
+end;
 
-FUNCTION TCustomHelpKeywordRecorder.GetHelpStrings(
-  CONST HelpString: string): TStringList;
-BEGIN
+function TCustomHelpKeywordRecorder.GetHelpStrings(
+  const HelpString: string): TStringList;
+begin
   Result := TStringList.Create;
   Result.Values[GetViewerName] := HelpString;
-  IF NOT Enabled THEN
+  if not Enabled then
     Exit;
   FHelpStrings.Add(HelpString);
-END;
+end;
 
-FUNCTION TCustomHelpKeywordRecorder.GetKeywordList: TStringList;
-BEGIN
+function TCustomHelpKeywordRecorder.GetKeywordList: TStringList;
+begin
   Result := FKeywords;
-END;
+end;
 
-FUNCTION TCustomHelpKeywordRecorder.GetShowHelpStringList: TStringList;
-BEGIN
+function TCustomHelpKeywordRecorder.GetShowHelpStringList: TStringList;
+begin
   Result := FShowHelpStrings;
-END;
+end;
 
-FUNCTION TCustomHelpKeywordRecorder.GetViewerName: string;
-BEGIN
+function TCustomHelpKeywordRecorder.GetViewerName: string;
+begin
   Result := ClassName;
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.DoRegister;
-BEGIN
-  IF NOT Assigned(FHelpManager) THEN
+procedure TCustomHelpKeywordRecorder.DoRegister;
+begin
+  if not Assigned(FHelpManager) then
     RegisterViewer(Self, FHelpManager);
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.DoUnregister;
-VAR
+procedure TCustomHelpKeywordRecorder.DoUnregister;
+var
   hm: IHelpManager;
-BEGIN
-  IF Assigned(FHelpManager) THEN
-  BEGIN
+begin
+  if Assigned(FHelpManager) then
+  begin
     hm := FHelpManager;
     FHelpManager := NIL;
     hm.Release(FViewerID);
-  END;
-END;
+  end;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.NotifyID(CONST ViewerID: integer);
-BEGIN
+procedure TCustomHelpKeywordRecorder.NotifyID(const ViewerID: Integer);
+begin
   FViewerID := ViewerID;
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.Reset;
+procedure TCustomHelpKeywordRecorder.Reset;
 
-  PROCEDURE Action(VAR sl: TStringList);
-  BEGIN
+  procedure Action(var sl: TStringList);
+  begin
     sl.Clear;
-  END;
+  end;
 
-BEGIN
+begin
   Action(self.FKeywords);
   Action(self.FHelpStrings);
   Action(self.FShowHelpStrings);
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.ShowHelp(CONST HelpString: string);
-BEGIN
-  IF NOT Enabled THEN
+procedure TCustomHelpKeywordRecorder.ShowHelp(const HelpString: string);
+begin
+  if not Enabled then
     Exit;
 
   // do nothing
   FShowHelpStrings.Add(HelpString);
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.ShowTableOfContents;
-BEGIN
+procedure TCustomHelpKeywordRecorder.ShowTableOfContents;
+begin
   // do nothing.
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.ShutDown;
-BEGIN
+procedure TCustomHelpKeywordRecorder.ShutDown;
+begin
   SoftShutDown;
   DoUnregister;
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.SoftShutDown;
-BEGIN
+procedure TCustomHelpKeywordRecorder.SoftShutDown;
+begin
   // do nothing
-END;
+end;
 
-FUNCTION TCustomHelpKeywordRecorder.UnderstandsKeyword(
-  CONST HelpString: string): integer;
-BEGIN
+function TCustomHelpKeywordRecorder.UnderstandsKeyword(
+  const HelpString: string): Integer;
+begin
   Result := 0;
-  IF NOT Enabled THEN
+  if not Enabled then
     Exit;
   AddKeyword(HelpString);
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.SetEnabled(CONST Value: boolean);
-BEGIN
+procedure TCustomHelpKeywordRecorder.SetEnabled(const Value: Boolean);
+begin
   FEnabled := Value;
-  IF NOT FEnabled THEN
+  if not FEnabled then
     Reset;
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.SetHelpStringList(CONST Value: TStringList);
-BEGIN
+procedure TCustomHelpKeywordRecorder.SetHelpStringList(const Value: TStringList);
+begin
   FHelpStrings := Value;
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.SetKeywordList(CONST Value: TStringList);
-BEGIN
+procedure TCustomHelpKeywordRecorder.SetKeywordList(const Value: TStringList);
+begin
   FKeywords.Assign(Value);
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.SetShowHelpStringList(CONST Value: TStringList);
-BEGIN
+procedure TCustomHelpKeywordRecorder.SetShowHelpStringList(const Value: TStringList);
+begin
   FShowHelpStrings := Value;
-END;
+end;
 
 {$region 'IExtendedHelpViewer'}
 
-PROCEDURE TCustomHelpKeywordRecorder.DisplayHelpByContext(CONST ContextID: integer;
-  CONST HelpFileName: string);
-BEGIN
-  IF Keywords.Count > 0 THEN
+procedure TCustomHelpKeywordRecorder.DisplayHelpByContext(const ContextID: Integer;
+  const HelpFileName: string);
+begin
+  if Keywords.Count > 0 then
     GlobalCustomHelp.ShowHelp(Keywords[0], GlobalCustomHelp.LastHelpCallKeyword);
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.DisplayTopic(CONST Topic: string);
-BEGIN
+procedure TCustomHelpKeywordRecorder.DisplayTopic(const Topic: string);
+begin
 
-END;
+end;
 
-FUNCTION TCustomHelpKeywordRecorder.UnderstandsTopic(CONST Topic: string): boolean;
-BEGIN
+function TCustomHelpKeywordRecorder.UnderstandsTopic(const Topic: string): Boolean;
+begin
   Result := False;
-END;
+end;
 
-FUNCTION TCustomHelpKeywordRecorder.UnderstandsContext(CONST ContextID: integer;
-  CONST HelpFileName: string): boolean;
-BEGIN
+function TCustomHelpKeywordRecorder.UnderstandsContext(const ContextID: Integer;
+  const HelpFileName: string): Boolean;
+begin
   Result := False;
-  IF NOT Enabled THEN
+  if not Enabled then
     Exit;
-  CASE ContextID OF
-    hcIDEFormDesigner, hcIDECodeEditor:
-      Result := Keywords.Count > 0;
-  END;
-END;
+  case ContextID of
+    hcIDEFormDesigner, hcIDECodeEditor: Result := Keywords.Count > 0;
+  end;
+end;
 
 {$endregion}
 
 {$region 'IHelpSystemFlags'}
-FUNCTION TCustomHelpKeywordRecorder.GetUseDefaultTopic: boolean;
-BEGIN
+function TCustomHelpKeywordRecorder.GetUseDefaultTopic: Boolean;
+begin
   Result := FUseDefaultTopic;
-END;
+end;
 
-PROCEDURE TCustomHelpKeywordRecorder.SetUseDefaultTopic(AValue: boolean);
-BEGIN
+procedure TCustomHelpKeywordRecorder.SetUseDefaultTopic(AValue: Boolean);
+begin
   FUseDefaultTopic := AValue;
-END;
+end;
 
 {$endregion}
 
-INITIALIZATION
+initialization
   CustomHelpKeywordRecorderIntf := TCustomHelpKeywordRecorder.Create;
 
-FINALIZATION
+finalization
   CustomHelpKeywordRecorderIntf := NIL;
   // This will automatically clear HelpViewer if object is destroyed.
-  IF CustomHelpKeywordRecorder <> NIL THEN
+  if CustomHelpKeywordRecorder <> NIL then
     // This will unregister the viewer from the help system
     CustomHelpKeywordRecorder.ShutDown;
 
-END.
+end.
 
