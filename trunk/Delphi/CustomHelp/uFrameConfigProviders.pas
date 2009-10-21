@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, ComCtrls, StdCtrls, ExtCtrls, uCustomHelpConsts, Buttons;
+  Dialogs, ComCtrls, StdCtrls, ExtCtrls, uCustomHelpConsts, Buttons,
+  uCustomHelpMain;
 
 type
   TConfigProvidersFilter = (cpfFileBased, cpfWebBased);
@@ -39,13 +40,13 @@ type
     function TrimOptionFromString(AString: String): TNamespaceTrimOption;
   public
     procedure AfterConstruction; override;
-    procedure InitContent(AFilter: TConfigProvidersFilter);
-    function Save(AOffset : Integer = 0) : Integer;
+    procedure InitContent(AFilter: TConfigProvidersFilter; AType : TProviderType);
+    function Save(AOffset : Integer; AType : TProviderType) : Integer;
   end;
 
 implementation
 
-uses Registry, uCustomHelpMain, StrUtils;
+uses Registry, StrUtils;
 
 {$R *.dfm}
 
@@ -153,7 +154,7 @@ begin
    ListView1.DeleteSelected;
 end;
 
-function TFrameConfigProviders.Save(AOffset : Integer = 0) : Integer;
+function TFrameConfigProviders.Save(AOffset : Integer; AType : TProviderType) : Integer;
 var
   Reg : TRegistry;
   idx: Integer;
@@ -170,7 +171,9 @@ begin
                                             ListView1.Items[Idx].Caption,
                                             ListView1.Items[Idx].SubItems[0],
                                             ListView1.Items[Idx].SubItems[1],
-                                            TrimOptionFromString(ListView1.Items[Idx].SubItems[2]));
+                                            TrimOptionFromString(ListView1.Items[Idx].SubItems[2]),
+                                            AType);
+
         inc(Result);
       end;
     end;
@@ -193,12 +196,18 @@ begin
 end;
 
 
-procedure TFrameConfigProviders.InitContent(AFilter: TConfigProvidersFilter);
+procedure TFrameConfigProviders.InitContent(AFilter: TConfigProvidersFilter; AType : TProviderType);
 var
   Reg : TRegistry;
   sl : TStringList;
   s : String;
+  Sub_Key : String;
 begin
+  case AType of
+    ptStandard: Sub_Key:=PROVIDER_SUB_KEY;
+    ptRSS: Sub_Key:=RSS_PROVIDER_SUB_KEY;
+  end;
+
   FInsertItem:=ListView1.Items.Add;
 
   with FInsertItem do
@@ -234,7 +243,7 @@ begin
   try
     TCustomHelp.ReadSettingsFromRegistry(sl);
 
-    if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY, true) then
+    if Reg.OpenKey(REG_ROOT_KEY + SUB_KEY, true) then
     begin
       Reg.GetKeyNames(sl);
       Reg.CloseKey;
@@ -242,7 +251,7 @@ begin
 
     for s in sl do
     begin
-      if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY + '\' + s, false) then
+      if Reg.OpenKey(REG_ROOT_KEY + SUB_KEY + '\' + s, false) then
       begin
         if IsURLAllowed(AFilter, Reg.ReadString(VALUE_URL)) then
         begin

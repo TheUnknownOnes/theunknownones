@@ -31,6 +31,7 @@ object FormHelpSelector: TFormHelpSelector
     Categories = <>
     RegularButtonColor = clWhite
     SelectedButtonColor = 15132390
+    ShowHint = True
     TabOrder = 0
     OnButtonClicked = catbtnTopicsButtonClicked
     OnDrawText = catbtnTopicsDrawText
