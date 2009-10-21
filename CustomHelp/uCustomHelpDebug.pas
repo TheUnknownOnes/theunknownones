@@ -153,7 +153,7 @@ constructor TCustomHelpDebugViewer.Create;
 begin
   inherited;
   DebugLog('Create', '', False);
-  FHelpManager     := NIL;
+  FHelpManager     := nil;
   FUseDefaultTopic := False;
   CreateStringList(self.FKeywords);
   CreateStringList(self.FContents);
@@ -193,7 +193,7 @@ begin
   FreeAndNil(self.FShowHelpStrings);
 
   if CustomHelpDebugViewer = Self then
-    CustomHelpDebugViewer := NIL;
+    CustomHelpDebugViewer := nil;
 
   inherited;
 end;
@@ -218,7 +218,7 @@ var
 begin
   if GetHelpSystem(hs) then
     if AClear then
-      hs.AssignHelpSelector(NIL)
+      hs.AssignHelpSelector(nil)
     else
       hs.AssignHelpSelector(TCustomHelpDebugSelector.Create);
 end;
@@ -239,7 +239,7 @@ begin
   if Assigned(FHelpManager) then
   begin
     hm           := FHelpManager;
-    FHelpManager := NIL;
+    FHelpManager := nil;
     hm.Release(FViewerID);
   end;
 end;
@@ -354,14 +354,13 @@ initialization
   if DEBUG_CUSTOMHELP then
     CustomHelpDebugViewerIntf := TCustomHelpDebugViewer.Create
   else
-    CustomHelpDebugViewerIntf := NIL;
+    CustomHelpDebugViewerIntf := nil;
 
 finalization
-  CustomHelpDebugViewerIntf := NIL;
+  CustomHelpDebugViewerIntf := nil;
   // This will automatically clear HelpViewer if object is destroyed.
-  if CustomHelpDebugViewer <> NIL then
+  if CustomHelpDebugViewer <> nil then
     // This will unregister the viewer from the help system
     CustomHelpDebugViewer.ShutDown;
 
 end.
-

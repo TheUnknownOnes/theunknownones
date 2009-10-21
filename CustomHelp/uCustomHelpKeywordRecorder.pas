@@ -76,12 +76,12 @@ type
     constructor Create;
     destructor Destroy; override;
   private
-    FViewerID: Integer;
-    FHelpManager: IHelpManager;
-    FKeywords: TStringList;
-    FHelpStrings: TStringList;
+    FViewerID:        Integer;
+    FHelpManager:     IHelpManager;
+    FKeywords:        TStringList;
+    FHelpStrings:     TStringList;
     FShowHelpStrings: TStringList;
-    FEnabled:  Boolean;
+    FEnabled:         Boolean;
     FUseDefaultTopic: Boolean;
     procedure DoUnregister;
     procedure DoRegister;
@@ -125,8 +125,8 @@ constructor TCustomHelpKeywordRecorder.Create;
 
 begin
   inherited;
-  FHelpManager := NIL;
-  FEnabled := False;
+  FHelpManager     := nil;
+  FEnabled         := False;
   FUseDefaultTopic := True;
   Action(self.FKeywords);
   Action(self.FHelpStrings);
@@ -148,7 +148,7 @@ begin
   Action(self.FShowHelpStrings);
 
   if CustomHelpKeywordRecorder = Self then
-    CustomHelpKeywordRecorder := NIL;
+    CustomHelpKeywordRecorder := nil;
 
   inherited;
 end;
@@ -200,8 +200,8 @@ var
 begin
   if Assigned(FHelpManager) then
   begin
-    hm := FHelpManager;
-    FHelpManager := NIL;
+    hm           := FHelpManager;
+    FHelpManager := nil;
     hm.Release(FViewerID);
   end;
 end;
@@ -329,11 +329,10 @@ initialization
   CustomHelpKeywordRecorderIntf := TCustomHelpKeywordRecorder.Create;
 
 finalization
-  CustomHelpKeywordRecorderIntf := NIL;
+  CustomHelpKeywordRecorderIntf := nil;
   // This will automatically clear HelpViewer if object is destroyed.
-  if CustomHelpKeywordRecorder <> NIL then
+  if CustomHelpKeywordRecorder <> nil then
     // This will unregister the viewer from the help system
     CustomHelpKeywordRecorder.ShutDown;
 
 end.
-
