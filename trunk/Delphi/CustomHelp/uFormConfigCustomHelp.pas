@@ -43,6 +43,7 @@ type
     TabSheet5: TTabSheet;
     FrameConfigRSSProviders: TFrameConfigProviders;
     fccRSSProvider: TFrameConfigColor;
+    Label1: TLabel;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -51,6 +52,7 @@ type
     procedure lbOrderDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
     procedure lbOrderDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure Label1Click(Sender: TObject);
   private
     FLastDropRect: TRect;
     procedure Save;
@@ -62,7 +64,7 @@ type
 
 implementation
 
-uses uUtils;
+uses uUtils, ShellAPI;
 
 {$R *.dfm}
 
@@ -198,6 +200,11 @@ begin
   end;
 
   Tabs.ActivePageIndex:=0;
+end;
+
+procedure Tform_Config.Label1Click(Sender: TObject);
+begin
+  ShellExecute(Self.Handle, 'open', 'http://www.delphipraxis.net/topic165769_ideexperte+customhelp.html&highlight=','','',SW_show);
 end;
 
 procedure Tform_Config.lbOrderDragDrop(Sender, Source: TObject; X, Y: Integer);
