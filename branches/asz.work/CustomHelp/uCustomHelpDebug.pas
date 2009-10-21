@@ -1,65 +1,68 @@
-UNIT uCustomHelpDebug;
+unit uCustomHelpDebug;
+
+{(*}
 // Remove the . to enable debugging ...
 {.$DEFINE DEBUG_CUSTOMHELP}
+{*)}
 
-INTERFACE
+interface
 
-USES
+uses
   Classes,
   HelpIntfs;
 
-CONST
-  DEBUG_CUSTOMHELP: boolean = {$IFDEF DEBUG_CUSTOMHELP}True{$ELSE}False{$ENDIF};
+const
+  DEBUG_CUSTOMHELP: Boolean = {$IFDEF DEBUG_CUSTOMHELP}True{$ELSE}False{$ENDIF};
 
-VAR
+var
   //We keep these global ... as it is done in WinHelpViewer.pas
   //and keep the reference to the object in the implementation section.
   CustomHelpDebugViewerIntf: ICustomHelpViewer;
 
-IMPLEMENTATION
+implementation
 
-USES
+uses
   SysUtils,
   ToolsApi,
   Windows;
 
-TYPE
+type
   {$TYPEINFO ON}
-  TCustomHelpDebugViewer = CLASS(TInterfacedObject,
+  TCustomHelpDebugViewer = class(TInterfacedObject,
     IExtendedHelpViewer,
     IHelpSystemFlags,
     ICustomHelpViewer)
-  PUBLIC
+  public
     {$REGION 'ICustomHelpViewer'}
-    FUNCTION GetViewerName: string;
-    FUNCTION UnderstandsKeyword(CONST HelpString: string): integer;
-    FUNCTION GetHelpStrings(CONST HelpString: string): TStringList;
-    FUNCTION CanShowTableOfContents: boolean;
-    PROCEDURE ShowTableOfContents;
-    PROCEDURE ShowHelp(CONST HelpString: string);
-    PROCEDURE NotifyID(CONST ViewerID: integer);
-    PROCEDURE SoftShutDown;
-    PROCEDURE ShutDown;
+    function GetViewerName: string;
+    function UnderstandsKeyword(const HelpString: string): Integer;
+    function GetHelpStrings(const HelpString: string): TStringList;
+    function CanShowTableOfContents: Boolean;
+    procedure ShowTableOfContents;
+    procedure ShowHelp(const HelpString: string);
+    procedure NotifyID(const ViewerID: Integer);
+    procedure SoftShutDown;
+    procedure ShutDown;
     {$ENDREGION}
 
     {$region 'IExtendedHelpViewer'}
-    FUNCTION UnderstandsTopic(CONST Topic: string): boolean;
-    PROCEDURE DisplayTopic(CONST Topic: string);
-    FUNCTION UnderstandsContext(CONST ContextID: integer;
-      CONST HelpFileName: string): boolean;
-    PROCEDURE DisplayHelpByContext(CONST ContextID: integer;
-      CONST HelpFileName: string);
+    function UnderstandsTopic(const Topic: string): Boolean;
+    procedure DisplayTopic(const Topic: string);
+    function UnderstandsContext(const ContextID: Integer;
+      const HelpFileName: string): Boolean;
+    procedure DisplayHelpByContext(const ContextID: Integer;
+      const HelpFileName: string);
     {$endregion}
 
     {$region 'IHelpSystemFlags'}
-    FUNCTION GetUseDefaultTopic: boolean;
-    PROCEDURE SetUseDefaultTopic(AValue: boolean);
+    function GetUseDefaultTopic: Boolean;
+    procedure SetUseDefaultTopic(AValue: Boolean);
     {$endregion}
 
-    DESTRUCTOR Destroy; OVERRIDE;
-  PRIVATE
-    FUseDefaultTopic: boolean;
-    FViewerID:        integer;
+    destructor Destroy; override;
+  private
+    FUseDefaultTopic: Boolean;
+    FViewerID:        Integer;
     FHelpManager:     IHelpManager;
     FKeywords:        TStringList;
     FContents:        TStringList;
@@ -67,90 +70,90 @@ TYPE
     FHelpStrings:     TStringList;
     FUnderstandsKeywords: TStringList;
     FShowHelpStrings: TStringList;
-    CONSTRUCTOR Create;
-    PROCEDURE AssignHelpSelector(AClear: boolean);
-    PROCEDURE DoUnregister;
-    PROCEDURE DoRegister;
-    PROCEDURE SetContents(CONST Value: TStringList);
-    PROCEDURE SetHelpStrings(CONST Value: TStringList);
-    PROCEDURE SetKeywords(CONST Value: TStringList);
-    PROCEDURE SetShowHelpStrings(CONST Value: TStringList);
-    PROCEDURE SetUnderstandsKeywords(CONST Value: TStringList);
-    PROCEDURE SetViewers(CONST Value: TStringList);
-  PROTECTED
-    PROCEDURE DebugLog(method, msg: string; LogDefaultTopic: boolean); OVERLOAD;
-    PROCEDURE DebugLog(method, msg: string); OVERLOAD;
-  PUBLISHED
-    PROPERTY Keywords: TStringList Read FKeywords Write SetKeywords;
-    PROPERTY Contents: TStringList Read FContents Write SetContents;
-    PROPERTY Viewers: TStringList Read FViewers Write SetViewers;
-    PROPERTY HelpStrings: TStringList Read FHelpStrings Write SetHelpStrings;
-    PROPERTY ShowHelpStrings: TStringList Read FShowHelpStrings Write SetShowHelpStrings;
-    PROPERTY UnderstandsKeywords: TStringList
-      Read FUnderstandsKeywords Write SetUnderstandsKeywords;
-  END;
+    constructor Create;
+    procedure AssignHelpSelector(AClear: Boolean);
+    procedure DoUnregister;
+    procedure DoRegister;
+    procedure SetContents(const Value: TStringList);
+    procedure SetHelpStrings(const Value: TStringList);
+    procedure SetKeywords(const Value: TStringList);
+    procedure SetShowHelpStrings(const Value: TStringList);
+    procedure SetUnderstandsKeywords(const Value: TStringList);
+    procedure SetViewers(const Value: TStringList);
+  protected
+    procedure DebugLog(method, msg: string; LogDefaultTopic: Boolean); overload;
+    procedure DebugLog(method, msg: string); overload;
+  published
+    property Keywords: TStringList read FKeywords write SetKeywords;
+    property Contents: TStringList read FContents write SetContents;
+    property Viewers: TStringList read FViewers write SetViewers;
+    property HelpStrings: TStringList read FHelpStrings write SetHelpStrings;
+    property ShowHelpStrings: TStringList read FShowHelpStrings write SetShowHelpStrings;
+    property UnderstandsKeywords: TStringList
+      read FUnderstandsKeywords write SetUnderstandsKeywords;
+  end;
 
   //This class must not contain any local fields
   //applies only to BDS 2006
   {$TYPEINFO ON}
-  TCustomHelpDebugSelector = CLASS(TInterfacedObject,
+  TCustomHelpDebugSelector = class(TInterfacedObject,
     IHelpSelector, IHelpSelector2)
-  PROTECTED
-    FUNCTION SelectKeyword(Keywords: TStrings): integer;
-    FUNCTION TableOfContents(Contents: TStrings): integer;
-    FUNCTION SelectContext(Viewers: TStrings): integer;
-  END;
+  protected
+    function SelectKeyword(Keywords: TStrings): Integer;
+    function TableOfContents(Contents: TStrings): Integer;
+    function SelectContext(Viewers: TStrings): Integer;
+  end;
 
-VAR
+var
   CustomHelpDebugViewer: TCustomHelpDebugViewer;
 
 { TKeywordsHelpSelector }
 
-FUNCTION TCustomHelpDebugSelector.SelectContext(Viewers: TStrings): integer;
-BEGIN
+function TCustomHelpDebugSelector.SelectContext(Viewers: TStrings): Integer;
+begin
   CustomHelpDebugViewer.Viewers.Text := Viewers.Text;
   Result := 0;
   CustomHelpDebugViewer.DebugLog('Selector.SelectContext',
     '(' + Viewers.CommaText + ')=' + IntToStr(Result), False);
-END;
+end;
 
-FUNCTION TCustomHelpDebugSelector.SelectKeyword(Keywords: TStrings): integer;
-BEGIN
+function TCustomHelpDebugSelector.SelectKeyword(Keywords: TStrings): Integer;
+begin
   CustomHelpDebugViewer.Keywords.Text := Keywords.Text;
   // Abort help call ...
   Result := -1;
   CustomHelpDebugViewer.DebugLog('Selector.SelectKeyword',
     '(' + Keywords.CommaText + ')=' + IntToStr(Result), False);
-END;
+end;
 
-FUNCTION TCustomHelpDebugSelector.TableOfContents(Contents: TStrings): integer;
-BEGIN
+function TCustomHelpDebugSelector.TableOfContents(Contents: TStrings): Integer;
+begin
   CustomHelpDebugViewer.Contents.Text := Contents.Text;
   Result := -1;
   CustomHelpDebugViewer.DebugLog('Selector.TableOfContents',
     '(' + Contents.CommaText + ')=' + IntToStr(Result), False);
-END;
+end;
 
 { TKeywordsHelpViewer }
 
-FUNCTION TCustomHelpDebugViewer.CanShowTableOfContents: boolean;
-BEGIN
+function TCustomHelpDebugViewer.CanShowTableOfContents: Boolean;
+begin
   Result := False;
   DebugLog('ShowTableOfContents', '=' + BoolToStr(Result, True));
-END;
+end;
 
-CONSTRUCTOR TCustomHelpDebugViewer.Create;
+constructor TCustomHelpDebugViewer.Create;
 
-  PROCEDURE CreateStringList(VAR sl: TStringList);
-  BEGIN
+  procedure CreateStringList(var sl: TStringList);
+  begin
     sl := TStringList.Create;
     sl.Duplicates := dupAccept;
-  END;
+  end;
 
-BEGIN
-  INHERITED;
+begin
+  inherited;
   DebugLog('Create', '', False);
-  FHelpManager := NIL;
+  FHelpManager     := NIL;
   FUseDefaultTopic := False;
   CreateStringList(self.FKeywords);
   CreateStringList(self.FContents);
@@ -160,26 +163,26 @@ BEGIN
   CreateStringList(self.FShowHelpStrings);
   DoRegister;
   CustomHelpDebugViewer := self;
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.DebugLog(method, msg: string);
-BEGIN
+procedure TCustomHelpDebugViewer.DebugLog(method, msg: string);
+begin
   DebugLog(method, msg, True);
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.DebugLog(method, msg: string;
-  LogDefaultTopic: boolean);
-VAR
+procedure TCustomHelpDebugViewer.DebugLog(method, msg: string;
+  LogDefaultTopic: Boolean);
+var
   s: string;
-BEGIN
-  IF LogDefaultTopic THEN
+begin
+  if LogDefaultTopic then
     method := method + '{' + BoolToStr(FUseDefaultTopic, True) + '}';
   s := FormatDateTime('', Now) + ': ' + ClassName + '[' + method + ']: ' + msg;
   OutputDebugString(PChar(s));
-END;
+end;
 
-DESTRUCTOR TCustomHelpDebugViewer.Destroy;
-BEGIN
+destructor TCustomHelpDebugViewer.Destroy;
+begin
   DebugLog('Destroy', '', False);
 
   FreeAndNil(self.FKeywords);
@@ -189,174 +192,176 @@ BEGIN
   FreeAndNil(self.FUnderstandsKeywords);
   FreeAndNil(self.FShowHelpStrings);
 
-  IF CustomHelpDebugViewer = Self THEN
+  if CustomHelpDebugViewer = Self then
     CustomHelpDebugViewer := NIL;
 
-  INHERITED;
-END;
+  inherited;
+end;
 
-FUNCTION TCustomHelpDebugViewer.GetHelpStrings(CONST HelpString: string): TStringList;
-BEGIN
+function TCustomHelpDebugViewer.GetHelpStrings(const HelpString: string): TStringList;
+begin
   Self.HelpStrings.Add(HelpString);
   Result := TStringList.Create;
   Result.Values[GetViewerName] := HelpString;
   DebugLog('GetHelpStrings', '(' + HelpString + ')=' + Result.CommaText);
-END;
+end;
 
-FUNCTION TCustomHelpDebugViewer.GetViewerName: string;
-BEGIN
+function TCustomHelpDebugViewer.GetViewerName: string;
+begin
   Result := ClassName;
   DebugLog('GetViewerName', '=' + Result);
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.AssignHelpSelector(AClear: boolean);
-VAR
+procedure TCustomHelpDebugViewer.AssignHelpSelector(AClear: Boolean);
+var
   hs: IHelpSystem;
-BEGIN
-  IF GetHelpSystem(hs) THEN
-    IF AClear THEN
+begin
+  if GetHelpSystem(hs) then
+    if AClear then
       hs.AssignHelpSelector(NIL)
-    ELSE
+    else
       hs.AssignHelpSelector(TCustomHelpDebugSelector.Create);
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.DoRegister;
-BEGIN
-  IF NOT Assigned(FHelpManager) THEN
+procedure TCustomHelpDebugViewer.DoRegister;
+begin
+  if not Assigned(FHelpManager) then
   begin
 
     RegisterViewer(Self, FHelpManager);
   end;
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.DoUnregister;
-VAR
+procedure TCustomHelpDebugViewer.DoUnregister;
+var
   hm: IHelpManager;
-BEGIN
-  IF Assigned(FHelpManager) THEN
-  BEGIN
-    hm := FHelpManager;
+begin
+  if Assigned(FHelpManager) then
+  begin
+    hm           := FHelpManager;
     FHelpManager := NIL;
     hm.Release(FViewerID);
-  END;
-END;
+  end;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.NotifyID(CONST ViewerID: integer);
-BEGIN
+procedure TCustomHelpDebugViewer.NotifyID(const ViewerID: Integer);
+begin
   FViewerID := ViewerID;
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.ShowHelp(CONST HelpString: string);
-BEGIN
+procedure TCustomHelpDebugViewer.ShowHelp(const HelpString: string);
+begin
   DebugLog('ShowHelp', '(' + HelpString + ')');
   Self.ShowHelpStrings.Add(HelpString);
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.ShowTableOfContents;
-BEGIN
+procedure TCustomHelpDebugViewer.ShowTableOfContents;
+begin
   DebugLog('ShowTableOfContents', '');
   // do nothing.
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.ShutDown;
-BEGIN
+procedure TCustomHelpDebugViewer.ShutDown;
+begin
   DebugLog('ShutDown', '');
   SoftShutDown;
   DoUnregister;
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.SoftShutDown;
-BEGIN
+procedure TCustomHelpDebugViewer.SoftShutDown;
+begin
   DebugLog('SoftShutDown', '');
   // do nothing
-END;
+end;
 
-FUNCTION TCustomHelpDebugViewer.UnderstandsKeyword(CONST HelpString: string): integer;
-BEGIN
+function TCustomHelpDebugViewer.UnderstandsKeyword(const HelpString: string): Integer;
+begin
   Self.UnderstandsKeywords.Add(HelpString);
   Result := 0;
   DebugLog('UnderstandsKeyword', '(' + HelpString + ')=' + IntToStr(Result));
-END;
+end;
 
 {$region 'IHelpSystemFlags'}
 
-FUNCTION TCustomHelpDebugViewer.GetUseDefaultTopic: boolean;
-BEGIN
+function TCustomHelpDebugViewer.GetUseDefaultTopic: Boolean;
+begin
   Result := FUseDefaultTopic;
-END;
+end;
 
-FUNCTION TCustomHelpDebugViewer.UnderstandsTopic(CONST Topic: string): boolean;
-BEGIN
+function TCustomHelpDebugViewer.UnderstandsTopic(const Topic: string): Boolean;
+begin
   Result := False;
   DebugLog('UnderstandsTopic', '(' + Topic + ')=' + BoolToStr(Result, True));
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.DisplayTopic(CONST Topic: string);
-BEGIN
+procedure TCustomHelpDebugViewer.DisplayTopic(const Topic: string);
+begin
   DebugLog('DisplayTopic', Topic);
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.SetContents(CONST Value: TStringList);
-BEGIN
+procedure TCustomHelpDebugViewer.SetContents(const Value: TStringList);
+begin
   FContents.Assign(Value);
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.SetHelpStrings(CONST Value: TStringList);
-BEGIN
+procedure TCustomHelpDebugViewer.SetHelpStrings(const Value: TStringList);
+begin
   FHelpStrings.Assign(Value);
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.SetKeywords(CONST Value: TStringList);
-BEGIN
+procedure TCustomHelpDebugViewer.SetKeywords(const Value: TStringList);
+begin
   FKeywords.Assign(Value);
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.SetShowHelpStrings(CONST Value: TStringList);
-BEGIN
+procedure TCustomHelpDebugViewer.SetShowHelpStrings(const Value: TStringList);
+begin
   FShowHelpStrings.Assign(Value);
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.SetUnderstandsKeywords(CONST Value: TStringList);
-BEGIN
+procedure TCustomHelpDebugViewer.SetUnderstandsKeywords(const Value: TStringList);
+begin
   FUnderstandsKeywords.Assign(Value);
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.SetUseDefaultTopic(AValue: boolean);
-BEGIN
+procedure TCustomHelpDebugViewer.SetUseDefaultTopic(AValue: Boolean);
+begin
   FUseDefaultTopic := AValue;
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.SetViewers(CONST Value: TStringList);
-BEGIN
+procedure TCustomHelpDebugViewer.SetViewers(const Value: TStringList);
+begin
   FViewers.Assign(Value);
-END;
+end;
 
-FUNCTION TCustomHelpDebugViewer.UnderstandsContext(CONST ContextID: integer;
-  CONST HelpFileName: string): boolean;
-BEGIN
+function TCustomHelpDebugViewer.UnderstandsContext(const ContextID: Integer;
+  const HelpFileName: string): Boolean;
+begin
   Result := False;
   DebugLog('UnderstandsContext', '(' + IntToStr(ContextID) + ', ' +
     HelpFileName + ')=' + BoolToStr(Result));
-END;
+end;
 
-PROCEDURE TCustomHelpDebugViewer.DisplayHelpByContext(CONST ContextID: integer;
-  CONST HelpFileName: string);
-BEGIN
+procedure TCustomHelpDebugViewer.DisplayHelpByContext(const ContextID: Integer;
+  const HelpFileName: string);
+begin
   DebugLog('DisplayHelpByContext', '(' + IntToStr(ContextID) + ', ' + HelpFileName);
-END;
+end;
 
 {$endregion}
 
-INITIALIZATION
-  IF DEBUG_CUSTOMHELP THEN
+initialization
+  if DEBUG_CUSTOMHELP then
     CustomHelpDebugViewerIntf := TCustomHelpDebugViewer.Create
-  ELSE
+  else
     CustomHelpDebugViewerIntf := NIL;
 
-FINALIZATION
-  CustomHelpDebugViewerIntf := nil; // This will automatically clear HelpViewer if object is destroyed.
-  if CustomHelpDebugViewer <> nil then // This will unregister the viewer from the help system
+finalization
+  CustomHelpDebugViewerIntf := NIL;
+  // This will automatically clear HelpViewer if object is destroyed.
+  if CustomHelpDebugViewer <> NIL then
+    // This will unregister the viewer from the help system
     CustomHelpDebugViewer.ShutDown;
 
-END.
+end.
 
