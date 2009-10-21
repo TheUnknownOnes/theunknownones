@@ -40,13 +40,15 @@ function BytesToCardArray(const b: TBytes): TCardinalDynArray;
 function FileContainsText(AFileName: string; AText: string): Boolean;
 
 type
-  TExpandEnvVarsOption  = (eevoPreferSystemValues);
+  TExpandEnvVarsOption  = (eevoPreferSystemValues, eevoUrlEncodeValues);
   TExpandEnvVarsOptions = set of TExpandEnvVarsOption;
 
 const
   ENVVAR_TOKEN_START = '$(';
+  ENVVAR_RAW_TOKEN_START = '$_(';
   ENVVAR_TOKEN_END   = ')';
 
+function UrlEncodeString(AString: string): string;
 function EnvVarToken(const Name: string; const AStartToken: string = ENVVAR_TOKEN_START;
   AEndToken: string = ENVVAR_TOKEN_END): string;
 function GetEnvironmentVariable(const Name: string; out Value: string): Boolean;
@@ -54,8 +56,7 @@ function GetEnvironmentVariable(const Name: string; out Value: string): Boolean;
 
 procedure ExpandEnvVars(var AString: string; const AStartToken, AEndToken: string;
   const ACustomEnvVars: TStrings = nil; Options: TExpandEnvVarsOptions = []); overload;
-procedure ExpandEnvVars(var AString: string; const ACustomEnvVars: TStrings = nil;
-  Options: TExpandEnvVarsOptions = []); overload;
+procedure ExpandEnvVars(var AString: string; const ACustomEnvVars: TStrings); overload;
 
 function CtrlDown: Boolean;
 function ShiftDown: Boolean;
@@ -219,16 +220,25 @@ begin
   Result := True;
 end;
 
+function UrlEncodeString(AString: string): string;
+var
+  i: Integer;
+begin
+  Result := '';
+  for i := 1 to Length(AString) do
+    Result := Result + '%' + IntToHex(Ord(AString[i]), 2);
+end;
+
 function EnvVarToken(const Name: string; const AStartToken: string;
   AEndToken: string): string;
 begin
   Result := AStartToken + Name + AEndToken;
 end;
 
-procedure ExpandEnvVars(var AString: string; const ACustomEnvVars: TStrings = nil;
-  Options: TExpandEnvVarsOptions = []);
+procedure ExpandEnvVars(var AString: string; const ACustomEnvVars: TStrings);
 begin
-  ExpandEnvVars(AString, ENVVAR_TOKEN_START, ENVVAR_TOKEN_END, ACustomEnvVars, Options);
+  ExpandEnvVars(AString, ENVVAR_RAW_TOKEN_START, ENVVAR_TOKEN_END, ACustomEnvVars, []);
+  ExpandEnvVars(AString, ENVVAR_TOKEN_START, ENVVAR_TOKEN_END, ACustomEnvVars, [eevoUrlEncodeValues]);
 end;
 
 procedure ExpandEnvVars(var AString: string; const AStartToken, AEndToken: string;
@@ -285,9 +295,12 @@ begin
       else
         Value := '';
 
+      if eevoUrlEncodeValues in Options then
+        Value := UrlEncodeString(Value);
+
       Delete(AString, EnvVarStartIdx, EndTokenLen + EnvVarEndIdx - EnvVarStartIdx);
       Insert(Value, AString, EnvVarStartIdx);
-      Inc(EnvVarStartIdx, Length(AString) + 1); // do not replace variables recursivly
+      Inc(EnvVarStartIdx, Length(Value) + 1); // do not replace variables recursivly
 
       EnvVarStartIdx := PosEx(AStartToken, AString, EnvVarStartIdx);
     end

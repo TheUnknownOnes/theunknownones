@@ -177,6 +177,7 @@ const
   SETTING_WINHELPGIDCHECK = 'CheckWinHelpGID';
   SETTINGS_HANDLEDSCHEMES = 'HandledSchemes';
   SETTINGS_REPLACEDEFAULT = 'ReplaceDefaultViewer';
+  SETTINGS_MIGRATION_COMPLETE = 'SettingsMigrated';
 
   GROUP_LABEL_DEFAULT = 'Available Search engines';
   GROUP_LABEL_STANDARD = 'Other Help Providers';
@@ -254,19 +255,9 @@ begin
       method + ']: ' + msg));
 end;
 
-function EncodedHelpString(AHelpString: string): string;
-var
-  i: Integer;
-begin
-  Result := '';
-  for i := 1 to Length(AHelpString) do
-    Result := Result + '%' + Format('%.2x', [Ord(AHelpString[i])]);
-end;
-
 procedure AddEnvVar(sl: TStringList; const AName, AValue: string);
 begin
-  sl.Values['_' + AName] := AValue;
-  sl.Values[AName]       := EncodedHelpString(AValue);
+  sl.Values[AName] := AValue;
 end;
 
 procedure ExpandEnvVars(var s: string; const HelpString: string);
@@ -894,27 +885,27 @@ begin
       'DP DelphiReference',
       'Search with Daniels Cool Tool',
       'http://ref.dp200x.de/dp_reference.php?query=' +
-      EnvVarToken('_' + ENVVAR_NAME_KEYWORD),
+      EnvVarToken(ENVVAR_NAME_KEYWORD),
       nstoTrimFirst);
 
     WriteProviderToRegistry('2',
       'Koders.com',
       'Search at koders.com',
       'http://www.koders.com/default.aspx?submit=Search&la=Delphi&li=*&s=' +
-      EnvVarToken('_' + ENVVAR_NAME_KEYWORD),
+      EnvVarToken(ENVVAR_NAME_KEYWORD),
       nstoTrimFirst);
 
     WriteProviderToRegistry('3',
       'Google Codesearch',
       'Search using Google Codesearch',
-      'http://www.google.com/codesearch?btnG=Code+suchen&hl=de&as_lang=pascal&as_license_restrict=i&as_license=&as_package=&as_filename=&as_case=&as_q=' + EnvVarToken('_' + ENVVAR_NAME_KEYWORD),
+      'http://www.google.com/codesearch?btnG=Code+suchen&hl=de&as_lang=pascal&as_license_restrict=i&as_license=&as_package=&as_filename=&as_case=&as_q=' + EnvVarToken(ENVVAR_NAME_KEYWORD),
       nstoTrimFirst);
 
     WriteProviderToRegistry('4',
       'MSDN Online',
       'Search using MSDN Online',
       'http://search.msdn.microsoft.com/Default.aspx?locale=en-US&Query=' +
-      EnvVarToken('_' + ENVVAR_NAME_KEYWORD),
+      EnvVarToken(ENVVAR_NAME_KEYWORD),
       nstoTrimFirst);
 
     LoadProviderFromRegistry;
@@ -1494,32 +1485,30 @@ end;
 
 procedure InitializeRegRootKey;
 var
-  reg:           TRegistry;
-  ATempFileName: TFileName;
+  reg: TRegistry;
 begin
   F_REG_ROOT_KEY := GetIdeBaseRegistryKey + REG_ROOT_BASE + REG_ROOT_PROJECT;
 
   if OLD_REG_ROOT_KEY = F_REG_ROOT_KEY then
     Exit;
 
-  reg := TRegistry.Create;
+  reg := TRegistry.Create(KEY_READ);
   try
     reg.RootKey := HKEY_CURRENT_USER;
-    if reg.KeyExists(F_REG_ROOT_KEY) then       // new settings exist?
-      Exit;
-    if not reg.KeyExists(OLD_REG_ROOT_KEY) then // old settings do not exist?
-      Exit;
-    // migrate old settings ...
-    ATempFileName := uUtils.GetTempFileName('tuo-ch');
-    if reg.SaveKey(OLD_REG_ROOT_KEY, ATempFileName) then
+    if reg.OpenKeyReadOnly(F_REG_ROOT_KEY) then       // new settings exist?
       try
-        if reg.RestoreKey(F_REG_ROOT_KEY, ATempFileName) then
-        begin
-          //          DeleteRegKey(reg.RootKey, OLD_REG_ROOT_KEY);
-        end;
+        // settings already migrated?
+        if reg.ValueExists(SETTINGS_MIGRATION_COMPLETE) then
+          Exit;
       finally
-        DeleteFile(ATempFileName);
+        reg.CloseKey;
       end;
+    if not reg.KeyExists(OLD_REG_ROOT_KEY) then
+      Exit;
+
+    // migrate old settings ...
+    reg.Access := KEY_READ or KEY_WRITE;
+    reg.MoveKey(OLD_REG_ROOT_KEY, F_REG_ROOT_KEY, False);
   finally
     reg.Free;
   end;
