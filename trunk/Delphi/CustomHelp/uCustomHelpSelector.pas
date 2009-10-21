@@ -231,6 +231,7 @@ begin
     begin
       s:=catbtnTopics.Categories[i].Caption;
       if  (s = GROUP_LABEL_WEB_BASED) or
+          (s = GROUP_LABEL_STANDARD) or
           (s = GROUP_LABEL_FILE_BASED) then
       begin
         idx:=GlobalCustomHelp.ResultOrderFromString[s];

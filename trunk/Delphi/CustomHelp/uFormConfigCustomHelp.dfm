@@ -28,6 +28,10 @@ object form_Config: Tform_Config
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'General'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object rgDisplayLocation: TRadioGroup
         AlignWithMargins = True
         Left = 3
@@ -65,11 +69,9 @@ object form_Config: Tform_Config
           Height = 323
           Hint = 'Use drag and drop to rearrange items'
           Align = alClient
-          DoubleBuffered = True
           DragMode = dmAutomatic
           ExtendedSelect = False
           ItemHeight = 13
-          ParentDoubleBuffered = False
           TabOrder = 0
           OnDragDrop = lbOrderDragDrop
           OnDragOver = lbOrderDragOver
@@ -135,7 +137,7 @@ object form_Config: Tform_Config
             'Example:'#13#10'Full Keyword is  Classes.TStringList.Create'#13#10'Trim Firs' +
             't searches for TStringList.Create'#13#10'Trim Full searches for Create'
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           ParentShowHint = False
           ShowHint = True
           TabOrder = 1
@@ -150,6 +152,7 @@ object form_Config: Tform_Config
         Align = alTop
         AutoSize = True
         TabOrder = 2
+        TabStop = True
         ExplicitLeft = 3
         ExplicitTop = 3
         ExplicitWidth = 650
@@ -190,6 +193,9 @@ object form_Config: Tform_Config
             Width = 531
             ExplicitWidth = 531
           end
+          inherited cbTrimNamespacesOHS: TComboBox
+            ItemHeight = 0
+          end
         end
         inherited ListView1: TListView
           Width = 650
@@ -207,6 +213,7 @@ object form_Config: Tform_Config
         Align = alTop
         AutoSize = True
         TabOrder = 1
+        TabStop = True
         ExplicitLeft = 3
         ExplicitTop = 3
         ExplicitWidth = 650
@@ -286,6 +293,7 @@ object form_Config: Tform_Config
         Align = alTop
         AutoSize = True
         TabOrder = 2
+        TabStop = True
         ExplicitLeft = 3
         ExplicitTop = 3
         ExplicitWidth = 650

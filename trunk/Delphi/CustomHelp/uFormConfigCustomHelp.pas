@@ -190,6 +190,8 @@ begin
     sl.free;
     Reg.Free;
   end;
+
+  Tabs.ActivePageIndex:=0;
 end;
 
 procedure Tform_Config.lbOrderDragDrop(Sender, Source: TObject; X, Y: Integer);
