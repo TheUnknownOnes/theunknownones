@@ -23,7 +23,7 @@ object form_Config: Tform_Config
     Top = 0
     Width = 664
     Height = 591
-    ActivePage = TabSheet5
+    ActivePage = TabSheet1
     Align = alClient
     TabOrder = 0
     object TabSheet1: TTabSheet
@@ -57,12 +57,33 @@ object form_Config: Tform_Config
         Align = alClient
         Caption = 'Result order'
         TabOrder = 2
+        object Label1: TLabel
+          AlignWithMargins = True
+          Left = 5
+          Top = 315
+          Width = 640
+          Height = 26
+          Cursor = crHandPoint
+          Align = alBottom
+          Caption = 
+            'go to the discussion thread at www.delphipraxis.net to receive h' +
+            'elp or post provider URLs (German and English spoken)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold, fsUnderline]
+          ParentFont = False
+          WordWrap = True
+          OnClick = Label1Click
+          ExplicitWidth = 626
+        end
         object lbOrder: TListBox
           AlignWithMargins = True
           Left = 5
           Top = 18
           Width = 640
-          Height = 323
+          Height = 291
           Hint = 'Use drag and drop to rearrange items'
           Align = alClient
           DragMode = dmAutomatic
@@ -71,6 +92,7 @@ object form_Config: Tform_Config
           TabOrder = 0
           OnDragDrop = lbOrderDragDrop
           OnDragOver = lbOrderDragOver
+          ExplicitHeight = 323
         end
       end
     end
@@ -303,12 +325,13 @@ object form_Config: Tform_Config
         Align = alClient
         TabOrder = 0
         TabStop = True
+        ExplicitTop = 28
         ExplicitWidth = 656
-        ExplicitHeight = 563
+        ExplicitHeight = 535
         inherited pnlOHSItem: TPanel
           Top = 441
           Width = 656
-          ExplicitTop = 469
+          ExplicitTop = 441
           ExplicitWidth = 656
           inherited BtnBrowseForFile: TSpeedButton
             Left = 628
@@ -331,7 +354,7 @@ object form_Config: Tform_Config
           Width = 650
           Height = 435
           ExplicitWidth = 650
-          ExplicitHeight = 463
+          ExplicitHeight = 435
         end
         inherited OpenDialog1: TOpenDialog
           Left = 600
