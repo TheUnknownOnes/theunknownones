@@ -84,7 +84,7 @@ object FormHelpSelector: TFormHelpSelector
       Left = 0
       Top = 0
       Width = 203
-      Height = 13
+      Height = 21
       Align = alLeft
       Caption = 'Keyword used in custom search providers:'
       Layout = tlCenter
@@ -97,7 +97,7 @@ object FormHelpSelector: TFormHelpSelector
       Align = alClient
       AutoDropDown = True
       AutoCloseUp = True
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 0
       OnCloseUp = cbbSearchKeywordCloseUp
     end

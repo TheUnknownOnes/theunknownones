@@ -1,3 +1,4 @@
+//jcf:all=off
 {******************************************************************************}
 {                                                                              }
 { HTML Help API interface Unit for Object Pascal                               }
