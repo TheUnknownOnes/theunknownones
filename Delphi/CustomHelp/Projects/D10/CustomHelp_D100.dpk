@@ -29,7 +29,11 @@ package CustomHelp_D100;
 requires
   rtl,
   designide,
-  vclie;
+  vclie,
+  vcl,
+  xmlrtl,
+  vclactnband,
+  vclx;
 
 contains
   uCustomHelpMain in '..\..\uCustomHelpMain.pas',
@@ -40,6 +44,8 @@ contains
   uUtils in '..\..\uUtils.pas',
   uCustomHelpIntfs in '..\..\uCustomHelpIntfs.pas',
   uCustomHelpKeywordRecorder in '..\..\uCustomHelpKeywordRecorder.pas',
-  uMSHelpServices in '..\..\uMSHelpServices.pas';
+  uMSHelpServices in '..\..\uMSHelpServices.pas',
+  uCustomHelpConsts in '..\..\uCustomHelpConsts.pas',
+  uFrameConfigProviders in '..\..\uFrameConfigProviders.pas' {FrameConfigProviders: TFrame};
 
 end.

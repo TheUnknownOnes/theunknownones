@@ -29,7 +29,6 @@ object FormHelpSelector: TFormHelpSelector
     ButtonFlow = cbfVertical
     ButtonOptions = [boFullSize, boShowCaptions, boBoldCaptions, boUsePlusMinus, boCaptionOnlyBorder]
     Categories = <>
-    Color = clBtnFace
     RegularButtonColor = clWhite
     SelectedButtonColor = 15132390
     TabOrder = 0

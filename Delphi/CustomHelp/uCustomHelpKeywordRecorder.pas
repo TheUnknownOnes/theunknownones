@@ -3,9 +3,7 @@ UNIT uCustomHelpKeywordRecorder;
 interface
 
 uses
-  Classes,
-  HelpIntfs,
-  uCustomHelpIntfs;
+  Classes, uCustomHelpConsts, HelpIntfs, uCustomHelpIntfs;
 
 const
   hcIDEStructureView   = $49E;
