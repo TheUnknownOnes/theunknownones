@@ -12,7 +12,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, HelpIntfs, OleCtrls, StdCtrls, ExtCtrls, ActiveX, mshtml, ComCtrls,
-  CategoryButtons;
+  CategoryButtons, msxml;
 
 type
   TFormHelpSelector = class(TForm)
@@ -82,9 +82,10 @@ type
     FURL: String;
     FIdx: Integer;
     FTO: TNamespaceTrimOption;
+    procedure SetDesc(const Value: String);
   public
     property URL: String read FURL write FURL;
-    property Description: String read FDesc write FDesc;
+    property Description: String read FDesc write SetDesc;
     property HelpIndex: Integer read FIdx write FIdx;
     property TrimOption: TNamespaceTrimOption read FTO write FTO;
   end;
@@ -232,7 +233,8 @@ begin
       s:=catbtnTopics.Categories[i].Caption;
       if  (s = GROUP_LABEL_WEB_BASED) or
           (s = GROUP_LABEL_STANDARD) or
-          (s = GROUP_LABEL_FILE_BASED) then
+          (s = GROUP_LABEL_FILE_BASED) or
+          StartsText(GROUP_PREFIX_RSS, s) then
       begin
         idx:=GlobalCustomHelp.ResultOrderFromString[s];
         toSort.AddObject(Format('%.4d', [idx]),catbtnTopics.Categories[i]);
@@ -287,6 +289,9 @@ var
       else
       if ALabel = GROUP_LABEL_FILE_BASED then
         Result.Color:=GlobalCustomHelp.ColorFileProvider
+      else
+      if StartsText(GROUP_PREFIX_RSS, ALabel) then
+        Result.Color:=GlobalCustomHelp.ColorRSSProvider
       else
         Result.Color:=GlobalCustomHelp.ColorMSHelp;
       Result.TextColor:=clCaptionText;
@@ -538,6 +543,14 @@ begin
   finally
     Reg.Free;
   end;
+end;
+
+{ TCustomHelpButtonItem }
+
+procedure TCustomHelpButtonItem.SetDesc(const Value: String);
+begin
+  FDesc := Value;
+  Hint:=Value;
 end;
 
 initialization

@@ -40,6 +40,9 @@ type
     fccMSHelp: TFrameConfigColor;
     fccWebProvider: TFrameConfigColor;
     fccFileProvider: TFrameConfigColor;
+    TabSheet5: TTabSheet;
+    FrameConfigRSSProviders: TFrameConfigProviders;
+    fccRSSProvider: TFrameConfigColor;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -144,6 +147,7 @@ begin
     newItems.Add(GROUP_LABEL_FILE_BASED);
     newItems.Add(GROUP_LABEL_STANDARD);
     newItems.Add(GROUP_LABEL_DUMMY_MSHELP2);
+    newItems.Add(GROUP_PREFIX_RSS);
 
     for idx := 0 to newItems.Count - 1 do
     begin
@@ -183,9 +187,11 @@ begin
     fccMSHelp.SelectedColor:=GlobalCustomHelp.ColorMSHelp;
     fccWebProvider.SelectedColor:=GlobalCustomHelp.ColorWebProvider;
     fccFileProvider.SelectedColor:=GlobalCustomHelp.ColorFileProvider;
+    fccRSSProvider.SelectedColor:=GlobalCustomHelp.ColorRSSProvider;
 
-    FrameConfigFileBasedProviders.InitContent(cpfFileBased);
-    FrameConfigWebBasedProviders.InitContent(cpfWebBased);
+    FrameConfigFileBasedProviders.InitContent(cpfFileBased, ptStandard);
+    FrameConfigWebBasedProviders.InitContent(cpfWebBased, ptStandard);
+    FrameConfigRSSProviders.InitContent(cpfWebBased, ptRSS);
   finally
     sl.free;
     Reg.Free;
@@ -239,8 +245,9 @@ begin
     Reg.Free;
   end;
 
-  idx:=FrameConfigFileBasedProviders.Save(0);
-  FrameConfigWebBasedProviders.Save(idx);
+  idx:=FrameConfigFileBasedProviders.Save(0, ptStandard);
+  FrameConfigWebBasedProviders.Save(idx, ptStandard);
+  FrameConfigRSSProviders.Save(0, ptRSS);
 
   GlobalCustomHelp.PerformFullTextSearch:=cbFullTextSearch.Checked;
   GlobalCustomHelp.TrimNamespacesUntilResultFound:=TNamespaceTrimOption(cbTrimNamespacesHX.ItemIndex);
@@ -249,6 +256,7 @@ begin
   GlobalCustomHelp.DisplayLocation:=TDisplayLocationOption(rgDisplayLocation.ItemIndex);
   GlobalCustomHelp.ColorMSHelp:=fccMSHelp.SelectedColor;
   GlobalCustomHelp.ColorWebProvider:=fccWebProvider.SelectedColor;
+  GlobalCustomHelp.ColorRSSProvider:=fccRSSProvider.SelectedColor;
   GlobalCustomHelp.ColorFileProvider:=fccFileProvider.SelectedColor;
 
   with lvNamespaces do

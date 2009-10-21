@@ -53,6 +53,7 @@ const
   VALUE_TRIMNAMESPACE = 'TrimNamespaces';
 
   PROVIDER_SUB_KEY = '\Provider';
+  RSS_PROVIDER_SUB_KEY = '\RSSProvider';
   SETTINGS_SUB_KEY= '\Settings';
   NAMESPACES_SUB_KEY = SETTINGS_SUB_KEY + '\NAMESPACES';
   EXPANDEDITEMS_SUB_KEY = SETTINGS_SUB_KEY + '\EXPANDED';
@@ -70,10 +71,12 @@ const
   GROUP_LABEL_FILE_BASED = 'File based providers';
   GROUP_LABEL_STANDARD = 'Other Help Providers';
   GROUP_LABEL_DUMMY_MSHELP2 = 'Microsoft Help 2.x';
+  GROUP_PREFIX_RSS = 'RSS Result for ';
 
   SETTINGS_COLOR_FILE_PROVIDER = 'Color File Provider';
   SETTINGS_COLOR_MSHELP = 'Color MSHelp 2';
   SETTINGS_COLOR_WEB_PROVIDER = 'Color Web Provider';
+  SETTINGS_COLOR_RSS_PROVIDER = 'Color RSS Provider';
 
   ENVVAR_NAME_KEYWORD = 'HelpString';
   ENVVAR_NAME_KEYWORD_URL = 'HelpStringURLEncoded';

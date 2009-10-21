@@ -11,9 +11,11 @@ interface
 uses
   Classes, Forms, Dialogs, ToolsAPI, Menus, Registry, HelpIntfs, Windows,
   uMSHelpServices, uHtmlHelp, SyncObjs, uCustomHelpSelector, uCustomHelpConsts,
-  Graphics;
+  Graphics, msxml;
 
 type
+  TProviderType = (ptStandard, ptRSS);
+
   //Main object
   TCustomHelp = class
   private
@@ -36,10 +38,14 @@ type
     procedure SetColorFileProv(const Value: TColor);
     procedure SetColorMSHelp(const Value: TColor);
     procedure SetColorWebProv(const Value: TColor);
+    procedure InternalLoadProviderFromRegistry(ATarget: TStrings;
+      ARootKey: String);
+    procedure SetColorRSSProv(const Value: TColor);
   protected
     FMenuItem : TMenuItem;
 
-    FProvider : TStringList;
+    FProvider,
+    FRSSProvider: TStringList;
     FShowCustHelpOnWP : Boolean;
     FFullTextSearch : Boolean;
     FEnabledhxSessions : TInterfaceList;
@@ -49,6 +55,7 @@ type
 
     FColorMSHelp : TColor;
     FColorWebProv : TColor;
+    FColorRSSProv : TColor;
     FColorFileProv : TColor;
 
     //hack into the IDE (Menu-entry, ...)
@@ -57,6 +64,7 @@ type
     function GetHelpMenu : TMenuItem;
 
     procedure LoadProviderFromRegistry;
+    procedure LoadRSSProviderFromRegistry;
     procedure LoadSettingsFromRegistry;
     procedure LoadResultOrderFromRegistry;
     procedure LoadEnabledNamespacesFromRegistry;
@@ -78,6 +86,7 @@ type
     destructor Destroy(); override;
 
     property ProviderList : TStringList read FProvider;
+    property RSSProviderList : TStringList read FRSSProvider;
     property Namespaces : IHxRegNamespaceList read GetNamespaces;
     property EnabledhxSessions : TInterfaceList read FEnabledhxSessions;
 
@@ -91,6 +100,7 @@ type
     property ColorMSHelp : TColor read FColorMSHelp write SetColorMSHelp;
     property ColorWebProvider : TColor read FColorWebProv write SetColorWebProv;
     property ColorFileProvider : TColor read FColorFileProv write SetColorFileProv;
+    property ColorRSSProvider : TColor read FColorRSSProv write SetColorRSSProv;
 
     property EnabledhxSession[Index: integer]: IHxSession read GetEnabledhxSession;
     property LastHelpErrors: string read FLastHelpErrors write FLastHelpErrors;
@@ -103,7 +113,7 @@ type
       out Description: String; out Link: String; out Group: String;
       out TrimOption: TNamespaceTrimOption): boolean; overload;
     class function EncodeURL(Caption, Description, Link, Group: String; TrimOption: TNamespaceTrimOption): String;
-    class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String; ATrimNamespaces: TNamespaceTrimOption);
+    class procedure WriteProviderToRegistry(AKeyName, AName, ADesc, AURL : String; ATrimNamespaces: TNamespaceTrimOption; AType : TProviderType);
     class procedure WriteNamespacesToRegistry(ANamespace: String; AEnabled: Boolean);
     class procedure WriteResultOrderToRegistry(AOrder: TStrings);
     class procedure ReadEnabledNamespacesFromRegistry(const ANamesList: TStrings);
@@ -130,7 +140,7 @@ implementation
 
 uses
   SysUtils, StrUtils, ShellAPI, uFormConfigCustomHelp, ActiveX, Variants, Types, uUtils,
-  uCustomHelpKeywordRecorder, uCustomHelpIDEIntegration;
+  uCustomHelpKeywordRecorder, uCustomHelpIDEIntegration, UrlMon;
 
 type
   TCustomHelpViewer = class(TInterfacedObject,
@@ -155,6 +165,7 @@ type
     function  InternalGetHelpStrings(const HelpString: String; const AddProviders: Boolean): TStringList;
   private
     FEnabled: Boolean;
+    procedure InternalGetRSSResults(const AURL, AHelpString: String; AList, AErrors: TStrings);
   public
     constructor Create;
     destructor Destroy; override;
@@ -213,6 +224,82 @@ var
   idx: Integer;
 begin
   Result := InternalGetHelpStrings(HelpString, true);
+end;
+
+procedure TCustomHelpViewer.InternalGetRSSResults(const AURL, AHelpString: String; AList, AErrors: TStrings);
+var
+  idx : Integer;
+  c, d, u, g : String;
+  TrimOption: TNamespaceTrimOption;
+  HelpString: String;
+  xmldocument : IXMLDomDocument;
+  node : IXMLDOMNode;
+  nodes : IXMLDOMNodeList;
+  FileName: string;
+begin
+  SetLength(FileName, MAX_PATH + 1);
+
+  try
+    if not TCustomHelp.DecodeURL(AURL, c, d, u, g, TrimOption) then
+      Exit;
+
+    HelpString:=AHelpString;
+    TCustomHelp.TrimNamespace(HelpString, TrimOption);
+
+    if PosText(EnvVarToken(ENVVAR_NAME_KEYWORD),u)=0 then
+      u:=u+EnvVarToken(ENVVAR_NAME_KEYWORD_URL)
+    else
+      u:=ReplaceText(u,
+                     EnvVarToken(ENVVAR_NAME_KEYWORD),
+                     EnvVarToken(ENVVAR_NAME_KEYWORD_URL));
+
+    ExpandEnvVars(u, HelpString);
+
+    if URLDownloadToCacheFile(nil, PChar(u), PChar(FileName), MAX_PATH, 0, nil) = s_OK then
+    begin
+      xmldocument:=CoDOMDocument.Create;
+      xmldocument.load(FileName);
+
+      g:=GROUP_PREFIX_RSS+c;
+
+      nodes:=xmldocument.selectNodes('/rss/channel/item');
+
+      for idx:=0 to nodes.length-1 do
+      begin
+        c:=EmptyStr;
+        d:=EmptyStr;
+        u:=EmptyStr;
+
+        node:=nodes[idx].selectSingleNode('title');
+        if Assigned(node) then
+          c:=node.text;
+        node:=nodes[idx].selectSingleNode('description');
+        if Assigned(node) then
+          d:=node.text;
+        node:=nodes[idx].selectSingleNode('link');
+        if Assigned(node) then
+          u:=node.text;
+
+        AList.Add(TCustomHelp.EncodeURL(c, d, u, g, TrimOption));
+      end;
+
+      if nodes.length>0 then
+      begin
+        node:=xmldocument.selectSingleNode('/rss/channel/title');
+        if Assigned(node) then
+          c:=node.text;
+
+        node:=xmldocument.selectSingleNode('/rss/channel/link');
+        if Assigned(node) then
+          AList.Add(TCustomHelp.EncodeURL('all results', 'for '+c, node.text, g, TrimOption));
+      end;
+    end
+    else
+      raise Exception.Create('Could not download RSS data for ' + c);
+  except
+    on E:Exception do
+      AErrors.Add(E.Message)
+  end;
 end;
 
 function TCustomHelpViewer.InternalGetHelpStrings(const HelpString: String; const AddProviders: Boolean): TStringList;
@@ -318,6 +405,11 @@ begin
               errmsgs.Add(u + ': '+ e.Message);
           end;
         end;
+
+        for idx := 0 to GlobalCustomHelp.RSSProviderList.Count - 1 do
+        begin
+          InternalGetRSSResults(GlobalCustomHelp.RSSProviderList.Strings[idx], HelpString, HelpStrings, errmsgs);
+        end;
       end;
 
       Result := HelpStrings;
@@ -331,6 +423,8 @@ begin
       FreeAndNil(HelpStrings);
   end;
 end;
+
+
 
 class function TCustomHelp.GetNamespaceTitle(Session: IHxSession): String;
 var
@@ -776,6 +870,7 @@ begin
   FEnabledhxSessions:=TInterfaceList.Create;
   FSessionLock := TCriticalSection.Create;
   FProvider := TStringList.Create;
+  FRSSProvider := TStringList.Create;
 
   FResultOrder:=TStringList.Create;
   FResultOrder.Sorted:=True;
@@ -795,28 +890,35 @@ begin
                             'DP DelphiReference',
                             'Search with Daniels Cool Tool',
                             'http://ref.dp200x.de/dp_reference.php?query='+EnvVarToken(ENVVAR_NAME_KEYWORD),
-                            nstoTrimFirst);
+                            nstoTrimFirst,
+                            ptStandard);
 
     WriteProviderToRegistry('2',
                             'Koders.com',
                             'Search at koders.com',
                             'http://www.koders.com/default.aspx?submit=Search&la=Delphi&li=*&s='+EnvVarToken(ENVVAR_NAME_KEYWORD),
-                            nstoTrimFirst);
+                            nstoTrimFirst,
+                            ptStandard);
 
     WriteProviderToRegistry('3',
                             'Google Codesearch',
                             'Search using Google Codesearch',
                             'http://www.google.com/codesearch?btnG=Code+suchen&hl=de&as_lang=pascal&as_license_restrict=i&as_license=&as_package=&as_filename=&as_case=&as_q='+EnvVarToken(ENVVAR_NAME_KEYWORD),
-                            nstoTrimFirst);
+                            nstoTrimFirst,
+                            ptStandard);
 
     WriteProviderToRegistry('4',
                             'MSDN Online',
                             'Search using MSDN Online',
                             'http://search.msdn.microsoft.com/Default.aspx?locale=en-US&Query='+EnvVarToken(ENVVAR_NAME_KEYWORD),
-                            nstoTrimFirst);
+                            nstoTrimFirst,
+                            ptStandard);
 
     LoadProviderFromRegistry;
   end;
+
+
+  LoadRSSProviderFromRegistry;
 end;
 
 class function TCustomHelp.GetTopicFromURL(hxHierarchy: IHxHierarchy; const URL: string): IHxTopic;
@@ -985,6 +1087,7 @@ begin
 
   FEnabledhxSessions.Free;
   FProvider.Free;
+  FRSSProvider.Free;
   FSessionLock.Free;
 
   HelpViewerIntf := nil; // This will automatically clear HelpViewer if object is destroyed.
@@ -1056,53 +1159,13 @@ begin
   LoadSettingsFromRegistry;
   LoadEnabledNamespacesFromRegistry;
 
-  FProvider.Clear;
-
-  sl := TStringList.Create;
-
-  Reg := TRegistry.Create;
-  try
-    Reg.RootKey := HKEY_CURRENT_USER;
-
-    if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY, true) then
-    begin
-      Reg.GetKeyNames(sl);
-      Reg.CloseKey;
-    end;
-
-    for s in sl do
-    begin
-      if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY + '\' + s, false) then
-      begin
-        if trim(reg.ReadString(VALUE_NAME))<>EmptyStr then
-        begin
-          if AnsiContainsStr(Reg.ReadString(VALUE_URL),'://') then
-            GroupLabel:=GROUP_LABEL_WEB_BASED
-          else
-            GroupLabel:=GROUP_LABEL_FILE_BASED;
-
-          FProvider.Add(TCustomHelp.EncodeURL(
-                              Reg.ReadString(VALUE_NAME),
-                              Reg.ReadString(VALUE_DESCR),
-                              Reg.ReadString(VALUE_URL),
-                              GroupLabel,
-                              TNamespaceTrimOption(StrToIntDef(Reg.ReadString(VALUE_TRIMNAMESPACE),0))));
-        end;
-
-        Reg.CloseKey;
-      end;
-    end;
-
-  finally
-    Reg.Free;
-    sl.Free;
-  end;
+  InternalLoadProviderFromRegistry(FProvider, PROVIDER_SUB_KEY);
 end;
 
 procedure TCustomHelp.LoadEnabledNamespacesFromRegistry;
 var
   sl : TStringList;
-  idx : integer;      
+  idx : integer;
   hxSession: IHxSession;
   hxIndex: IHxIndex;
   errmsg: string;
@@ -1154,6 +1217,7 @@ begin
     FDisplayLocation:=TDisplayLocationOption(StrToIntDef(sl.Values[SETTINGS_DISPLAY_LOCATION], 0));
 
     FColorMSHelp:=StrToIntDef(sl.Values[SETTINGS_COLOR_MSHELP], clActiveCaption);
+    FColorRSSProv:=StrToIntDef(sl.Values[SETTINGS_COLOR_RSS_PROVIDER], clActiveCaption);
     FColorFileProv:=StrToIntDef(sl.Values[SETTINGS_COLOR_FILE_PROVIDER], clActiveCaption);
     FColorWebProv:=StrToIntDef(sl.Values[SETTINGS_COLOR_WEB_PROVIDER], clActiveCaption);
   finally
@@ -1190,10 +1254,68 @@ begin
   end;
 end;
 
+procedure TCustomHelp.InternalLoadProviderFromRegistry(ATarget: TStrings; ARootKey: String);
+var
+  Reg : TRegistry;
+  sl : TStringList;
+  s : String;
+  GroupLabel : String;
+begin
+  ATarget.Clear;
+
+  sl := TStringList.Create;
+
+  Reg := TRegistry.Create;
+  try
+    Reg.RootKey := HKEY_CURRENT_USER;
+
+    if Reg.OpenKey(REG_ROOT_KEY + ARootKey, true) then
+    begin
+      Reg.GetKeyNames(sl);
+      Reg.CloseKey;
+    end;
+
+    for s in sl do
+    begin
+      if Reg.OpenKey(REG_ROOT_KEY + ARootKey + '\' + s, false) then
+      begin
+        if trim(reg.ReadString(VALUE_NAME))<>EmptyStr then
+        begin
+          if AnsiContainsStr(Reg.ReadString(VALUE_URL),'://') then
+            GroupLabel:=GROUP_LABEL_WEB_BASED
+          else
+            GroupLabel:=GROUP_LABEL_FILE_BASED;
+
+          ATarget.Add(TCustomHelp.EncodeURL(
+                              Reg.ReadString(VALUE_NAME),
+                              Reg.ReadString(VALUE_DESCR),
+                              Reg.ReadString(VALUE_URL),
+                              GroupLabel,
+                              TNamespaceTrimOption(StrToIntDef(Reg.ReadString(VALUE_TRIMNAMESPACE),0))));
+        end;
+
+        Reg.CloseKey;
+      end;
+    end;
+
+  finally
+    Reg.Free;
+    sl.Free;
+  end;
+end;
+
+procedure TCustomHelp.LoadRSSProviderFromRegistry;
+begin
+  InternalLoadProviderFromRegistry(FRSSProvider, RSS_PROVIDER_SUB_KEY);
+end;
+
 procedure TCustomHelp.OnMenuItemClick(Sender: TObject);
 begin
   if Tform_Config.Execute then
+  begin
     LoadProviderFromRegistry;
+    LoadRSSProviderFromRegistry;
+  end;
 end;
 
 function TCustomHelp.PerformInHxSession(HelpString: string;
@@ -1282,6 +1404,12 @@ procedure TCustomHelp.SetColorMSHelp(const Value: TColor);
 begin
   FColorMSHelp := Value;
   TCustomHelp.WriteSettingToRegistry(SETTINGS_COLOR_MSHELP, IntToStr(Value));
+end;
+
+procedure TCustomHelp.SetColorRSSProv(const Value: TColor);
+begin
+  FColorRSSProv := Value;
+  TCustomHelp.WriteSettingToRegistry(SETTINGS_COLOR_RSS_PROVIDER, IntToStr(Value));
 end;
 
 procedure TCustomHelp.SetColorWebProv(const Value: TColor);
@@ -1378,15 +1506,21 @@ begin
 end;
 
 class procedure TCustomHelp.WriteProviderToRegistry(AKeyName, AName, ADesc,
-  AURL: String; ATrimNamespaces: TNamespaceTrimOption);
+  AURL: String; ATrimNamespaces: TNamespaceTrimOption; AType : TProviderType);
 var
   Reg : TRegistry;
+  SubKey : String;
 begin
+  case AType of
+    ptStandard: SubKey:=PROVIDER_SUB_KEY;
+    ptRSS: SubKey:=RSS_PROVIDER_SUB_KEY;
+  end;
+
   Reg := TRegistry.Create;
   try
     Reg.RootKey := HKEY_CURRENT_USER;
 
-    if Reg.OpenKey(REG_ROOT_KEY + PROVIDER_SUB_KEY + '\' + AKeyName, true) then
+    if Reg.OpenKey(REG_ROOT_KEY + SubKey + '\' + AKeyName, true) then
     begin
       Reg.WriteString(VALUE_NAME, AName);
       Reg.WriteString(VALUE_DESCR, ADesc);

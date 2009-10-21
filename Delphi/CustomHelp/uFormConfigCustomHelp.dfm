@@ -23,15 +23,11 @@ object form_Config: Tform_Config
     Top = 0
     Width = 664
     Height = 591
-    ActivePage = TabSheet4
+    ActivePage = TabSheet5
     Align = alClient
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'General'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object rgDisplayLocation: TRadioGroup
         AlignWithMargins = True
         Left = 3
@@ -137,7 +133,7 @@ object form_Config: Tform_Config
             'Example:'#13#10'Full Keyword is  Classes.TStringList.Create'#13#10'Trim Firs' +
             't searches for TStringList.Create'#13#10'Trim Full searches for Create'
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ParentShowHint = False
           ShowHint = True
           TabOrder = 1
@@ -192,9 +188,6 @@ object form_Config: Tform_Config
           inherited edURL: TEdit
             Width = 531
             ExplicitWidth = 531
-          end
-          inherited cbTrimNamespacesOHS: TComboBox
-            ItemHeight = 0
           end
         end
         inherited ListView1: TListView
@@ -293,6 +286,67 @@ object form_Config: Tform_Config
         Align = alTop
         AutoSize = True
         TabOrder = 2
+        TabStop = True
+        ExplicitLeft = 3
+        ExplicitTop = 3
+        ExplicitWidth = 650
+      end
+    end
+    object TabSheet5: TTabSheet
+      Caption = 'Dynamic Web based providers (RSS)'
+      ImageIndex = 4
+      inline FrameConfigRSSProviders: TFrameConfigProviders
+        Left = 0
+        Top = 28
+        Width = 656
+        Height = 535
+        Align = alClient
+        TabOrder = 0
+        TabStop = True
+        ExplicitWidth = 656
+        ExplicitHeight = 563
+        inherited pnlOHSItem: TPanel
+          Top = 441
+          Width = 656
+          ExplicitTop = 469
+          ExplicitWidth = 656
+          inherited BtnBrowseForFile: TSpeedButton
+            Left = 628
+            ExplicitLeft = 626
+          end
+          inherited edName: TEdit
+            Width = 560
+            ExplicitWidth = 560
+          end
+          inherited edDesc: TEdit
+            Width = 560
+            ExplicitWidth = 560
+          end
+          inherited edURL: TEdit
+            Width = 533
+            ExplicitWidth = 533
+          end
+        end
+        inherited ListView1: TListView
+          Width = 650
+          Height = 435
+          ExplicitWidth = 650
+          ExplicitHeight = 463
+        end
+        inherited OpenDialog1: TOpenDialog
+          Left = 600
+          Top = 24
+        end
+      end
+      inline fccRSSProvider: TFrameConfigColor
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 650
+        Height = 22
+        Align = alTop
+        AutoSize = True
+        TabOrder = 1
         TabStop = True
         ExplicitLeft = 3
         ExplicitTop = 3
