@@ -125,9 +125,11 @@ type
       out TrimOption: TNamespaceTrimOption): boolean;
     class function DecodeURL(const URL: String; out Link: String): boolean; overload;
     class function CheckGidFile(AWinHelpFile: String; const ARaiseError: Boolean): Boolean; static;
-    procedure ShowHelp(const HelpString: String; const SelectedKeyword: string); overload;
+    procedure ShowHelp(const HelpString: String); overload;
     function GetViewerID: integer;
   end;
+
+function REG_ROOT_KEY: string;
 
 var
   GlobalCustomHelp : TCustomHelp;
@@ -162,15 +164,14 @@ type
     procedure ShutDown;
     {$ENDREGION}
 
-    function  InternalGetHelpStrings(const HelpString: String; const AddProviders: Boolean): TStringList;
+    function  InternalGetHelpStrings(const HelpString: String; const AddProviders: Boolean; const AddRSSResults: Boolean): TStringList;
   private
     FEnabled: Boolean;
     procedure InternalGetRSSResults(const AURL, AHelpString: String; AList, AErrors: TStrings);
   public
     constructor Create;
     destructor Destroy; override;
-    procedure ShowHelp(const HelpString: String); overload;
-    procedure ShowHelp(const HelpString: String; const SelectedKeyword: string); overload;
+    procedure ShowHelp(const HelpString: String);
     property HelpManager : IHelpManager read FHelpManager write FHelpManager;
     property ViewerID: Integer read FViewerID;
     property Name: String read GetViewerName;
@@ -223,17 +224,20 @@ function TCustomHelpViewer.GetHelpStrings(
 var
   idx: Integer;
 begin
-  Result := InternalGetHelpStrings(HelpString, true);
+  Result := InternalGetHelpStrings(HelpString, true, true);
 end;
 
 procedure TCustomHelpViewer.InternalGetRSSResults(const AURL, AHelpString: String; AList, AErrors: TStrings);
 var
-  idx : Integer;
+  idx,
+  channelidx : Integer;
   c, d, u, g : String;
+  oldc : string;
   TrimOption: TNamespaceTrimOption;
   HelpString: String;
   xmldocument : IXMLDomDocument;
   node : IXMLDOMNode;
+  channels,
   nodes : IXMLDOMNodeList;
   FileName: string;
 begin
@@ -242,6 +246,8 @@ begin
   try
     if not TCustomHelp.DecodeURL(AURL, c, d, u, g, TrimOption) then
       Exit;
+
+    oldc:=c;
 
     HelpString:=AHelpString;
     TCustomHelp.TrimNamespace(HelpString, TrimOption);
@@ -258,40 +264,57 @@ begin
     if URLDownloadToCacheFile(nil, PChar(u), PChar(FileName), MAX_PATH, 0, nil) = s_OK then
     begin
       xmldocument:=CoDOMDocument.Create;
+      xmldocument.async:=False;
+      xmldocument.validateOnParse:=False;
       xmldocument.load(FileName);
 
-      g:=GROUP_PREFIX_RSS+c;
+      if xmldocument.parseError.errorCode<>0 then
+        raise Exception.Create('Could not parse RSS data for ' + c + #13#10+
+                               'Reason: '+xmldocument.parseError.reason + //reason has a linebreak for itself
+                               'File saved to: '+FileName);
 
-      nodes:=xmldocument.selectNodes('/rss/channel/item');
+      channels:=xmldocument.selectNodes('/rss/channel');
 
-      for idx:=0 to nodes.length-1 do
+      for channelidx := 0 to channels.length - 1 do
       begin
-        c:=EmptyStr;
-        d:=EmptyStr;
-        u:=EmptyStr;
 
-        node:=nodes[idx].selectSingleNode('title');
+        node:=channels[channelidx].selectSingleNode('title');
         if Assigned(node) then
-          c:=node.text;
-        node:=nodes[idx].selectSingleNode('description');
-        if Assigned(node) then
-          d:=node.text;
-        node:=nodes[idx].selectSingleNode('link');
-        if Assigned(node) then
-          u:=node.text;
+          g:=GROUP_PREFIX_RSS+node.text
+        else
+          g:=GROUP_PREFIX_RSS+oldc;
 
-        AList.Add(TCustomHelp.EncodeURL(c, d, u, g, TrimOption));
-      end;
+        nodes:=channels[channelidx].selectNodes('item');
 
-      if nodes.length>0 then
-      begin
-        node:=xmldocument.selectSingleNode('/rss/channel/title');
-        if Assigned(node) then
-          c:=node.text;
+        for idx:=0 to nodes.length-1 do
+        begin
+          c:=EmptyStr;
+          d:=EmptyStr;
+          u:=EmptyStr;
 
-        node:=xmldocument.selectSingleNode('/rss/channel/link');
-        if Assigned(node) then
-          AList.Add(TCustomHelp.EncodeURL('all results', 'for '+c, node.text, g, TrimOption));
+          node:=nodes[idx].selectSingleNode('title');
+          if Assigned(node) then
+            c:=node.text;
+          node:=nodes[idx].selectSingleNode('description');
+          if Assigned(node) then
+            d:=node.text;
+          node:=nodes[idx].selectSingleNode('link');
+          if Assigned(node) then
+            u:=node.text;
+
+          AList.Add(TCustomHelp.EncodeURL(c, d, u, g, TrimOption));
+        end;
+
+        if nodes.length>0 then
+        begin
+          node:=channels[channelidx].selectSingleNode('title');
+          if Assigned(node) then
+            c:=node.text;
+
+          node:=channels[channelidx].selectSingleNode('link');
+          if Assigned(node) then
+            AList.Add(TCustomHelp.EncodeURL(' -=all results=-', 'for '+c, node.text, g, TrimOption));
+        end;
       end;
     end
     else
@@ -302,7 +325,7 @@ begin
   end;
 end;
 
-function TCustomHelpViewer.InternalGetHelpStrings(const HelpString: String; const AddProviders: Boolean): TStringList;
+function TCustomHelpViewer.InternalGetHelpStrings(const HelpString: String; const AddProviders: Boolean; const AddRSSResults: Boolean): TStringList;
 var
   idx : Integer;
   c, d, u, g : String;
@@ -376,6 +399,8 @@ begin
                                EnvVarToken(ENVVAR_NAME_KEYWORD),
                                EnvVarToken(ENVVAR_NAME_KEYWORD_URL));
 
+              ExpandEnvVars(u, ShortHelpString);
+
               HelpStrings.Add(TCustomHelp.EncodeURL(c,d,u, g, TrimOption))
             end
             else
@@ -405,12 +430,13 @@ begin
               errmsgs.Add(u + ': '+ e.Message);
           end;
         end;
+      end;
 
+      if AddRSSResults then
         for idx := 0 to GlobalCustomHelp.RSSProviderList.Count - 1 do
         begin
           InternalGetRSSResults(GlobalCustomHelp.RSSProviderList.Strings[idx], HelpString, HelpStrings, errmsgs);
         end;
-      end;
 
       Result := HelpStrings;
       GlobalCustomHelp.LastHelpErrors := errmsgs.Text;
@@ -555,19 +581,13 @@ var
   sl : TStringList;
   i : integer;
   u : String;
-  sk: string;
 begin
-  sl:=InternalGetHelpStrings(HelpString, true);
-  if TFormHelpSelector.Execute(GlobalCustomHelp.LastHelpCallKeyword, sl, i, u, sk) then
-    ShowHelp(u, sk);
+  sl:=InternalGetHelpStrings(HelpString, true, true);
+  if TFormHelpSelector.Execute(GlobalCustomHelp.LastHelpCallKeyword, sl, i, u) then
+    ShowHelp(u);
 end;
 
 procedure TCustomHelpViewer.ShowHelp(const HelpString: String);
-begin
-  ShowHelp(HelpString, '');
-end;
-
-procedure TCustomHelpViewer.ShowHelp(const HelpString, SelectedKeyword: string);
 var
   u: String;
   alternativeNavigate : boolean;
@@ -585,9 +605,6 @@ begin
 
     if TCustomHelp.DecodeURL(HelpString, u) then
     begin
-      // Late expand environment variables contained in the url ...
-      ExpandEnvVars(u, SelectedKeyword);
-
       if StrUtils.AnsiStartsText(PROTPREFIX_UNKNOWNHELP, u) then
       begin
         Delete(u,1,Length(PROTPREFIX_UNKNOWNHELP));
@@ -645,9 +662,7 @@ begin
       //oops das haben wir jetzt nicht verstanden....
       //das heiﬂt wir sind die einzige Instanz, die Hilfe angemeldet hat.
       //Wir erzwingen einen Selektor!
-      if AnsiSameText(HelpString, KIBITZ_IGNORED_HELPSTRING) or (SelectedKeyword <> '') then
-        ForceSelector(SelectedKeyword)
-      else
+
         ForceSelector(HelpString);
     end;
   end;
@@ -830,7 +845,7 @@ begin
   // Start recording of keywords and add "missing" keyword.
   CustomHelpKeywordRecorderIntf.SetEnabled(True);
 
-  with InternalGetHelpStrings(AHelpString, not dontAddDefault) do
+  with InternalGetHelpStrings(AHelpString, not dontAddDefault, false) do
   begin
     Result := Count;
     Free;
@@ -1442,10 +1457,10 @@ begin
   TCustomHelp.WriteSettingToRegistry(SETTINGS_TRIMNAMESPACES, IntToStr(byte(Value)));
 end;
 
-procedure TCustomHelp.ShowHelp(const HelpString, SelectedKeyword: string);
+procedure TCustomHelp.ShowHelp(const HelpString: string);
 begin
   if Assigned(HelpViewerIntf) then
-    HelpViewer.ShowHelp(HelpString, SelectedKeyword);
+    HelpViewer.ShowHelp(HelpString);
 end;
 
 class function TCustomHelp.CheckGidFile(AWinHelpFile: String; const ARaiseError: Boolean): Boolean;
@@ -1575,8 +1590,63 @@ begin
 
 end;
 
+var
+  F_REG_ROOT_KEY: string;
+
+function REG_ROOT_KEY: string;
+begin
+  Result := F_REG_ROOT_KEY;
+end;
+
+procedure InitializeRegRootKey;
+const
+  {$ifDef VER170}
+     OLD_REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER170' + REG_ROOT_PROJECT;
+  {$Endif}
+  {$ifDef VER180}
+    {$ifDef VER185}
+      OLD_REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER185' + REG_ROOT_PROJECT;
+    {$Else}
+      OLD_REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER180' + REG_ROOT_PROJECT;
+    {$Endif}
+  {$Endif}
+  {$ifDef VER200}
+    OLD_REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER200' + REG_ROOT_PROJECT;
+  {$Endif}
+  {$ifDef VER210}
+    OLD_REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER210' + REG_ROOT_PROJECT;
+  {$Endif}
+var
+  reg: TRegistry;
+begin
+  F_REG_ROOT_KEY := GetIdeBaseRegistryKey + REG_ROOT_BASE + REG_ROOT_PROJECT;
+
+  if OLD_REG_ROOT_KEY = F_REG_ROOT_KEY then
+    Exit;
+
+  reg := TRegistry.Create(KEY_READ);
+    
+  try
+    reg.RootKey := HKEY_CURRENT_USER;
+
+    if reg.KeyExists(F_REG_ROOT_KEY) then
+      Exit;
+
+    if not reg.KeyExists(OLD_REG_ROOT_KEY) then
+      Exit;
+
+    // migrate old settings ...
+    reg.Access := KEY_READ or KEY_WRITE;
+    reg.MoveKey(OLD_REG_ROOT_KEY, F_REG_ROOT_KEY, True);
+
+  finally
+    reg.Free;
+  end;
+end;
 
 initialization
+  InitializeRegRootKey;
+
   GlobalCustomHelp:=TCustomHelp.Create;
   AddSplashBitmap;
 

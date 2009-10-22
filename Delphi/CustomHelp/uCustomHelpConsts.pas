@@ -24,23 +24,6 @@ const
   REG_ROOT_BASE = '\TheUnknownOnes\Delphi';
   REG_ROOT_PROJECT = '\CustomHelp';
 
-  {$ifDef VER170}
-     REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER170' + REG_ROOT_PROJECT;
-  {$Endif}
-  {$ifDef VER180}
-    {$ifDef VER185}
-      REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER185' + REG_ROOT_PROJECT;
-    {$Else}
-      REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER180' + REG_ROOT_PROJECT;
-    {$Endif}
-  {$Endif}
-  {$ifDef VER200}
-    REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER200' + REG_ROOT_PROJECT;
-  {$Endif}
-  {$ifDef VER210}
-    REG_ROOT_KEY = '\Software'+REG_ROOT_BASE+'\VER210' + REG_ROOT_PROJECT;
-  {$Endif}
-
   PROTPREFIX_CUSTOMHELP = 'CustomHelp://';
   PROTPREFIX_MSHELP = 'ms-help://';
   PROTPREFIX_HTMLHELP = 'htmlhlp://';

@@ -184,8 +184,8 @@ begin
 
       Delete(AString, EnvVarStartIdx, EndTokenLen+EnvVarEndIdx-EnvVarStartIdx);
       Insert(Value, AString, EnvVarStartIdx);
-      Inc(EnvVarStartIdx, Length(AString) + 1); // do not replace variables recursivly
 
+      // Sometimes we need to replace variables recursively
       EnvVarStartIdx:=PosEx(AStartToken, AString, EnvVarStartIdx);
     end
     else

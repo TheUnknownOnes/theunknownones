@@ -20,9 +20,6 @@ type
     cbFullTextSearch: TCheckBox;
     grpErrors: TGroupBox;
     mmoErrors: TMemo;
-    cbbSearchKeyword: TComboBox;
-    pnlSearchKeyword: TPanel;
-    lblSearchKeyword: TLabel;
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ListBox1Compare(Sender: TObject; Item1, Item2: TListItem;
       Data: Integer; var Compare: Integer);
@@ -49,8 +46,6 @@ type
 
     class function Execute(HelpString: string; Keywords: TStrings; out SelectedIndex: Integer;
       out SelectedUrl: String): Boolean; overload; static;
-    class function Execute(HelpString: string; Keywords: TStrings; out SelectedIndex: Integer;
-      out SelectedUrl: String; out SelectedKeyword: string): Boolean; overload; static;
   end;
 
   //This class must not contain any local fields
@@ -153,16 +148,6 @@ end;
 class function TFormHelpSelector.Execute(HelpString: string; Keywords: TStrings;
   out SelectedIndex: Integer; out SelectedUrl: string): Boolean;
 var
-  SelectedKeyword: string;
-begin
-  Result := TFormHelpSelector.Execute(HelpString, Keywords, SelectedIndex, selectedUrl, SelectedKeyword);
-end;
-
-class function TFormHelpSelector.Execute(HelpString: string; Keywords: TStrings;
-                                   out SelectedIndex: Integer;
-                                   out SelectedUrl: String;
-                                   out SelectedKeyword: string): Boolean;
-var
   SearchKeywords: TStrings;
   fhs: TFormHelpSelector;
 begin
@@ -188,18 +173,6 @@ begin
         end;
       end;
 
-      cbbSearchKeyword.Items.Assign(CustomHelpKeywordRecorderIntf.GetKeywordList);
-      SearchKeywords := cbbSearchKeyword.Items;
-      pnlSearchKeyword.Visible := SearchKeywords.Count > 1;
-      if SearchKeywords.Count = 0 then
-        cbbSearchKeyword.Items.Add(HelpString);
-
-      cbbSearchKeyword.ItemIndex := cbbSearchKeyword.Items.IndexOf(HelpString);
-      if cbbSearchKeyword.ItemIndex < 0 then
-        cbbSearchKeyword.ItemIndex := 0;
-      if cbbSearchKeyword.ItemIndex >= 0 then
-        cbbSearchKeyword.Text := SearchKeywords[cbbSearchKeyword.ItemIndex];
-
       // clear keyword history before showing help select form ...
       CustomHelpKeywordRecorderIntf.Reset;
       CustomHelpKeywordRecorderIntf.SetEnabled(False);
@@ -211,7 +184,6 @@ begin
         Result:=True;
         SelectedIndex:=SelectedHelpIndex;
         SelectedUrl:=URL;
-        SelectedKeyword := cbbSearchKeyword.Text;
       end;
     finally
       Free;
@@ -408,34 +380,26 @@ end;
 function THelpSelector.SelectKeyword(Keywords: TStrings): Integer;
 var
   u, l : String;
-  SearchKeyword: string;
   hv: IExtendedHelpViewer;
   prv: ICustomHelpProvider;
 begin
-  if not TFormHelpSelector.Execute(GlobalCustomHelp.LastHelpCallKeyword, Keywords, Result, u, SearchKeyword) then
+  if not TFormHelpSelector.Execute(GlobalCustomHelp.LastHelpCallKeyword, Keywords, Result, u) then
   begin
     Result:=-1;
     Exit;
   end;
 
-//  if not GlobalCustomHelp.IsHandledByDefaultViewer(Keywords[Result]) then
-//  begin
-//    GlobalCustomHelp.ShowHelp(Keywords[Result], SearchKeyword);
-//    Result := -1;
-//    Exit;
-//  end;
-
   with THelpViewerNodeAccess(Keywords.Objects[Result]) do
   begin
     if FViewer = HelpViewerIntf then
     begin
-      GlobalCustomHelp.ShowHelp(Keywords[Result], SearchKeyword);
+      GlobalCustomHelp.ShowHelp(Keywords[Result]);
       Result := -1;
       Exit;
     end;
     if GlobalCustomHelp.DecodeURL(u, l) then
     begin
-      GlobalCustomHelp.ShowHelp(u, SearchKeyword);
+      GlobalCustomHelp.ShowHelp(u);
       Result := -1;
       Exit;
     end;
@@ -483,27 +447,10 @@ end;
 procedure TFormHelpSelector.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if ActiveControl = cbbSearchKeyword then
+  if (Key = VK_ESCAPE) then
   begin
-    if (Key = VK_ESCAPE) then
-    begin
-      if cbbSearchKeyword.DroppedDown then
-        cbbSearchKeyword.DroppedDown := False;
+    ModalResult := mrCancel;
     Key := 0;
-    end;
-  end
-  else begin
-    if (Key = VK_ESCAPE) then
-    begin
-      ModalResult := mrCancel;
-      Key := 0;
-    end
-    else if (Key = VK_INSERT) and cbbSearchKeyword.Visible then
-    begin
-      cbbSearchKeyword.SetFocus;
-      cbbSearchKeyword.DroppedDown := True;
-      Key := 0;
-    end;
   end;
 end;
 
