@@ -172,7 +172,6 @@ procedure Tform_Config.FormShow(Sender: TObject);
 var
   Reg : TRegistry;
   sl : TStringList;
-  s : String;
 begin
   BuildNamespaceList;
 

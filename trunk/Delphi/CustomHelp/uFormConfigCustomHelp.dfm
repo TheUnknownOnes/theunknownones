@@ -28,6 +28,10 @@ object form_Config: Tform_Config
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'General'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object rgDisplayLocation: TRadioGroup
         AlignWithMargins = True
         Left = 3
@@ -54,7 +58,7 @@ object form_Config: Tform_Config
           AlignWithMargins = True
           Left = 5
           Top = 338
-          Width = 640
+          Width = 626
           Height = 26
           Cursor = crHandPoint
           Align = alBottom
@@ -69,8 +73,6 @@ object form_Config: Tform_Config
           ParentFont = False
           WordWrap = True
           OnClick = Label1Click
-          ExplicitTop = 315
-          ExplicitWidth = 626
         end
         object lbOrder: TListBox
           AlignWithMargins = True
@@ -86,13 +88,16 @@ object form_Config: Tform_Config
           TabOrder = 0
           OnDragDrop = lbOrderDragDrop
           OnDragOver = lbOrderDragOver
-          ExplicitHeight = 291
         end
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'Microsoft Help 2.x'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lvNamespaces: TListView
         AlignWithMargins = True
         Left = 3
@@ -149,7 +154,7 @@ object form_Config: Tform_Config
             'Example:'#13#10'Full Keyword is  Classes.TStringList.Create'#13#10'Trim Firs' +
             't searches for TStringList.Create'#13#10'Trim Full searches for Create'
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           ParentShowHint = False
           ShowHint = True
           TabOrder = 1
