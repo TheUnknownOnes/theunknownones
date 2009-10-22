@@ -156,6 +156,7 @@ object FrameConfigProviders: TFrameConfigProviders
     Width = 445
     Height = 204
     Align = alClient
+    Checkboxes = True
     Columns = <
       item
         Caption = 'Name'

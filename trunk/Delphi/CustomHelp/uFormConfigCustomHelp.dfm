@@ -28,10 +28,6 @@ object form_Config: Tform_Config
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'General'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object rgDisplayLocation: TRadioGroup
         AlignWithMargins = True
         Left = 3
@@ -41,7 +37,6 @@ object form_Config: Tform_Config
         Align = alTop
         Caption = 'Where to display help?'
         TabOrder = 0
-        ExplicitTop = 26
       end
       object GroupBox2: TGroupBox
         AlignWithMargins = True
@@ -52,13 +47,11 @@ object form_Config: Tform_Config
         Align = alClient
         Caption = 'Result order'
         TabOrder = 1
-        ExplicitTop = 214
-        ExplicitHeight = 346
         object Label1: TLabel
           AlignWithMargins = True
           Left = 5
           Top = 338
-          Width = 626
+          Width = 640
           Height = 26
           Cursor = crHandPoint
           Align = alBottom
@@ -73,6 +66,7 @@ object form_Config: Tform_Config
           ParentFont = False
           WordWrap = True
           OnClick = Label1Click
+          ExplicitWidth = 626
         end
         object lbOrder: TListBox
           AlignWithMargins = True
@@ -210,6 +204,9 @@ object form_Config: Tform_Config
             Width = 531
             ExplicitWidth = 531
           end
+          inherited cbTrimNamespacesOHS: TComboBox
+            ItemHeight = 0
+          end
         end
         inherited ListView1: TListView
           Width = 650
@@ -267,6 +264,9 @@ object form_Config: Tform_Config
           inherited edURL: TEdit
             Width = 531
             ExplicitWidth = 531
+          end
+          inherited cbTrimNamespacesOHS: TComboBox
+            ItemHeight = 0
           end
         end
         inherited ListView1: TListView
@@ -347,6 +347,9 @@ object form_Config: Tform_Config
           inherited edURL: TEdit
             Width = 533
             ExplicitWidth = 533
+          end
+          inherited cbTrimNamespacesOHS: TComboBox
+            ItemHeight = 0
           end
         end
         inherited ListView1: TListView
