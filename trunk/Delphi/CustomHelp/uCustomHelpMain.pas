@@ -425,6 +425,8 @@ begin
             end
             else
             begin
+              ExpandEnvVars(u, ShortHelpString);
+
               HelpStrings.Add(TCustomHelp.EncodeURL(c,d,PROTPREFIX_UNKNOWNHELP+u, g, TrimOption, ProvEnabled));
             end;
           except
