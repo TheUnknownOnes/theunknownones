@@ -131,13 +131,13 @@ begin
       (TabPos>0) then
   begin
     Canvas.Font.Style:=[fsBold];
-    txt:=copy(TCustomHelpButtonItem(Button).Caption, 0, TabPos);
+    txt:=copy(TCustomHelpButtonItem(Button).Caption, 0, TabPos - 1);
     drawRect.Right:=drawrect.Left+(catbtnTopics.Width div 3);
     Canvas.TextRect(drawrect, txt, [tfEndEllipsis, tfNoPrefix]);
 
     Canvas.Font.Style:=[fsItalic];
     txt:=copy(TCustomHelpButtonItem(Button).Caption,
-              TabPos,
+              TabPos + 1,
               Length(TCustomHelpButtonItem(Button).Caption));
     drawRect.Left:=drawRect.Right;
     drawRect.Right:=drawrect.Left+(catbtnTopics.Width div 3);
