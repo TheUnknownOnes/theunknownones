@@ -34,6 +34,7 @@ const
   VALUE_DESCR = 'Description';
   VALUE_URL = 'URL';
   VALUE_TRIMNAMESPACE = 'TrimNamespaces';
+  VALUE_ENABLED = 'Enabled';
 
   PROVIDER_SUB_KEY = '\Provider';
   RSS_PROVIDER_SUB_KEY = '\RSSProvider';
