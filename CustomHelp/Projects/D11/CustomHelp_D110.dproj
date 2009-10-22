@@ -105,6 +105,15 @@
     <DCCReference Include="..\..\uHtmlHelp.pas" />
     <DCCReference Include="..\..\uMSHelpServices.pas" />
     <DCCReference Include="..\..\uUtils.pas" />
+    <DCCReference Include="..\..\uFrameConfigProviders.pas">
+      <Form>FrameConfigProviders</Form>
+      <DesignClass>TFrame</DesignClass>
+    </DCCReference>
+    <DCCReference Include="..\..\uCustomHelpConsts.pas"/>
+    <DCCReference Include="..\..\uFrameConfigColor.pas">
+      <Form>FrameConfigColor</Form>
+      <DesignClass>TFrame</DesignClass>
+    </DCCReference>
     <DCCReference Include="designide.dcp" />
     <DCCReference Include="rtl.dcp" />
     <DCCReference Include="vcl.dcp" />
