@@ -44,9 +44,9 @@ type
   TExpandEnvVarsOptions = set of TExpandEnvVarsOption;
 
 const
-  ENVVAR_TOKEN_START = '$(';
+  ENVVAR_TOKEN_START     = '$(';
   ENVVAR_RAW_TOKEN_START = '$_(';
-  ENVVAR_TOKEN_END   = ')';
+  ENVVAR_TOKEN_END       = ')';
 
 function UrlEncodeString(AString: string): string;
 function EnvVarToken(const Name: string; const AStartToken: string = ENVVAR_TOKEN_START;
@@ -237,8 +237,10 @@ end;
 
 procedure ExpandEnvVars(var AString: string; const ACustomEnvVars: TStrings);
 begin
-  ExpandEnvVars(AString, ENVVAR_RAW_TOKEN_START, ENVVAR_TOKEN_END, ACustomEnvVars, [eevoRecursive]);
-  ExpandEnvVars(AString, ENVVAR_TOKEN_START, ENVVAR_TOKEN_END, ACustomEnvVars, [eevoUrlEncodeValues]);
+  ExpandEnvVars(AString, ENVVAR_RAW_TOKEN_START, ENVVAR_TOKEN_END,
+    ACustomEnvVars, [eevoRecursive]);
+  ExpandEnvVars(AString, ENVVAR_TOKEN_START, ENVVAR_TOKEN_END,
+    ACustomEnvVars, [eevoUrlEncodeValues]);
 end;
 
 procedure ExpandEnvVars(var AString: string; const AStartToken, AEndToken: string;

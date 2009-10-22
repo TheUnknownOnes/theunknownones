@@ -73,6 +73,7 @@ object FormHelpSelector: TFormHelpSelector
     Width = 611
     Height = 17
     Align = alBottom
+    Caption = 'cbFullTextSearch'
     Color = clBtnFace
     ParentColor = False
     TabOrder = 2

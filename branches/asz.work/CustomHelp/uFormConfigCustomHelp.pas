@@ -254,8 +254,7 @@ procedure Tform_Config.ListView1InfoTip(Sender: TObject; Item: TListItem;
 begin
   InfoTip := 'Name: Name of your search provider' + #13#10 +
     'Desription: some descriptive hint for your searchprovider' +
-    #13#10 +
-    'URL: URL or filename of your search provider. URLs must start with http://. ';
+    #13#10 + 'URL: URL or filename of your search provider. URLs must start with http://. ';
 end;
 
 procedure Tform_Config.Save;
@@ -278,7 +277,8 @@ begin
   GlobalCustomHelp.TrimNamespacesUntilResultFound :=
     TNamespaceTrimOption(cbTrimNamespacesHX.ItemIndex);
   GlobalCustomHelp.CheckWinHelpGid   := cbCheckGID.Checked;
-  GlobalCustomHelp.DisplayLocation   := TDisplayLocationOption(rgDisplayLocation.ItemIndex);
+  GlobalCustomHelp.DisplayLocation   :=
+    TDisplayLocationOption(rgDisplayLocation.ItemIndex);
   GlobalCustomHelp.ColorMSHelp       := fccMSHelp.SelectedColor;
   GlobalCustomHelp.ColorWebProvider  := fccWebProvider.SelectedColor;
   GlobalCustomHelp.ColorRSSProvider  := fccRSSProvider.SelectedColor;

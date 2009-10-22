@@ -95,7 +95,6 @@ object FrameConfigProviders: TFrameConfigProviders
         0D0C0C0C0C03041919191919100F0C0C19191919030402191919191919191919
         1900010303011919191919191919191919191919191919191919}
       OnClick = BtnBrowseForFileClick
-      ExplicitLeft = 662
     end
     object edName: TEdit
       Left = 94
@@ -156,6 +155,7 @@ object FrameConfigProviders: TFrameConfigProviders
     Width = 445
     Height = 204
     Align = alClient
+    Checkboxes = True
     Columns = <
       item
         Caption = 'Name'

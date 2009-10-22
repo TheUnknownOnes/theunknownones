@@ -5,6 +5,7 @@ object FrameConfigColor: TFrameConfigColor
   Height = 22
   AutoSize = True
   TabOrder = 0
+  TabStop = True
   object catbtnTopics: TCategoryButtons
     Left = 0
     Top = 0
@@ -13,6 +14,7 @@ object FrameConfigColor: TFrameConfigColor
     BorderStyle = bsNone
     ButtonFlow = cbfVertical
     ButtonOptions = [boFullSize, boShowCaptions, boBoldCaptions, boUsePlusMinus, boCaptionOnlyBorder]
+    Enabled = False
     Categories = <
       item
         Caption = 'This is an example header'
