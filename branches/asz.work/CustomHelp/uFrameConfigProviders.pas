@@ -188,8 +188,7 @@ begin
           ListView1.Items[Idx].Caption,
           ListView1.Items[Idx].SubItems[0],
           ListView1.Items[Idx].SubItems[1],
-          TrimOptionFromString(
-          ListView1.Items[Idx].SubItems[2]),
+          TrimOptionFromString(ListView1.Items[Idx].SubItems[2]),
           AType,
           ListView1.Items[Idx].Checked);
 

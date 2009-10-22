@@ -443,11 +443,19 @@ begin
 
           ShortHelpString := HelpString;
           TCustomHelp.TrimNamespace(ShortHelpString, TrimOption);
+          // not not add current help string. It can be selected in keyowrd combo.
+          // c:=c+#9+' search "'+ShortHelpString+'"';
 
           try
             if Pos('://', u) > 0 then
             begin
-              if PosText(EnvVarToken(ENVVAR_NAME_KEYWORD), u) = 0 then
+              if PosText(EnvVarToken(ENVVAR_NAME_KEYWORD_URL), u) > 0 then
+              begin
+              end
+              else if PosText(EnvVarToken(ENVVAR_NAME_KEYWORD), u) > 0 then
+              begin
+              end
+              else
               begin
                 u := u + EnvVarToken(ENVVAR_NAME_KEYWORD_URL);
                 // end else begin
@@ -1426,8 +1434,7 @@ begin
 
           ATarget.Add(TCustomHelp.EncodeURL(
             Reg.ReadString(VALUE_NAME), Reg.ReadString(VALUE_DESCR),
-            Reg.ReadString(VALUE_URL), GroupLabel,
-            TNamespaceTrimOption(
+            Reg.ReadString(VALUE_URL), GroupLabel, TNamespaceTrimOption(
             StrToIntDef(Reg.ReadString(VALUE_TRIMNAMESPACE), 0)),
             Reg.ReadString(VALUE_ENABLED) <> '0'));
         end;
