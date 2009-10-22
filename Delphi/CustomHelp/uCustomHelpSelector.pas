@@ -120,12 +120,36 @@ procedure TFormHelpSelector.catbtnTopicsDrawText(Sender: TObject;
 var
   drawrect : TRect;
   txt : String;
+  TabPos : integer;
 begin
   drawrect:=Rect;
-  Canvas.Font.Style:=[fsBold];
-  txt:=TCustomHelpButtonItem(Button).Caption;
-  drawRect.Right:=drawrect.Left+(catbtnTopics.Width * 2 div 3);
-  Canvas.TextRect(drawrect, txt, [tfEndEllipsis, tfNoPrefix]);
+
+  TabPos:=Pos(#9, TCustomHelpButtonItem(Button).Caption);
+
+  if ((Button.Category.Caption=GROUP_LABEL_WEB_BASED) or
+      (Button.Category.Caption=GROUP_LABEL_FILE_BASED)) and
+      (TabPos>0) then
+  begin
+    Canvas.Font.Style:=[fsBold];
+    txt:=copy(TCustomHelpButtonItem(Button).Caption, 0, TabPos);
+    drawRect.Right:=drawrect.Left+(catbtnTopics.Width div 3);
+    Canvas.TextRect(drawrect, txt, [tfEndEllipsis, tfNoPrefix]);
+
+    Canvas.Font.Style:=[fsItalic];
+    txt:=copy(TCustomHelpButtonItem(Button).Caption,
+              TabPos,
+              Length(TCustomHelpButtonItem(Button).Caption));
+    drawRect.Left:=drawRect.Right;
+    drawRect.Right:=drawrect.Left+(catbtnTopics.Width div 3);
+    Canvas.TextRect(drawrect, txt, [tfEndEllipsis, tfNoPrefix]);
+  end
+  else
+  begin
+    Canvas.Font.Style:=[fsBold];
+    txt:=TCustomHelpButtonItem(Button).Caption;
+    drawRect.Right:=drawrect.Left+(catbtnTopics.Width * 2 div 3);
+    Canvas.TextRect(drawrect, txt, [tfEndEllipsis, tfNoPrefix]);
+  end;
 
   drawrect:=Rect;
   Canvas.Font.Style:=[];

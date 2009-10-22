@@ -390,6 +390,7 @@ begin
 
           ShortHelpString:=HelpString;
           TCustomHelp.TrimNamespace(ShortHelpString, TrimOption);
+          c:=c+#9+' search "'+ShortHelpString+'"';
 
           try
             if Pos('://', u)>0 then
