@@ -787,7 +787,7 @@ begin
   if AnsiSameText(AHelpString, KIBITZ_IGNORED_HELPSTRING) then
     Exit;
 
-  doCheck := not CtrlDown;
+  doCheck := CtrlDown;
 
   // Das Hilfesystem fragt uns: Verstehst du dieses Keyword (der Begriff unter dem Cursor)?
   // Die Abfrage auf 'erroneous type' ist nur eine Teillösung, weil das Delphi-Hilfesystem
