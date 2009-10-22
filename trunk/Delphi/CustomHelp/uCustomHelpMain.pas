@@ -23,10 +23,8 @@ type
     FLastHelpErrors: string;
     FSessionLock: TCriticalSection;
     FReplaceDefaultViewer: boolean;
-    FShowOHSAtTop: boolean;
     FCheckWinHelpGid: Boolean;
 
-   procedure SetShowOHSAtTop(const Value: boolean);
     procedure SetCheckWinHelpGid(const Value: Boolean);
     class function GetNamespaces: IHxRegNamespaceList;
     function GetEnabledhxSession(Index: Integer): IHxSession;
@@ -106,7 +104,6 @@ type
     property LastHelpErrors: string read FLastHelpErrors write FLastHelpErrors;
 
     procedure InitHelpSelector(const HelpString: string);
-    property ShowOHSAtTop: boolean read FShowOHSAtTop write SetShowOHSAtTop;
     property CheckWinHelpGid: Boolean read FCheckWinHelpGid write SetCheckWinHelpGid;
 
     class function DecodeURL(const URL: String; out Caption: String;
@@ -1226,7 +1223,6 @@ begin
   sl:=TStringList.Create;
   try
     ReadSettingsFromRegistry(sl);
-    FShowOHSAtTop:=sl.Values[SETTINGS_OHSATTOP]='1';
     FFullTextSearch:=sl.Values[SETTINGS_FULLTEXTSEARCH]='1';
     FTrimNamespaces:=TNamespaceTrimOption(StrToIntDef(sl.Values[SETTINGS_TRIMNAMESPACES], 0));
     FDisplayLocation:=TDisplayLocationOption(StrToIntDef(sl.Values[SETTINGS_DISPLAY_LOCATION], 0));
@@ -1443,12 +1439,6 @@ procedure TCustomHelp.SetFullTextSearch(const Value: Boolean);
 begin
   FFullTextSearch := Value;
   TCustomHelp.WriteSettingToRegistry(SETTINGS_FULLTEXTSEARCH, IntToStr(byte(Value)));
-end;
-
-procedure TCustomHelp.SetShowOHSAtTop(const Value: boolean);
-begin
-  FShowOHSAtTop := Value;
-  TCustomHelp.WriteSettingToRegistry(SETTINGS_OHSATTOP, IntToStr(byte(Value)));
 end;
 
 procedure TCustomHelp.SetTrimNamespaces(const Value: TNamespaceTrimOption);

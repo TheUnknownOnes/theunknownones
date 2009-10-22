@@ -24,7 +24,6 @@ type
     cbFullTextSearch: TCheckBox;
     cbTrimNamespacesHX: TComboBox;
     Label4: TLabel;
-    cbOHSAtTop: TCheckBox;
     cbCheckGID: TCheckBox;
     Tabs: TPageControl;
     TabSheet1: TTabSheet;
@@ -183,7 +182,6 @@ begin
     TCustomHelp.ReadSettingsFromRegistry(sl);
     cbFullTextSearch.Checked:=GlobalCustomHelp.PerformFullTextSearch;
     cbTrimNamespacesHX.ItemIndex:=StrToIntDef(sl.Values[SETTINGS_TRIMNAMESPACES], 0);
-    cbOHSAtTop.Checked:=GlobalCustomHelp.ShowOHSAtTop;
     cbCheckGID.Checked:=GlobalCustomHelp.CheckWinHelpGid;
 
     fccMSHelp.SelectedColor:=GlobalCustomHelp.ColorMSHelp;
@@ -258,7 +256,6 @@ begin
 
   GlobalCustomHelp.PerformFullTextSearch:=cbFullTextSearch.Checked;
   GlobalCustomHelp.TrimNamespacesUntilResultFound:=TNamespaceTrimOption(cbTrimNamespacesHX.ItemIndex);
-  GlobalCustomHelp.ShowOHSAtTop := cbOHSAtTop.Checked;
   GlobalCustomHelp.CheckWinHelpGid := cbCheckGID.Checked;
   GlobalCustomHelp.DisplayLocation:=TDisplayLocationOption(rgDisplayLocation.ItemIndex);
   GlobalCustomHelp.ColorMSHelp:=fccMSHelp.SelectedColor;

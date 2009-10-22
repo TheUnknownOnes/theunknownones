@@ -352,19 +352,6 @@ begin
     end;
 
     SortCategories;
-//    // move standard group to end of category button list
-//    // if the user wishes so
-//    cat := GetCategoryFromLabel(GROUP_LABEL_WEB_BASED, False);
-//    if (cat <> nil) then
-//      if not GlobalCustomHelp.ShowOHSAtTop then
-//        cat.Index := catbtnTopics.Categories.Count - 1
-//      else
-//        cat.Index := 0;
-//
-//    // move default group to end of category button list
-//    cat := GetCategoryFromLabel(GROUP_LABEL_STANDARD, False);
-//    if cat <> nil then
-//      cat.Index := 0; //catbtnTopics.Categories.Count - 1;
 
     Reg.CloseKey;
   finally

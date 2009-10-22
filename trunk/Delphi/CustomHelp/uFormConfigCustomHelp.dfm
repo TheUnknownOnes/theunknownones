@@ -31,36 +31,29 @@ object form_Config: Tform_Config
       object rgDisplayLocation: TRadioGroup
         AlignWithMargins = True
         Left = 3
-        Top = 26
+        Top = 3
         Width = 650
         Height = 182
         Align = alTop
         Caption = 'Where to display help?'
         TabOrder = 0
-      end
-      object cbOHSAtTop: TCheckBox
-        AlignWithMargins = True
-        Left = 3
-        Top = 3
-        Width = 650
-        Height = 17
-        Align = alTop
-        Caption = 'Display other help sources at the top of the result list'
-        TabOrder = 1
+        ExplicitTop = 26
       end
       object GroupBox2: TGroupBox
         AlignWithMargins = True
         Left = 3
-        Top = 214
+        Top = 191
         Width = 650
-        Height = 346
+        Height = 369
         Align = alClient
         Caption = 'Result order'
-        TabOrder = 2
+        TabOrder = 1
+        ExplicitTop = 214
+        ExplicitHeight = 346
         object Label1: TLabel
           AlignWithMargins = True
           Left = 5
-          Top = 315
+          Top = 338
           Width = 640
           Height = 26
           Cursor = crHandPoint
@@ -76,6 +69,7 @@ object form_Config: Tform_Config
           ParentFont = False
           WordWrap = True
           OnClick = Label1Click
+          ExplicitTop = 315
           ExplicitWidth = 626
         end
         object lbOrder: TListBox
@@ -83,7 +77,7 @@ object form_Config: Tform_Config
           Left = 5
           Top = 18
           Width = 640
-          Height = 291
+          Height = 314
           Hint = 'Use drag and drop to rearrange items'
           Align = alClient
           DragMode = dmAutomatic
@@ -92,7 +86,7 @@ object form_Config: Tform_Config
           TabOrder = 0
           OnDragDrop = lbOrderDragDrop
           OnDragOver = lbOrderDragOver
-          ExplicitHeight = 323
+          ExplicitHeight = 291
         end
       end
     end
