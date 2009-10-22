@@ -131,13 +131,13 @@ begin
   Canvas.Font.Style:=[fsBold];
   txt:=TCustomHelpButtonItem(Button).Caption;
   drawRect.Right:=drawrect.Left+(catbtnTopics.Width * 2 div 3);
-  Canvas.TextRect(drawrect, txt, [tfEndEllipsis]);
+  Canvas.TextRect(drawrect, txt, [tfEndEllipsis, tfNoPrefix]);
 
   drawrect:=Rect;
   Canvas.Font.Style:=[];
   txt:=TCustomHelpButtonItem(Button).Description;
   drawRect.Left:=drawrect.Left+(catbtnTopics.Width * 2 div 3);
-  Canvas.TextRect(drawrect, txt, [tfEndEllipsis]);
+  Canvas.TextRect(drawrect, txt, [tfEndEllipsis, tfNoPrefix]);
 end;
 
 procedure TFormHelpSelector.cbbSearchKeywordCloseUp(Sender: TObject);
