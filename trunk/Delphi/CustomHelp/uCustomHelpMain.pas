@@ -271,7 +271,6 @@ begin
 
       for channelidx := 0 to channels.length - 1 do
       begin
-
         node:=channels[channelidx].selectSingleNode('title');
         if Assigned(node) then
           g:=GROUP_PREFIX_RSS+node.text
@@ -1023,7 +1022,7 @@ begin
     sl:=TStringList.Create;
     try
       sl.QuoteChar:=#0;
-      sl.Delimiter:='|';
+      sl.Delimiter:=URL_SEPERATOR;
       sl.StrictDelimiter:=True;
       sl.DelimitedText:=Copy(URL, Length(PROTPREFIX_CUSTOMHELP)+1, Length(URL));
       Caption:=Sl[0];
@@ -1114,7 +1113,7 @@ end;
 
 class function TCustomHelp.EncodeURL(Caption, Description, Link, Group: String; TrimOption: TNamespaceTrimOption): String;
 begin
-  Result:=PROTPREFIX_CUSTOMHELP+Caption+'|'+Description+'|'+Link+'|'+Group+'|'+IntToStr(Integer(TrimOption));
+  Result:=PROTPREFIX_CUSTOMHELP+Caption+URL_SEPERATOR+Description+URL_SEPERATOR+Link+URL_SEPERATOR+Group+URL_SEPERATOR+IntToStr(Integer(TrimOption));
 end;
 
 function TCustomHelp.GetEnabledhxSession(Index: Integer): IHxSession;

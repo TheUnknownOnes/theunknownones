@@ -278,7 +278,7 @@ var
     Result := False;
     if AURL = '' then
       Exit;
-    AURL := '|' + AURL + '|';
+    AURL := URL_SEPERATOR + AURL + URL_SEPERATOR;
     for jdx := 0 to Keywords.Count - 1 do
       if Pos(AURL, Keywords[jdx]) > 0 then
       begin
