@@ -28,37 +28,30 @@ object form_Config: Tform_Config
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'General'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object rgDisplayLocation: TRadioGroup
         AlignWithMargins = True
         Left = 3
         Top = 3
         Width = 650
-        Height = 182
+        Height = 130
         Align = alTop
         Caption = 'Where to display help?'
         TabOrder = 0
-        ExplicitTop = 26
       end
       object GroupBox2: TGroupBox
         AlignWithMargins = True
         Left = 3
-        Top = 191
+        Top = 139
         Width = 650
-        Height = 369
+        Height = 421
         Align = alClient
         Caption = 'Result order'
         TabOrder = 1
-        ExplicitTop = 214
-        ExplicitHeight = 346
         object Label1: TLabel
           AlignWithMargins = True
           Left = 5
-          Top = 338
-          Width = 626
+          Top = 393
+          Width = 640
           Height = 26
           Cursor = crHandPoint
           Align = alBottom
@@ -79,7 +72,7 @@ object form_Config: Tform_Config
           Left = 5
           Top = 18
           Width = 640
-          Height = 314
+          Height = 369
           Hint = 'Use drag and drop to rearrange items'
           Align = alClient
           DragMode = dmAutomatic
@@ -94,10 +87,6 @@ object form_Config: Tform_Config
     object TabSheet2: TTabSheet
       Caption = 'Microsoft Help 2.x'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lvNamespaces: TListView
         AlignWithMargins = True
         Left = 3
@@ -154,7 +143,7 @@ object form_Config: Tform_Config
             'Example:'#13#10'Full Keyword is  Classes.TStringList.Create'#13#10'Trim Firs' +
             't searches for TStringList.Create'#13#10'Trim Full searches for Create'
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ParentShowHint = False
           ShowHint = True
           TabOrder = 1
@@ -170,9 +159,6 @@ object form_Config: Tform_Config
         AutoSize = True
         TabOrder = 2
         TabStop = True
-        ExplicitLeft = 3
-        ExplicitTop = 3
-        ExplicitWidth = 650
       end
     end
     object TabSheet3: TTabSheet
@@ -186,36 +172,25 @@ object form_Config: Tform_Config
         Align = alClient
         TabOrder = 0
         TabStop = True
-        ExplicitTop = 28
-        ExplicitWidth = 656
-        ExplicitHeight = 535
         inherited pnlOHSItem: TPanel
           Top = 441
           Width = 656
-          ExplicitTop = 441
-          ExplicitWidth = 656
           inherited BtnBrowseForFile: TSpeedButton
             Left = 626
-            ExplicitLeft = 626
           end
           inherited edName: TEdit
             Width = 558
-            ExplicitWidth = 558
           end
           inherited edDesc: TEdit
             Width = 558
-            ExplicitWidth = 558
           end
           inherited edURL: TEdit
             Width = 531
-            ExplicitWidth = 531
           end
         end
         inherited ListView1: TListView
           Width = 650
           Height = 435
-          ExplicitWidth = 650
-          ExplicitHeight = 435
         end
       end
       inline fccWebProvider: TFrameConfigColor
@@ -228,9 +203,6 @@ object form_Config: Tform_Config
         AutoSize = True
         TabOrder = 1
         TabStop = True
-        ExplicitLeft = 3
-        ExplicitTop = 3
-        ExplicitWidth = 650
       end
     end
     object TabSheet4: TTabSheet
@@ -244,36 +216,25 @@ object form_Config: Tform_Config
         Align = alClient
         TabOrder = 0
         TabStop = True
-        ExplicitTop = 80
-        ExplicitWidth = 656
-        ExplicitHeight = 483
         inherited pnlOHSItem: TPanel
           Top = 389
           Width = 656
-          ExplicitTop = 389
-          ExplicitWidth = 656
           inherited BtnBrowseForFile: TSpeedButton
             Left = 626
-            ExplicitLeft = 626
           end
           inherited edName: TEdit
             Width = 558
-            ExplicitWidth = 558
           end
           inherited edDesc: TEdit
             Width = 558
-            ExplicitWidth = 558
           end
           inherited edURL: TEdit
             Width = 531
-            ExplicitWidth = 531
           end
         end
         inherited ListView1: TListView
           Width = 650
           Height = 383
-          ExplicitWidth = 650
-          ExplicitHeight = 383
         end
       end
       object GroupBox1: TGroupBox
@@ -308,9 +269,6 @@ object form_Config: Tform_Config
         AutoSize = True
         TabOrder = 2
         TabStop = True
-        ExplicitLeft = 3
-        ExplicitTop = 3
-        ExplicitWidth = 650
       end
     end
     object TabSheet5: TTabSheet
@@ -324,36 +282,25 @@ object form_Config: Tform_Config
         Align = alClient
         TabOrder = 0
         TabStop = True
-        ExplicitTop = 28
-        ExplicitWidth = 656
-        ExplicitHeight = 535
         inherited pnlOHSItem: TPanel
           Top = 441
           Width = 656
-          ExplicitTop = 441
-          ExplicitWidth = 656
           inherited BtnBrowseForFile: TSpeedButton
             Left = 628
-            ExplicitLeft = 626
           end
           inherited edName: TEdit
             Width = 560
-            ExplicitWidth = 560
           end
           inherited edDesc: TEdit
             Width = 560
-            ExplicitWidth = 560
           end
           inherited edURL: TEdit
             Width = 533
-            ExplicitWidth = 533
           end
         end
         inherited ListView1: TListView
           Width = 650
           Height = 435
-          ExplicitWidth = 650
-          ExplicitHeight = 435
         end
         inherited OpenDialog1: TOpenDialog
           Left = 600
@@ -370,9 +317,6 @@ object form_Config: Tform_Config
         AutoSize = True
         TabOrder = 1
         TabStop = True
-        ExplicitLeft = 3
-        ExplicitTop = 3
-        ExplicitWidth = 650
       end
     end
   end

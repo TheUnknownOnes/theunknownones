@@ -225,9 +225,9 @@ begin
 
       if (ShowModal = mrOk) then
       begin
-        Result        := True;
-        SelectedIndex := SelectedHelpIndex;
-        SelectedUrl   := URL;
+        Result          := True;
+        SelectedIndex   := SelectedHelpIndex;
+        SelectedUrl     := URL;
         SelectedKeyword := cbbSearchKeyword.Text;
       end;
     finally
@@ -276,12 +276,13 @@ procedure TFormHelpSelector.InitList(Keywords: TStrings);
 var
   cat:           TButtonCategory;
   idx:           Integer;
-  c, d, u, g, kw: string;
+  Caption, Description, URL, Group, Keyword: string;
   item:          TCustomHelpButtonItem;
   Reg:           TRegistry;
   CheckExpanded: Boolean;
   TrimOption:    TNamespaceTrimOption;
   ANode:         THelpViewerNodeAccess;
+  ProvEnabled:   Boolean;
   AProvider:     ICustomHelpProvider;
 
   function GetCategoryFromLabel(ALabel: string;
@@ -353,24 +354,28 @@ begin
 
     for idx := 0 to Keywords.Count - 1 do
     begin
-      kw    := Keywords[idx];
-      ANode := GetNode(idx);
-      if AnsiStartsText(PROTPREFIX_CUSTOMHELP, kw) then
+      Keyword := Keywords[idx];
+      ANode   := GetNode(idx);
+      if AnsiStartsText(PROTPREFIX_CUSTOMHELP, Keyword) then
       begin
-        if not TCustomHelp.DecodeURL(kw, c, d, u, g, TrimOption) then
+        if not TCustomHelp.DecodeURL(Keyword, Caption, Description,
+          URL, Group, TrimOption, ProvEnabled) then
           Continue;
       end
-      else if CustomURLExists(kw) then
+      else if CustomURLExists(Keyword) then
       begin
         // ignore duplicate url
         Continue;
       end
-      else if AnsiStartsText(PROTPREFIX_MSHELP, kw) then
+      else if AnsiStartsText(PROTPREFIX_MSHELP, Keyword) then
       begin
-        if not TCustomHelp.DecodeURL(kw, c, d, u, g, TrimOption) then
+        if not TCustomHelp.DecodeURL(Keyword, Caption, Description,
+          URL, Group, TrimOption, ProvEnabled) then
           Continue;
-        if g = GROUP_LABEL_STANDARD then
-          GetViewerName(ANode, g);
+        if not ProvEnabled then
+          Continue;
+        if Group = GROUP_LABEL_STANDARD then
+          GetViewerName(ANode, Group);
         // replace default viewer?
         if GlobalCustomHelp.DisplayLocation <> dloMSDocumentExplorer then
           Keywords.Objects[idx] := GlobalCustomHelpViewerNode;
@@ -378,26 +383,28 @@ begin
       else if Supports(ANode.FViewer, ICustomHelpProvider, AProvider) then
       begin
         // e.g. madHelp of madCollection (test keyword: imesettings)
-        if not AProvider.TranslateHelpString(kw, c, d, u, g) then
+        if not AProvider.TranslateHelpString(Keyword, Caption, Description,
+          URL, Group) then
           Continue;
         TrimOption := nstoNoTrim;
-        kw         := GlobalCustomHelp.EncodeURL(c, d, u, g, TrimOption);
+        Keyword    := GlobalCustomHelp.EncodeURL(Caption, Description,
+          URL, Group, TrimOption, True);
       end
       else
       begin
-        c          := kw;
-        d          := '';
-        u          := kw;
-        g          := GROUP_LABEL_STANDARD;
-        GetViewerName(ANode, g);
-        TrimOption := nstoNoTrim;
+        Caption     := Keyword;
+        Description := '';
+        URL         := Keyword;
+        Group       := GROUP_LABEL_STANDARD;
+        GetViewerName(ANode, Group);
+        TrimOption  := nstoNoTrim;
       end;
 
-      cat          := GetCategoryFromLabel(g);
+      cat          := GetCategoryFromLabel(Group);
       item         := TCustomHelpButtonItem.Create(cat.Items);
-      item.Caption := c;
-      item.Description := d;
-      item.URL     := kw;
+      item.Caption := Caption;
+      item.Description := Description;
+      item.URL     := Keyword;
       item.HelpIndex := idx;
       item.TrimOption := TrimOption;
     end;
@@ -417,13 +424,13 @@ end;
 
 function THelpSelector.SelectKeyword(Keywords: TStrings): Integer;
 var
-  u, l: string;
+  URL, l: string;
   SearchKeyword: string;
-  hv:   IExtendedHelpViewer;
-  prv:  ICustomHelpProvider;
+  hv:  IExtendedHelpViewer;
+  prv: ICustomHelpProvider;
 begin
   if not TFormHelpSelector.Execute(GlobalCustomHelp.LastHelpCallKeyword,
-    Keywords, Result, u, SearchKeyword) then
+    Keywords, Result, URL, SearchKeyword) then
   begin
     Result := -1;
     Exit;
@@ -444,9 +451,9 @@ begin
       Result := -1;
       Exit;
     end;
-    if GlobalCustomHelp.DecodeURL(u, l) then
+    if GlobalCustomHelp.DecodeURL(URL, l) then
     begin
-      GlobalCustomHelp.ShowHelp(u, SearchKeyword);
+      GlobalCustomHelp.ShowHelp(URL, SearchKeyword);
       Result := -1;
       Exit;
     end;

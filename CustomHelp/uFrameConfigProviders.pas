@@ -122,17 +122,23 @@ procedure TFrameConfigProviders.ListView1Change(Sender: TObject;
 begin
   if Change = ctState then
   begin
-    edName.Text := Item.Caption;
-    edDesc.Text := Item.SubItems[0];
-    edURL.Text  := Item.SubItems[1];
-    cbTrimNamespacesOHS.ItemIndex := Integer(TrimOptionFromString(Item.SubItems[2]));
+    try
+      edName.Text := Item.Caption;
+      edDesc.Text := Item.SubItems[0];
+      edURL.Text  := Item.SubItems[1];
+      if Integer(TrimOptionFromString(Item.SubItems[2])) <
+        cbTrimNamespacesOHS.Items.Count then
+        cbTrimNamespacesOHS.ItemIndex := Integer(TrimOptionFromString(Item.SubItems[2]));
 
-    edName.Enabled := Assigned(ListView1.Selected) and
-      (ListView1.Selected <> FInsertItem);
-    edDesc.Enabled := edName.Enabled;
-    edURL.Enabled  := edName.Enabled;
-    BtnBrowseForFile.Enabled := edName.Enabled;
-    cbTrimNamespacesOHS.Enabled := edName.Enabled;
+      edName.Enabled := Assigned(ListView1.Selected) and
+        (ListView1.Selected <> FInsertItem);
+      edDesc.Enabled := edName.Enabled;
+      edURL.Enabled  := edName.Enabled;
+      BtnBrowseForFile.Enabled := edName.Enabled;
+      cbTrimNamespacesOHS.Enabled := edName.Enabled;
+    except
+
+    end;
   end;
 end;
 
@@ -143,6 +149,7 @@ begin
   if ListView1.Selected = FInsertItem then
   begin
     item := ListView1.Items.Insert(1);
+    item.SubItems.Add('');
     item.SubItems.Add('');
     item.SubItems.Add('');
     item.SubItems.Add('');
@@ -183,7 +190,8 @@ begin
           ListView1.Items[Idx].SubItems[1],
           TrimOptionFromString(
           ListView1.Items[Idx].SubItems[2]),
-          AType);
+          AType,
+          ListView1.Items[Idx].Checked);
 
         Inc(Result);
       end;
@@ -229,6 +237,7 @@ begin
     SubItems.Add('double click to add');
     SubItems.Add('');
     SubItems.Add('');
+    SubItems.Add('');
   end;
 
   case AFilter of
@@ -252,6 +261,9 @@ begin
       edURL.Hint  := '- URL to a webbased search provider (e.g. koders.com)';
     end;
   end;
+
+
+
 
   Reg := TRegistry.Create;
   sl  := TStringList.Create;
@@ -277,6 +289,8 @@ begin
             SubItems.Add(Reg.ReadString(VALUE_URL));
             SubItems.Add(OPTIONS_NAMESPACETRIM[TNamespaceTrimOption(
               StrToIntDef(Reg.ReadString(VALUE_TRIMNAMESPACE), 0))]);
+            Checked := Reg.ReadString(VALUE_ENABLED) <> '0';
+            Checked := Reg.ReadString(VALUE_ENABLED) <> '0';
           end;
         end;
 
