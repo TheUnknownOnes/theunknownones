@@ -284,7 +284,7 @@ procedure TCustomHelpKeywordRecorder.DisplayHelpByContext(const ContextID: integ
   const HelpFileName: string);
 begin
   if Keywords.Count > 0 then
-    GlobalCustomHelp.ShowHelp(Keywords[0], GlobalCustomHelp.LastHelpCallKeyword);
+    GlobalCustomHelp.ShowHelp(Keywords[0]);
 end;
 
 procedure TCustomHelpKeywordRecorder.DisplayTopic(const Topic: string);
