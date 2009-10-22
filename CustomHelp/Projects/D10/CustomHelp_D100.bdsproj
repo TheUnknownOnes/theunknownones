@@ -130,12 +130,12 @@
 			<Directories Name="UsePackages">False</Directories>
 		</Directories>
 		<Parameters>
-			<Parameters Name="RunParams"></Parameters>
-			<Parameters Name="HostApplication"></Parameters>
+			<Parameters Name="RunParams">-pDelphi -rDebug_CustomHelp</Parameters>
+			<Parameters Name="HostApplication">$(BDS)\bin\bds.exe</Parameters>
 			<Parameters Name="Launcher"></Parameters>
 			<Parameters Name="UseLauncher">False</Parameters>
 			<Parameters Name="DebugCWD"></Parameters>
-			<Parameters Name="Debug Symbols Search Path"></Parameters>
+			<Parameters Name="Debug Symbols Search Path">$(BDSCOMMONDIR)\Bpl\</Parameters>
 			<Parameters Name="LoadAllSymbols">True</Parameters>
 			<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
 		</Parameters>
