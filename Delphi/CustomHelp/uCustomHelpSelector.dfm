@@ -35,7 +35,6 @@ object FormHelpSelector: TFormHelpSelector
     TabOrder = 0
     OnButtonClicked = catbtnTopicsButtonClicked
     OnDrawText = catbtnTopicsDrawText
-    ExplicitHeight = 345
   end
   object grpErrors: TGroupBox
     Left = 0
