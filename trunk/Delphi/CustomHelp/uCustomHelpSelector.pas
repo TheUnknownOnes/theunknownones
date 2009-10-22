@@ -110,12 +110,6 @@ begin
     CustomButton := TCustomHelpButtonItem(Button);
     FHelpIndex:=CustomButton.HelpIndex;
     FURL:= CustomButton.URL;
-//    FURL:=TCustomHelp.EncodeURL(CustomButton.Caption,
-//                                CustomButton.Description,
-//                                CustomButton.URL,
-//                                '',
-//                                TCustomHelpButtonItem(Button).FTO);
-    SaveExpanded;
     ModalResult:=mrOk;
   end;
 end;
@@ -413,6 +407,7 @@ procedure TFormHelpSelector.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
   GlobalCustomHelp.PerformFullTextSearch:=cbFullTextSearch.Checked;
+  SaveExpanded;
   Action := caHide;
 end;
 
