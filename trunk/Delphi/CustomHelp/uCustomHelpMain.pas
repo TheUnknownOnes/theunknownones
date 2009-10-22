@@ -22,7 +22,6 @@ type
     FLastKeyword: String;
     FLastHelpErrors: string;
     FSessionLock: TCriticalSection;
-    FReplaceDefaultViewer: boolean;
     FCheckWinHelpGid: Boolean;
 
     procedure SetCheckWinHelpGid(const Value: Boolean);
@@ -1156,10 +1155,6 @@ begin
 end;
 
 procedure TCustomHelp.LoadProviderFromRegistry;
-var
-  sl : TStringList;
-  s : String;
-  GroupLabel : String;
 begin
   LoadResultOrderFromRegistry;
   LoadSettingsFromRegistry;
