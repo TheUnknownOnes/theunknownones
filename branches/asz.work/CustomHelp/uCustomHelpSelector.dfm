@@ -4,7 +4,7 @@ object FormHelpSelector: TFormHelpSelector
   Caption = 'Select Help Topic for "@@HELPSTRING@@" ...'
   ClientHeight = 495
   ClientWidth = 617
-  Color = clGradientActiveCaption
+  Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -31,6 +31,7 @@ object FormHelpSelector: TFormHelpSelector
     Categories = <>
     RegularButtonColor = clWhite
     SelectedButtonColor = 15132390
+    ShowHint = True
     TabOrder = 0
     OnButtonClicked = catbtnTopicsButtonClicked
     OnDrawText = catbtnTopicsDrawText
@@ -42,7 +43,7 @@ object FormHelpSelector: TFormHelpSelector
     Height = 100
     Align = alBottom
     Caption = 'Errors'
-    Color = clGradientActiveCaption
+    Color = clBtnFace
     ParentBackground = False
     ParentColor = False
     TabOrder = 3
@@ -53,6 +54,12 @@ object FormHelpSelector: TFormHelpSelector
       Width = 607
       Height = 77
       Align = alClient
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clRed
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
       ReadOnly = True
       ScrollBars = ssBoth
       TabOrder = 0
@@ -66,7 +73,7 @@ object FormHelpSelector: TFormHelpSelector
     Width = 611
     Height = 17
     Align = alBottom
-    Color = clGradientActiveCaption
+    Color = clBtnFace
     ParentColor = False
     TabOrder = 2
   end

@@ -4,6 +4,7 @@ interface
 
 uses
   Classes,
+  uCustomHelpConsts,
   HelpIntfs,
   uCustomHelpIntfs;
 

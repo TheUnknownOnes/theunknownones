@@ -54,6 +54,7 @@ type
     FHelpIndex: Integer;
     procedure InitList(Keywords: TStrings);
     procedure SaveExpanded;
+    procedure SortCategories;
   public
     property URL: string read FURL;
     property SelectedHelpIndex: Integer read FHelpIndex;
@@ -86,7 +87,8 @@ uses
   Math,
   Registry,
   uCustomHelpKeywordRecorder,
-  uCustomHelpIntfs;
+  uCustomHelpIntfs,
+  uCustomHelpConsts;
 
 {$R *.dfm}
 
@@ -103,9 +105,10 @@ type
     FURL:  string;
     FIdx:  Integer;
     FTO:   TNamespaceTrimOption;
+    procedure SetDesc(const Value: string);
   public
     property URL: string read FURL write FURL;
-    property Description: string read FDesc write FDesc;
+    property Description: string read FDesc write SetDesc;
     property HelpIndex: Integer read FIdx write FIdx;
     property TrimOption: TNamespaceTrimOption read FTO write FTO;
   end;
@@ -150,13 +153,13 @@ begin
   Canvas.Font.Style := [fsBold];
   txt := TCustomHelpButtonItem(Button).Caption;
   drawRect.Right := drawrect.Left + (catbtnTopics.Width * 2 div 3);
-  Canvas.TextRect(drawrect, txt, [tfEndEllipsis]);
+  Canvas.TextRect(drawrect, txt, [tfEndEllipsis, tfNoPrefix]);
 
   drawrect      := Rect;
   Canvas.Font.Style := [];
   txt           := TCustomHelpButtonItem(Button).Description;
   drawRect.Left := drawrect.Left + (catbtnTopics.Width * 2 div 3);
-  Canvas.TextRect(drawrect, txt, [tfEndEllipsis]);
+  Canvas.TextRect(drawrect, txt, [tfEndEllipsis, tfNoPrefix]);
 end;
 
 procedure TFormHelpSelector.cbbSearchKeywordCloseUp(Sender: TObject);
@@ -222,14 +225,50 @@ begin
 
       if (ShowModal = mrOk) then
       begin
-        Result          := True;
-        SelectedIndex   := SelectedHelpIndex;
-        SelectedUrl     := URL;
+        Result        := True;
+        SelectedIndex := SelectedHelpIndex;
+        SelectedUrl   := URL;
         SelectedKeyword := cbbSearchKeyword.Text;
       end;
     finally
       Free;
     end;
+  end;
+end;
+
+procedure TFormHelpSelector.SortCategories;
+var
+  i:      Integer;
+  idx:    Integer;
+  toSort: TStringList;
+  s:      string;
+begin
+  toSort := TStringList.Create;
+  try
+    for i := 0 to catbtnTopics.Categories.Count - 1 do
+    begin
+      s := catbtnTopics.Categories[i].Caption;
+      if (s = GROUP_LABEL_WEB_BASED) or (s = GROUP_LABEL_STANDARD) or
+        (s = GROUP_LABEL_FILE_BASED) or StartsText(GROUP_PREFIX_RSS, s) then
+      begin
+        idx := GlobalCustomHelp.ResultOrderFromString[s];
+        toSort.AddObject(Format('%.4d', [idx]), catbtnTopics.Categories[i]);
+      end
+      else
+      begin
+        toSort.AddObject(Format('%.4d',
+          [GlobalCustomHelp.ResultOrderFromString[GROUP_LABEL_DUMMY_MSHELP2]]),
+          catbtnTopics.Categories[i]);
+      end;
+    end;
+
+    toSort.Sort;
+    for i := 0 to toSort.Count - 1 do
+    begin
+      TButtonCategory(toSort.Objects[i]).Index := i;
+    end;
+  finally
+    toSort.Free;
   end;
 end;
 
@@ -261,9 +300,16 @@ var
 
     if not Assigned(Result) and ACreate then
     begin
-      Result           := catbtnTopics.Categories.Add;
-      Result.Caption   := ALabel;
-      Result.Color     := clActiveCaption;
+      Result         := catbtnTopics.Categories.Add;
+      Result.Caption := ALabel;
+      if ALabel = GROUP_LABEL_WEB_BASED then
+        Result.Color := GlobalCustomHelp.ColorWebProvider
+      else if ALabel = GROUP_LABEL_FILE_BASED then
+        Result.Color := GlobalCustomHelp.ColorFileProvider
+      else if StartsText(GROUP_PREFIX_RSS, ALabel) then
+        Result.Color := GlobalCustomHelp.ColorRSSProvider
+      else
+        Result.Color := GlobalCustomHelp.ColorMSHelp;
       Result.TextColor := clCaptionText;
       Result.Collapsed := True;
       if CheckExpanded then
@@ -278,7 +324,7 @@ var
     Result := False;
     if AURL = '' then
       Exit;
-    AURL := '|' + AURL + '|';
+    AURL := URL_SEPERATOR + AURL + URL_SEPERATOR;
     for jdx := 0 to Keywords.Count - 1 do
       if Pos(AURL, Keywords[jdx]) > 0 then
       begin
@@ -326,12 +372,12 @@ begin
         if g = GROUP_LABEL_STANDARD then
           GetViewerName(ANode, g);
         // replace default viewer?
-        if GlobalCustomHelp.ReplaceDefaultViewer then
+        if GlobalCustomHelp.DisplayLocation <> dloMSDocumentExplorer then
           Keywords.Objects[idx] := GlobalCustomHelpViewerNode;
       end
       else if Supports(ANode.FViewer, ICustomHelpProvider, AProvider) then
       begin
-        // e.g. madHelp of madCollection
+        // e.g. madHelp of madCollection (test keyword: imesettings)
         if not AProvider.TranslateHelpString(kw, c, d, u, g) then
           Continue;
         TrimOption := nstoNoTrim;
@@ -356,21 +402,7 @@ begin
       item.TrimOption := TrimOption;
     end;
 
-
-
-    // move standard group to end of category button list
-    // if the user wishes so
-    cat := GetCategoryFromLabel(GROUP_LABEL_DEFAULT, False);
-    if (cat <> nil) then
-      if not GlobalCustomHelp.ShowOHSAtTop then
-        cat.Index := catbtnTopics.Categories.Count - 1
-      else
-        cat.Index := 0;
-
-    // move default group to end of category button list
-    cat := GetCategoryFromLabel(GROUP_LABEL_STANDARD, False);
-    if cat <> nil then
-      cat.Index := catbtnTopics.Categories.Count - 1;
+    SortCategories;
 
     Reg.CloseKey;
   finally
@@ -387,8 +419,8 @@ function THelpSelector.SelectKeyword(Keywords: TStrings): Integer;
 var
   u, l: string;
   SearchKeyword: string;
-  hv:  IExtendedHelpViewer;
-  prv: ICustomHelpProvider;
+  hv:   IExtendedHelpViewer;
+  prv:  ICustomHelpProvider;
 begin
   if not TFormHelpSelector.Execute(GlobalCustomHelp.LastHelpCallKeyword,
     Keywords, Result, u, SearchKeyword) then
@@ -397,12 +429,12 @@ begin
     Exit;
   end;
 
-  if not GlobalCustomHelp.IsHandledByDefaultViewer(Keywords[Result]) then
-  begin
-    GlobalCustomHelp.ShowHelp(Keywords[Result], SearchKeyword);
-    Result := -1;
-    Exit;
-  end;
+  // if not GlobalCustomHelp.IsHandledByDefaultViewer(Keywords[Result]) then
+  // begin
+  //   GlobalCustomHelp.ShowHelp(Keywords[Result], SearchKeyword);
+  //   Result := -1;
+  //   Exit;
+  // end;
 
   with THelpViewerNodeAccess(Keywords.Objects[Result]) do
   begin
@@ -523,6 +555,14 @@ begin
   finally
     Reg.Free;
   end;
+end;
+
+{ TCustomHelpButtonItem }
+
+procedure TCustomHelpButtonItem.SetDesc(const Value: string);
+begin
+  FDesc := Value;
+  Hint  := Value;
 end;
 
 initialization

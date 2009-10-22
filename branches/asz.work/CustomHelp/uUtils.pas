@@ -40,7 +40,7 @@ function BytesToCardArray(const b: TBytes): TCardinalDynArray;
 function FileContainsText(AFileName: string; AText: string): Boolean;
 
 type
-  TExpandEnvVarsOption  = (eevoPreferSystemValues, eevoUrlEncodeValues);
+  TExpandEnvVarsOption  = (eevoPreferSystemValues, eevoUrlEncodeValues, eevoRecursive);
   TExpandEnvVarsOptions = set of TExpandEnvVarsOption;
 
 const
@@ -237,7 +237,7 @@ end;
 
 procedure ExpandEnvVars(var AString: string; const ACustomEnvVars: TStrings);
 begin
-  ExpandEnvVars(AString, ENVVAR_RAW_TOKEN_START, ENVVAR_TOKEN_END, ACustomEnvVars, []);
+  ExpandEnvVars(AString, ENVVAR_RAW_TOKEN_START, ENVVAR_TOKEN_END, ACustomEnvVars, [eevoRecursive]);
   ExpandEnvVars(AString, ENVVAR_TOKEN_START, ENVVAR_TOKEN_END, ACustomEnvVars, [eevoUrlEncodeValues]);
 end;
 
@@ -300,8 +300,10 @@ begin
 
       Delete(AString, EnvVarStartIdx, EndTokenLen + EnvVarEndIdx - EnvVarStartIdx);
       Insert(Value, AString, EnvVarStartIdx);
-      Inc(EnvVarStartIdx, Length(Value) + 1); // do not replace variables recursivly
+      if not (eevoRecursive in Options) then
+        Inc(EnvVarStartIdx, Length(Value) + 1); // do not replace variables recursivly
 
+      // Sometimes we need to replace variables recursively
       EnvVarStartIdx := PosEx(AStartToken, AString, EnvVarStartIdx);
     end
     else
@@ -309,7 +311,7 @@ begin
   end;
 end;
 
-{$if not Defined(PosStr) OR not Defined(PosText)}
+{$if not Defined(PosStr) or not Defined(PosText)}
 function SearchBuf(const s: string; const delim: string;
   const IgnoreCase: Boolean; fromPos: Cardinal; toPos: Cardinal): Integer;
 var
