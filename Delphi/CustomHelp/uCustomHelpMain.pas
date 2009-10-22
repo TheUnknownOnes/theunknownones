@@ -218,8 +218,6 @@ end;
 
 function TCustomHelpViewer.GetHelpStrings(
   const HelpString: String): TStringList;
-var
-  idx: Integer;
 begin
   Result := InternalGetHelpStrings(HelpString, true, true);
 end;
@@ -587,7 +585,6 @@ end;
 procedure TCustomHelpViewer.ShowHelp(const HelpString: String);
 var
   u: String;
-  alternativeNavigate : boolean;
   sl : TStringList;
   command, params : String;
   hs: IHelpSystem;
@@ -847,8 +844,6 @@ begin
     Result := Count;
     Free;
   end;
-
-  result:=1;
 
   GlobalCustomHelp.InitHelpSelector(AHelpString);
 end;
@@ -1162,7 +1157,6 @@ end;
 
 procedure TCustomHelp.LoadProviderFromRegistry;
 var
-  Reg : TRegistry;
   sl : TStringList;
   s : String;
   GroupLabel : String;

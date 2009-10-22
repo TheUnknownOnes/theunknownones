@@ -100,6 +100,8 @@ end;
 
 function TFrameConfigProviders.IsURLAllowed(AFilter: TConfigProvidersFilter; AURL: String): Boolean;
 begin
+  Result := false;
+
   case AFilter of
     cpfFileBased: Result:=not AnsiContainsStr(AURL,'://');
     cpfWebBased: Result:=AnsiContainsStr(AURL,'://');

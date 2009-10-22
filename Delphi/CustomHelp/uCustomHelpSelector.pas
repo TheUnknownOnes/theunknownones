@@ -148,7 +148,6 @@ end;
 class function TFormHelpSelector.Execute(HelpString: string; Keywords: TStrings;
   out SelectedIndex: Integer; out SelectedUrl: string): Boolean;
 var
-  SearchKeywords: TStrings;
   fhs: TFormHelpSelector;
 begin
   Result:=False;
