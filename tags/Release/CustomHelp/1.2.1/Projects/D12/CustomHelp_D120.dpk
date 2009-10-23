@@ -1,0 +1,54 @@
+package CustomHelp_D120;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'CustomHelp Expert ... by TUO'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+{$DEFINE DEBUG}
+
+requires
+  rtl,
+  designide,
+  vclie,
+  vcl,
+  xmlrtl,
+  vclactnband,
+  vclx;
+
+contains
+  uCustomHelpMain in '..\..\uCustomHelpMain.pas',
+  uCustomHelpSelector in '..\..\uCustomHelpSelector.pas' {FormHelpSelector},
+  uFormConfigCustomHelp in '..\..\uFormConfigCustomHelp.pas' {form_Config},
+  uCustomHelpIDEIntegration in '..\..\uCustomHelpIDEIntegration.pas',
+  uHtmlHelp in '..\..\uHtmlHelp.pas',
+  uUtils in '..\..\uUtils.pas',
+  uCustomHelpIntfs in '..\..\uCustomHelpIntfs.pas',
+  uCustomHelpKeywordRecorder in '..\..\uCustomHelpKeywordRecorder.pas',
+  uMSHelpServices in '..\..\uMSHelpServices.pas',
+  uFrameConfigProviders in '..\..\uFrameConfigProviders.pas' {FrameConfigProviders: TFrame},
+  uCustomHelpConsts in '..\..\uCustomHelpConsts.pas',
+  uFrameConfigColor in '..\..\uFrameConfigColor.pas' {FrameConfigColor: TFrame},
+  uFrameConfig3rdParty in '..\..\uFrameConfig3rdParty.pas' {FrameConfig3rdParty: TFrame};
+
+end.
