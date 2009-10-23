@@ -815,7 +815,7 @@ begin
   if not Enabled then
     Exit;
 
-  if AnsiSameText(AHelpString, KIBITZ_IGNORED_HELPSTRING) then
+  if AnsiContainsText(AHelpString, KIBITZ_IGNORED_HELPSTRING) then
     Exit;
 
   doCheck := CtrlDown;
