@@ -23,11 +23,35 @@ object form_Config: Tform_Config
     Top = 0
     Width = 664
     Height = 591
-    ActivePage = TabSheet1
+    ActivePage = TabSheet6
     Align = alClient
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'General'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object Label1: TLabel
+        AlignWithMargins = True
+        Left = 3
+        Top = 534
+        Width = 626
+        Height = 26
+        Cursor = crHandPoint
+        Align = alBottom
+        Caption = 
+          'go to the discussion thread at www.delphipraxis.net to receive h' +
+          'elp or post provider URLs (German and English spoken)'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlue
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold, fsUnderline]
+        ParentFont = False
+        WordWrap = True
+        OnClick = Label1Click
+      end
       object rgDisplayLocation: TRadioGroup
         AlignWithMargins = True
         Left = 3
@@ -43,31 +67,10 @@ object form_Config: Tform_Config
         Left = 3
         Top = 191
         Width = 650
-        Height = 369
+        Height = 337
         Align = alClient
         Caption = 'Result order'
         TabOrder = 1
-        object Label1: TLabel
-          AlignWithMargins = True
-          Left = 5
-          Top = 338
-          Width = 640
-          Height = 26
-          Cursor = crHandPoint
-          Align = alBottom
-          Caption = 
-            'go to the discussion thread at www.delphipraxis.net to receive h' +
-            'elp or post provider URLs (German and English spoken)'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlue
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = [fsBold, fsUnderline]
-          ParentFont = False
-          WordWrap = True
-          OnClick = Label1Click
-          ExplicitWidth = 626
-        end
         object lbOrder: TListBox
           AlignWithMargins = True
           Left = 5
@@ -204,9 +207,6 @@ object form_Config: Tform_Config
             Width = 531
             ExplicitWidth = 531
           end
-          inherited cbTrimNamespacesOHS: TComboBox
-            ItemHeight = 0
-          end
         end
         inherited ListView1: TListView
           Width = 650
@@ -264,9 +264,6 @@ object form_Config: Tform_Config
           inherited edURL: TEdit
             Width = 531
             ExplicitWidth = 531
-          end
-          inherited cbTrimNamespacesOHS: TComboBox
-            ItemHeight = 0
           end
         end
         inherited ListView1: TListView
@@ -348,9 +345,6 @@ object form_Config: Tform_Config
             Width = 533
             ExplicitWidth = 533
           end
-          inherited cbTrimNamespacesOHS: TComboBox
-            ItemHeight = 0
-          end
         end
         inherited ListView1: TListView
           Width = 650
@@ -376,6 +370,36 @@ object form_Config: Tform_Config
         ExplicitLeft = 3
         ExplicitTop = 3
         ExplicitWidth = 650
+      end
+    end
+    object TabSheet6: TTabSheet
+      Caption = '3rd party providers'
+      ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object ScrollBox1: TScrollBox
+        Left = 0
+        Top = 0
+        Width = 656
+        Height = 563
+        Align = alClient
+        BorderStyle = bsNone
+        TabOrder = 0
+        object FlowPanel1: TFlowPanel
+          Left = 0
+          Top = 0
+          Width = 656
+          Height = 41
+          Align = alTop
+          AutoSize = True
+          BevelOuter = bvNone
+          TabOrder = 0
+          ExplicitLeft = 28
+          ExplicitTop = 3
+          ExplicitWidth = 185
+        end
       end
     end
   end

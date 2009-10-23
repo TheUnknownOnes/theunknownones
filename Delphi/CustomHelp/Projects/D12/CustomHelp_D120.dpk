@@ -48,6 +48,7 @@ contains
   uMSHelpServices in '..\..\uMSHelpServices.pas',
   uFrameConfigProviders in '..\..\uFrameConfigProviders.pas' {FrameConfigProviders: TFrame},
   uCustomHelpConsts in '..\..\uCustomHelpConsts.pas',
-  uFrameConfigColor in '..\..\uFrameConfigColor.pas' {FrameConfigColor: TFrame};
+  uFrameConfigColor in '..\..\uFrameConfigColor.pas' {FrameConfigColor: TFrame},
+  uFrameConfig3rdParty in '..\..\uFrameConfig3rdParty.pas' {FrameConfig3rdParty: TFrame};
 
 end.

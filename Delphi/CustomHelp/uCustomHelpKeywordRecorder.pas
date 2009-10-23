@@ -1,9 +1,12 @@
-UNIT uCustomHelpKeywordRecorder;
+unit uCustomHelpKeywordRecorder;
 
 interface
 
 uses
-  Classes, uCustomHelpConsts, HelpIntfs, uCustomHelpIntfs;
+  Classes,
+  uCustomHelpConsts,
+  HelpIntfs,
+  uCustomHelpIntfs;
 
 const
   hcIDEStructureView   = $49E;
@@ -34,28 +37,28 @@ type
   public
     {$REGION 'ICustomHelpViewer'}
     function GetViewerName: string;
-    function UnderstandsKeyword(const HelpString: string): integer;
+    function UnderstandsKeyword(const HelpString: string): Integer;
     function GetHelpStrings(const HelpString: string): TStringList;
-    function CanShowTableOfContents: boolean;
+    function CanShowTableOfContents: Boolean;
     procedure ShowTableOfContents;
     procedure ShowHelp(const HelpString: string);
-    procedure NotifyID(const ViewerID: integer);
+    procedure NotifyID(const ViewerID: Integer);
     procedure SoftShutDown;
     procedure ShutDown;
     {$ENDREGION}
 
     {$region 'IExtendedHelpViewer'}
-    function UnderstandsTopic(const Topic: string): boolean;
+    function UnderstandsTopic(const Topic: string): Boolean;
     procedure DisplayTopic(const Topic: string);
-    function UnderstandsContext(const ContextID: integer;
-      const HelpFileName: string): boolean;
-    procedure DisplayHelpByContext(const ContextID: integer;
+    function UnderstandsContext(const ContextID: Integer;
+      const HelpFileName: string): Boolean;
+    procedure DisplayHelpByContext(const ContextID: Integer;
       const HelpFileName: string);
     {$endregion}
 
     {$region 'IHelpSystemFlags'}
-    function GetUseDefaultTopic: boolean;
-    procedure SetUseDefaultTopic(AValue: boolean);
+    function GetUseDefaultTopic: Boolean;
+    procedure SetUseDefaultTopic(AValue: Boolean);
     {$endregion}
 
     {$REGION 'ICustomHelpKeywordRecorder'}
@@ -65,30 +68,30 @@ type
     procedure SetHelpStringList(const Value: TStringList);
     function GetShowHelpStringList: TStringList;
     procedure SetShowHelpStringList(const Value: TStringList);
-    function GetEnabled: boolean;
-    procedure SetEnabled(const Value: boolean);
+    function GetEnabled: Boolean;
+    procedure SetEnabled(const Value: Boolean);
     procedure Reset;
-    procedure AddKeyword(HelpString: string; AIgnoreDuplicate: boolean = False);
+    procedure AddKeyword(HelpString: string; AIgnoreDuplicate: Boolean = False);
     {$ENDREGION}
 
     constructor Create;
     destructor Destroy; override;
   private
-    FViewerID: integer;
-    FHelpManager: IHelpManager;
-    FKeywords: TStringList;
-    FHelpStrings: TStringList;
+    FViewerID:        Integer;
+    FHelpManager:     IHelpManager;
+    FKeywords:        TStringList;
+    FHelpStrings:     TStringList;
     FShowHelpStrings: TStringList;
-    FEnabled:  boolean;
-    FUseDefaultTopic: boolean;
+    FEnabled:         Boolean;
+    FUseDefaultTopic: Boolean;
     procedure DoUnregister;
     procedure DoRegister;
   published
-    property Keywords: TStringList Read GetKeywordList Write SetKeywordList;
-    property HelpStrings: TStringList Read GetHelpStringList Write SetHelpStringList;
-    property ShowHelpStrings: TStringList Read GetShowHelpStringList
-      Write SetShowHelpStringList;
-    property Enabled: boolean Read GetEnabled Write SetEnabled;
+    property Keywords: TStringList read GetKeywordList write SetKeywordList;
+    property HelpStrings: TStringList read GetHelpStringList write SetHelpStringList;
+    property ShowHelpStrings: TStringList read GetShowHelpStringList
+      write SetShowHelpStringList;
+    property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
 
 var
@@ -97,7 +100,7 @@ var
 { TKeywordsHelpViewer }
 
 procedure TCustomHelpKeywordRecorder.AddKeyword(HelpString: string;
-  AIgnoreDuplicate: boolean);
+  AIgnoreDuplicate: Boolean);
 begin
   if AnsiSameText(HelpString, KIBITZ_IGNORED_HELPSTRING) then
     Exit;
@@ -108,7 +111,7 @@ begin
       Add(HelpString);
 end;
 
-function TCustomHelpKeywordRecorder.CanShowTableOfContents: boolean;
+function TCustomHelpKeywordRecorder.CanShowTableOfContents: Boolean;
 begin
   Result := False;
 end;
@@ -123,8 +126,8 @@ constructor TCustomHelpKeywordRecorder.Create;
 
 begin
   inherited;
-  FHelpManager := nil;
-  FEnabled := False;
+  FHelpManager     := nil;
+  FEnabled         := False;
   FUseDefaultTopic := True;
   Action(self.FKeywords);
   Action(self.FHelpStrings);
@@ -151,7 +154,7 @@ begin
   inherited;
 end;
 
-function TCustomHelpKeywordRecorder.GetEnabled: boolean;
+function TCustomHelpKeywordRecorder.GetEnabled: Boolean;
 begin
   Result := FEnabled;
 end;
@@ -166,7 +169,7 @@ function TCustomHelpKeywordRecorder.GetHelpStrings(
 begin
   Result := TStringList.Create;
   Result.Values[GetViewerName] := HelpString;
-  if NOT Enabled then
+  if not Enabled then
     Exit;
   FHelpStrings.Add(HelpString);
 end;
@@ -188,7 +191,7 @@ end;
 
 procedure TCustomHelpKeywordRecorder.DoRegister;
 begin
-  if NOT Assigned(FHelpManager) then
+  if not Assigned(FHelpManager) then
     RegisterViewer(Self, FHelpManager);
 end;
 
@@ -198,13 +201,13 @@ var
 begin
   if Assigned(FHelpManager) then
   begin
-    hm := FHelpManager;
+    hm           := FHelpManager;
     FHelpManager := nil;
     hm.Release(FViewerID);
   end;
 end;
 
-procedure TCustomHelpKeywordRecorder.NotifyID(const ViewerID: integer);
+procedure TCustomHelpKeywordRecorder.NotifyID(const ViewerID: Integer);
 begin
   FViewerID := ViewerID;
 end;
@@ -224,7 +227,7 @@ end;
 
 procedure TCustomHelpKeywordRecorder.ShowHelp(const HelpString: string);
 begin
-  if NOT Enabled then
+  if not Enabled then
     Exit;
 
   // do nothing
@@ -248,18 +251,18 @@ begin
 end;
 
 function TCustomHelpKeywordRecorder.UnderstandsKeyword(
-  const HelpString: string): integer;
+  const HelpString: string): Integer;
 begin
   Result := 0;
-  if NOT Enabled then
+  if not Enabled then
     Exit;
   AddKeyword(HelpString);
 end;
 
-procedure TCustomHelpKeywordRecorder.SetEnabled(const Value: boolean);
+procedure TCustomHelpKeywordRecorder.SetEnabled(const Value: Boolean);
 begin
   FEnabled := Value;
-  if NOT FEnabled then
+  if not FEnabled then
     Reset;
 end;
 
@@ -280,7 +283,7 @@ end;
 
 {$region 'IExtendedHelpViewer'}
 
-procedure TCustomHelpKeywordRecorder.DisplayHelpByContext(const ContextID: integer;
+procedure TCustomHelpKeywordRecorder.DisplayHelpByContext(const ContextID: Integer;
   const HelpFileName: string);
 begin
   if Keywords.Count > 0 then
@@ -292,32 +295,31 @@ begin
 
 end;
 
-function TCustomHelpKeywordRecorder.UnderstandsTopic(const Topic: string): boolean;
+function TCustomHelpKeywordRecorder.UnderstandsTopic(const Topic: string): Boolean;
 begin
   Result := False;
 end;
 
-function TCustomHelpKeywordRecorder.UnderstandsContext(const ContextID: integer;
-  const HelpFileName: string): boolean;
+function TCustomHelpKeywordRecorder.UnderstandsContext(const ContextID: Integer;
+  const HelpFileName: string): Boolean;
 begin
   Result := False;
-  if NOT Enabled then
+  if not Enabled then
     Exit;
-  CASE ContextID OF
-    hcIDEFormDesigner, hcIDECodeEditor:
-      Result := Keywords.Count > 0;
+  case ContextID of
+    hcIDEFormDesigner, hcIDECodeEditor: Result := Keywords.Count > 0;
   end;
 end;
 
 {$endregion}
 
 {$region 'IHelpSystemFlags'}
-function TCustomHelpKeywordRecorder.GetUseDefaultTopic: boolean;
+function TCustomHelpKeywordRecorder.GetUseDefaultTopic: Boolean;
 begin
   Result := FUseDefaultTopic;
 end;
 
-procedure TCustomHelpKeywordRecorder.SetUseDefaultTopic(AValue: boolean);
+procedure TCustomHelpKeywordRecorder.SetUseDefaultTopic(AValue: Boolean);
 begin
   FUseDefaultTopic := AValue;
 end;
@@ -335,4 +337,3 @@ finalization
     CustomHelpKeywordRecorder.ShutDown;
 
 end.
-

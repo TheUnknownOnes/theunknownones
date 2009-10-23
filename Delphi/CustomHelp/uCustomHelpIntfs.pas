@@ -1,4 +1,4 @@
-UNIT uCustomHelpIntfs;
+unit uCustomHelpIntfs;
 
 interface
 
@@ -19,7 +19,7 @@ type
   ICustomHelpProvider = interface(ICustomHelpViewer)
     ['{DFCBE0F2-B3AC-4D1D-B3FF-919FEAD3988B}']
     function TranslateHelpString(const HelpString: string;
-      var Caption, Description, Link, Group: string): boolean;
+      var Caption, Description, Link, Group: string): Boolean;
     function GetCustomHelpStrings(const HelpString: string): TStringList;
     procedure ShowCustomHelp(const HelpString: string);
   end;
@@ -28,17 +28,16 @@ type
     ['{2D69C7B6-0681-43CF-B995-F1A91C41E1BD}']
     function GetKeywordList: TStringList;
     procedure SetKeywordList(const Value: TStringList);
-    function GetHelpStringList: TStringList;
+    function GetHelpStringList: TStringList;             
     procedure SetHelpStringList(const Value: TStringList);
     function GetShowHelpStringList: TStringList;
     procedure SetShowHelpStringList(const Value: TStringList);
-    function GetEnabled: boolean;
-    procedure SetEnabled(const Value: boolean);
-    procedure AddKeyword(HelpString: string; AIgnoreDuplicate: boolean = False);
+    function GetEnabled: Boolean;
+    procedure SetEnabled(const Value: Boolean);
+    procedure AddKeyword(HelpString: string; AIgnoreDuplicate: Boolean = False);
     procedure Reset;
   end;
 
 implementation
 
 end.
-
