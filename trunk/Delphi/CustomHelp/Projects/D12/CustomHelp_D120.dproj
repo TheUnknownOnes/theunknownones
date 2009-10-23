@@ -79,6 +79,10 @@
 				<Form>FrameConfigColor</Form>
 				<DesignClass>TFrame</DesignClass>
 			</DCCReference>
+			<DCCReference Include="..\..\uFrameConfig3rdParty.pas">
+				<Form>FrameConfig3rdParty</Form>
+				<DesignClass>TFrame</DesignClass>
+			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
