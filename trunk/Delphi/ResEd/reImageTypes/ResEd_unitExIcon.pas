@@ -26,11 +26,13 @@ unit ResEd_unitExIcon;
 
 interface
 
+{$i defines.inc}
+
 uses Windows, Classes, SysUtils, Graphics, Controls,
-     {$ifndef VER200}
-       resEd_PngImage
+     {$ifdef HavePNGImage}
+       pngimage
      {$else}
-       PngImage
+       resEd_PngImage
      {$endif};
 
 type

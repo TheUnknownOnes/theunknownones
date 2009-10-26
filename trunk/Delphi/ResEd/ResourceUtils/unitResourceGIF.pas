@@ -2,10 +2,10 @@ unit unitResourceGIF;
 
 interface
 
+{$i defines.inc}
+
 uses Windows, Classes, SysUtils, graphics,
-     {$ifndef VER200}resed_gifimage,
-     {$else}GIFImg,
-     {$endif}
+     {$ifdef HaveGIFImage} gifimg, {$else} resed_gifimage, {$endif}
      unitResourceElement,
      unitResourceGraphics;
 

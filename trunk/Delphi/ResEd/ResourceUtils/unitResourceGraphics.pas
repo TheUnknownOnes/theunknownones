@@ -12,10 +12,11 @@ unit unitResourceGraphics;
 
 interface
 
+{$i defines.inc}
+
 uses Windows, Classes, SysUtils, unitResourceElement, graphics, resed_unitExIcon
-     {$ifndef VER200}, resEd_PngImage, resed_gifimage
-     {$else}, PngImage
-     {$endif};
+     {$ifdef HavePNGImage}, PNGImage {$else}, resEd_PngImage {$endif}
+     {$ifdef HaveGIFImage}, gifimg {$else}, resed_gifimage {$endif};
 
 type
 
