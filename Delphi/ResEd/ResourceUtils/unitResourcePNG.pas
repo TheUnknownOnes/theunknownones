@@ -7,9 +7,10 @@ unit unitResourcePNG;
 
 interface
 
+{$i defines.inc}
+
 uses Windows, Classes, SysUtils, graphics
-     {$ifndef VER200}, resEd_PngImage
-     {$else}, PNGImage{$endif}
+     {$ifdef HavePNGImage}, PNGImage {$else}, resEd_PngImage {$endif}
      ,unitResourceElement,
      unitResourceGraphics;
 

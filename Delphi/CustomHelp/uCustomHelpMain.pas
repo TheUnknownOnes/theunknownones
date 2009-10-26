@@ -203,6 +203,7 @@ type
 var
   HelpViewer: TCustomHelpViewer;
 
+
 {$WARN SYMBOL_PLATFORM OFF}
 
 function EncodedHelpString(AHelpString: string): string;
