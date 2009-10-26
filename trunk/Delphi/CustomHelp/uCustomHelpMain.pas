@@ -827,8 +827,8 @@ begin
     if Supports(Editor, IOTASourceEditor70, SourceEditor) then
     begin
       EditView:=SourceEditor.EditViews[0];
-      LookedUpWord:=EditView.Position.RipText([],rfBackward or rfIncludeAlphaChars or rfIncludeNumericChars)+
-              EditView.Position.RipText([],rfIncludeAlphaChars or rfIncludeNumericChars);
+      LookedUpWord:=EditView.Position.RipText(['_','.'],rfBackward or rfIncludeAlphaChars or rfIncludeNumericChars)+
+              EditView.Position.RipText(['_','.'],rfIncludeAlphaChars or rfIncludeNumericChars);
 
       HelpString:=ReplaceText(HelpString, KIBITZ_IGNORED_HELPSTRING, LookedUpWord);
     end;
