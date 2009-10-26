@@ -5,6 +5,7 @@ interface
 uses
   Classes,
   Windows,
+  Messages,
   ComCtrls,
   Forms,
   SysUtils,
@@ -175,9 +176,11 @@ end;
 procedure TSIAFB.OnFillEdit(Sender: TObject);
 var
   SearchWindow,
+  ComboBoxEdit,
   ComboBox : HWND;
   SearchEdit : HWND;
   Buffer : array[0..255] of Char;
+  l : Integer;
 begin
   Inc(FFillEditCount);
 
@@ -191,12 +194,14 @@ begin
     FTimerFillEdit.Enabled := false;
 
     ComboBox := FindWindowEx(SearchWindow, 0, 'THistoryPropComboBox', nil);
+    ComboBoxEdit := FindWindowEx(ComboBox, 0, 'Edit', nil);
     SearchEdit := FindWindowEx(FSearchPanelHandle, 0, 'THistoryPropComboBox', nil);
 
-    if ComboBox + SearchEdit > 0 then
+    if ComboBoxEdit + SearchEdit > 0 then
     begin
       GetWindowText(SearchEdit, @Buffer[0], 254);
-      SetWindowText(ComboBox, Buffer);
+      SetWindowText(ComboBoxEdit, Buffer);
+      SendMessage(ComboBoxEdit, EM_SETSEL, 0, -1);
     end;
   end;
 end;
