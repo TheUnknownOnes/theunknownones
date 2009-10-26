@@ -188,6 +188,7 @@ type
     FEnabled: Boolean;
     procedure InternalGetRSSResults(const AURL, AHelpString: string;
       AList, AErrors: TStrings);
+    procedure EnsureValidHelpString(var HelpString: String);
   public
     constructor Create;
     destructor Destroy; override;
@@ -248,7 +249,7 @@ procedure TCustomHelpViewer.InternalGetRSSResults(const AURL, AHelpString: strin
   AList, AErrors: TStrings);
 var
   idx, channelidx: Integer;
-  c, d, u, g:  string;
+  Caption, Description, Url, Group:  string;
   provEnabled: Boolean;
   oldc:        string;
   TrimOption:  TNamespaceTrimOption;
@@ -261,26 +262,26 @@ begin
   SetLength(FileName, MAX_PATH + 1);
 
   try
-    if not TCustomHelp.DecodeURL(AURL, c, d, u, g, TrimOption, provEnabled) then
+    if not TCustomHelp.DecodeURL(AURL, Caption, Description, Url, Group, TrimOption, provEnabled) then
       Exit;
 
     if not provEnabled then
       Exit;
 
-    oldc := c;
+    oldc := Caption;
 
     HelpString := AHelpString;
     TCustomHelp.TrimNamespace(HelpString, TrimOption);
 
-    if PosText(EnvVarToken(ENVVAR_NAME_KEYWORD), u) = 0 then
-      u := u + EnvVarToken(ENVVAR_NAME_KEYWORD_URL)
+    if PosText(EnvVarToken(ENVVAR_NAME_KEYWORD), Url) = 0 then
+      Url := Url + EnvVarToken(ENVVAR_NAME_KEYWORD_URL)
     else
-      u := ReplaceText(u, EnvVarToken(ENVVAR_NAME_KEYWORD),
+      Url := ReplaceText(Url, EnvVarToken(ENVVAR_NAME_KEYWORD),
         EnvVarToken(ENVVAR_NAME_KEYWORD_URL));
 
-    ExpandEnvVars(u, HelpString);
+    ExpandEnvVars(Url, HelpString);
 
-    if URLDownloadToCacheFile(nil, PChar(u), PChar(FileName), MAX_PATH,
+    if URLDownloadToCacheFile(nil, PChar(Url), PChar(FileName), MAX_PATH,
       0, nil) = s_OK then
     begin
       xmldocument       := CoDOMDocument.Create;
@@ -289,7 +290,7 @@ begin
       xmldocument.load(FileName);
 
       if xmldocument.parseError.errorCode <> 0 then
-        raise Exception.Create('Could not parse RSS data for ' + c +
+        raise Exception.Create('Could not parse RSS data for ' + Caption +
           #13#10 + 'Reason: ' + xmldocument.parseError.reason +
           //reason has a linebreak for itself
           'File saved to: ' + FileName);
@@ -300,46 +301,46 @@ begin
       begin
         node := channels[channelidx].selectSingleNode('title');
         if Assigned(node) then
-          g := GROUP_PREFIX_RSS + node.Text
+          Group := GROUP_PREFIX_RSS + node.Text
         else
-          g := GROUP_PREFIX_RSS + oldc;
+          Group := GROUP_PREFIX_RSS + oldc;
 
         nodes := channels[channelidx].selectNodes('item');
 
         for idx := 0 to nodes.length - 1 do
         begin
-          c := EmptyStr;
-          d := EmptyStr;
-          u := EmptyStr;
+          Caption := EmptyStr;
+          Description := EmptyStr;
+          Url := EmptyStr;
 
           node := nodes[idx].selectSingleNode('title');
           if Assigned(node) then
-            c := node.Text;
+            Caption := node.Text;
           node := nodes[idx].selectSingleNode('description');
           if Assigned(node) then
-            d := node.Text;
+            Description := node.Text;
           node := nodes[idx].selectSingleNode('link');
           if Assigned(node) then
-            u := node.Text;
+            Url := node.Text;
 
-          AList.Add(TCustomHelp.EncodeURL(c, d, u, g, TrimOption, provEnabled));
+          AList.Add(TCustomHelp.EncodeURL(Caption, Description, Url, Group, TrimOption, provEnabled));
         end;
 
         if nodes.length > 0 then
         begin
           node := channels[channelidx].selectSingleNode('title');
           if Assigned(node) then
-            c := node.Text;
+            Caption := node.Text;
 
           node := channels[channelidx].selectSingleNode('link');
           if Assigned(node) then
-            AList.Add(TCustomHelp.EncodeURL(' -=all results=-', 'for ' + c,
-              node.Text, g, TrimOption, provEnabled));
+            AList.Add(TCustomHelp.EncodeURL(' -=all results=-', 'for ' + Caption,
+              node.Text, Group, TrimOption, provEnabled));
         end;
       end;
     end
     else
-      raise Exception.Create('Could not download RSS data for ' + c);
+      raise Exception.Create('Could not download RSS data for ' + Caption);
   except
     on E: Exception do
       AErrors.Add(E.Message)
@@ -350,15 +351,23 @@ function TCustomHelpViewer.InternalGetHelpStrings(const HelpString: string;
   const AddProviders: Boolean; const AddRSSResults: Boolean): TStringList;
 var
   idx:         Integer;
-  c, d, u, g:  string;
-  ShortHelpString: string;
-  ProvEnabled: Boolean;
-  HelpStrings, errmsgs: TStringList;
-  TrimOption:  TNamespaceTrimOption;
-  sl:          TStringList;
+  AHelpString : String;
+  Caption,
+  Description,
+  Url,
+  Group           : string;
+  ShortHelpString : string;
+  ProvEnabled     : Boolean;
+  HelpStrings,
+  errmsgs         : TStringList;
+  TrimOption      : TNamespaceTrimOption;
+  sl              : TStringList;
 begin
   Result := nil;
-  GlobalCustomHelp.LastHelpCallKeyword := HelpString;
+  AHelpString:=HelpString;
+  EnsureValidHelpString(AHelpString);
+  GlobalCustomHelp.LastHelpCallKeyword := AHelpString;
+
 
   //Weil wir bei UnderstandsKeyword gesagt haben, das wir das Keyword verstehen (Result = 1)
   //werden wir jetzt gefragt, welche Hilfethemen wir zu diesem Keyword liefern können
@@ -378,7 +387,7 @@ begin
       for idx := 0 to GlobalCustomHelp.EnabledhxSessions.Count - 1 do
       begin
         try
-          ShortHelpString := HelpString;
+          ShortHelpString := AHelpString;
           if CustomHelpKeywordRecorderIntf.GetEnabled then
             CustomHelpKeywordRecorderIntf.AddKeyword(ShortHelpString, True);
           if not GlobalCustomHelp.PerformInHxSession(ShortHelpString,
@@ -410,58 +419,58 @@ begin
         for idx := 0 to GlobalCustomHelp.ProviderList.Count - 1 do
         begin
           if not TCustomHelp.DecodeURL(GlobalCustomHelp.ProviderList.Strings[idx],
-            c, d, u, g, TrimOption, ProvEnabled) then
+            Caption, Description, Url, Group, TrimOption, ProvEnabled) then
             Continue;
 
           if not ProvEnabled then
             Continue;
 
-          ShortHelpString := HelpString;
+          ShortHelpString := AHelpString;
           TCustomHelp.TrimNamespace(ShortHelpString, TrimOption);
-          c := c + #9 + ' search "' + ShortHelpString + '"';
+          Caption := Caption + #9 + ' search "' + ShortHelpString + '"';
 
           try
-            if Pos('://', u) > 0 then
+            if Pos('://', Url) > 0 then
             begin
-              if PosText(EnvVarToken(ENVVAR_NAME_KEYWORD), u) = 0 then
-                u := u + EnvVarToken(ENVVAR_NAME_KEYWORD_URL)
+              if PosText(EnvVarToken(ENVVAR_NAME_KEYWORD), Url) = 0 then
+                Url := Url + EnvVarToken(ENVVAR_NAME_KEYWORD_URL)
               else
-                u := ReplaceText(u, EnvVarToken(
+                Url := ReplaceText(Url, EnvVarToken(
                   ENVVAR_NAME_KEYWORD), EnvVarToken(
                   ENVVAR_NAME_KEYWORD_URL));
 
-              ExpandEnvVars(u, ShortHelpString);
+              ExpandEnvVars(Url, ShortHelpString);
 
-              HelpStrings.Add(TCustomHelp.EncodeURL(c, d, u, g, TrimOption, ProvEnabled));
+              HelpStrings.Add(TCustomHelp.EncodeURL(Caption, Description, Url, Group, TrimOption, ProvEnabled));
             end
-            else if AnsiSameText(ExtractFileExt(u), '.hlp') then
+            else if AnsiSameText(ExtractFileExt(Url), '.hlp') then
             begin
               ShortHelpString := AnsiReplaceStr(ShortHelpString, '.', ',');
 
               if (not GlobalCustomHelp.CheckWinHelpGid) or
-                TCustomHelp.CheckGidFile(u, True) then
+                TCustomHelp.CheckGidFile(Url, True) then
               begin
                 if (not GlobalCustomHelp.CheckWinHelpGid) or
-                  FileContainsText(u, ShortHelpString) then
+                  FileContainsText(Url, ShortHelpString) then
                   HelpStrings.Add(TCustomHelp.EncodeURL(
-                    c, d, PROTPREFIX_WINHELP + '-k ' + ShortHelpString + ' ' + u, g, TrimOption, ProvEnabled));
+                    Caption, Description, PROTPREFIX_WINHELP + '-k ' + ShortHelpString + ' ' + Url, Group, TrimOption, ProvEnabled));
               end;
             end
-            else if AnsiSameText(ExtractFileExt(u), '.chm') then
+            else if AnsiSameText(ExtractFileExt(Url), '.chm') then
             begin
               HelpStrings.Add(TCustomHelp.EncodeURL(
-                c, d, PROTPREFIX_HTMLHELP + ShortHelpString + URL_SPLITTER + u, g, TrimOption, ProvEnabled));
+                Caption, Description, PROTPREFIX_HTMLHELP + ShortHelpString + URL_SPLITTER + Url, Group, TrimOption, ProvEnabled));
             end
             else
             begin
-              ExpandEnvVars(u, ShortHelpString);
+              ExpandEnvVars(Url, ShortHelpString);
 
-              HelpStrings.Add(TCustomHelp.EncodeURL(c, d, PROTPREFIX_UNKNOWNHELP + u,
-                g, TrimOption, ProvEnabled));
+              HelpStrings.Add(TCustomHelp.EncodeURL(Caption, Description, PROTPREFIX_UNKNOWNHELP + Url,
+                Group, TrimOption, ProvEnabled));
             end;
           except
             on e: Exception do
-              errmsgs.Add(u + ': ' + e.Message);
+              errmsgs.Add(Url + ': ' + e.Message);
           end;
         end;
       end;
@@ -470,7 +479,7 @@ begin
         for idx := 0 to GlobalCustomHelp.RSSProviderList.Count - 1 do
         begin
           InternalGetRSSResults(GlobalCustomHelp.RSSProviderList.Strings[idx],
-            HelpString, HelpStrings, errmsgs);
+            AHelpString, HelpStrings, errmsgs);
         end;
 
       Result := HelpStrings;
@@ -803,6 +812,28 @@ begin
   end;
 end;
 
+procedure TCustomHelpViewer.EnsureValidHelpString(var HelpString: String);
+var
+  Editor            : IOTAEditor;
+  SourceEditor      : IOTASourceEditor70;
+  EditView          : IOTAEditView;
+  LookedUpWord      : String;
+begin
+  if AnsiContainsText(HelpString, KIBITZ_IGNORED_HELPSTRING) then
+  begin
+    Editor:=(BorlandIDEServices as IOTAModuleServices).CurrentModule.CurrentEditor;
+
+    if Supports(Editor, IOTASourceEditor70, SourceEditor) then
+    begin
+      EditView:=SourceEditor.EditViews[0];
+      LookedUpWord:=EditView.Position.RipText([],rfBackward or rfIncludeAlphaChars or rfIncludeNumericChars)+
+              EditView.Position.RipText([],rfIncludeAlphaChars or rfIncludeNumericChars);
+
+      HelpString:=ReplaceText(HelpString, KIBITZ_IGNORED_HELPSTRING, LookedUpWord);
+    end;
+  end;
+end;
+
 function TCustomHelpViewer.UnderstandsKeyword(const HelpString: string): Integer;
 var
   doCheck:      Boolean;
@@ -814,6 +845,8 @@ begin
 
   if not Enabled then
     Exit;
+
+  EnsureValidHelpString(AHelpString);
 
   if AnsiContainsText(AHelpString, KIBITZ_IGNORED_HELPSTRING) then
     Exit;
