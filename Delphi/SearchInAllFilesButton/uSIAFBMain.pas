@@ -4,6 +4,7 @@ interface
 
 uses
   Classes,
+  Windows,
   ComCtrls,
   Forms,
   SysUtils,
@@ -14,16 +15,26 @@ uses
 type
   TSIAFB = class
   private
+    FSearchPanelHandle : HWND;
     FTimer : TTimer;
     FIcon : TIcon;
     FButton : TToolButton;
+
+    FTimerFillEdit : TTimer;
+    FFillEditCount : Integer;
+
+    FOffHandler : TNotifyEvent;
+
     function FindSearchToolbar(AParent : TComponent): TToolbar;
     function FindFindInFilesHandler(AParent : TComponent) : TNotifyEvent;
 
     function CreateButton(AToolbar : TToolBar) : Boolean;
     procedure FreeButton;
 
+    procedure OnButtonClick(Sender : TObject);
+
     procedure OnTimer(Sender : TObject);
+    procedure OnFillEdit(Sender : TObject);
   public
     constructor Create;
     destructor Destroy; override;
@@ -49,20 +60,23 @@ begin
   FTimer.Interval := 1000;
   FTimer.OnTimer := OnTimer;
   FTimer.Enabled := true;
+
+  FTimerFillEdit := TTimer.Create(nil);
+  FTimerFillEdit.Interval := 100;
+  FTimerFillEdit.OnTimer := OnFillEdit;
+  FTimerFillEdit.Enabled := false;
 end;
 
 function TSIAFB.CreateButton(AToolbar : TToolBar) : Boolean;
-var
-  Handler : TNotifyEvent;
 begin
-  Handler := FindFindInFilesHandler(Application);
+  FOffHandler := FindFindInFilesHandler(Application);
 
-  Result := Assigned(Handler) and (not FIcon.Empty);
+  Result := Assigned(FOffHandler) and (not FIcon.Empty);
 
   if Result then
   begin
     FButton := TToolButton.Create(nil);
-    FButton.OnClick := Handler;
+    FButton.OnClick := OnButtonClick;
     FButton.Name := 'SearchInAllFilesButton';
     FButton.Hint := 'Search in all files';
     AToolbar.AutoSize := true;
@@ -119,7 +133,10 @@ begin
     Child := AParent.Components[idx];
 
     if (Child is TToolBar) and (Child.Name = 'SearchNavToolbar') then
-      Result := TToolBar(Child)
+    begin
+      Result := TToolBar(Child);
+      FSearchPanelHandle := Result.Parent.Handle;
+    end
     else
       Result := FindSearchToolbar(Child);
 
@@ -144,6 +161,45 @@ begin
   end;
 end;
 
+
+procedure TSIAFB.OnButtonClick(Sender: TObject);
+begin
+  if Assigned(FOffHandler) then
+  begin
+    FFillEditCount := 0;
+    FTimerFillEdit.Enabled := true;
+    FOffHandler(FButton);
+  end;
+end;
+
+procedure TSIAFB.OnFillEdit(Sender: TObject);
+var
+  SearchWindow,
+  ComboBox : HWND;
+  SearchEdit : HWND;
+  Buffer : array[0..255] of Char;
+begin
+  Inc(FFillEditCount);
+
+  if (FFillEditCount * (1000 div FTimerFillEdit.Interval)) >= 10 then //secs.
+    FTimerFillEdit.Enabled := false;
+
+  SearchWindow := FindWindow('TSrchDialog', nil);
+
+  if SearchWindow > 0 then
+  begin
+    FTimerFillEdit.Enabled := false;
+
+    ComboBox := FindWindowEx(SearchWindow, 0, 'THistoryPropComboBox', nil);
+    SearchEdit := FindWindowEx(FSearchPanelHandle, 0, 'THistoryPropComboBox', nil);
+
+    if ComboBox + SearchEdit > 0 then
+    begin
+      GetWindowText(SearchEdit, @Buffer[0], 254);
+      SetWindowText(ComboBox, Buffer);
+    end;
+  end;
+end;
 
 procedure TSIAFB.OnTimer(Sender: TObject);
 var
