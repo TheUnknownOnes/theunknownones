@@ -52,7 +52,7 @@
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="DesignIde.dcp"/>
-			<DCCReference Include="uSIAFBMain.pas"/>
+			<DCCReference Include="..\..\uSIAFBMain.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

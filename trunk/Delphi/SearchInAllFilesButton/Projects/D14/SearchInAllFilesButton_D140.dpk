@@ -32,6 +32,6 @@ requires
   DesignIde;
 
 contains
-  uSIAFBMain in 'uSIAFBMain.pas';
+  uSIAFBMain in '..\..\uSIAFBMain.pas';
 
 end.
