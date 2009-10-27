@@ -4,105 +4,121 @@ interface
 
 uses
   Classes,
-  Windows,
   Messages,
   ComCtrls,
   Forms,
   SysUtils,
   Graphics,
   ExtCtrls,
-  ToolsApi;
+  Menus,
+  StdCtrls,
+  ToolsApi,
+  Controls;
 
 type
-  TSIAFB = class
+  TSIAFB = class(TComponent)
   private
-    FSearchPanelHandle : HWND;
+    FSearchPanel : TPanel;
+    FSearchPanelToolBar : TToolBar;
     FTimer : TTimer;
-    FIcon : TIcon;
     FButton : TToolButton;
+    FFindInFilesMenuItem : TMenuItem;
+    FSimpleSearchCombobox : TComboBox;
+    FSimpleSearchOrigKeyUp : TKeyEvent;
 
-    FTimerFillEdit : TTimer;
     FFillEditCount : Integer;
 
-    FOffHandler : TNotifyEvent;
+    procedure StartInstallation;
+    procedure StartFillEdit;
 
-    function FindSearchToolbar(AParent : TComponent): TToolbar;
-    function FindFindInFilesHandler(AParent : TComponent) : TNotifyEvent;
+    function FindSearchPanel(AParent : TComponent): Boolean;
+    function FindFindInFilesMenu(AParent : TComponent) : Boolean;
 
-    function CreateButton(AToolbar : TToolBar) : Boolean;
-    procedure FreeButton;
+    procedure CreateButton;
 
     procedure OnButtonClick(Sender : TObject);
 
-    procedure OnTimer(Sender : TObject);
-    procedure OnFillEdit(Sender : TObject);
+    procedure OnDoInstallation(Sender : TObject);
+    procedure OnDoFillEdit(Sender : TObject);
+
+    procedure OnSimpleSearchKeyUp(Sender : TObject; var Key: Word; Shift: TShiftState);
+  protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   end;
 
 implementation
 
 uses
-  Dialogs, Menus, ActnList;
+  Dialogs, ActnList, Windows;
 
 var
   FSIAFB : TSIAFB;
 
 { TSIAFB }
 
-constructor TSIAFB.Create;
+constructor TSIAFB.Create(AOwner: TComponent);
 begin
+  inherited;
+
+  FSearchPanel := nil;
+  FSearchPanelToolBar := nil;
   FButton := nil;
 
-  FIcon := TIcon.Create;
-
   FTimer := TTimer.Create(nil);
-  FTimer.Interval := 1000;
-  FTimer.OnTimer := OnTimer;
-  FTimer.Enabled := true;
+  FTimer.Enabled := false;
 
-  FTimerFillEdit := TTimer.Create(nil);
-  FTimerFillEdit.Interval := 100;
-  FTimerFillEdit.OnTimer := OnFillEdit;
-  FTimerFillEdit.Enabled := false;
+  StartInstallation;
 end;
 
-function TSIAFB.CreateButton(AToolbar : TToolBar) : Boolean;
+procedure TSIAFB.CreateButton();
+var
+  Act : TCustomAction;
+  ico : TIcon;
 begin
-  FOffHandler := FindFindInFilesHandler(Application);
+  FButton := TToolButton.Create(nil);
+  FButton.OnClick := OnButtonClick;
+  FButton.Name := 'SearchInAllFilesButton';
+  FButton.Hint := 'Search in all files ' + ShortCutToText(ShortCut(VK_RETURN, [ssCtrl]));
+  FSearchPanelToolBar.AutoSize := true;
 
-  Result := Assigned(FOffHandler) and (not FIcon.Empty);
+  FSearchPanelToolBar.InsertControl(FButton);
 
-  if Result then
-  begin
-    FButton := TToolButton.Create(nil);
-    FButton.OnClick := OnButtonClick;
-    FButton.Name := 'SearchInAllFilesButton';
-    FButton.Hint := 'Search in all files';
-    AToolbar.AutoSize := true;
+  FButton.FreeNotification(Self);
 
-    AToolbar.InsertControl(FButton);
+  Act := TCustomAction(FFindInFilesMenuItem.Action);
 
-    FButton.ImageIndex := AToolbar.Images.AddIcon(FIcon);
-
-    FButton.Left := AToolbar.Buttons[AToolbar.ButtonCount - 1].Left + AToolbar.Buttons[AToolbar.ButtonCount - 1].Width;
+  Ico := TIcon.Create;
+  try
+    FFindInFilesMenuItem.GetParentMenu.Images.GetIcon(Act.ImageIndex, ico);
+    FButton.ImageIndex := FSearchPanelToolBar.Images.AddIcon(ico);
+  finally
+    Ico.Free;
   end;
+
+  FButton.Left := FSearchPanelToolBar.Buttons[FSearchPanelToolBar.ButtonCount - 1].Left +
+                  FSearchPanelToolBar.Buttons[FSearchPanelToolBar.ButtonCount - 1].Width;
 end;
 
 destructor TSIAFB.Destroy;
 begin
-  FreeButton;
+  FTimer.Free;
+
+  if Assigned(FButton) then
+    FButton.Free;
 
   inherited;
 end;
 
-function TSIAFB.FindFindInFilesHandler(AParent: TComponent): TNotifyEvent;
+
+function TSIAFB.FindFindInFilesMenu(AParent: TComponent): Boolean;
 var
   Child : TComponent;
   idx : Integer;
 begin
-  Result := nil;
+  Result := false;
 
   for idx := 0 to AParent.ComponentCount - 1 do
   begin
@@ -110,24 +126,45 @@ begin
 
     if (Child is TMenuItem) and (Child.Name = 'SearchFileFindItem') then
     begin
-      Result := TMenuItem(Child).Action.OnExecute;
-
-      TMenuItem(Child).GetParentMenu.Images.GetIcon(TCustomAction(TMenuItem(Child).Action).ImageIndex, FIcon);
+      FFindInFilesMenuItem := TMenuItem(Child);
+      Result := true;
     end
     else
-      Result := FindFindInFilesHandler(Child);
+      Result := FindFindInFilesMenu(Child);
 
-    if Assigned(Result) then
+    if Result then
       break;
   end;
 end;
 
-function TSIAFB.FindSearchToolbar(AParent: TComponent): TToolbar;
+function TSIAFB.FindSearchPanel(AParent: TComponent) : Boolean;
 var
   Child : TComponent;
   idx : Integer;
+
+  function FindSimpleSearchCombobox : Boolean;
+  var
+    idy : Integer;
+    Combo : TComponent;
+  begin
+    result := false;
+
+    for idy := 0 to FSearchPanel.ControlCount - 1 do
+    begin
+      Combo := FSearchPanel.Controls[idy];
+
+      if Combo.Name = 'SearchTextBox' then
+      begin
+        Result := true;
+        FSimpleSearchCombobox := TComboBox(Combo);
+        FSimpleSearchOrigKeyUp := FSimpleSearchCombobox.OnKeyUp;
+        FSimpleSearchCombobox.OnKeyUp := OnSimpleSearchKeyUp;
+      end;
+    end;
+  end;
+
 begin
-  Result := nil;
+  Result := false;
 
   for idx := 0 to AParent.ComponentCount - 1 do
   begin
@@ -135,89 +172,103 @@ begin
 
     if (Child is TToolBar) and (Child.Name = 'SearchNavToolbar') then
     begin
-      Result := TToolBar(Child);
-      FSearchPanelHandle := Result.Parent.Handle;
+      FSearchPanelToolBar := TToolBar(Child);
+      FSearchPanel := TPanel(FSearchPanelToolBar.Parent);
+
+      Result := FindSimpleSearchCombobox;
     end
     else
-      Result := FindSearchToolbar(Child);
+      Result := FindSearchPanel(Child);
 
-    if Assigned(Result) then
+    if Result then
       break;
   end;
 end;
 
-procedure TSIAFB.FreeButton;
+
+procedure TSIAFB.Notification(AComponent: TComponent; Operation: TOperation);
 begin
-  FTimer.Free;
+  inherited;
 
-  if Assigned(FIcon) then
-    FIcon.Free;
-
-  if Assigned(FButton) then
+  if (AComponent = FButton) and (Operation = opRemove) then
   begin
-    try
-      TToolBar(FButton.Parent).RemoveControl(FButton);
-      FButton.Free;
-    except end;
+    FButton := nil;
   end;
 end;
-
 
 procedure TSIAFB.OnButtonClick(Sender: TObject);
 begin
-  if Assigned(FOffHandler) then
-  begin
-    FFillEditCount := 0;
-    FTimerFillEdit.Enabled := true;
-    FOffHandler(FButton);
-  end;
+  StartFillEdit;
+  FFindInFilesMenuItem.Action.Execute;
 end;
 
-procedure TSIAFB.OnFillEdit(Sender: TObject);
+procedure TSIAFB.OnDoFillEdit(Sender: TObject);
 var
   SearchWindow,
   ComboBoxEdit,
   ComboBox : HWND;
-  SearchEdit : HWND;
-  Buffer : array[0..255] of Char;
-  l : Integer;
 begin
   Inc(FFillEditCount);
 
-  if (FFillEditCount * (1000 div FTimerFillEdit.Interval)) >= 10 then //secs.
-    FTimerFillEdit.Enabled := false;
+  if (FFillEditCount * (1000 div FTimer.Interval)) >= 10 then //secs.
+    FTimer.Enabled := false;
 
   SearchWindow := FindWindow('TSrchDialog', nil);
 
   if SearchWindow > 0 then
   begin
-    FTimerFillEdit.Enabled := false;
+    FTimer.Enabled := false;
 
     ComboBox := FindWindowEx(SearchWindow, 0, 'THistoryPropComboBox', nil);
     ComboBoxEdit := FindWindowEx(ComboBox, 0, 'Edit', nil);
-    SearchEdit := FindWindowEx(FSearchPanelHandle, 0, 'THistoryPropComboBox', nil);
 
-    if ComboBoxEdit + SearchEdit > 0 then
+    if ComboBoxEdit > 0 then
     begin
-      GetWindowText(SearchEdit, @Buffer[0], 254);
-      SetWindowText(ComboBoxEdit, Buffer);
+      SetWindowText(ComboBoxEdit, FSimpleSearchCombobox.Text);
       SendMessage(ComboBoxEdit, EM_SETSEL, 0, -1);
     end;
   end;
 end;
 
-procedure TSIAFB.OnTimer(Sender: TObject);
-var
-  TB : TToolBar;
+procedure TSIAFB.OnDoInstallation(Sender: TObject);
 begin
-  TB := FindSearchToolbar(Application);
-
-  if Assigned(TB) and CreateButton(TB) then
+  if FindSearchPanel(Application) and
+     FindFindInFilesMenu(Application) then
+  begin
+    CreateButton;
     FTimer.Enabled := false;
+    FTimer.OnTimer := nil;
+  end;
+end;
+
+procedure TSIAFB.OnSimpleSearchKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Key = VK_RETURN) and
+     (ssCtrl in Shift) then
+    FButton.Click
+  else
+  if Assigned(FSimpleSearchOrigKeyUp) then
+    FSimpleSearchOrigKeyUp(Sender, Key, Shift);
+end;
+
+procedure TSIAFB.StartFillEdit;
+begin
+  FFillEditCount := 0;
+  FTimer.Interval := 100;
+  FTimer.OnTimer := OnDoFillEdit;
+  FTimer.Enabled := true;
+end;
+
+procedure TSIAFB.StartInstallation;
+begin
+  FTimer.Interval := 1000;
+  FTimer.OnTimer := OnDoInstallation;
+  FTimer.Enabled := true;
 end;
 
 initialization
-  FSIAFB := TSIAFB.Create;
+  FSIAFB := TSIAFB.Create(nil);
 
 finalization
   if Assigned(FSIAFB) then
