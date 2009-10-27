@@ -56,6 +56,7 @@ uses
 
 var
   FSIAFB : TSIAFB;
+  SIAF_Shortcut  : TShortCut;
 
 { TSIAFB }
 
@@ -81,7 +82,7 @@ begin
   FButton := TToolButton.Create(nil);
   FButton.OnClick := OnButtonClick;
   FButton.Name := 'SearchInAllFilesButton';
-  FButton.Hint := 'Search in all files ' + ShortCutToText(ShortCut(VK_RETURN, [ssCtrl]));
+  FButton.Hint := 'Search in all files ' + ShortCutToText(SIAF_Shortcut);
   FSearchPanelToolBar.AutoSize := true;
 
   FSearchPanelToolBar.InsertControl(FButton);
@@ -244,8 +245,7 @@ end;
 procedure TSIAFB.OnSimpleSearchKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if (Key = VK_RETURN) and
-     (ssCtrl in Shift) then
+  if ShortCut(Key, Shift) = SIAF_Shortcut then
     FButton.Click
   else
   if Assigned(FSimpleSearchOrigKeyUp) then
@@ -268,6 +268,7 @@ begin
 end;
 
 initialization
+  SIAF_Shortcut := ShortCut(VK_RETURN, [ssCtrl]);
   FSIAFB := TSIAFB.Create(nil);
 
 finalization
