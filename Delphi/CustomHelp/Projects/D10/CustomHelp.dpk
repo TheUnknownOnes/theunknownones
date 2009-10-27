@@ -1,4 +1,4 @@
-package CustomHelp_D100;
+package CustomHelp;
 
 {$R *.res}
 {$ALIGN 8}
@@ -23,6 +23,7 @@ package CustomHelp_D100;
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'CustomHelp Expert ... by TUO'}
+{$LIBSUFFIX '_D100'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
@@ -33,7 +34,8 @@ requires
   vcl,
   xmlrtl,
   vclactnband,
-  vclx;
+  vclx,
+  TUOCommon;
 
 contains
   uCustomHelpMain in '..\..\uCustomHelpMain.pas',
