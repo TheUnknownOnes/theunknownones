@@ -6,7 +6,7 @@
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<ProjectVersion>12.0</ProjectVersion>
 		</PropertyGroup>
-		<PropertyGroup Condition="'$(Config)'=='Basis' or '$(Base)'!=''">
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
@@ -21,7 +21,7 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DCC_ImageBase>00400000</DCC_ImageBase>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\7.0\Bpl\CustomHelp_D140.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\7.0\Bpl\CustomHelp_D140.bpl</DCC_DependencyCheckOutputName>
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
 			<DesignOnlyPackage>true</DesignOnlyPackage>
 			<DCC_Optimize>false</DCC_Optimize>
@@ -44,9 +44,7 @@
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
 			<DCC_DebugInformation>false</DCC_DebugInformation>
 		</PropertyGroup>
-		<PropertyGroup Condition="'$(Cfg_2)'!=''">
-			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
-		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''"/>
 		<ItemGroup>
 			<DelphiCompile Include="CustomHelp_D140.dpk">
 				<MainSource>MainSource</MainSource>
@@ -58,6 +56,7 @@
 			<DCCReference Include="xmlrtl.dcp"/>
 			<DCCReference Include="vclactnband.dcp"/>
 			<DCCReference Include="vclx.dcp"/>
+			<DCCReference Include="TUOCommon.dcp"/>
 			<DCCReference Include="..\..\uCustomHelpMain.pas"/>
 			<DCCReference Include="..\..\uCustomHelpSelector.pas">
 				<Form>FormHelpSelector</Form>
@@ -84,7 +83,7 @@
 				<Form>FrameConfig3rdParty</Form>
 				<DesignClass>TFrame</DesignClass>
 			</DCCReference>
-			<BuildConfiguration Include="Basis">
+			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
 			<BuildConfiguration Include="Debug">
