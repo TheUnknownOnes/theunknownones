@@ -67,6 +67,7 @@ begin
   FSearchPanel := nil;
   FSearchPanelToolBar := nil;
   FButton := nil;
+  FSimpleSearchOrigKeyUp := nil;
 
   FTimer := TTimer.Create(nil);
   FTimer.Enabled := false;
@@ -109,6 +110,9 @@ begin
 
   if Assigned(FButton) then
     FButton.Free;
+
+  if Assigned(FSimpleSearchCombobox) then
+    FSimpleSearchCombobox.OnKeyUp := FSimpleSearchOrigKeyUp;
 
   inherited;
 end;
