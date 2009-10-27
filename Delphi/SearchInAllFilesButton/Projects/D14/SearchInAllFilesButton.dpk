@@ -1,4 +1,4 @@
-package SearchInAllFilesButton_D140;
+package SearchInAllFilesButton;
 
 {$R *.res}
 {$ALIGN 8}
@@ -23,8 +23,9 @@ package SearchInAllFilesButton_D140;
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'SearchInAllFiles-Button'}
+{$LIBSUFFIX '_D140'}
 {$DESIGNONLY}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,
