@@ -1,12 +1,12 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{C876841F-4B2F-455B-AE17-1027AB891FA7}</ProjectGuid>
-			<MainSource>CustomHelp_D120.dpk</MainSource>
+			<ProjectGuid>{2793A2A4-2254-40AC-A155-A342CB4C05DC}</ProjectGuid>
+			<MainSource>TUOCommon.dpk</MainSource>
 			<Config Condition="'$(Config)'==''">Debug</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<ProjectVersion>12.0</ProjectVersion>
 		</PropertyGroup>
-		<PropertyGroup Condition="'$(Config)'=='Basis' or '$(Base)'!=''">
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
@@ -20,22 +20,21 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
-			<ImageDebugInfo>true</ImageDebugInfo>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp_D120.bpl</DCC_DependencyCheckOutputName>
 			<DesignOnlyPackage>true</DesignOnlyPackage>
-			<DCC_Optimize>false</DCC_Optimize>
-			<DCC_Description>CustomHelp Expert ... by TUO</DCC_Description>
-			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DllSuffix>_D140</DllSuffix>
+			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_Platform>x86</DCC_Platform>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\7.0\Bpl\TUOCommon_D140.bpl</DCC_DependencyCheckOutputName>
+			<GenPackage>true</GenPackage>
+			<DCC_S>false</DCC_S>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<GenDll>true</GenDll>
-			<GenPackage>true</GenPackage>
-			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
-			<DCC_RemoteDebug>true</DCC_RemoteDebug>
-			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
-			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
-			<DCC_ImageBase>00400000</DCC_ImageBase>
-			<DCC_Platform>x86</DCC_Platform>
+			<DCC_N>true</DCC_N>
+			<DCC_E>false</DCC_E>
+			<DCC_F>false</DCC_F>
+			<DCC_K>false</DCC_K>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -44,47 +43,19 @@
 			<DCC_DebugInformation>false</DCC_DebugInformation>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
-			<DCC_MapFile>3</DCC_MapFile>
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="CustomHelp_D120.dpk">
+			<DelphiCompile Include="TUOCommon.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
+			<DCCReference Include="..\D10\images.res"/>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="designide.dcp"/>
-			<DCCReference Include="vclie.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
-			<DCCReference Include="xmlrtl.dcp"/>
-			<DCCReference Include="vclactnband.dcp"/>
-			<DCCReference Include="vclx.dcp"/>
-			<DCCReference Include="tuocommon.dcp"/>
-			<DCCReference Include="..\..\uCustomHelpMain.pas"/>
-			<DCCReference Include="..\..\uCustomHelpSelector.pas">
-				<Form>FormHelpSelector</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\uFormConfigCustomHelp.pas">
-				<Form>form_Config</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\uCustomHelpIDEIntegration.pas"/>
-			<DCCReference Include="..\..\uHtmlHelp.pas"/>
-			<DCCReference Include="..\..\uUtils.pas"/>
-			<DCCReference Include="..\..\uCustomHelpIntfs.pas"/>
-			<DCCReference Include="..\..\uCustomHelpKeywordRecorder.pas"/>
-			<DCCReference Include="..\..\uMSHelpServices.pas"/>
-			<DCCReference Include="..\..\uFrameConfigProviders.pas">
-				<Form>FrameConfigProviders</Form>
-				<DesignClass>TFrame</DesignClass>
-			</DCCReference>
-			<DCCReference Include="..\..\uCustomHelpConsts.pas"/>
-			<DCCReference Include="..\..\uFrameConfigColor.pas">
-				<Form>FrameConfigColor</Form>
-				<DesignClass>TFrame</DesignClass>
-			</DCCReference>
-			<DCCReference Include="..\..\uFrameConfig3rdParty.pas">
-				<Form>FrameConfig3rdParty</Form>
-				<DesignClass>TFrame</DesignClass>
-			</DCCReference>
-			<BuildConfiguration Include="Basis">
+			<DCCReference Include="DesignIDE.dcp"/>
+			<DCCReference Include="..\..\uTUOCommonMain.pas"/>
+			<DCCReference Include="..\..\uTUOCommonIntf.pas"/>
+			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
 			<BuildConfiguration Include="Debug">
@@ -103,15 +74,12 @@
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">CustomHelp_D120.dpk</Source>
+						<Source Name="MainSource">TUOCommon.dpk</Source>
 					</Source>
 					<Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
 						<Parameters Name="LoadAllSymbols">True</Parameters>
 						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
-						<Parameters Name="Debug Symbols Search Path">$(BDSCOMMONDIR)\Bpl\</Parameters>
-						<Parameters Name="RunParams">-pDelphi -rDebug_CustomHelp</Parameters>
-						<Parameters Name="HostApplication">$(BDS)\bin\bds.exe</Parameters>
 					</Parameters>
 					<VersionInfo>
 						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
@@ -141,11 +109,9 @@
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
 					<Excluded_Packages>
-						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp_D120.bpl">CustomHelp Expert ... by TUO</Excluded_Packages>
-						<Excluded_Packages Name="$(BDS)\bin\bcboffice2k120.bpl">CodeGear C++Builder Office 2000-Server-Package</Excluded_Packages>
-						<Excluded_Packages Name="$(BDS)\bin\bcbofficexp120.bpl">CodeGear C++Builder Office XP-Server-Package</Excluded_Packages>
-						<Excluded_Packages Name="$(BDS)\bin\dcloffice2k120.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
-						<Excluded_Packages Name="$(BDS)\bin\dclofficexp120.bpl">Microsoft Office XP Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\PNGImageListDesigner_D100D.bpl">PNGImagelist - Design</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\DBIni100.bpl">(Unbenannt)</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\dclqrt100.bpl">QuickReport Components</Excluded_Packages>
 					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>

@@ -21,7 +21,7 @@ const
     'default browser',
     'Microsoft Document Explorer');
 
-  REG_ROOT_BASE       = '\TheUnknownOnes\Delphi';
+  REG_ROOT_BASE       = '\Delphi';
   REG_ROOT_PROJECT    = '\CustomHelp';
 
   PROTPREFIX_CUSTOMHELP = 'CustomHelp://';

@@ -23,7 +23,8 @@ uses
   uCustomHelpSelector,
   uCustomHelpConsts,
   Graphics,
-  msxml;
+  msxml,
+  uTUOCommonIntf;
 
 type
   TProviderType = (ptStandard, ptRSS);
@@ -61,7 +62,6 @@ type
     //hack into the IDE (Menu-entry, ...)
     procedure ConnectToIDE;
     procedure DisconnectFromIDE;
-    function GetHelpMenu: TMenuItem;
 
     procedure LoadProviderFromRegistry;
     procedure LoadRSSProviderFromRegistry;
@@ -942,16 +942,15 @@ procedure TCustomHelp.ConnectToIDE;
 var
   HelpMenu: TMenuItem;
 begin
-  HelpMenu := GetHelpMenu;
+  HelpMenu := GetTUOCommon.ToolsMenuItem;
 
   if Assigned(HelpMenu) then
   begin
     FMenuItem         := TMenuItem.Create(HelpMenu);
     FMenuItem.Caption := 'Configure Custom Help ...';
     FMenuItem.OnClick := OnMenuItemClick;
-    HelpMenu.Insert(1, FMenuItem);
+    HelpMenu.Add(FMenuItem);
   end;
-
 end;
 
 constructor TCustomHelp.Create;
@@ -1249,27 +1248,6 @@ function TCustomHelp.GetEnabledhxSession(Index: Integer): IHxSession;
 begin
   if not Supports(EnabledhxSessions[Index], IHxSession, Result) then
     Result := nil;
-end;
-
-function TCustomHelp.GetHelpMenu: TMenuItem;
-var
-  NTA: INTAServices;
-  idx: Integer;
-begin
-  Result := nil;
-
-  if Supports(BorlandIDEServices, INTAServices, NTA) then
-  begin
-    for idx := 0 to NTA.MainMenu.Items.Count - 1 do
-    begin
-      if NTA.MainMenu.Items[idx].Name = 'HelpMenu' then
-      begin
-        Result := NTA.MainMenu.Items[idx];
-        break;
-      end;
-    end;
-  end;
-
 end;
 
 class function TCustomHelp.GetNamespaceName(Session: IHxSession): string;
@@ -1718,7 +1696,7 @@ const
 var
   reg: TRegistry;
 begin
-  F_REG_ROOT_KEY := GetIdeBaseRegistryKey + REG_ROOT_BASE + REG_ROOT_PROJECT;
+  F_REG_ROOT_KEY := GetTUOCommon.RegistryRootKey + REG_ROOT_BASE + REG_ROOT_PROJECT;
 
   if OLD_REG_ROOT_KEY = F_REG_ROOT_KEY then
     Exit;
