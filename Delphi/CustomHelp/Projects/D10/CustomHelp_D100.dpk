@@ -1,4 +1,4 @@
-package CustomHelp;
+package CustomHelp_D100;
 
 {$R *.res}
 {$ALIGN 8}
@@ -23,7 +23,6 @@ package CustomHelp;
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'CustomHelp Expert ... by TUO'}
-{$LIBSUFFIX '_D100'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 

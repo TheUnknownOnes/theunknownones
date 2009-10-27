@@ -10,7 +10,7 @@
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">CustomHelp.dpk</Source>
+			<Source Name="MainSource">CustomHelp_D100.dpk</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -171,9 +171,6 @@
 			<Language Name="ProjectLang">$00000000</Language>
 			<Language Name="RootDir"></Language>
 		</Language>  
-    
-    
-    
     <Excluded_Packages>
       <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxFlatPack_D10.bpl">Max's Flat Component Pack</Excluded_Packages>
       <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\mxCalendar_d10.bpl">Max's Calendar Component Suite</Excluded_Packages>

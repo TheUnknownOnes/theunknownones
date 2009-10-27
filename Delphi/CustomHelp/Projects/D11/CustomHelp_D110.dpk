@@ -34,7 +34,8 @@ requires
   vcl,
   xmlrtl,
   vclactnband,
-  vclx;
+  vclx,
+  TUOCommon;
 
 contains
   uCustomHelpMain in '..\..\uCustomHelpMain.pas',
