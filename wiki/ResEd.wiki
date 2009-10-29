@@ -3,7 +3,7 @@
 
 === What is ResEd ===
 
-ResEd is an expert for Delphi 2005, 2006 and 2007.
+ResEd is an expert for Delphi 2005, 2006, 2007, 2009 and 2010.
 
 This expert is designed for editing the resource files (.res; .resx) that are linked to the active project. It will automatically search for all occurrences of {$R xyz.res} lines and will open/create resourcefiles for them. The expert registers itself in the menubar of Delphi under View.
 
@@ -27,6 +27,6 @@ After installing the package successfully you've got a new menu-item in the menu
 
 ===Live-Templates?===
 
-Since version 1.4 ResEd uses a new Delphi 2006 feature calles live-templates. Now it is possible to add and create resources without leaving your sourcecode. Simply copy the ready-to-use template xml files into the appropriate folder on your harddisk and play around with them. Because everyone has his own likes and dislikes regarding templates I just added some hints what you can do with them. If you want to create new templates using TUO-Script feel free to do so. You may also send them to us and maybe we will incorporate them within the resed archive. 
+Since version 1.4 ResEd uses a new Delphi 2006+ feature calles live-templates. Now it is possible to add and create resources without leaving your sourcecode. Simply copy the ready-to-use template xml files into the appropriate folder on your harddisk and play around with them. Because everyone has his own likes and dislikes regarding templates I just added some hints what you can do with them. If you want to create new templates using TUO-Script feel free to do so. You may also send them to us and maybe we will incorporate them within the resed archive. 
 
 For a better understanding about the new scripting feature and live templates see TUOScriptPak
