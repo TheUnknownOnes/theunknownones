@@ -12,7 +12,7 @@ unit unitResourceGraphics;
 
 interface
 
-{$i defines.inc}
+{$i ..\Source\defines.inc}
 
 uses Windows, Classes, SysUtils, unitResourceElement, graphics, resed_unitExIcon
      {$ifdef HavePNGImage}, PNGImage {$else}, resEd_PngImage {$endif}

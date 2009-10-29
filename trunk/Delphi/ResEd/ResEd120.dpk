@@ -101,7 +101,6 @@ requires
   rtl,
   vcl,
   tuoscript120,
-  VirtualTreesD12,
   vclx,
   vclimg;
 

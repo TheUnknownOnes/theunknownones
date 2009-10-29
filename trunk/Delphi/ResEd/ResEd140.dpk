@@ -101,11 +101,8 @@ requires
   rtl,
   vcl,
   tuoscript140,
-  VirtualTreesD14,
   vclx,
   vclimg;
-
-{$i defines.inc}
 
 contains
   UnitResEdExpert in 'Source\UnitResEdExpert.pas',
@@ -133,8 +130,8 @@ contains
   ResEdVirtualTrees in 'VirtualTree\ResEdVirtualTrees.pas',
   ResEdVTAccessibility in 'VirtualTree\ResEdVTAccessibility.pas',
   ResEdVTAccessibilityFactory in 'VirtualTree\ResEdVTAccessibilityFactory.pas',
-  {$ifndef HaveGIFImage}ResEd_GIFImage in 'reImageTypes\ResEd_GIFImage.pas',{$endif}
-  {$ifndef HavePNGImage}ResEd_PngImage in 'reImageTypes\ResEd_PngImage.pas',{$endif}
+  ResEd_GIFImage in 'reImageTypes\ResEd_GIFImage.pas',
+  ResEd_PngImage in 'reImageTypes\ResEd_PngImage.pas',
   ResEd_pnglang in 'reImageTypes\ResEd_pnglang.pas',
   ResEd_pngzlib in 'reImageTypes\ResEd_pngzlib.pas',
   ResEd_unitExIcon in 'reImageTypes\ResEd_unitExIcon.pas';

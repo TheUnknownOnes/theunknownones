@@ -90,6 +90,10 @@ unit ResEd_pngimage;
 
 interface
 
+{$I defines.inc}
+
+{$ifndef HavePNGImage}
+
 {Triggers avaliable}
 
 {$DEFINE UseDelphi}              //Disable fat vcl units (perfect to small apps)
@@ -772,7 +776,10 @@ function update_crc(crc: {$IFNDEF DelphiBuilder3Less}Cardinal{$ELSE}Integer
 {Invert bytes using assembly}
 function ByteSwap(const a: integer): integer;
 
+{$endif} //HavePNGImage
+
 implementation
+{$ifndef HavePNGImage}
 
 var
   ChunkClasses: TPngPointerList;
@@ -4661,6 +4668,9 @@ finalization
   {$ENDIF}{$ENDIF}
   {Free chunk classes}
   FreeChunkClassList;
+
+
+{$endif} //HavePNGImage
 end.
 
 
