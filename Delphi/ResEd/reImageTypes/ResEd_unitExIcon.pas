@@ -26,7 +26,7 @@ unit ResEd_unitExIcon;
 
 interface
 
-{$i defines.inc}
+{$i ..\Source\defines.inc}
 
 uses Windows, Classes, SysUtils, Graphics, Controls,
      {$ifdef HavePNGImage}

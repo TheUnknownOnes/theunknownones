@@ -3950,7 +3950,7 @@ function WrapString(DC: HDC; const S: UnicodeString; const Bounds: TRect; RTL: B
 
 implementation
 
-{$R VirtualTrees.res}
+{$R ResEdVirtualTrees.res}
 
 uses
   Consts, Math,

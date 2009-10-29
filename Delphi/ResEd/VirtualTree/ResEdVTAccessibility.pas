@@ -21,7 +21,7 @@ uses
   {$else}
     oleacc, // MSAA support in Delphi 2006 or higher
   {$endif COMPILER_10_UP}
-  VirtualTrees, VTAccessibilityFactory, Controls;
+  ResEdVirtualTrees, ResEdVTAccessibilityFactory, Controls;
 
 type
   TVirtualTreeAccessibility = class(TInterfacedObject, IDispatch, IAccessible)

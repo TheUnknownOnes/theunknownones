@@ -2,7 +2,7 @@ unit unitResourceGIF;
 
 interface
 
-{$i defines.inc}
+{$i ..\Source\defines.inc}
 
 uses Windows, Classes, SysUtils, graphics,
      {$ifdef HaveGIFImage} gifimg, {$else} resed_gifimage, {$endif}

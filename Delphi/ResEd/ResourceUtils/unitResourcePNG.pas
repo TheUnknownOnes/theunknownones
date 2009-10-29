@@ -7,7 +7,7 @@ unit unitResourcePNG;
 
 interface
 
-{$i defines.inc}
+{$i ..\Source\defines.inc}
 
 uses Windows, Classes, SysUtils, graphics
      {$ifdef HavePNGImage}, PNGImage {$else}, resEd_PngImage {$endif}
