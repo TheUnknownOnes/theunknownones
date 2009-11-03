@@ -28,7 +28,10 @@ package DelphiRemoteIDEClient;
 
 requires
   rtl,
-  vcl;
+  vcl,
+  rttihelper_D100R,
+  hvrttihelper,
+  DesignIde;
 
 contains
   uDelphiRemoteIDEClient in '..\..\uDelphiRemoteIDEClient.pas',
@@ -36,6 +39,7 @@ contains
   uDelphiRemoteIDEClientPlugin in '..\..\uDelphiRemoteIDEClientPlugin.pas',
   uObjectDispatchEx in '..\..\uObjectDispatchEx.pas',
   uPluginTest1 in '..\..\uPluginTest1.pas',
-  uDRPApplication in '..\..\uDRPApplication.pas';
+  uDRPApplication in '..\..\uDRPApplication.pas',
+  ComLib in '..\..\..\Common\ComLib.pas';
 
 end.

@@ -165,7 +165,12 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>  <Excluded_Packages>
+		</VersionInfoKeys>
+		<Language>
+			<Language Name="ActiveLang"></Language>
+			<Language Name="ProjectLang">$00000000</Language>
+			<Language Name="RootDir"></Language>
+		</Language>  <Excluded_Packages>
       <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\PNGImageListDesigner_D100D.bpl">PNGImagelist - Design</Excluded_Packages>
       <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\DBIni100.bpl">(Unbenannt)</Excluded_Packages>
       <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\dclqrt100.bpl">QuickReport Components</Excluded_Packages>
