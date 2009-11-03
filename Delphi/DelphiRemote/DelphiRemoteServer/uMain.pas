@@ -7,19 +7,12 @@ uses
   Forms, Dialogs, StdCtrls;
 
 type
-  {$TYPEINFO ON}
-  {$METHODINFO ON}
-  TForm9 = class(TForm)
-    ListBox1: TListBox;
+  TFormMain = class(TForm)
   end;
-  {$TYPEINFO OFF}
-  {$METHODINFO OFF}
-
 
 var
-  Form9: TForm9;
-
-
+  FormMain: TFormMain;
+       
 implementation
 
 uses
