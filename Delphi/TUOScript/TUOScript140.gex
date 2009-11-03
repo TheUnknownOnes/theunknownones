@@ -1,0 +1,7 @@
+[General]
+Name=TUOScript140
+Project=1
+[Classes]
+Count=2
+Class0="TTUOScriptInterpreter_1_0","TObject","TUOScript","43","E:\Libs\tuo\trunk\Delphi\TUOScript\TUOScript.pas"
+Class1="TTUOScript","TNotifierObject, IOTACodeTemplateScriptEngine","TUOScript","62","E:\Libs\tuo\trunk\Delphi\TUOScript\TUOScript.pas"
