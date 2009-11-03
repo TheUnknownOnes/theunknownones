@@ -5,7 +5,7 @@ unit uService;
 interface
 
 uses
-  ComObj, ComLib, ActiveX, DelphiRemoteServer_TLB, StdVcl;
+  ComObj, ComLib, ActiveX, DelphiRemoteServer_TLB;
 
 type
   TService = class(TAutoObject, IService)
@@ -15,12 +15,11 @@ type
     procedure RegisterIDE(const IDE: IDispatch); safecall;
     procedure UnregisterIDE(const IDE: IDispatch); safecall;
     function Get_IDEs: IEnumVARIANT; safecall;
-    function Get_IDE_Properties(const IDE: IDispatch): IEnumVARIANT; safecall;
   end;
 
 implementation
 
-uses ComServ, uGlobal, SysUtils, Dialogs;
+uses ComServ, uGlobal, SysUtils;
 
 function TService.Get_IDE(idx: Integer): IDispatch;
 begin
@@ -73,11 +72,6 @@ begin
    DocName := ExtractFilePath( DocName );
 
    OleCheck( RegisterTypeLib( TypeLib, PWideChar( wFileName ), PWideChar( DocName ) ) );
-end;
-
-function TService.Get_IDE_Properties(const IDE: IDispatch): IEnumVARIANT;
-begin
-
 end;
 
 initialization
