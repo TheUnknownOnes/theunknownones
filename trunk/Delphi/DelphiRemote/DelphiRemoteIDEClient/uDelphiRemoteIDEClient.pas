@@ -16,8 +16,6 @@ uses
 type
   
   TDelphiRemoteIDEClient = class(TDelphiRemoteIDEClientPlugin)
-  protected
-    function GetHelpText : string; override;
   public
     procedure DoSomething;
   end;
@@ -43,11 +41,6 @@ end;
 var
   DelphiRemoteServerService : Service;
   DelphiRemoteIDEClientIntf : IDispatch;
-
-function TDelphiRemoteIDEClient.GetHelpText: string;
-begin
-  Result:='Basis';
-end;
 
 initialization
   DelphiRemoteServerService:=CreateOleObject('DelphiRemoteServer.Service') as Service;

@@ -41,7 +41,7 @@ type
 
 implementation
 
-uses uObjectDispatchEx;
+uses uObjectDispatchEx, uRTTIHelper, HVVMT, TypInfo, HVMethodSignature, HVMethodInfoClasses;
 
 { TDelphiRemoteIDEClientPlugin }
 
@@ -103,8 +103,60 @@ begin
 end;
 
 function TDelphiRemoteIDEClientPlugin.GetHelpText: string;
+var
+  sl : TStringList;
+  idx : Integer;
+  prop : PPropInfo;
+  s : String;
+  ci : TClassInfo;
 begin
-  Result:='';
+  sl := TStringList.Create;
+  try
+    rttihGetPropertiesList(Self, sl, false, [], [tkUnknown, tkMethod, tkClass, tkDynArray, tkRecord]);
+
+    for idx := 0 to sl.Count - 1 do
+    begin
+      Prop := rttihGetPropertyByName(Self, sl[idx]);
+
+      case Prop^.PropType^.Kind of
+        tkInteger : s := 'Integer';
+        tkChar : s := 'Char';
+        tkEnumeration : s := 'Enum';
+        tkFloat : s := 'Float';
+        tkString : s := 'String';
+        tkSet : s := 'Set';
+        tkWChar : s := 'Widechar';
+        tkLString : s := 'AnsiString';
+        tkWString : s := 'WideString';
+        tkVariant : s := 'Variant';
+        tkArray : s := 'Array';
+        tkInterface : s := 'Interface';
+        tkInt64 : s := 'Int64';
+      end;
+
+      sl[idx] := sl[idx] + ' Type: ' + s + #13#10;
+    end;
+
+    if sl.Count > 0 then
+      Result := '[Properties]' + #13#10 + sl.Text + #13#10;
+
+    sl.Clear;
+
+    GetClassInfo(Self.ClassInfo, ci);
+
+    for idx := 0 to ci.MethodCount - 1 do
+      sl.Add(MethodSignatureToString(ci.Methods[idx].Name, ci.Methods[idx]));
+
+    if sl.Count > 0 then
+      Result := '[Methods]' + #13#10 + sl.Text + #13#10;
+
+    sl.Clear;
+    sl.AddStrings(FChildren);
+    if sl.Count > 0 then
+      Result := '[Children]' + #13#10 + sl.Text + #13#10;
+  finally
+    sl.Free;
+  end;
 end;
 
 function TDelphiRemoteIDEClientPlugin.GetName: string;

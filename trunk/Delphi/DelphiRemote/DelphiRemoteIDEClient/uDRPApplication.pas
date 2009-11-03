@@ -7,10 +7,12 @@ uses
 
 type
   TDRPApplication = class(TDelphiRemoteIDEClientPlugin)
-  protected
-    function GetHelpText : string; override;
   public
     procedure Close;
+    procedure Minimize;
+    procedure Restore;
+    procedure BringToFront;
+    function MessageBox(AText : String; ACaption : String; AFlags : Integer) : Integer;
   end;
 
 implementation
@@ -22,14 +24,30 @@ var
 
 { TDRPApplication }
 
+procedure TDRPApplication.BringToFront;
+begin
+  Application.BringToFront;
+end;
+
 procedure TDRPApplication.Close;
 begin
   Application.MainForm.Close;
 end;
 
-function TDRPApplication.GetHelpText: string;
+procedure TDRPApplication.Restore;
 begin
-  Result:='Lustiges App Objekt';
+  Application.Restore;
+end;
+
+function TDRPApplication.MessageBox(AText, ACaption: String;
+  AFlags: Integer): Integer;
+begin
+  Result := Application.MessageBox(Pchar(AText), PChar(ACaption), AFlags);
+end;
+
+procedure TDRPApplication.Minimize;
+begin
+  Application.Minimize;
 end;
 
 initialization

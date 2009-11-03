@@ -6,8 +6,6 @@ uses uDelphiRemoteIDEClient, uDelphiRemoteIDEClientPlugin;
 
 type
   TTestPlugin = class(TDelphiRemoteIDEClientPlugin)
-  protected
-    function GetHelpText : string; override;
   public
     procedure Abc;
   end;
@@ -26,11 +24,6 @@ end;
 
 var
   myPlugin: TTestPlugin;
-
-function TTestPlugin.GetHelpText: string;
-begin
-  Result:='Test';
-end;
 
 initialization
   myPlugin:=TTestPlugin.Create;
