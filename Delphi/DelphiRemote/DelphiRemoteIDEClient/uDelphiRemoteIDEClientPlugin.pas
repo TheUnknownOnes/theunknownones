@@ -14,7 +14,6 @@ type
     FChildren: TStringList;
     FParent: TDelphiRemoteIDEClientPlugin;
     FInterface : IDispatch;
-    function GetClassname: String;
   protected
     function GetName : string; virtual;
     function GetHelpText : string; virtual;
