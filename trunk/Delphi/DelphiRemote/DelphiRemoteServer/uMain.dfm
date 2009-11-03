@@ -1,7 +1,7 @@
-object Form9: TForm9
+object FormMain: TFormMain
   Left = 0
   Top = 0
-  Caption = 'Form9'
+  Caption = 'FormMain'
   ClientHeight = 292
   ClientWidth = 554
   Color = clBtnFace
@@ -13,13 +13,4 @@ object Form9: TForm9
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
-  object ListBox1: TListBox
-    Left = 0
-    Top = 0
-    Width = 554
-    Height = 292
-    Align = alClient
-    ItemHeight = 13
-    TabOrder = 0
-  end
 end

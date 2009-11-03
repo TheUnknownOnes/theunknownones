@@ -3,10 +3,10 @@ unit uObjectDispatchEx;
 interface
 
 uses
-  ActiveX, ObjComAuto, Classes, TypInfo;
+  ActiveX, ObjComAuto, Classes, TypInfo, uDelphiRemoteIDEClientPlugin;
 
 type
-  TObjectDispatchEx = class(TObjectDispatch, IDispatch)
+  TObjectDispatchEx = class(TObjectDispatch)
   public
     constructor Create(Instance: TObject; Owned: Boolean = True);
     destructor Destroy; override;
@@ -15,7 +15,7 @@ type
 implementation
 
 uses
-  Dialogs;
+  Dialogs, SysUtils;
 
 { TObjectDispatchEx }
 
@@ -28,6 +28,5 @@ destructor TObjectDispatchEx.Destroy;
 begin
   inherited;
 end;
-
 
 end.

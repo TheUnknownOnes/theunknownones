@@ -12,7 +12,7 @@ unit DelphiRemoteServer_TLB;
 // ************************************************************************ //
 
 // PASTLWTR : 1.2
-// Datei generiert am 03.11.2009 11:33:52 aus der unten beschriebenen Typbibliothek.
+// Datei generiert am 03.11.2009 14:17:46 aus der unten beschriebenen Typbibliothek.
 
 // ************************************************************************  //
 // Typbib: C:\Users\MaWarm\Documents\Projects\TUO\trunk\Delphi\DelphiRemote\DelphiRemoteServer\Project\DelphiRemoteServer.tlb (1)

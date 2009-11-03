@@ -6,7 +6,7 @@ program DelphiRemoteServer;
 
 uses
   Forms,
-  uMain in '..\uMain.pas' {Form9},
+  uMain in '..\uMain.pas' {FormMain},
   uGlobal in '..\uGlobal.pas' {Global: TDataModule},
   uService in '..\uService.pas' {Service: CoClass},
   DelphiRemoteServer_TLB in 'DelphiRemoteServer_TLB.pas';
@@ -17,7 +17,8 @@ uses
 
 begin
   Application.Initialize;
-  Application.CreateForm(TForm9, Form9);
+  Application.CreateForm(TFormMain, FormMain);
   Application.CreateForm(TGlobal, Global);
+  Application.ShowMainForm:=False;
   Application.Run;
 end.

@@ -116,15 +116,16 @@
 			<Linker Name="MinStackSize">16384</Linker>
 			<Linker Name="MaxStackSize">1048576</Linker>
 			<Linker Name="ImageBase">4194304</Linker>
-			<Linker Name="ExeDescription"></Linker>
-		</Linker>
+			<Linker Name="ExeDescription"></Linker>  <Linker Name="AutoRegisterTLB">False</Linker>
+      <Linker Name="AutoGenImportAssembly">False</Linker>
+    </Linker>
 		<Directories>
 			<Directories Name="OutputDir"></Directories>
 			<Directories Name="UnitOutputDir"></Directories>
 			<Directories Name="PackageDLLOutputDir"></Directories>
 			<Directories Name="PackageDCPOutputDir"></Directories>
 			<Directories Name="SearchPath"></Directories>
-			<Directories Name="Packages"></Directories>
+			<Directories Name="Packages">vcl;rtl;vclx;dbrtl;vcldb;adortl;dbxcds;dbexpress;vclib;ibxpress;indy;dsnap;bdertl;teeui;teedb;tee;vcldbx;dsnapcon;vclactnband;ConsoleTools_D100R;EffectPNGEdit_D100R;PNGSupport_D100;DirectX9_D10;GDIPlus100;EffectPNGImage_D100R;EffectPNGImageList_D100R;EffectPNGToolbar_D100R;GDIPlus100D;GroupListView_D100R;ImageListProvider_D100D;ImageListProvider_D100R;PNGImageList_D100D;PNGUtils_D100R;PNGImageList_D100R;PSBuzz_D100R;SearchEdit_D100D;SearchEdit_D100R;xmlrtl;RegExp_D100R;XMLTools_D100R;Settings_D100R;tdbf_d10d;tdbf_d10r;Wiimote_D100R;TUOScript100;eltreeD10;SPPComponents100;qrpt100;JvStdCtrlsD10R;JvCoreD10R;Jcl;FIBPlus2006;FlexCelXLS100;FlexCel100;RxCtl100;VclSmp;FIBDBMidas2006;PCheck100;SQLClientDataset100;XPMenu100;SingleSignOn100;CommonTools_D100R;JclVcl;JvCryptD10R;CheckCombo100;HotKeyManager_D100;BarcodeHelper_D100;TntUnicodeVcl;RichViewEditor_D100;RVPkg2006;EffectPNG_D100R;JvSystemD10R;vclie;inet;inetdbbde;inetdbxpress;NPipe_D100;O407_r100;O407br100;VNCWrapper_D100;SPPCrypt;xtrafil100;Drucker_D100;Rechte100;HTMLEditor_D10;JvCtrlsD10R;JvCustomD10R;JvDlgsD10R;JvAppFrmD10R;JvBandsD10R;JvDBD10R;JvBDED10R;JvCmpD10R;JvDockingD10R;JvDotNetCtrlsD10R;JvEDID10R;JvGlobusD10R;JvHMID10R;JvInterpreterD10R;JvJansD10R;JvManagedThreadsD10R;JvMMD10R;JvNetD10R;JvPageCompsD10R;JvPluginD10R;JvPrintPreviewD10R;JvRuntimeDesignD10R;JvTimeFrameworkD10R;JvValidatorsD10R;JvWizardD10R;JvXPCtrlsD10R;madDisAsm_;madBasic_;mxNativeExcel_d10;mxExport_D10;QRExports100;VirtualTreesD10;SPPVirtualTrees_D100D;SPPVirtualTrees_D100R;VirtualActionTree_D100R;VSTHeaderSaver;VSTSearchEdit_D100R;Settings_VirtualTrees_D100R;BCGEN100;QRAngledLabel100;Etikettendruck_D100;ImageTypes100;TUOCommon;fs10;fsADO10;frxADO10;frxBDE10;frxDBX10;frxe10;frxFib10;frxIBX10;fsTee10;frx10;fsDB10;frxDB10;fsBDE10;frxTee10;fsIBX10;Fastreport_Components_D100;madExcept_;madKernel_;madSecurity_;madShell_;MemoExD6;soaprtl</Directories>
 			<Directories Name="Conditionals"></Directories>
 			<Directories Name="DebugSourceDirs"></Directories>
 			<Directories Name="UsePackages">False</Directories>
@@ -165,7 +166,10 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>  <Excluded_Packages>
+		</VersionInfoKeys>  
+    
+    
+    <Excluded_Packages>
       <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\PNGImageListDesigner_D100D.bpl">PNGImagelist - Design</Excluded_Packages>
       <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\DBIni100.bpl">(Unbenannt)</Excluded_Packages>
       <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\dclqrt100.bpl">QuickReport Components</Excluded_Packages>
