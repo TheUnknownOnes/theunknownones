@@ -5,9 +5,13 @@ interface
 uses uDelphiRemoteIDEClient, uDelphiRemoteIDEClientPlugin;
 
 type
+  ttestrecord = record
+    a : string;
+    b : integer;
+  end;
   TTestPlugin = class(TDelphiRemoteIDEClientPlugin)
   public
-    procedure Abc;
+    function Abc: ttestrecord;
   end;
 
 implementation
@@ -17,20 +21,13 @@ uses
 
 { TTestPlugin }
 
-procedure TTestPlugin.Abc;
+function TTestPlugin.Abc: ttestrecord;
 begin
-  showmessage('abc');
+  result.a:='abc';
+  result.b:=55;
 end;
 
-var
-  myPlugin: TTestPlugin;
-
 initialization
-  myPlugin:=TTestPlugin.Create;
-  GlobalDelphiRemoteIDEClient.RegisterChild('testPlugin', myPlugin);
-
-finalization
-  GlobalDelphiRemoteIDEClient.UnregisterChild(myPlugin);
-  myPlugin.Free;
+  GlobalDelphiRemoteIDEClient.RegisterChild('testPlugin', TTestPlugin.Create);
 
 end.

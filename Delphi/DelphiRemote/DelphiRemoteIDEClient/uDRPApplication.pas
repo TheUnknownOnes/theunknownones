@@ -19,9 +19,6 @@ implementation
 
 uses uDelphiRemoteIDEClient, Forms;
 
-var
-  DRPApplication: TDRPApplication;
-
 { TDRPApplication }
 
 procedure TDRPApplication.BringToFront;
@@ -51,11 +48,6 @@ begin
 end;
 
 initialization
-  DRPApplication:=TDRPApplication.Create;
-  GlobalDelphiRemoteIDEClient.RegisterChild('Application', DRPApplication);
-
-finalization
-  GlobalDelphiRemoteIDEClient.UnregisterChild(DRPApplication);
-  DRPApplication.Free;
+  GlobalDelphiRemoteIDEClient.RegisterChild('Application', TDRPApplication.Create);
 
 end.

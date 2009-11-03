@@ -86,6 +86,11 @@ end;
 
 destructor TDelphiRemoteIDEClientPlugin.Destroy;
 begin
+  while FChildren.Count>0 do
+  begin
+    UnregisterChild(FChildren.Objects[0]);
+  end;
+
   FChildren.Free;
 
   FInterface:=nil;
@@ -194,6 +199,9 @@ procedure TDelphiRemoteIDEClientPlugin.RegisterChild(AName: String;
   AChild: TObject);
 begin
   FChildren.AddObject(AName, AChild);
+
+  if AChild is TDelphiRemoteIDEClientPlugin then
+    TDelphiRemoteIDEClientPlugin(AChild).Parent:=Self;
 end;
 
 procedure TDelphiRemoteIDEClientPlugin.UnregisterChild(
@@ -203,7 +211,10 @@ var
 begin
   idx:=FChildren.IndexOfObject(AChild);
   if idx>=0 then
+  begin
     FChildren.Delete(idx);
+  end;
+  AChild.Free;
 end;
 
 end.
