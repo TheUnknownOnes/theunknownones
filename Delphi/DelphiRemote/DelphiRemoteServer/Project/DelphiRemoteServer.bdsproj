@@ -116,9 +116,10 @@
 			<Linker Name="MinStackSize">16384</Linker>
 			<Linker Name="MaxStackSize">1048576</Linker>
 			<Linker Name="ImageBase">4194304</Linker>
-			<Linker Name="ExeDescription"></Linker>  <Linker Name="AutoRegisterTLB">False</Linker>
-      <Linker Name="AutoGenImportAssembly">False</Linker>
-    </Linker>
+			<Linker Name="ExeDescription"></Linker>
+			<Linker Name="AutoRegisterTLB">False</Linker>
+			<Linker Name="AutoGenImportAssembly">False</Linker>
+		</Linker>
 		<Directories>
 			<Directories Name="OutputDir"></Directories>
 			<Directories Name="UnitOutputDir"></Directories>
@@ -167,7 +168,6 @@
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
 		</VersionInfoKeys>  
-    
     
     <Excluded_Packages>
       <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\PNGImageListDesigner_D100D.bpl">PNGImagelist - Design</Excluded_Packages>
