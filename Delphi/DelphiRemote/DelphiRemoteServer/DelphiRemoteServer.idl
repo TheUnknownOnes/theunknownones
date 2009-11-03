@@ -1,0 +1,55 @@
+[
+  uuid(4B987DA2-F15C-4A9D-AEAC-F2B56E9E714D), 
+  version(1.0)
+    
+]
+library DelphiRemoteServer
+{
+
+  importlib("stdole2.tlb");
+
+  [
+    uuid(2755AA8A-EE23-4A1A-A6B3-55B526D317DB), 
+    version(1.0), 
+    helpstring("Service Objekt")
+  ]
+  coclass Service
+  {
+    [default] interface IService;
+  };
+
+  [
+    uuid(CF69BEFB-C2E7-4652-84EA-36D397DE2C51), 
+    version(1.0), 
+    helpstring("Dispatch-Interface für Service-Objekt"), 
+    dual, 
+    oleautomation
+  ]
+   interface IService: IDispatch
+  {
+    [
+    id(0x000000C9)
+    ]
+    HRESULT _stdcall RegisterIDE([in]  IDispatch * IDE );
+    [
+    id(0x000000CA)
+    ]
+    HRESULT _stdcall UnregisterIDE([in]  IDispatch * IDE );
+    [
+    propget, 
+    id(0x000000CB)
+    ]
+    HRESULT _stdcall IDE([in] long idx, [out, retval]  IDispatch ** Value );
+    [
+    propget, 
+    id(0x000000CC)
+    ]
+    HRESULT _stdcall IDECount([out, retval] long * Value );
+    [
+    propget, 
+    id(0x000000CD)
+    ]
+    HRESULT _stdcall IDEs([out, retval] IEnumVARIANT ** Value /*Warnung: Strukturname kann nicht überprüft werden: */ );
+  };
+
+};
