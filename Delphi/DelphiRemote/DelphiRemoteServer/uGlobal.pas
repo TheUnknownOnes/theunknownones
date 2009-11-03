@@ -21,7 +21,7 @@ var
 
 implementation
 
-uses ActiveX, comobj, DelphiRemoteServer_TLB;
+uses ActiveX, comobj, DelphiRemoteServer_TLB, Dialogs;
 
 {$R *.dfm}
 
