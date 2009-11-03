@@ -34,10 +34,10 @@ end;
 
 initialization
   myPlugin:=TTestPlugin.Create;
-  GlobalDelphiRemoteIDEClient.RegisterPlugin('testPlugin', myPlugin);
+  GlobalDelphiRemoteIDEClient.RegisterChild('testPlugin', myPlugin);
 
 finalization
-  GlobalDelphiRemoteIDEClient.UnregisterPlugin(myPlugin);
+  GlobalDelphiRemoteIDEClient.UnregisterChild(myPlugin);
   myPlugin.Free;
 
 end.

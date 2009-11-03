@@ -34,10 +34,10 @@ end;
 
 initialization
   DRPApplication:=TDRPApplication.Create;
-  GlobalDelphiRemoteIDEClient.RegisterPlugin('Application', DRPApplication);
+  GlobalDelphiRemoteIDEClient.RegisterChild('Application', DRPApplication);
 
 finalization
-  GlobalDelphiRemoteIDEClient.UnregisterPlugin(DRPApplication);
+  GlobalDelphiRemoteIDEClient.UnregisterChild(DRPApplication);
   DRPApplication.Free;
 
 end.

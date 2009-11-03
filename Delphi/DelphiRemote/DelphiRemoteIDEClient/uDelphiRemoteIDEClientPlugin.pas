@@ -5,7 +5,7 @@ interface
 {$TYPEINFO ON}
 
 uses
-  Classes;
+  Classes, ComLib;
 
 type  
   {$METHODINFO ON}
@@ -14,6 +14,7 @@ type
     FChildren: TStringList;
     FParent: TDelphiRemoteIDEClientPlugin;
     FInterface : IDispatch;
+    function GetClassname: String;
   protected
     function GetName : string; virtual;
     function GetHelpText : string; virtual;
@@ -22,13 +23,14 @@ type
     destructor Destroy; override;
 
     function GetChild(AString: String): IDispatch;
+    function GetChildren: IEnumVariant;
 
     {$METHODINFO OFF}
     function GetDispatchInterface  : IDispatch;
-    procedure RegisterPlugin(AName: String; APlugin : TDelphiRemoteIDEClientPlugin);
-    procedure UnregisterPlugin(APlugin : TDelphiRemoteIDEClientPlugin);
-    function GetPluginByName(AName: String): TDelphiRemoteIDEClientPlugin;
-    function GetNameByPlugin(APlugin: TDelphiRemoteIDEClientPlugin): String;
+    procedure RegisterChild(AName: String; AChild : TObject);
+    procedure UnregisterChild(AChild : TObject);
+    function GetChildByName(AName: String): TObject;
+    function GetNameByChild(AChild: TObject): String;
     {$METHODINFO ON}
 
     function GetHelp: String;
@@ -46,14 +48,32 @@ uses uObjectDispatchEx;
 
 function TDelphiRemoteIDEClientPlugin.GetChild(AString: String): IDispatch;
 var
-  ChildObj : TDelphiRemoteIDEClientPlugin;
+  ChildObj : TObject;
 begin
-  ChildObj:=GetPluginByName(AString);
+  ChildObj:=GetChildByName(AString);
 
   if Assigned(ChildObj) then
-    Result:=ChildObj.GetDispatchInterface
+  begin
+    if ChildObj is TDelphiRemoteIDEClientPlugin then
+      Result:=TDelphiRemoteIDEClientPlugin(ChildObj).GetDispatchInterface
+    else
+      Result:=TObjectDispatchEx.Create(ChildObj, False);
+  end
   else
     Result:=nil;
+end;
+
+function TDelphiRemoteIDEClientPlugin.GetChildren: IEnumVariant;
+var
+  List : TVariantCollection;
+  idx: Integer;
+begin
+  List:=TVariantCollection.Create(nil);
+
+  for idx := 0 to FChildren.Count - 1 do
+    List.Add(TDelphiRemoteIDEClientPlugin(FChildren.Objects[idx]).GetDispatchInterface);
+
+  Result:=List.GetEnum;
 end;
 
 constructor TDelphiRemoteIDEClientPlugin.Create;
@@ -92,23 +112,23 @@ function TDelphiRemoteIDEClientPlugin.GetName: string;
 begin
   Result:='Root';
   if Assigned(FParent) then
-    Result:=FParent.GetNameByPlugin(Self);
+    Result:=FParent.GetNameByChild(Self);
 end;
 
-function TDelphiRemoteIDEClientPlugin.GetNameByPlugin(
-  APlugin: TDelphiRemoteIDEClientPlugin): String;
+function TDelphiRemoteIDEClientPlugin.GetNameByChild(
+  AChild: TObject): String;
 var
   idx: Integer;
 begin
   Result:='';
 
-  idx:=FChildren.IndexOfObject(APlugin);
+  idx:=FChildren.IndexOfObject(AChild);
   if idx>=0 then
     Result:=FChildren[idx];
 end;
 
-function TDelphiRemoteIDEClientPlugin.GetPluginByName(
-  AName: String): TDelphiRemoteIDEClientPlugin;
+function TDelphiRemoteIDEClientPlugin.GetChildByName(
+  AName: String): TObject;
 var
   idx: Integer;
 begin
@@ -116,21 +136,21 @@ begin
 
   idx:=FChildren.IndexOf(AName);
   if idx>=0 then
-    Result:=TDelphiRemoteIDEClientPlugin(FChildren.Objects[idx]);
+    Result:=FChildren.Objects[idx];
 end;
 
-procedure TDelphiRemoteIDEClientPlugin.RegisterPlugin(AName: String;
-  APlugin: TDelphiRemoteIDEClientPlugin);
+procedure TDelphiRemoteIDEClientPlugin.RegisterChild(AName: String;
+  AChild: TObject);
 begin
-  FChildren.AddObject(AName,APlugin);
+  FChildren.AddObject(AName, AChild);
 end;
 
-procedure TDelphiRemoteIDEClientPlugin.UnregisterPlugin(
-  APlugin: TDelphiRemoteIDEClientPlugin);
+procedure TDelphiRemoteIDEClientPlugin.UnregisterChild(
+  AChild: TObject);
 var
   idx : Integer;
 begin
-  idx:=FChildren.IndexOfObject(APlugin);
+  idx:=FChildren.IndexOfObject(AChild);
   if idx>=0 then
     FChildren.Delete(idx);
 end;
