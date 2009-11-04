@@ -2,13 +2,12 @@ unit uDelphiRemoteIDEClientPlugin;
 
 interface
 
-
+{$TYPEINFO ON}
 
 uses
-  Classes, ComLib, SysUtils;
+  Classes, ComLib;
 
-type
-  {$TYPEINFO ON}  
+type  
   {$METHODINFO ON}
   TDelphiRemoteIDEClientPlugin = class(TObject)
   private
@@ -26,20 +25,22 @@ type
     function GetChildren: IEnumVariant;
 
     function GetDispatchInterface  : IDispatch;
-    procedure RegisterChild(AName: String; AChild : TObject);
-    procedure UnregisterChild(AChild : TObject);
-    function GetChildByName(AName: String): TObject;
-    function GetNameByChild(AChild: TObject): String;
+    procedure RegisterChild(AName: String; AChild : TDelphiRemoteIDEClientPlugin);
+    procedure UnregisterChild(AChild : TDelphiRemoteIDEClientPlugin);
+    function GetChildByName(AName: String): TDelphiRemoteIDEClientPlugin;
+    function GetNameByChild(AChild: TDelphiRemoteIDEClientPlugin): String;
 
     function GetHelp: String;
   published
     property Name : String read GetName;
     property Parent : TDelphiRemoteIDEClientPlugin read FParent write FParent;
   end;
+  {$METHODINFO OFF}
 
 implementation
 
-uses uObjectDispatchEx, uRTTIHelper, HVVMT, TypInfo, HVMethodSignature, HVMethodInfoClasses;
+uses uObjectDispatchEx, uRTTIHelper, HVVMT, TypInfo, HVMethodSignature, HVMethodInfoClasses, 
+  SysUtils;
 
 { TDelphiRemoteIDEClientPlugin }
 
@@ -51,10 +52,7 @@ begin
 
   if Assigned(ChildObj) then
   begin
-    if ChildObj is TDelphiRemoteIDEClientPlugin then
-      Result:=TDelphiRemoteIDEClientPlugin(ChildObj).GetDispatchInterface
-    else
-      Result:=TObjectDispatchEx.Create(ChildObj, False);
+    Result:=TDelphiRemoteIDEClientPlugin(ChildObj).GetDispatchInterface
   end
   else
     Result:=nil;
@@ -75,8 +73,6 @@ end;
 
 constructor TDelphiRemoteIDEClientPlugin.Create;
 begin
-  FParent := nil;
-  
   FChildren:=TStringList.Create;
   FChildren.Sorted:=True;
   FChildren.Duplicates:=dupError;
@@ -88,7 +84,7 @@ destructor TDelphiRemoteIDEClientPlugin.Destroy;
 begin
   while FChildren.Count>0 do
   begin
-    UnregisterChild(FChildren.Objects[0]);
+    UnregisterChild(TDelphiRemoteIDEClientPlugin(FChildren.Objects[0]));
   end;
 
   FChildren.Free;
@@ -115,6 +111,7 @@ var
   s : String;
   ci : TClassInfo;
 begin
+  Result := '';
   sl := TStringList.Create;
   try
     rttihGetPropertiesList(Self, sl, false, [], [tkUnknown, tkMethod, tkClass, tkDynArray, tkRecord]);
@@ -143,7 +140,7 @@ begin
     end;
 
     if sl.Count > 0 then
-      Result := '[Properties]' + #13#10 + sl.Text + #13#10;
+      Result := Result + '[Properties]' + #13#10 + trim(sl.Text) + #13#10;
 
     sl.Clear;
 
@@ -153,17 +150,15 @@ begin
       sl.Add(MethodSignatureToString(ci.Methods[idx].Name, ci.Methods[idx]));
 
     if sl.Count > 0 then
-      Result := '[Methods]' + #13#10 + sl.Text + #13#10;
+      Result := Result + '[Methods]' + #13#10 + trim(sl.Text) + #13#10;
 
     sl.Clear;
     sl.AddStrings(FChildren);
     if sl.Count > 0 then
-      Result := '[Children]' + #13#10 + sl.Text + #13#10;
+      Result := Result + '[Children]' + #13#10 + trim(sl.Text) + #13#10;
   finally
     sl.Free;
   end;
-
-  Result := trim(Result);
 end;
 
 function TDelphiRemoteIDEClientPlugin.GetName: string;
@@ -174,7 +169,7 @@ begin
 end;
 
 function TDelphiRemoteIDEClientPlugin.GetNameByChild(
-  AChild: TObject): String;
+  AChild: TDelphiRemoteIDEClientPlugin): String;
 var
   idx: Integer;
 begin
@@ -186,7 +181,7 @@ begin
 end;
 
 function TDelphiRemoteIDEClientPlugin.GetChildByName(
-  AName: String): TObject;
+  AName: String): TDelphiRemoteIDEClientPlugin;
 var
   idx: Integer;
 begin
@@ -194,20 +189,18 @@ begin
 
   idx:=FChildren.IndexOf(AName);
   if idx>=0 then
-    Result:=FChildren.Objects[idx];
+    Result:=TDelphiRemoteIDEClientPlugin(FChildren.Objects[idx]);
 end;
 
 procedure TDelphiRemoteIDEClientPlugin.RegisterChild(AName: String;
-  AChild: TObject);
+  AChild: TDelphiRemoteIDEClientPlugin);
 begin
   FChildren.AddObject(AName, AChild);
-
-  if AChild is TDelphiRemoteIDEClientPlugin then
-    TDelphiRemoteIDEClientPlugin(AChild).Parent:=Self;
+  AChild.Parent:=Self;
 end;
 
 procedure TDelphiRemoteIDEClientPlugin.UnregisterChild(
-  AChild: TObject);
+  AChild: TDelphiRemoteIDEClientPlugin);
 var
   idx : Integer;
 begin

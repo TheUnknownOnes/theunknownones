@@ -52,9 +52,15 @@
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
-			<DCCReference Include="..\..\uDelphiRemoteIDEClient.pas"/>
+			<DCCReference Include="rttihelper_d120R.dcp"/>
+			<DCCReference Include="HVRTTIHelper.dcp"/>
 			<DCCReference Include="..\..\..\DelphiRemoteServer\Project\DelphiRemoteServer_TLB.pas"/>
 			<DCCReference Include="..\..\..\Common\ComLib.pas"/>
+			<DCCReference Include="..\..\uDelphiRemoteIDEClient.pas"/>
+			<DCCReference Include="..\..\uDelphiRemoteIDEClientPlugin.pas"/>
+			<DCCReference Include="..\..\uDRPApplication.pas"/>
+			<DCCReference Include="..\..\uObjectDispatchEx.pas"/>
+			<DCCReference Include="..\..\uPluginTest1.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

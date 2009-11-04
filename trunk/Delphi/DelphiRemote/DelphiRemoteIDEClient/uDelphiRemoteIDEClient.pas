@@ -14,12 +14,14 @@ uses
   Dialogs, ObjComAuto, Windows;
      
 type
-  
+   {$TYPEINFO ON}
+  {$METHODINFO ON}
   TDelphiRemoteIDEClient = class(TDelphiRemoteIDEClientPlugin)
   public
     procedure DoSomething;
   end;
-
+   {$TYPEINFO OFF}
+  {$METHODINFO OFF}
 var  
   DelphiRemoteIDEClient : TDelphiRemoteIDEClient = nil;
 
