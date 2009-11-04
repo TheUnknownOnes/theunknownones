@@ -1,6 +1,6 @@
 function Get-DelphiRemoteServer
 {
-  new-object -com DelphiRemoteServer.Service
+  new-object -com DelphiRemoteServer.Service | Write-Output
 }
 
 function Invoke-IDispatchMethod([string]$MethodName=$null, [System.__ComObject]$DispIntf=$null, $Params=$null)
@@ -8,7 +8,7 @@ function Invoke-IDispatchMethod([string]$MethodName=$null, [System.__ComObject]$
   Begin {
     # Executes once before first item in pipeline is processed
     if ($DispIntf) {
-      $DispIntf.psbase.GetType().InvokeMember($MethodName,[Reflection.BindingFlags]::InvokeMethod, $null, $DispIntf, $Params);
+      $DispIntf.psbase.GetType().InvokeMember($MethodName,[Reflection.BindingFlags]::InvokeMethod, $null, $DispIntf, $Params) | Write-Output;
       break;
     }
   }
@@ -16,7 +16,7 @@ function Invoke-IDispatchMethod([string]$MethodName=$null, [System.__ComObject]$
   Process {
     # Executes once for each pipeline object
     if($_) {
-      $_.psbase.GetType().InvokeMember($MethodName,[Reflection.BindingFlags]::InvokeMethod, $null, $_, $Params)
+      $_.psbase.GetType().InvokeMember($MethodName,[Reflection.BindingFlags]::InvokeMethod, $null, $_, $Params) | Write-Output
     }
   }
 
@@ -25,12 +25,12 @@ function Invoke-IDispatchMethod([string]$MethodName=$null, [System.__ComObject]$
   }
 }
 
-function Invoke-IDispatchPropertyGet([string]$MethodName=$null, [System.__ComObject]$DispIntf=$null, $Params=$null)
+function Invoke-IDispatchPropertyGet([string]$MethodName=$null, [System.__ComObject]$DispIntf=$null, $Params=$null) 
 {
   Begin {
     # Executes once before first item in pipeline is processed
     if ($DispIntf) {
-      $DispIntf.psbase.GetType().InvokeMember($MethodName,[Reflection.BindingFlags]::GetProperty, $null, $DispIntf, $Params);
+      $DispIntf.psbase.GetType().InvokeMember($MethodName,[Reflection.BindingFlags]::GetProperty, $null, $DispIntf, $Params) | Write-Output;
       break;
     }
   }
@@ -38,7 +38,7 @@ function Invoke-IDispatchPropertyGet([string]$MethodName=$null, [System.__ComObj
   Process {
     # Executes once for each pipeline object
     if($_) {
-      $_.psbase.GetType().InvokeMember($MethodName,[Reflection.BindingFlags]::GetProperty, $null, $_, $Params)
+      $_.psbase.GetType().InvokeMember($MethodName,[Reflection.BindingFlags]::GetProperty, $null, $_, $Params) | Write-Output
     }
   }
 
@@ -52,7 +52,7 @@ function Invoke-IDispatchPropertySet([string]$MethodName=$null, [System.__ComObj
   Begin {
     # Executes once before first item in pipeline is processed
     if ($DispIntf) {
-      $DispIntf.psbase.GetType().InvokeMember($MethodName,[Reflection.BindingFlags]::SetProperty, $null, $DispIntf, $Params);
+      $DispIntf.psbase.GetType().InvokeMember($MethodName,[Reflection.BindingFlags]::SetProperty, $null, $DispIntf, $Params) | Write-Output;
       break;
     }
   }
@@ -60,7 +60,7 @@ function Invoke-IDispatchPropertySet([string]$MethodName=$null, [System.__ComObj
   Process {
     # Executes once for each pipeline object
     if($_) {
-      $_.psbase.GetType().InvokeMember($MethodName,[Reflection.BindingFlags]::SetProperty, $null, $_, $Params)
+      $_.psbase.GetType().InvokeMember($MethodName,[Reflection.BindingFlags]::SetProperty, $null, $_, $Params) | Write-Output
     }
   }
 
@@ -74,7 +74,7 @@ function DelphiRemote-GetChild([string]$ChildName=$null, [System.__ComObject]$Di
   Begin {
     # Executes once before first item in pipeline is processed
     if ($DispIntf) {
-      Invoke-IDispatchMethod GetChild $DipsIntf $ChildName;
+      $DispIntf.psbase.GetType().InvokeMember('GetChild',[Reflection.BindingFlags]::InvokeMethod, $null, $DispIntf, $ChildName) | Write-Output;
       break;
     }
   }
@@ -82,7 +82,7 @@ function DelphiRemote-GetChild([string]$ChildName=$null, [System.__ComObject]$Di
   Process {
     # Executes once for each pipeline object
     if($_) {
-      Invoke-IDispatchMethod GetChild $_ $ChildName;
+      $_.psbase.GetType().InvokeMember('GetChild',[Reflection.BindingFlags]::InvokeMethod, $null, $_, $ChildName) | Write-Output;
     }
   }
 
