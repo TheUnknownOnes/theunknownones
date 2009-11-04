@@ -38,7 +38,6 @@ contains
   DelphiRemoteServer_TLB in '..\..\..\DelphiRemoteServer\Project\DelphiRemoteServer_TLB.pas',
   uDelphiRemoteIDEClientPlugin in '..\..\uDelphiRemoteIDEClientPlugin.pas',
   uObjectDispatchEx in '..\..\uObjectDispatchEx.pas',
-  uPluginTest1 in '..\..\uPluginTest1.pas',
   uDRPApplication in '..\..\uDRPApplication.pas',
   ComLib in '..\..\..\Common\ComLib.pas',
   uDRPToolsApi in '..\..\uDRPToolsApi.pas';

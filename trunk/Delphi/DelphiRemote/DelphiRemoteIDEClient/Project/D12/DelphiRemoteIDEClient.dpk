@@ -30,7 +30,8 @@ requires
   rtl,
   vcl,
   rttihelper_d120R,
-  HVRTTIHelper;
+  HVRTTIHelper,
+  DesignIDE;
 
 contains
   DelphiRemoteServer_TLB in '..\..\..\DelphiRemoteServer\Project\DelphiRemoteServer_TLB.pas',
@@ -38,7 +39,6 @@ contains
   uDelphiRemoteIDEClient in '..\..\uDelphiRemoteIDEClient.pas',
   uDelphiRemoteIDEClientPlugin in '..\..\uDelphiRemoteIDEClientPlugin.pas',
   uDRPApplication in '..\..\uDRPApplication.pas',
-  uObjectDispatchEx in '..\..\uObjectDispatchEx.pas',
-  uPluginTest1 in '..\..\uPluginTest1.pas';
+  uObjectDispatchEx in '..\..\uObjectDispatchEx.pas';
 
 end.

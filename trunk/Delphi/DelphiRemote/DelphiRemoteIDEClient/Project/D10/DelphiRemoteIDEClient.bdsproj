@@ -170,12 +170,8 @@
 			<Language Name="ActiveLang"></Language>
 			<Language Name="ProjectLang">$00000000</Language>
 			<Language Name="RootDir"></Language>
-		</Language>  <Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\PNGImageListDesigner_D100D.bpl">PNGImagelist - Design</Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\DBIni100.bpl">(Unbenannt)</Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\dclqrt100.bpl">QuickReport Components</Excluded_Packages>
-    </Excluded_Packages>
-  </Delphi.Personality>
+		</Language>
+		<Excluded_Packages><Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\PNGImageListDesigner_D100D.bpl">PNGImagelist - Design</Excluded_Packages><Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\DBIni100.bpl">(Unbenannt)</Excluded_Packages><Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\dclqrt100.bpl">QuickReport Components</Excluded_Packages></Excluded_Packages></Delphi.Personality>
 	<StarTeamAssociation></StarTeamAssociation>
 	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
 </BorlandProject>
