@@ -1,7 +1,7 @@
 object FormMain: TFormMain
   Left = 0
   Top = 0
-  Caption = 't'
+  Caption = 'FormMain'
   ClientHeight = 292
   ClientWidth = 554
   Color = clBtnFace

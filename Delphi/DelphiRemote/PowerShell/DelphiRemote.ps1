@@ -1,4 +1,7 @@
-$DR = new-object -com DelphiRemoteServer.Service
+function Get-DelphiRemoteServer
+{
+  new-object -com DelphiRemoteServer.Service
+}
 
 function Invoke-IDispatchMethod([string]$MethodName=$null, [System.__ComObject]$DispIntf=$null, $Params=$null)
 {
