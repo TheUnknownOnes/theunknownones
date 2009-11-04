@@ -35,7 +35,6 @@ type
     property Name : String read GetName;
     property Parent : TDelphiRemoteIDEClientPlugin read FParent write FParent;
   end;
-  {$METHODINFO OFF}
 
 implementation
 
@@ -136,7 +135,7 @@ begin
         tkInt64 : s := 'Int64';
       end;
 
-      sl[idx] := sl[idx] + ' Type: ' + s + #13#10;
+      sl[idx] := sl[idx] + ' : ' + s + #13#10;
     end;
 
     if sl.Count > 0 then
@@ -159,11 +158,13 @@ begin
   finally
     sl.Free;
   end;
+
+  Result := Trim(Result);
 end;
 
 function TDelphiRemoteIDEClientPlugin.GetName: string;
 begin
-  Result:='Root';
+  Result:='';
   if Assigned(FParent) then
     Result:=FParent.GetNameByChild(Self);
 end;

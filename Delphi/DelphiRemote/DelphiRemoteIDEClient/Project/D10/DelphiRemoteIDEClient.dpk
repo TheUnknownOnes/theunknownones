@@ -40,6 +40,7 @@ contains
   uObjectDispatchEx in '..\..\uObjectDispatchEx.pas',
   uPluginTest1 in '..\..\uPluginTest1.pas',
   uDRPApplication in '..\..\uDRPApplication.pas',
-  ComLib in '..\..\..\Common\ComLib.pas';
+  ComLib in '..\..\..\Common\ComLib.pas',
+  uDRPToolsApi in '..\..\uDRPToolsApi.pas';
 
 end.
