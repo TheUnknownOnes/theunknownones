@@ -2,12 +2,13 @@ unit uDelphiRemoteIDEClientPlugin;
 
 interface
 
-{$TYPEINFO ON}
+
 
 uses
-  Classes, ComLib;
+  Classes, ComLib, SysUtils;
 
-type  
+type
+  {$TYPEINFO ON}  
   {$METHODINFO ON}
   TDelphiRemoteIDEClientPlugin = class(TObject)
   private
@@ -24,20 +25,17 @@ type
     function GetChild(AString: String): IDispatch;
     function GetChildren: IEnumVariant;
 
-    {$METHODINFO OFF}
     function GetDispatchInterface  : IDispatch;
     procedure RegisterChild(AName: String; AChild : TObject);
     procedure UnregisterChild(AChild : TObject);
     function GetChildByName(AName: String): TObject;
     function GetNameByChild(AChild: TObject): String;
-    {$METHODINFO ON}
 
     function GetHelp: String;
   published
     property Name : String read GetName;
     property Parent : TDelphiRemoteIDEClientPlugin read FParent write FParent;
   end;
-  {$METHODINFO OFF}
 
 implementation
 
@@ -77,6 +75,8 @@ end;
 
 constructor TDelphiRemoteIDEClientPlugin.Create;
 begin
+  FParent := nil;
+  
   FChildren:=TStringList.Create;
   FChildren.Sorted:=True;
   FChildren.Duplicates:=dupError;
@@ -162,6 +162,8 @@ begin
   finally
     sl.Free;
   end;
+
+  Result := trim(Result);
 end;
 
 function TDelphiRemoteIDEClientPlugin.GetName: string;
