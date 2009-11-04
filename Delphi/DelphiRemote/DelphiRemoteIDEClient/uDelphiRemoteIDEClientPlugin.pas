@@ -135,7 +135,7 @@ begin
         tkInt64 : s := 'Int64';
       end;
 
-      sl[idx] := sl[idx] + ' : ' + s + #13#10;
+      sl[idx] := sl[idx] + ' : ' + s
     end;
 
     if sl.Count > 0 then
