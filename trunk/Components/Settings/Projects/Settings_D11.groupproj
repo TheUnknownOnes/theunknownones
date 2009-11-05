@@ -1,0 +1,64 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{c070a333-4643-4eb8-976c-badcc4d9e7ae}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="D11\Settings_D110D.dproj" />
+    <Projects Include="D11\Settings_D110R.dproj" />
+    <Projects Include="D11\Settings_VirtualTrees_D110D.dproj" />
+    <Projects Include="D11\Settings_VirtualTrees_D110R.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+<BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="Settings_D110R">
+    <MSBuild Projects="D11\Settings_D110R.dproj" Targets="" />
+  </Target>
+  <Target Name="Settings_D110R:Clean">
+    <MSBuild Projects="D11\Settings_D110R.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="Settings_D110R:Make">
+    <MSBuild Projects="D11\Settings_D110R.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Settings_VirtualTrees_D110R">
+    <MSBuild Projects="D11\Settings_VirtualTrees_D110R.dproj" Targets="" />
+  </Target>
+  <Target Name="Settings_VirtualTrees_D110R:Clean">
+    <MSBuild Projects="D11\Settings_VirtualTrees_D110R.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="Settings_VirtualTrees_D110R:Make">
+    <MSBuild Projects="D11\Settings_VirtualTrees_D110R.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Settings_D110D">
+    <MSBuild Projects="D11\Settings_D110D.dproj" Targets="" />
+  </Target>
+  <Target Name="Settings_D110D:Clean">
+    <MSBuild Projects="D11\Settings_D110D.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="Settings_D110D:Make">
+    <MSBuild Projects="D11\Settings_D110D.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Settings_VirtualTrees_D110D">
+    <MSBuild Projects="D11\Settings_VirtualTrees_D110D.dproj" Targets="" />
+  </Target>
+  <Target Name="Settings_VirtualTrees_D110D:Clean">
+    <MSBuild Projects="D11\Settings_VirtualTrees_D110D.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="Settings_VirtualTrees_D110D:Make">
+    <MSBuild Projects="D11\Settings_VirtualTrees_D110D.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="Settings_D110R;Settings_VirtualTrees_D110R;Settings_D110D;Settings_VirtualTrees_D110D" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="Settings_D110R:Clean;Settings_VirtualTrees_D110R:Clean;Settings_D110D:Clean;Settings_VirtualTrees_D110D:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="Settings_D110R:Make;Settings_VirtualTrees_D110R:Make;Settings_D110D:Make;Settings_VirtualTrees_D110D:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>
