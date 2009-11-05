@@ -1,0 +1,43 @@
+package Settings_D110R;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'Settings Base and default VCL Components - Runtime'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  RegExp_D110R,
+  xmltools_D110R,
+  vcl,
+  RTTIHelper_D110R;
+
+contains
+  uSettingsBase in '..\..\uSettingsBase.pas',
+  uSettingsStream in '..\..\uSettingsStream.pas',
+  uSettingsXML in '..\..\uSettingsXML.pas',
+  uSettingsLinksDefault in '..\..\uSettingsLinksDefault.pas',
+  uSettingsRTTI in '..\..\uSettingsRTTI.pas';
+
+end.
