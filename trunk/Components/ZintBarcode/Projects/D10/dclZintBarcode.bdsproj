@@ -5,12 +5,12 @@
 			<Option Name="Personality">Delphi.Personality</Option>
 			<Option Name="ProjectType"></Option>
 			<Option Name="Version">1.0</Option>
-			<Option Name="GUID">{D530A581-64CC-4F96-8473-2B3815788569}</Option>
+			<Option Name="GUID">{86E9BDCA-BCC3-4FCD-9607-AF1548CE7A95}</Option>
 		</Option>
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">frxZintBarcode_D100R.dpk</Source>
+			<Source Name="MainSource">dclZintBarcode.dpk</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -131,7 +131,7 @@
 		</Directories>
 		<Parameters>
 			<Parameters Name="RunParams"></Parameters>
-			<Parameters Name="HostApplication">C:\Users\MaWarm\Documents\Projects\SPPDesk\trunk\bin\SPPDesk.exe</Parameters>
+			<Parameters Name="HostApplication"></Parameters>
 			<Parameters Name="Launcher"></Parameters>
 			<Parameters Name="UseLauncher">False</Parameters>
 			<Parameters Name="DebugCWD"></Parameters>
@@ -139,6 +139,11 @@
 			<Parameters Name="LoadAllSymbols">True</Parameters>
 			<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
 		</Parameters>
+		<Language>
+			<Language Name="ActiveLang"></Language>
+			<Language Name="ProjectLang">$00000000</Language>
+			<Language Name="RootDir"></Language>
+		</Language>
 		<VersionInfo>
 			<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
 			<VersionInfo Name="AutoIncBuild">False</VersionInfo>
@@ -165,13 +170,10 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>  
-    
-    
-    
-    
-    <Excluded_Packages>
-      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\QRAngledLabel100.bpl">(Unbenannt)</Excluded_Packages>
+		</VersionInfoKeys>  <Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\madExceptIde_.bpl">madExceptIde 1.1  -  www.madshi.net</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\madExceptVcl_.bpl">madExceptVcl 2.0c  -  www.madshi.net</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\CNA2_D100.bpl">CNA2 - Component Naming Assistant V.2 by TUO</Excluded_Packages>
     </Excluded_Packages>
   </Delphi.Personality>
 </BorlandProject>

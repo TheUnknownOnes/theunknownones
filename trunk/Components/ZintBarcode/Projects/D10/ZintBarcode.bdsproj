@@ -10,7 +10,7 @@
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">ZintBarcode_D100R.dpk</Source>
+			<Source Name="MainSource">ZintBarcode.dpk</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -170,8 +170,12 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>
-	</Delphi.Personality>
+		</VersionInfoKeys>  <Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\ResEd100.bpl">ResEd (Project Ressource Editor)</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\VirtualActionTree_D100D.bpl">Datei C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\VirtualActionTree_D100D.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\CNA2_D100.bpl">CNA2 - Component Naming Assistant V.2 by TUO</Excluded_Packages>
+    </Excluded_Packages>
+  </Delphi.Personality>
 	<StarTeamAssociation></StarTeamAssociation>
 	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
 </BorlandProject>

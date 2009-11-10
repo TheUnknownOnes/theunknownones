@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{CFC02781-2436-4CAF-AC09-F3FDF6726D12}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="ZintBarcode100.bpl">D10\ZintBarcode.bdsproj</Projects>
+      <Projects Name="dclZintBarcode100.bpl">D10\dclZintBarcode.bdsproj</Projects>
+      <Projects Name="frxZintBarcode100.bpl">D10\frxZintBarcode.bdsproj</Projects>
+      <Projects Name="Targets">ZintBarcode100.bpl dclZintBarcode100.bpl frxZintBarcode100.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>  <StarTeamAssociation></StarTeamAssociation>
+  <StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>
