@@ -1,4 +1,4 @@
-package ZintBarcode_D100R;
+package dclZintBarcode;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,15 +22,15 @@ package ZintBarcode_D100R;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$RUNONLY}
+{$LIBSUFFIX '100'}
+{$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  vcl;
+  ZintBarcode;
 
 contains
-  uZintInterface in '..\..\uZintInterface.pas',
-  uZintBarcode in '..\..\uZintBarcode.pas';
+  uRegZintBarcode in '..\..\Design\uRegZintBarcode.pas';
 
 end.
