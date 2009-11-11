@@ -137,6 +137,7 @@ type
     procedure SetPrimary(const Value: String);
     function GetSHRT: Boolean;
     procedure SetSHRT(const Value: Boolean);
+    procedure SetStacked(const Value: Boolean);
   public
     constructor Create();
     destructor Destroy(); override;
@@ -165,19 +166,19 @@ type
     property Roatation : TZBRotation read FRotation write SetRotation;
     property Primary : String read GetPrimary write SetPrimary;
     property ShowHumanReadableText : Boolean read GetSHRT write SetSHRT;
-    property Stacked : Boolean read FStacked write FStacked default true;
+    property Stacked : Boolean read FStacked write SetStacked;
   end;
 
   TCustomZintBarcodeComponent = class(TGraphicControl)
   protected
     FBarcode : TZintBarcode;
+    FBitmap : TBitmap;
 
     procedure OnChanged(Sender : TObject);
 
     procedure Resize; override;
 
     procedure Paint; override;
-    procedure NeedBitmap(const ABitmap : TBitmap);
 
     property Barcode : TZintBarcode read FBarcode;
   public
@@ -257,18 +258,11 @@ procedure TZintBarcode.Clear;
 var
   temp : PZSymbol;
 begin
-  New(temp);
-  try
-    CopyMemory(temp, FSymbol, SizeOf(TZSymbol));
-
-    FreeSymbol;
-    CreateSymbol;
-
-    CopyMemory(FSymbol, temp, SizeOf(TZSymbol));
-  finally
-    Dispose(temp);
-  end;
-
+  temp := FSymbol;
+  CreateSymbol;
+  CopyMemory(FSymbol, temp, SizeOf(TZSymbol));
+  FSymbol.bitmap := nil;
+  ZBarcode_Delete(temp);
 end;
 
 constructor TZintBarcode.Create;
@@ -277,7 +271,7 @@ begin
 
   CreateSymbol;
 
-  FStacked := true;
+  FStacked := false;
 
   FSymbol.show_humand_readable_text := 1;
   FSymbol.input_mode := Integer(UNICODE_MODE);
@@ -574,6 +568,12 @@ begin
   Changed;
 end;
 
+procedure TZintBarcode.SetStacked(const Value: Boolean);
+begin
+  FStacked := Value;
+  Changed;
+end;
+
 procedure TZintBarcode.SetType(const Value: TZBType);
 var
   Oldsymbology : Integer;
@@ -679,44 +679,37 @@ constructor TCustomZintBarcodeComponent.Create(AOwner: TComponent);
 begin
   inherited;
 
+  FBitmap := TBitmap.Create;
+
   FBarcode := TZintBarcode.Create;
   FBarcode.OnChanged := OnChanged;
+  FBarcode.Data := FBarcode.Data;
 end;
 
 destructor TCustomZintBarcodeComponent.Destroy;
 begin
   FBarcode.Free;
 
+  FBitmap.Free;
+
   inherited;
 end;
 
-procedure TCustomZintBarcodeComponent.NeedBitmap(const ABitmap: TBitmap);
-begin
-  FBarcode.GetBarcode(ABitmap);
-end;
 
 procedure TCustomZintBarcodeComponent.OnChanged(Sender: TObject);
 begin
-  Repaint;
+  FBarcode.GetBarcode(FBitmap);
+  Invalidate;
 end;
 
 procedure TCustomZintBarcodeComponent.Paint;
-var
-  bmp : TBitmap;
 begin
   inherited;
 
   Canvas.Brush.Color := FBarcode.BGColor;
   Canvas.Brush.Style := bsSolid;
   Canvas.FillRect(Canvas.ClipRect);
-
-  bmp := TBitmap.Create;
-  try
-    NeedBitmap(bmp);
-    Canvas.Draw(0,0, bmp);
-  finally
-    bmp.Free;
-  end;
+  Canvas.Draw(0,0, FBitmap);
 end;
 
 procedure TCustomZintBarcodeComponent.Resize;
