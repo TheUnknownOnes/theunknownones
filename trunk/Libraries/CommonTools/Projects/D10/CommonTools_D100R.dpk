@@ -29,7 +29,6 @@ requires
   vcl,
   rtl,
   dbrtl,
-  VirtualTreesD10,
   TntUnicodeVcl,
   vclactnband,
   vclx,
