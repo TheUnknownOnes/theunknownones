@@ -173,13 +173,13 @@ begin
   ABitmap.PixelFormat := pf24bit;
   ABitmap.SetSize(ASymbol.bitmap_width, ASymbol.bitmap_height);
 
-  FillMemory(@bmpinfo.bmiHeader, sizeof(bmpinfo.bmiHeader), 0);
+  {FillMemory(@bmpinfo.bmiHeader, sizeof(bmpinfo.bmiHeader), 0);
   bmpinfo.bmiHeader.biSize := SizeOf(bmpinfo.bmiHeader);
   bmpinfo.bmiHeader.biWidth := ASymbol.bitmap_width;
   bmpinfo.bmiHeader.biHeight := -ASymbol.bitmap_height;
   bmpinfo.bmiHeader.biPlanes := 1;
   bmpinfo.bmiHeader.biBitCount := 24;
-  bmpinfo.bmiHeader.biCompression := BI_RGB;
+  bmpinfo.bmiHeader.biCompression := BI_RGB;}
 
   myp := ASymbol.bitmap;
   rowwidth := Asymbol.bitmap_width * 3;
@@ -189,8 +189,7 @@ begin
     CopyMemory(ABitmap.ScanLine[row], myp, rowwidth);
     Inc(myp, Asymbol.bitmap_width);
   end;
-    
-    
+
 
 
   //Normaly StretchDIBits should do this work. But it has problems with odd image_width
