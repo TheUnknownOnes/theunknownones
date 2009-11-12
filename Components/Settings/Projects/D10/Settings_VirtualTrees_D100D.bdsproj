@@ -171,52 +171,7 @@
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
 		</VersionInfoKeys>  <Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\eltreeD10.bpl">EldoS Visual Components</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\qrpt100.bpl">QuickReport Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\Jcl100.bpl">JEDI Code Library RTL package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvCmpD10R.bpl">JVCL Non-Visual Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvCoreD10R.bpl">JVCL Core Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JclVcl100.bpl">JEDI Code Library VCL package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvCryptD10R.bpl">JVCL Encryption and Compression Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvStdCtrlsD10R.bpl">JVCL Standard Controls Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvSystemD10R.bpl">JVCL System Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvCustomD10R.bpl">JVCL Custom Controls Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvCtrlsD10R.bpl">JVCL Visual Controls Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvMMD10R.bpl">JVCL Multimedia and Image Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvNetD10R.bpl">JVCL Network Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvAppFrmD10R.bpl">JVCL Application and Form Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvBandsD10R.bpl">JVCL Band Objects Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvJansD10R.bpl">JVCL Jans Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvGlobusD10R.bpl">JVCL Globus Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvPrintPreviewD10R.bpl">JVCL Print Preview Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvValidatorsD10R.bpl">JVCL Validators and Error Provider Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvWizardD10R.bpl">JVCL Wizard Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvTimeFrameworkD10R.bpl">JVCL Time Framework Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvHMID10R.bpl">JVCL HMI Controls Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvManagedThreadsD10R.bpl">JVCL Managed Threads Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvXPCtrlsD10R.bpl">JVCL XP Controls Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvDockingD10R.bpl">JVCL Docking Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvDotNetCtrlsD10R.bpl">JVCL DotNet Controls Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvEDID10R.bpl">JVCL EDI Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvRuntimeDesignD10R.bpl">JVCL Runtime Design Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvDBD10R.bpl">JVCL Database Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvDlgsD10R.bpl">JVCL Dialog Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvBDED10R.bpl">JVCL BDE Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvInterpreterD10R.bpl">JVCL Interpreter Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvPageCompsD10R.bpl">JVCL Page Style Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvPluginD10R.bpl">JVCL Plugin Components Runtime Package</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\TntUnicodeVcl100.bpl">TntWare Unicode Controls - Runtime</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\ConsoleTools_D100R.bpl">ConsoleTools - Runtime</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\ConsoleTools_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\ConsoleTools_D100.bpl nicht gefunden</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\GroupListView_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\GroupListView_D100.bpl nicht gefunden</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\SearchEdit_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\SearchEdit_D100.bpl nicht gefunden</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\BaseImageList_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\BaseImageList_D100.bpl nicht gefunden</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\XMLTools_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\XMLTools_D100.bpl nicht gefunden</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\VirtualActionTree_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\VirtualActionTree_D100.bpl nicht gefunden</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\VirtualTreeHelpers_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\VirtualTreeHelpers_D100.bpl nicht gefunden</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\RegExp_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\RegExp_D100.bpl nicht gefunden</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\VSTSearchEdit_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\VSTSearchEdit_D100.bpl nicht gefunden</Excluded_Packages>
-      <Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\VSTHeaderSaver_D100.bpl">Datei D:\Documents\Borland Studio-Projekte\Bpl\VSTHeaderSaver_D100.bpl nicht gefunden</Excluded_Packages>
+      <Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\DBIni100.bpl">(Unbenannt)</Excluded_Packages>
     </Excluded_Packages>
   </Delphi.Personality>
 	<CompactFramework_Emulator></CompactFramework_Emulator>
