@@ -9,16 +9,22 @@ uses
   frxClass, frxDsgnIntf, uZintBarcode, uZintInterface, fs_iinterpreter;
 
 type
+  TfrxZintBarcodeDataFormat = (dfANSI, dfUTF8);
+
   TfrxZintBarcode = class(TfrxView)
   private
     FBarcode : TZintBarcode;
     FBitmap : TBitmap;
     FRotation : TZBRotation;
     FZoom : Single;
+    FDataFormat: TfrxZintBarcodeDataFormat;
+
+    FData : String;
+
     function GetZoom: Single;
     procedure SetZoom(const Value: Single);
-    function GetData: WideString;
-    procedure SetData(const Value: WideString);
+    function GetData: String;
+    procedure SetData(const Value: String);
     function GetBorderWidth: Integer;
     function GetColor(const Index: Integer): TColor;
     function GetOption(const Index: Integer): Integer;
@@ -34,6 +40,8 @@ type
     procedure SetType(const Value: TZBType);
     function GetSHRT: Boolean;
     procedure SetSHRT(const Value: Boolean);
+    procedure SetDataFormat(const Value: TfrxZintBarcodeDataFormat);
+    function GetDataEncoded: Widestring;
   protected
     procedure BarcodeChanged(Sender: TObject);
     procedure SetHeight(Value: Extended); override;
@@ -44,8 +52,9 @@ type
     procedure Draw(Canvas: TCanvas; ScaleX, ScaleY, OffsetX, OffsetY: Extended); override;
   published
     property Zoom: Single read GetZoom write SetZoom;
-    property Data: WideString read GetData write SetData;
-    property BarcodeType : TZBType read GetType write SetType;
+    property BarcodeType : TZBType read GetType write SetType;  
+    property DataFormat: TfrxZintBarcodeDataFormat read FDataFormat write SetDataFormat;
+    property Data: String read GetData write SetData;
     property BorderWidth : Integer read GetBorderWidth write SetBorderWidth;
     property OutputOptions : TZOutputOptions read GetOutputOptions write SetOutputOptions;
     property FGColor : TColor index 0 read GetColor write SetColor;
@@ -71,18 +80,16 @@ uses
 { TfrxZintBarcode }
 
 procedure TfrxZintBarcode.BarcodeChanged(Sender: TObject);
-var
-  FTempBC : TZintBarcode;
 begin
-  FTempBC:=TZintBarcode.Create;
-  try
-    FTempBC.Assign(FBarcode);
-    FTempBC.Height:=Round(Self.Height / FZoom / 2);
-    FTempBC.GetBarcode(FBitmap);
+  FBarcode.OnChanged:=nil;
+  try   
+    FBarcode.Height:=Round(Self.Height / FZoom / 2);
+    FBarcode.GetBarcode(FBitmap);
 
-    Width:=Round(FBitmap.Width * FZoom);    
+    Width:=Round(FBitmap.Width * FZoom);
+
   finally
-    FTempBC.Free;
+    FBarcode.OnChanged:=Self.BarcodeChanged;
   end;
 end;
 
@@ -134,9 +141,17 @@ begin
   end;
 end;
 
-function TfrxZintBarcode.GetData: WideString;
+function TfrxZintBarcode.GetData: String;
 begin
-  Result:=FBarcode.Data;
+  Result:=FData;
+end;
+
+function TfrxZintBarcode.GetDataEncoded: Widestring;
+begin
+  case FDataFormat of
+    dfANSI: Result:=FData;
+    dfUTF8: Result:=UTF8Decode(FData);
+  end;
 end;
 
 class function TfrxZintBarcode.GetDescription: String;
@@ -191,9 +206,26 @@ begin
   end;
 end;
 
-procedure TfrxZintBarcode.SetData(const Value: WideString);
+procedure TfrxZintBarcode.SetData(const Value: String);
+var
+  ws : WideString;
 begin
-  FBarcode.Data:=Value;
+  FData:=Value;
+
+  ws:=GetDataEncoded;
+  if ws<>EmptyWideStr then
+    FBarcode.Data:=ws;
+end;
+
+procedure TfrxZintBarcode.SetDataFormat(const Value: TfrxZintBarcodeDataFormat);
+var
+  ws : WideString;
+begin
+  FDataFormat := Value;
+
+  ws:=GetDataEncoded;
+  if ws<>EmptyWideStr then
+    FBarcode.Data:=ws;
 end;
 
 procedure TfrxZintBarcode.SetHeight(Value: Extended);
