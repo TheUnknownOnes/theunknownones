@@ -25,7 +25,7 @@
 			<GenPackage>true</GenPackage>
 			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\PNGUtils_D120R.bpl</DCC_DependencyCheckOutputName>
 			<DCC_Platform>x86</DCC_Platform>
-			<DCC_Description>PNGUtils D100 - Runtime</DCC_Description>
+			<DCC_Description>PNGUtils D120 - Runtime</DCC_Description>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
 			<DCC_S>false</DCC_S>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <PersonalityInfo>
+    <Option>
+      <Option Name="Personality">Default.Personality</Option>
+      <Option Name="ProjectType"></Option>
+      <Option Name="Version">1.0</Option>
+      <Option Name="GUID">{57784436-60BA-4A00-A55B-1649C6032A73}</Option>
+    </Option>
+  </PersonalityInfo>
+  <Default.Personality>
+    
+    
+    
+    <Projects>
+      <Projects Name="IBEScriptComponent_D100.bpl">D10\IBEScriptComponent.bdsproj</Projects>
+      <Projects Name="dclIBEScriptComponent_D100.bpl">D10\dclIBEScriptComponent.bdsproj</Projects>
+      <Projects Name="Targets">IBEScriptComponent_D100.bpl dclIBEScriptComponent_D100.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+  <StarTeamAssociation></StarTeamAssociation>
+  <StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>
