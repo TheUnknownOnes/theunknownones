@@ -44,14 +44,14 @@ type
     tBARCODE_PHARMA,
     tBARCODE_PZN,
     tBARCODE_PHARMA_TWO,
-    tBARCODE_PDF417	,
+    tBARCODE_PDF417,
     tBARCODE_PDF417TRUNC,
     tBARCODE_MAXICODE,
     tBARCODE_QRCODE,
     tBARCODE_CODE128B,
     tBARCODE_AUSPOST,
     tBARCODE_AUSREPLY,
-    tBARCODE_AUSROUTE	,
+    tBARCODE_AUSROUTE,
     tBARCODE_AUSREDIRECT,
     tBARCODE_ISBNX,
     tBARCODE_RM4SCC,
@@ -68,14 +68,12 @@ type
     tBARCODE_MICROPDF417,
     tBARCODE_ONECODE,
     tBARCODE_PLESSEY,
-
     tBARCODE_TELEPEN_NUM,
     tBARCODE_ITF14,
     tBARCODE_KIX,
     tBARCODE_AZTEC,
     tBARCODE_DAFT,
     tBARCODE_MICROQR,
-
     tBARCODE_HIBC_128,
     tBARCODE_HIBC_39,
     tBARCODE_HIBC_DM,
@@ -83,7 +81,7 @@ type
     tBARCODE_HIBC_PDF,
     tBARCODE_HIBC_MICPDF,
     tBARCODE_HIBC_BLOCKF,
-
+    tBARCODE_HIBC_AZTEC,
     tBARCODE_AZRUNE,
     tBARCODE_CODE32,
     tBARCODE_EANX_CC,
@@ -97,7 +95,8 @@ type
     tBARCODE_RSS14_OMNI_CC,
     tBARCODE_RSS_EXPSTACK_CC,
     tBARCODE_CHANNEL,
-    tBARCODE_CODEONE);
+    tBARCODE_CODEONE,
+    tBARCODE_GRIDMATRIX);
 
   TZintBarcode = class(TPersistent)
   private
@@ -106,6 +105,7 @@ type
     FRotation: TZBRotation;
     FOnChanged: TNotifyEvent;
     FStacked: Boolean;
+    FScale : Single;
 
     procedure CheckForError(AReturnValue : Integer);
     function ErrorTextFromSymbol : String;
@@ -119,7 +119,6 @@ type
     procedure SetType(const Value: TZBType);
     function GetData: WideString;
     function GetType: TZBType;
-    function GetScale: Single;
     procedure SetScale(const Value: Single);
     function GetHeight: Integer;
     procedure SetHeight(const Value: Integer);
@@ -152,9 +151,9 @@ type
 
     property OnChanged : TNotifyEvent read FOnChanged write FOnChanged;
   published
-    property Data : Widestring read GetData write SetData;
     property BarcodeType : TZBType read GetType write SetType;
-    property Scale : Single read GetScale write SetScale;
+    property Data : Widestring read GetData write SetData;
+    property Scale : Single read FScale write SetScale stored true;
     property Height : Integer read GetHeight write SetHeight;
     property BorderWidth : Integer read GetBorderWidth write SetBorderWidth;
     property OutputOptions : TZOutputOptions read GetOutputOptions write SetOutputOptions;
@@ -170,17 +169,20 @@ type
   end;
 
   TCustomZintBarcodeComponent = class(TGraphicControl)
+  private
+    FCenter: Boolean;
+    procedure SetCenter(const Value: Boolean);
+    procedure SetBarode(const Value: TZintBarcode);
   protected
     FBarcode : TZintBarcode;
     FBitmap : TBitmap;
 
     procedure OnChanged(Sender : TObject);
 
-    procedure Resize; override;
-
     procedure Paint; override;
 
-    property Barcode : TZintBarcode read FBarcode;
+    property Barcode : TZintBarcode read FBarcode write SetBarode;
+    property Center : Boolean read FCenter write SetCenter default true;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -188,6 +190,8 @@ type
 
   TZintBarcodeComponent = class(TCustomZintBarcodeComponent)
   published
+    property Align;
+    property Center;
     property Barcode;
   end;
 
@@ -258,11 +262,26 @@ procedure TZintBarcode.Clear;
 var
   temp : PZSymbol;
 begin
-  temp := FSymbol;
+  New(temp);
+
+  CopyMemory(temp, FSymbol, SizeOf(TZSymbol));
+
+  FreeSymbol;
   CreateSymbol;
+
   CopyMemory(FSymbol, temp, SizeOf(TZSymbol));
+
   FSymbol.bitmap := nil;
-  ZBarcode_Delete(temp);
+  FSymbol.bitmap_width := 0;
+  FSymbol.bitmap_height := 0;
+  FillMemory(@FSymbol.encoded_data, SizeOf(FSymbol.encoded_data), 0);
+  FillMemory(@FSymbol.text, SizeOf(FSymbol.text), 0);
+  FSymbol.rows := 0;
+  FSymbol.width := 0;
+  FillMemory(@FSymbol.row_height, SizeOf(FSymbol.row_height), 0);
+
+
+  Dispose(temp);
 end;
 
 constructor TZintBarcode.Create;
@@ -273,10 +292,11 @@ begin
 
   FStacked := false;
 
-  FSymbol.show_humand_readable_text := 1;
+  FScale := 1;
+
+  FSymbol.show_human_readable_text := 1;
   FSymbol.input_mode := Integer(UNICODE_MODE);
   FRotation := r0;
-  FSymbol.outfile := '.BMP';
   Data := '123456789';
 end;
 
@@ -310,8 +330,8 @@ begin
 
   if not FStacked then
     Clear;
-    
-  CheckForError(ZBarcode_Encode_and_Print_Rotated(FSymbol, PAnsiChar(FData + #0), rotation));
+
+  CheckForError(ZBarcode_Encode_and_Buffer(FSymbol, PChar(FData), Length(FData), rotation));
 end;
 
 function TZintBarcode.ErrorTextFromSymbol: String;
@@ -329,9 +349,26 @@ begin
 end;
 
 procedure TZintBarcode.GetBarcode(const ABitmap: TBitmap);
+var
+  bmp : TBitmap;
 begin
   EncodeNow;
-  ZBarcodeToBitmap(FSymbol, ABitmap);
+
+  bmp := TBitmap.Create;
+  try
+    ZBarcodeToBitmap(FSymbol, bmp);
+
+    ABitmap.PixelFormat := bmp.PixelFormat;
+    ABitmap.SetSize(Round(bmp.Width * FScale), Round(bmp.Height * FScale));
+
+    StretchBlt(ABitmap.Canvas.Handle,
+               0, 0, ABitmap.Width, ABitmap.Height,
+               bmp.Canvas.Handle,
+               0, 0, bmp.Width, bmp.Height,
+               SRCCOPY);
+  finally
+    bmp.Free;
+  end;
 end;
 
 function TZintBarcode.GetBarcodeSize: TPoint;
@@ -387,14 +424,9 @@ begin
   Result := StrPas(@FSymbol.primary);
 end;
 
-function TZintBarcode.GetScale: Single;
-begin
-  Result := FSymbol.scale;
-end;
-
 function TZintBarcode.GetSHRT: Boolean;
 begin
-  Result := FSymbol.show_humand_readable_text = 1;
+  Result := FSymbol.show_human_readable_text = 1;
 end;
 
 function TZintBarcode.GetType: TZBType;
@@ -468,6 +500,7 @@ begin
     BARCODE_HIBC_PDF : Result := tBARCODE_HIBC_PDF;
     BARCODE_HIBC_MICPDF : Result := tBARCODE_HIBC_MICPDF;
     BARCODE_HIBC_BLOCKF : Result := tBARCODE_HIBC_BLOCKF;
+    BARCODE_HIBC_AZTEC : Result := tBARCODE_HIBC_AZTEC;
     BARCODE_AZRUNE : Result := tBARCODE_AZRUNE;
     BARCODE_CODE32 : Result := tBARCODE_CODE32;
     BARCODE_EANX_CC : Result := tBARCODE_EANX_CC;
@@ -482,6 +515,7 @@ begin
     BARCODE_RSS_EXPSTACK_CC : Result := tBARCODE_RSS_EXPSTACK_CC;
     BARCODE_CHANNEL : Result := tBARCODE_CHANNEL;
     BARCODE_CODEONE : Result := tBARCODE_CODEONE;
+    BARCODE_GRIDMATRIX : Result := tBARCODE_GRIDMATRIX;
   end;
 end;
 
@@ -554,16 +588,16 @@ end;
 
 procedure TZintBarcode.SetScale(const Value: Single);
 begin
-  FSymbol.scale := Value;
+  FScale := Value;
   Changed;
 end;
 
 procedure TZintBarcode.SetSHRT(const Value: Boolean);
 begin
   if Value then
-    FSymbol.show_humand_readable_text := 1
+    FSymbol.show_human_readable_text := 1
   else
-    FSymbol.show_humand_readable_text := 0;
+    FSymbol.show_human_readable_text := 0;
 
   Changed;
 end;
@@ -649,6 +683,7 @@ begin
     tBARCODE_HIBC_PDF: FSymbol.symbology := BARCODE_HIBC_PDF;
     tBARCODE_HIBC_MICPDF: FSymbol.symbology := BARCODE_HIBC_MICPDF;
     tBARCODE_HIBC_BLOCKF: FSymbol.symbology := BARCODE_HIBC_BLOCKF;
+    tBARCODE_HIBC_AZTEC: FSymbol.symbology := BARCODE_HIBC_AZTEC;
     tBARCODE_AZRUNE: FSymbol.symbology := BARCODE_AZRUNE;
     tBARCODE_CODE32: FSymbol.symbology := BARCODE_CODE32;
     tBARCODE_EANX_CC: FSymbol.symbology := BARCODE_EANX_CC;
@@ -663,6 +698,7 @@ begin
     tBARCODE_RSS_EXPSTACK_CC: FSymbol.symbology := BARCODE_RSS_EXPSTACK_CC;
     tBARCODE_CHANNEL: FSymbol.symbology := BARCODE_CHANNEL;
     tBARCODE_CODEONE: FSymbol.symbology := BARCODE_CODEONE;
+    tBARCODE_GRIDMATRIX: FSymbol.symbology := BARCODE_GRIDMATRIX;
   end;
 
   try
@@ -680,6 +716,8 @@ begin
   inherited;
 
   FBitmap := TBitmap.Create;
+
+  FCenter := true;
 
   FBarcode := TZintBarcode.Create;
   FBarcode.OnChanged := OnChanged;
@@ -709,13 +747,25 @@ begin
   Canvas.Brush.Color := FBarcode.BGColor;
   Canvas.Brush.Style := bsSolid;
   Canvas.FillRect(Canvas.ClipRect);
-  Canvas.Draw(0,0, FBitmap);
+
+  if FCenter then
+    Canvas.Draw((Width - FBitmap.Width) div 2, (Height - FBitmap.Height) div 2, FBitmap)
+  else
+    Canvas.Draw(0,0, FBitmap);
 end;
 
-procedure TCustomZintBarcodeComponent.Resize;
+procedure TCustomZintBarcodeComponent.SetCenter(const Value: Boolean);
 begin
-  FBarcode.Height := Height;
-  inherited;
+  if FCenter <> Value then
+  begin
+    FCenter := Value;
+    Invalidate;
+  end;
+end;
+
+procedure TCustomZintBarcodeComponent.SetBarode(const Value: TZintBarcode);
+begin
+  FBarcode.Assign(Value);
 end;
 
 end.
