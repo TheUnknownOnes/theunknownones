@@ -1,4 +1,4 @@
-package PNGUtils_D120R;
+package dclIBEScriptComponent;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,19 +22,15 @@ package PNGUtils_D120R;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'PNGUtils D120 - Runtime'}
-{$RUNONLY}
-{$IMPLICITBUILD OFF}
+{$LIBSUFFIX '_D100'}
+{$DESIGNONLY}
+{$IMPLICITBUILD ON}
 
 requires
   rtl,
-  vcl,
-  GDIPlus120,
-  DirectX9_D12,
-  vclimg;
+  IBEScriptComponent;
 
 contains
-  uPNGCommon in '..\..\uPNGCommon.pas',
-  uPNGHelper in '..\..\uPNGHelper.pas';
+  uRegIBEScriptComponent in '..\..\design\uRegIBEScriptComponent.pas';
 
 end.
