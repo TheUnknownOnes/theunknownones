@@ -2,7 +2,7 @@
  Purpose: Interface the Wiimote
  Created: 13.06.2008 06:38:08
  
- (c) by TheUnknownOnes
+ (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 

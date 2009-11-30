@@ -3,7 +3,7 @@
  Purpose: Register components
  Created: 12.08.2008 08:22:26
  
- (c) by TheUnknownOnes
+ (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 

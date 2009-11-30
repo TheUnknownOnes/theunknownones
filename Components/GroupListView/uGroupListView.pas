@@ -3,7 +3,7 @@
  Purpose: Wraps the Windows functions for groups in listviews
  Created: 22.05.2008 14:37:20
  
- (c) by TheUnknownOnes
+ (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 
