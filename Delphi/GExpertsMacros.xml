@@ -16,8 +16,8 @@
  Project: %PROJECTNAME%
  Purpose: %INPUTVAR,PRUPOSE,Purpose of this unit%| 
  Created: %DATETIME%
- 
- (c) by TheUnknownOnes
+
+ (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 
