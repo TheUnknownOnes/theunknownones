@@ -3,7 +3,7 @@
  Purpose: Contains components for loading and saving Settings in Streams,Files ...
  Created: 21.05.2008 14:45:06
 
- (c) by TheUnknownOnes
+ (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 

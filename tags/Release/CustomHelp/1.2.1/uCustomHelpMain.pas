@@ -1,7 +1,7 @@
 {-----------------------------------------------------------------------------
  Purpose: The main unit of the custom help expert
 
- (c) by TheUnknownOnes
+ (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 unit uCustomHelpMain;

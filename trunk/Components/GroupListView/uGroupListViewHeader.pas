@@ -3,7 +3,7 @@
  Purpose: Defines basic types for working with the GroupListView
  Created: 22.05.2008 14:36:32
  
- (c) by TheUnknownOnes
+ (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 

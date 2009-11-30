@@ -3,7 +3,7 @@
  Purpose: Contains the base classes for working with Settings
  Created: 21.05.2008 14:40:48
 
- (c) by TheUnknownOnes
+ (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 unit uSettingsBase;

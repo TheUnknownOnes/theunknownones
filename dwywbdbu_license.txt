@@ -1,0 +1,10 @@
+######## The dwywbdbu-license ########
+ (do want you want but don't blame us)
+
+
+This license allows you to do everything (copy, modify, include, ...) with the
+source code or compiled software this license was mentioned with.
+
+The source code or compiled software is distributed in the hope that it will 
+be useful but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
