@@ -1,6 +1,14 @@
+{----------------------------------------------------------------------------- 
+ Purpose: Useful classes and components to work with the zint library
+ Created: 03.12.2009 14:29:10
+
+ (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
+ see http://www.TheUnknownOnes.net
+-----------------------------------------------------------------------------}
+
 unit uZintInterface;
 
-interface
+interface 
 
 {$M+}
 
