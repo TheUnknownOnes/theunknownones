@@ -14,6 +14,7 @@ type
     pum_Shooter: TPopupMenu;
     mi_EndShooting: TMenuItem;
     mi_Transp: TMenuItem;
+    mi_Flip: TMenuItem;
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure FormShow(Sender: TObject);
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
@@ -24,6 +25,7 @@ type
     procedure mi_EndShootingClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormMouseLeave(Sender: TObject);
+    procedure mi_FlipClick(Sender: TObject);
   private
     procedure AlignWindowUnderMouse;
 
@@ -111,6 +113,18 @@ end;
 procedure Tform_Shooter.mi_EndShootingClick(Sender: TObject);
 begin
   Hide;
+end;
+
+procedure Tform_Shooter.mi_FlipClick(Sender: TObject);
+var
+  t : Int32;
+begin
+  t := form_Main.ed_RatioX.Value;
+  form_Main.ed_RatioX.Value := form_Main.ed_RatioY.Value;
+  form_Main.ed_RatioY.Value := t;
+
+  SetBounds(Left, Top, Height, Width);
+  AlignWindowUnderMouse;
 end;
 
 procedure Tform_Shooter.OnClickTransp(Sender: TObject);

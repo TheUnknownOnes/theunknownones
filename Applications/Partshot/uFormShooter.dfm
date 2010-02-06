@@ -66,5 +66,9 @@ object form_Shooter: Tform_Shooter
     object mi_Transp: TMenuItem
       Caption = 'Transparency'
     end
+    object mi_Flip: TMenuItem
+      Caption = 'Flip'
+      OnClick = mi_FlipClick
+    end
   end
 end

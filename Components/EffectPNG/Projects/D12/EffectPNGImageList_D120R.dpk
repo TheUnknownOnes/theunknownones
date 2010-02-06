@@ -24,7 +24,7 @@ package EffectPNGImageList_D120R;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'EffectPNGImagelist - Runtime'}
 {$RUNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
   rtl,

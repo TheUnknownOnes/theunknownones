@@ -25,7 +25,7 @@ package Settings_D120D;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'Settings Base and default VCL Components - Design'}
 {$DESIGNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
   rtl,

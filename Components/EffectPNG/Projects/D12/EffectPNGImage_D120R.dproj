@@ -20,6 +20,7 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
 			<GenPackage>true</GenPackage>
@@ -28,7 +29,6 @@
 			<DCC_Description>EffectPNGImage - Runtime</DCC_Description>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
 			<DCC_S>false</DCC_S>
-			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<GenDll>true</GenDll>
 			<DCC_N>false</DCC_N>
 			<DCC_E>false</DCC_E>
@@ -49,10 +49,10 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="vclEffectPNG_D120R.dcp"/>
-			<DCCReference Include="..\..\uEffectPNGImage.pas"/>
 			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="EffectPNG_D120R.dcp"/>
+			<DCCReference Include="..\..\uEffectPNGImage.pas"/>
+			<DCCReference Include="vclEffectPNG_D120R.dcp"/>
 			<DCCReference Include="PNGSupport_D120.dcp"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
