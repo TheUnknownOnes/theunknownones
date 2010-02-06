@@ -24,7 +24,7 @@ package BaseImageList_D120R;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'BaseImageList- Runtime'}
 {$RUNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
   rtl,

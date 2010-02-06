@@ -24,7 +24,7 @@ package SearchEdit_D120R;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'SearchEdit - Runtime'}
 {$RUNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
   rtl,

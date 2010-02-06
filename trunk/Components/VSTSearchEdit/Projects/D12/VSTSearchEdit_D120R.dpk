@@ -39,7 +39,8 @@ requires
   vclactnband,
   vclx,
   vcldb,
-  dbrtl;
+  dbrtl,
+  VirtualTreeHelpers_D120R;
 
 contains
   uVSTSearchEdit in '..\..\uVSTSearchEdit.pas';

@@ -54,6 +54,7 @@
 			<DCCReference Include="vclx.dcp"/>
 			<DCCReference Include="vcldb.dcp"/>
 			<DCCReference Include="dbrtl.dcp"/>
+			<DCCReference Include="VirtualTreeHelpers_D120R.dcp"/>
 			<DCCReference Include="..\..\uVSTSearchEdit.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>

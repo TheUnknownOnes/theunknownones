@@ -24,11 +24,12 @@ package XMLTools_D120R;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'XMLTools'}
 {$RUNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
   rtl,
-  vcl;
+  vcl,
+  CommonTools_D120R;
 
 contains
   MSXML2 in '..\..\MSXML2.pas',

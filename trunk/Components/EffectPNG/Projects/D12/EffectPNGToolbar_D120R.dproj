@@ -20,6 +20,7 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
 			<GenPackage>true</GenPackage>
@@ -28,7 +29,6 @@
 			<DCC_Description>EffectPNGToolbar - Runtime</DCC_Description>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
 			<DCC_S>false</DCC_S>
-			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<GenDll>true</GenDll>
 			<DCC_N>false</DCC_N>
 			<DCC_E>false</DCC_E>

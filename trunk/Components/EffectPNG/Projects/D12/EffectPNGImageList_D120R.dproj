@@ -20,6 +20,7 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
 			<GenPackage>true</GenPackage>
@@ -28,7 +29,6 @@
 			<DCC_Description>EffectPNGImagelist - Runtime</DCC_Description>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
 			<DCC_S>false</DCC_S>
-			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<GenDll>true</GenDll>
 			<DCC_N>false</DCC_N>
 			<DCC_E>false</DCC_E>
@@ -53,6 +53,7 @@
 			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="PNGUtils_D120R.dcp"/>
 			<DCCReference Include="EffectPNG_D120R.dcp"/>
+			<DCCReference Include="..\..\uEffectPNGImageList.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

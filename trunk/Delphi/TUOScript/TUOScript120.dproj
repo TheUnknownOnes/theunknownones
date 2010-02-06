@@ -26,7 +26,7 @@
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<DCC_Description>TUOScript for Delphi 2006</DCC_Description>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\TUOScript120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\TUOScript120.bpl</DCC_DependencyCheckOutputName>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<GenDll>true</GenDll>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
@@ -43,6 +43,26 @@
 			<Version>7.0</Version>
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="TUOScript120.dpk">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="designide.dcp"/>
+			<DCCReference Include="TUOScript.pas"/>
+			<BuildConfiguration Include="Basis">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_2</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
 		<ProjectExtensions>
 			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
 			<Borland.ProjectType>Package</Borland.ProjectType>
@@ -87,25 +107,4 @@
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
 		</ProjectExtensions>
-		<ItemGroup>
-			<DelphiCompile Include="TUOScript120.dpk">
-				<MainSource>MainSource</MainSource>
-			</DelphiCompile>
-			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="designide.dcp"/>
-			<DCCReference Include="TUOScript.pas"/>
-			<BuildConfiguration Include="Basis">
-				<Key>Base</Key>
-			</BuildConfiguration>
-			<BuildConfiguration Include="Debug">
-				<Key>Cfg_2</Key>
-				<CfgParent>Base</CfgParent>
-			</BuildConfiguration>
-			<BuildConfiguration Include="Release">
-				<Key>Cfg_1</Key>
-				<CfgParent>Base</CfgParent>
-			</BuildConfiguration>
-		</ItemGroup>
-		<ItemGroup/>
-		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
 	</Project>

@@ -25,11 +25,11 @@ package Settings_VirtualTrees_D120D;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'Settings Support for VirtualTrees - Design'}
 {$DESIGNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
   rtl,
-  settings_virtualtrees_d120R;
+  Settings_VirtualTrees_D120R;
 
 contains
   uRegSettingsVST in '..\..\Design\uRegSettingsVST.pas';
