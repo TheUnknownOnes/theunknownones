@@ -29,18 +29,18 @@ requires
   vcl,
   vclx,
   vclie,
-  JvCoreD10R,
+  JvCore,
   vcldb,
   dbrtl,
   vcljpg,
   JclVcl,
   Jcl,
   VclSmp,
-  JvDlgsD10R,
-  JvCustomD10R,
-  JvSystemD10R,
-  JvStdCtrlsD10R,
-  JvCtrlsD10R;
+  JvDlgs,
+  JvCustom,
+  JvSystem,
+  JvStdCtrls,
+  JvControls;
 
 contains
   uHTMLEditor in '..\..\uHTMLEditor.pas' {frmHTMLEditor: TFrame},

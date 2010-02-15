@@ -28,11 +28,11 @@ package PSBuzz_D100R;
 requires
   rtl,
   vcl,
-  JvSystemD10R,
+  JvSystem,
   vcljpg,
   vclx,
   Jcl,
-  JvCoreD10R,
+  JvCore,
   vcldb,
   dbrtl,
   JclVcl;
