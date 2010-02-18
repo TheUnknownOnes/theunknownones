@@ -276,11 +276,13 @@ begin
                         PWideChar(FCurrentDir),
                         Sa,
                         FProcessInformation);
-                        
+
   FRunning:=Result;
 
   if not Result then
-    RaiseLastOSError
+  begin
+    RaiseLastOSError;
+  end
   else
   begin
     FWatcher:=TConsoleProcessWatcher.Create(Self);
@@ -422,12 +424,8 @@ begin
 end;
 
 procedure TConsoleProcessWatcher.Execute;
-var
-  GoHome : Boolean;
 begin
-  GoHome:=false;
-
-  while not (Suspended or Terminated or GoHome) do
+  while not Terminated do
   begin
     if PipeHasData(FProcess.FPipeOutputRead) then
     begin
@@ -447,10 +445,11 @@ begin
     begin
       GetExitCodeProcess(FProcess.ProcessInformation.hProcess, FExitCode);
       Synchronize(DoProcessExit);
-      
-      GoHome:=true;
+
+      Terminate;
     end;
-    
+
+    Sleep(10);
   end;
 end;
 
