@@ -13,12 +13,17 @@ uses
   SysUtils, Classes, VirtualTrees, StdCtrls, ComCtrls, StrUtils;
 
 type
+  TVSTSearchEdit = class;
+
+  TOnAfterSearchEvent = procedure(ASender : TVSTSearchEdit; ASearchText : String) of object;
+
   TVSTSearchEdit = class(TComponent)
   private
     FTree: TVirtualStringTree;
     FProgress: TProgressBar;
     FEdit: TCustomEdit;
     FOldOnChangeProc : TNotifyEvent;
+    FOnAfterSearch: TOnAfterSearchEvent;
 
     procedure DoSearch(const AWords : TStrings);
     function NodeMatches(const ANode : PVirtualNode; const AWords : TStrings) : Boolean;
@@ -33,8 +38,10 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy(); override;
 
-    procedure RunSearch(AText : String);
+    procedure RunSearch; overload;
+    procedure RunSearch(AText : String); overload;
   published
+    property OnAfterSearch : TOnAfterSearchEvent read FOnAfterSearch write FOnAfterSearch;
     property VST : TVirtualStringTree read FTree write FTree;
     property Edit : TCustomEdit read FEdit write SetEdit;
     property Progress : TProgressBar read FProgress write FProgress;
@@ -136,10 +143,16 @@ end;
 
 procedure TVSTSearchEdit.OnEditChange(Sender: TObject);
 begin
-  RunSearch(FEdit.Text);
+  RunSearch;
 
   if Assigned(FOldOnChangeProc) then
     FOldOnChangeProc(Sender);
+end;
+
+procedure TVSTSearchEdit.RunSearch;
+begin
+  if Assigned(FEdit) then
+    RunSearch(FEdit.Text);
 end;
 
 procedure TVSTSearchEdit.RunSearch(AText: String);
@@ -158,6 +171,9 @@ begin
   finally
     Screen.Cursor:=crDefault;
   end;
+
+  if Assigned(FOnAfterSearch) then
+    FOnAfterSearch(Self, AText);
 end;
 
 procedure TVSTSearchEdit.DetachFromEdit(const Value: TCustomEdit);
