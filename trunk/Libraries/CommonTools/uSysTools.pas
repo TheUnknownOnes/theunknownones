@@ -22,6 +22,12 @@ function GetRegExFileList(APath           : String;           //The path where w
                           APathPattern    : String = '.*'     //the pattern the path must match
                          )                : Integer;          //count of files found
 
+procedure FindFileInPaths(const AFileName: String;            //Filename to be searched for
+                          const ASearchPaths: String;         //semikolon separated list of search paths. Environment variables may be used
+                          AMinimumFileSize: Int64;            //Minimum filesize to match.
+                          const AResultList: TStrings);       //List that receives found files
+
+
 {$ENDREGION}
 
 {$REGION 'Window-Printing'}
@@ -32,6 +38,7 @@ procedure PrintWindow(Wnd: HWND; ATo: TBitmap);
   function GetTempFile(AExtension : String = '') : String;
   function DeleteFileToWasteBin(AFileName:string): boolean;
   function ExpandEnvVars(AInputString : String) : String;
+  function FileSize(AFileName: String): Int64;
 {$ENDREGION}
 
 {$REGION 'Information'}
@@ -207,6 +214,35 @@ begin
   end;
 end;
 
+procedure FindFileInPaths(const AFileName: String; const ASearchPaths: String; AMinimumFileSize: Int64; const AResultList: TStrings);
+var
+  sl : TStringList;
+  FileName : String;
+  idx: Integer;
+begin
+  Assert(Assigned(AResultList), 'Result list is not assigned!');
+  Assert(AMinimumFileSize>=0, 'Minimum filesize must be larger or equal 0!');
+
+  sl:=TStringList.Create;
+  try
+    sl.Delimiter:=';';
+    sl.StrictDelimiter:=True;
+    sl.DelimitedText:=ExpandEnvVars(ASearchPaths);
+
+    for idx := 0 to sl.Count - 1 do
+    begin
+      FileName:=IncludeTrailingPathDelimiter(sl[idx])+AFileName;
+      if (FileSize(FileName)>=AMinimumFileSize) then
+      begin
+        AResultList.Add(FileName);
+        break;
+      end;
+    end;
+  finally
+    sl.Free;
+  end;
+end;
+
 {$ENDREGION}
 
 {$REGION 'Window-Printing'}
@@ -320,6 +356,18 @@ begin
   end;
 
   Reg.Free;
+end;
+
+function FileSize(AFileName : String) : Int64;
+var
+  sr : TSearchRec;
+begin
+  if FindFirst(AFileName, faAnyFile, sr ) = 0 then
+     result := Int64(sr.FindData.nFileSizeHigh) shl Int64(32) +  Int64(sr.FindData.nFileSizeLow)
+  else
+     result := -1;
+
+  FindClose(sr) ;
 end;
 
 {$ENDREGION}
