@@ -27,7 +27,7 @@ package DiscBurner_D120R;
 
 requires
   rtl,
-  JediApi_StaticRelease;
+  JediApi_SingleUnits;
 
 contains
   uDiscBurner in '..\..\uDiscBurner.pas';

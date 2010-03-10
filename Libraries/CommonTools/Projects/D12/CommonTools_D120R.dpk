@@ -37,7 +37,8 @@ requires
   GDIPlus120,
   RegExp_D120R,
   vclimg,
-  Jcl;
+  Jcl,
+  JediApi_SingleUnits;
 
 contains
   sndkey32 in '..\..\sndkey32.pas',

@@ -29,7 +29,8 @@ package Settings_VirtualTrees_D120D;
 
 requires
   rtl,
-  Settings_VirtualTrees_D120R;
+  Settings_VirtualTrees_D120R,
+  regexp_d120R;
 
 contains
   uRegSettingsVST in '..\..\Design\uRegSettingsVST.pas';

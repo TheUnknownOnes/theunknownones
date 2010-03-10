@@ -28,11 +28,11 @@ package Wiimote_D120R;
 
 requires
   rtl,
-  JvSystemD12R,
+  JvSystem,
   vcl,
   vclx,
   Jcl,
-  JvCoreD12R,
+  JvCore,
   vcldb,
   dbrtl,
   JclVcl;
