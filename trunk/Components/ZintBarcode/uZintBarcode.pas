@@ -339,12 +339,12 @@ begin
   if not FStacked then
     Clear;
 
-  CheckForError(ZBarcode_Encode_and_Buffer(FSymbol, PChar(FData), Length(FData), rotation));
+  CheckForError(ZBarcode_Encode_and_Buffer(FSymbol, PAnsiChar(FData), Length(FData), rotation));
 end;
 
 function TZintBarcode.ErrorTextFromSymbol: String;
 begin
-  Result := StrPas(@FSymbol.errtxt);
+  Result := StrPas(PAnsiChar(@FSymbol.errtxt));
 end;
 
 procedure TZintBarcode.FreeSymbol;
@@ -391,7 +391,7 @@ end;
 
 function TZintBarcode.GetColor(const Index: Integer): TColor;
 var
-  S : String;
+  S : AnsiString;
 begin
   case Index of
     0: S := FSymbol.fgcolour;
@@ -403,7 +403,11 @@ end;
 
 function TZintBarcode.GetData: Widestring;
 begin
+  {$IFDEF UNICODE}
+  Result := UTF8ToWideString(FData);
+  {$ELSE}
   Result := UTF8Decode(FData);
+  {$ENDIF}
 end;
 
 function TZintBarcode.GetHeight: Integer;
@@ -429,7 +433,7 @@ end;
 
 function TZintBarcode.GetPrimary: String;
 begin
-  Result := StrPas(@FSymbol.primary);
+  Result := StrPas(PAnsiChar(@FSymbol.primary));
 end;
 
 function TZintBarcode.GetSHRT: Boolean;

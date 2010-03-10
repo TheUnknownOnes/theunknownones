@@ -1,4 +1,4 @@
-package VirtualActionTree_D120R;
+package PSBuzz_D120D;
 
 {$R *.res}
 {$ALIGN 8}
@@ -22,22 +22,15 @@ package VirtualActionTree_D120R;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'VirtualActionTree - Runtime'}
-{$RUNONLY}
-{$IMPLICITBUILD ON}
+{$DESCRIPTION 'PSBuzz'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  vcl,
-  VirtualTreesD12,
-  vclactnband,
-  vclx,
-  vcldb,
-  dbrtl,
-  GDIPlus120,
-  DirectX9_D12;
+  PSBuzz_D120R;
 
 contains
-  uVirtualActionTree in '..\..\uVirtualActionTree.pas';
+  uRegPSBuzz in '..\..\design\uRegPSBuzz.pas';
 
 end.

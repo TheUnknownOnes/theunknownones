@@ -1,0 +1,48 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{35A0091A-00C1-4E40-BBAC-996ABE3A8BBD}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="D12\PSBuzz_D120R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="D12\PSBuzz_D120D.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="PSBuzz_D120R">
+			<MSBuild Projects="D12\PSBuzz_D120R.dproj"/>
+		</Target>
+		<Target Name="PSBuzz_D120R:Clean">
+			<MSBuild Targets="Clean" Projects="D12\PSBuzz_D120R.dproj"/>
+		</Target>
+		<Target Name="PSBuzz_D120R:Make">
+			<MSBuild Targets="Make" Projects="D12\PSBuzz_D120R.dproj"/>
+		</Target>
+		<Target Name="PSBuzz_D120D">
+			<MSBuild Projects="D12\PSBuzz_D120D.dproj"/>
+		</Target>
+		<Target Name="PSBuzz_D120D:Clean">
+			<MSBuild Targets="Clean" Projects="D12\PSBuzz_D120D.dproj"/>
+		</Target>
+		<Target Name="PSBuzz_D120D:Make">
+			<MSBuild Targets="Make" Projects="D12\PSBuzz_D120D.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="PSBuzz_D120R;PSBuzz_D120D"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="PSBuzz_D120R:Clean;PSBuzz_D120D:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="PSBuzz_D120R:Make;PSBuzz_D120D:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>

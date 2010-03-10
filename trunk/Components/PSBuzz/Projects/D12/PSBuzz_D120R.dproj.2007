@@ -1,10 +1,9 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{403CF627-2769-494F-B734-FC5C67950186}</ProjectGuid>
-			<MainSource>VirtualActionTree_D120R.dpk</MainSource>
-			<Config Condition="'$(Config)'==''">Release</Config>
+			<ProjectGuid>{74BE0115-4231-4AD7-8C59-1E8374F174FA}</ProjectGuid>
+			<MainSource>PSBuzz_D120R.dpk</MainSource>
+			<Config Condition="'$(Config)'==''">Debug</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-			<ProjectVersion>12.0</ProjectVersion>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Basis' or '$(Base)'!=''">
 			<Base>true</Base>
@@ -20,20 +19,14 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DesignOnlyPackage>false</DesignOnlyPackage>
-			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
-			<GenPackage>true</GenPackage>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\VirtualActionTree_D120R.bpl</DCC_DependencyCheckOutputName>
-			<DCC_Platform>x86</DCC_Platform>
-			<DCC_Description>VirtualActionTree - Runtime</DCC_Description>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\PSBuzz_D120R.bpl</DCC_DependencyCheckOutputName>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
-			<DCC_S>false</DCC_S>
+			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<GenDll>true</GenDll>
-			<DCC_N>false</DCC_N>
-			<DCC_E>false</DCC_E>
-			<DCC_F>false</DCC_F>
-			<DCC_K>false</DCC_K>
+			<GenPackage>true</GenPackage>
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DCC_Platform>x86</DCC_Platform>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -45,20 +38,20 @@
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="VirtualActionTree_D120R.dpk">
+			<DelphiCompile Include="PSBuzz_D120R.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
-			<DCCReference Include="VirtualTreesD12.dcp"/>
-			<DCCReference Include="vclactnband.dcp"/>
+			<DCCReference Include="JvSystem.dcp"/>
+			<DCCReference Include="vcljpg.dcp"/>
 			<DCCReference Include="vclx.dcp"/>
+			<DCCReference Include="Jcl.dcp"/>
+			<DCCReference Include="JvCore.dcp"/>
 			<DCCReference Include="vcldb.dcp"/>
 			<DCCReference Include="dbrtl.dcp"/>
-			<DCCReference Include="GDIPlus120.dcp"/>
-			<DCCReference Include="DirectX9_D12.dcp"/>
-			<DCCReference Include="..\..\uVirtualActionTree.pas"/>
-			<DCCReference Include="TntUnicodeVcl.dcp"/>
+			<DCCReference Include="JclVcl.dcp"/>
+			<DCCReference Include="..\..\uPSBuzz.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -78,7 +71,7 @@
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">VirtualActionTree_D120R.dpk</Source>
+						<Source Name="MainSource">PSBuzz_D120R.dpk</Source>
 					</Source>
 					<Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
@@ -86,7 +79,7 @@
 						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
 					</Parameters>
 					<VersionInfo>
-						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
 						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">0</VersionInfo>

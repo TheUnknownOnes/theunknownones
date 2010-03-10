@@ -131,8 +131,6 @@ type
     procedure DoStdOut;
     procedure DoStdErr;
 
-    function ProcessRunning : Boolean;
-
     function PipeHasData(APipe : THandle) : Boolean; 
     function ReadPipe(APipe : THandle) : AnsiString;
   protected
@@ -441,9 +439,8 @@ begin
       FStringBuffer:=EmptyStr;
     end;
 
-    if not ProcessRunning then
+    if GetExitCodeProcess(FProcess.ProcessInformation.hProcess, FExitCode) and (FExitCode <> STILL_ACTIVE) then
     begin
-      GetExitCodeProcess(FProcess.ProcessInformation.hProcess, FExitCode);
       Synchronize(DoProcessExit);
 
       Terminate;
@@ -458,11 +455,6 @@ var
   BytesAvailable : Cardinal;
 begin
   Result:=PeekNamedPipe(APipe, nil, 0, nil, @BytesAvailable, nil) and (BytesAvailable>0);
-end;
-
-function TConsoleProcessWatcher.ProcessRunning: Boolean;
-begin
-  Result:=WaitForSingleObject(FProcess.ProcessInformation.hProcess, 50)<>WAIT_OBJECT_0;
 end;
 
 function TConsoleProcessWatcher.ReadPipe(APipe: THandle): AnsiString;

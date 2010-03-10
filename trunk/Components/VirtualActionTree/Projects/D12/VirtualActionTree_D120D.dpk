@@ -24,7 +24,7 @@ package VirtualActionTree_D120D;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'VirtualActionTree - Design'}
 {$DESIGNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
   rtl,
