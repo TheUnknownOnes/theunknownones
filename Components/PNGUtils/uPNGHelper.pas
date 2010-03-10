@@ -12,6 +12,12 @@ uses
   Dialogs, StdCtrls, pngImage, gdipapi, gdipobj, ActiveX, ImgList, ShellAPI,
   gdiputil;
 
+type
+  TPNGHelper = class helper for TPngObject
+  public
+    procedure LoadFromResourceName(AInstance: HINST; AResourceGroup : string; AResourceName: String); overload;
+  end;
+
   function PNGtoIcon(const APNG : TGPBitmap;
                       ACursor : Boolean = false;
                       AHotSpotX : Integer = 0;
@@ -416,7 +422,7 @@ end;
 
 procedure GetAsPNG(Instance:THandle;Identifier:String;const PNG:TPngObject);
 begin
-  PNG.LoadFromResourceName(Instance,Identifier);
+  PNG.LoadFromResourceName(Instance, 'PNG', Identifier);
 end;
 
 procedure GetAsBitmap(Instance:THandle;Identifier:String;Backcolor:Graphics.TColor;const Bitmap:Graphics.TBitmap);
@@ -567,6 +573,22 @@ begin
     graphicsBack.Free;
     imgfg.Free;
     imgbg.Free;
+  end;
+end;
+
+{ TPNGHelper }
+
+procedure TPNGHelper.LoadFromResourceName(AInstance: HINST; AResourceGroup,
+  AResourceName: String);
+var
+  strm : TResourceStream;
+begin
+  strm:=TResourceStream.Create(AInstance, AResourceName, PChar(AResourceGroup));
+  try
+    strm.Seek(0, soBeginning);
+    self.LoadFromStream(strm);
+  finally
+    strm.Free;
   end;
 end;
 
