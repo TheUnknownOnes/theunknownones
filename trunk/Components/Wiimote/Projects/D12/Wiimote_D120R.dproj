@@ -23,7 +23,7 @@
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
 			<GenPackage>true</GenPackage>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\Wiimote_D120R.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\Wiimote_D120R.bpl</DCC_DependencyCheckOutputName>
 			<DCC_Platform>x86</DCC_Platform>
 			<DCC_Description>Wiimote Support</DCC_Description>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
@@ -49,8 +49,7 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="JvSystemD12R.dcp"/>
-			<DCCReference Include="vcljpg.dcp"/>
+			<DCCReference Include="JvSystem.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="vclx.dcp"/>
 			<DCCReference Include="Jcl.dcp"/>
@@ -59,6 +58,8 @@
 			<DCCReference Include="dbrtl.dcp"/>
 			<DCCReference Include="JclVcl.dcp"/>
 			<DCCReference Include="..\..\uWiimote.pas"/>
+			<DCCReference Include="JvSystemD12R.dcp"/>
+			<DCCReference Include="vcljpg.dcp"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

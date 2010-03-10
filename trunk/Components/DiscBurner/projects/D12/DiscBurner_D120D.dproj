@@ -21,7 +21,7 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
-			<DCC_DependencyCheckOutputName>F:\Dokumente und Einstellungen\All Users\Dokumente\RAD Studio\6.0\Bpl\DiscBurner_D120D.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\DiscBurner_D120D.bpl</DCC_DependencyCheckOutputName>
 			<DCC_Description>DiscBurner</DCC_Description>
 			<DesignOnlyPackage>true</DesignOnlyPackage>
 			<GenDll>true</GenDll>

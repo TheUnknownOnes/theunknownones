@@ -21,7 +21,7 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
-			<DCC_DependencyCheckOutputName>F:\Dokumente und Einstellungen\All Users\Dokumente\RAD Studio\6.0\Bpl\DiscBurner_D120R.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\DiscBurner_D120R.bpl</DCC_DependencyCheckOutputName>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
 			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<GenDll>true</GenDll>
@@ -44,7 +44,7 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="JediApi_StaticRelease.dcp"/>
+			<DCCReference Include="JediApi_SingleUnits.dcp"/>
 			<DCCReference Include="..\..\uDiscBurner.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>

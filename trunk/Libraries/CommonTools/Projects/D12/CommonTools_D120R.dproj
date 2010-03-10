@@ -26,7 +26,7 @@
 			<GenPackage>true</GenPackage>
 			<DCC_Platform>x86</DCC_Platform>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\CommonTools_D120R.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\CommonTools_D120R.bpl</DCC_DependencyCheckOutputName>
 			<DCC_E>false</DCC_E>
 			<DCC_S>false</DCC_S>
 			<GenDll>true</GenDll>
@@ -59,6 +59,7 @@
 			<DCCReference Include="RegExp_D120R.dcp"/>
 			<DCCReference Include="vclimg.dcp"/>
 			<DCCReference Include="Jcl.dcp"/>
+			<DCCReference Include="JediApi_SingleUnits.dcp"/>
 			<DCCReference Include="..\..\sndkey32.pas"/>
 			<DCCReference Include="..\..\uCanvasClassHelper.pas"/>
 			<DCCReference Include="..\..\uCommonTypes.pas"/>

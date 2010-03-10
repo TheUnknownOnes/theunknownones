@@ -35,8 +35,7 @@ requires
   xmlrtl,
   vclactnband,
   vclx,
-  XMLTools_D120R,
-  RegExp_d120R;
+  XMLTools_D120R;
 
 contains
   uSettingsLinkVirtualTrees in '..\..\uSettingsLinkVirtualTrees.pas';
