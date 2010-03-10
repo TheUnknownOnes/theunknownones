@@ -1,5 +1,5 @@
-package VirtualActionTree_D120R;
-
+package frxZintBarcode;
+     
 {$R *.res}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -22,22 +22,15 @@ package VirtualActionTree_D120R;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'VirtualActionTree - Runtime'}
-{$RUNONLY}
-{$IMPLICITBUILD ON}
+{$LIBSUFFIX '120'}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  vcl,
-  VirtualTreesD12,
-  vclactnband,
-  vclx,
-  vcldb,
-  dbrtl,
-  GDIPlus120,
-  DirectX9_D12;
+  frx12,
+  ZintBarcode;
 
 contains
-  uVirtualActionTree in '..\..\uVirtualActionTree.pas';
+  ufrxZintBarcode in '..\..\ufrxZintBarcode.pas';
 
 end.

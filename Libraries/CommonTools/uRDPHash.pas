@@ -19,7 +19,7 @@ unit uRDPHash;
 
 interface
 
-uses Windows, Sysutils {$ifndef FPC}, JwaWinCrypt{$endif};
+uses Windows, Sysutils {$ifndef FPC}, JwaWinCrypt{$endif}, JwaWinType;
 
 {$ifdef FPC}
 type
@@ -99,7 +99,7 @@ begin
 
   GetMem(Result.pbData, dwBufSize);
   Result.cbData := dwBufSize;
-  Result.pbData := PByte(Buf);
+  Result.pbData := LPBYTE(Buf);
 end;
 
 {***********************************************************}
@@ -153,7 +153,7 @@ begin
                       CRYPTPROTECT_UI_FORBIDDEN,  // Never show interface
                       @DataOut) then
   begin
-    PwdHash := BlobDataToHexStr(DataOut.pbData, DataOut.cbData);
+    PwdHash := BlobDataToHexStr(PByte(DataOut.pbData), DataOut.cbData);
   end;
   Result := PwdHash;
 

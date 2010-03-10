@@ -1,0 +1,60 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{9E579A36-D59C-4598-9D2A-E8C302F7F4A6}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="D12\ZintBarcode.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="D12\dclZintBarcode.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="D12\frxZintBarcode.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="ZintBarcode">
+			<MSBuild Projects="D12\ZintBarcode.dproj"/>
+		</Target>
+		<Target Name="ZintBarcode:Clean">
+			<MSBuild Targets="Clean" Projects="D12\ZintBarcode.dproj"/>
+		</Target>
+		<Target Name="ZintBarcode:Make">
+			<MSBuild Targets="Make" Projects="D12\ZintBarcode.dproj"/>
+		</Target>
+		<Target Name="dclZintBarcode">
+			<MSBuild Projects="D12\dclZintBarcode.dproj"/>
+		</Target>
+		<Target Name="dclZintBarcode:Clean">
+			<MSBuild Targets="Clean" Projects="D12\dclZintBarcode.dproj"/>
+		</Target>
+		<Target Name="dclZintBarcode:Make">
+			<MSBuild Targets="Make" Projects="D12\dclZintBarcode.dproj"/>
+		</Target>
+		<Target Name="frxZintBarcode">
+			<MSBuild Projects="D12\frxZintBarcode.dproj"/>
+		</Target>
+		<Target Name="frxZintBarcode:Clean">
+			<MSBuild Targets="Clean" Projects="D12\frxZintBarcode.dproj"/>
+		</Target>
+		<Target Name="frxZintBarcode:Make">
+			<MSBuild Targets="Make" Projects="D12\frxZintBarcode.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="ZintBarcode;dclZintBarcode;frxZintBarcode"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="ZintBarcode:Clean;dclZintBarcode:Clean;frxZintBarcode:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="ZintBarcode:Make;dclZintBarcode:Make;frxZintBarcode:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>
