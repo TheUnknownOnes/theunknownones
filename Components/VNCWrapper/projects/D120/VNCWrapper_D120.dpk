@@ -26,7 +26,8 @@ package VNCWrapper_D120;
 {$IMPLICITBUILD OFF}
 
 requires
-  rtl;
+  rtl,
+  SPPCryptD120;
 
 contains
   vncserverwrapper in 'vncserverwrapper.pas',
