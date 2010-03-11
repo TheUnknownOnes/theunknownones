@@ -154,7 +154,7 @@ begin
 		if srvHandle > 0 then
 		begin
 			FillChar(Chars, SizeOf(Chars), 0);
-			EnumDependentServices(
+			EnumDependentServicesA(
         srvHandle, SERVICE_ACTIVE, Services[0],
         256 * SizeOf(ENUM_SERVICE_STATUSA), dwCheckPoint, Running
       );
