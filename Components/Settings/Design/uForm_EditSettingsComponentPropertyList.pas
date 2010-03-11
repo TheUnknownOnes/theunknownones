@@ -172,10 +172,10 @@ end;
 function Tform_EditComponentPropertyList.GetPropertyNode(
   APath: TSettingName): TTreeNode;
 var
-  Splitter : TWideStringList;
+  Splitter : TStringList;
   idx : Integer;
 begin
-  Splitter := TWideStringList.Create;
+  Splitter := TStringList.Create;
   try
     SettingsSplitPath(APath, Splitter);
 
