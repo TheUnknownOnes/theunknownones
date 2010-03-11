@@ -48,6 +48,7 @@
 			</DelphiCompile>
 			<DCCReference Include="icon.res"/>
 			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="SPPCryptD120.dcp"/>
 			<DCCReference Include="vncserverwrapper.pas"/>
 			<DCCReference Include="vncclientwrapper.pas"/>
 			<DCCReference Include="icon.res"/>
