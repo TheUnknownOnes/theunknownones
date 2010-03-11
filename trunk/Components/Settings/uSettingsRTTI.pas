@@ -11,7 +11,7 @@ uses
   uRTTIHelper;
 
 type
-  TsrPropertyName = WideString;
+  TsrPropertyName = String;
 
   TsrPropertyList = class(TStringList)
   protected

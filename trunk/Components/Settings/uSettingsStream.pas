@@ -16,8 +16,8 @@ interface
 uses
   Classes,
   SysUtils,
-  Variants,
   WideStrings,
+  Variants,
   WideStrUtils,
   uSettingsBase;
 

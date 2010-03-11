@@ -17,7 +17,6 @@ uses
   Contnrs,
   Sysutils,
   Variants,
-  WideStrings,
   RegExpr,
   Windows,
   uSettingsRTTI,
@@ -32,7 +31,7 @@ type
   TCustomSettingsLinkList = class;
 
   { - use the following types whenever possible}
-  TSettingName = WideString;
+  TSettingName = String;
 
   TSettingValue = Variant;
 
@@ -88,7 +87,7 @@ type
 
     FChildren : TSettingList;
 
-    FIndex : TWideStringList;
+    FIndex : TStringList;
 
     function CalculatePath : TSettingName;
 
@@ -127,7 +126,7 @@ type
     property Value : TSettingValue read FValue write SetValue;
     property Parent : TSetting read FParent write SetParent;
     property Children : TSettingList read FChildren;
-    property Index : TWideStringList read FIndex;
+    property Index : TStringList read FIndex;
   end;
 
 
@@ -404,7 +403,7 @@ var
 
 function SettingsExcludeTrailingPathDelimiter(APath : TSettingName) : TSettingName;
 function SettingsIncludeLeadingPathDelimiter(APath : TSettingName) : TSettingName;
-procedure SettingsSplitPath(APath : WideString; AList : TWideStrings);
+procedure SettingsSplitPath(APath : String; AList : TStrings);
 procedure SettingsInitRegEx(const ARegEx : TRegExpr);
 function SettingsNameStringMatches(AName, APattern : TSettingName; AIsRegEx : Boolean) : Boolean;
 function SettingsCheckValueType(AVariant : Variant; ARaiseException : Boolean = true) : Boolean;
@@ -464,7 +463,7 @@ begin
     Result := APath;
 end;
 
-procedure SettingsSplitPath(APath : WideString; AList : TWideStrings);
+procedure SettingsSplitPath(APath : String; AList : TStrings);
 begin
   AList.Delimiter := SettingsPathDelimiter;
   AList.StrictDelimiter := true;
@@ -543,11 +542,11 @@ end;
 function TSetting.CalculatePath: TSettingName;
 var
   Setting : TSetting;
-  Path : TWideStringList;
+  Path : TStringList;
 begin
   Result := EmptyWideStr;
 
-  Path := TWideStringList.Create;
+  Path := TStringList.Create;
   try
     SettingsSplitPath(EmptyWideStr, Path); //init list
     Path.Clear;
@@ -615,7 +614,7 @@ end;
 
 procedure TSetting.CreateFromPath(ARoot: TSetting; APath: TSettingName);
 var
-  Path : TWideStringList;
+  Path : TStringList;
   Setting : TSetting;
   ChildIndex,
   PathIndex : Integer;
@@ -625,7 +624,7 @@ begin
 
   Setting := ARoot;
 
-  Path := TWideStringList.Create;
+  Path := TStringList.Create;
   try
     SettingsSplitPath(APath, Path);
 
@@ -657,7 +656,7 @@ end;
 
 procedure TSetting.CreateIndex;
 begin
-  FIndex := TWideStringList.Create;
+  FIndex := TStringList.Create;
   FIndex.Sorted := true;
   FIndex.Duplicates := dupIgnore;
 end;
@@ -1645,12 +1644,12 @@ end;
 function TCustomSettingsComponentLink.GenerateRootSettingName(
   AComponent: TComponent): TSettingName;
 var
-  Path : TWideStringList;
+  Path : TStringList;
   Compo : TComponent;
 begin
   Compo := AComponent;
 
-  Path := TWideStringList.Create;
+  Path := TStringList.Create;
   try
     SettingsSplitPath(EmptyWideStr, Path); //Init the list;
 

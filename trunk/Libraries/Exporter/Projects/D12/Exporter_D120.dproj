@@ -1,8 +1,8 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{BA5328DC-AE89-4679-B5AE-CBBA8B28DF91}</ProjectGuid>
-			<MainSource>Settings_VirtualTrees_D120D.dpk</MainSource>
-			<Config Condition="'$(Config)'==''">Release</Config>
+			<ProjectGuid>{18CF59E3-8D78-45CD-8F26-A8FEF9039FF1}</ProjectGuid>
+			<MainSource>Exporter_D120.dpk</MainSource>
+			<Config Condition="'$(Config)'==''">Debug</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<ProjectVersion>12.0</ProjectVersion>
 		</PropertyGroup>
@@ -20,19 +20,12 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DesignOnlyPackage>true</DesignOnlyPackage>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\Exporter_D120.bpl</DCC_DependencyCheckOutputName>
+			<GenDll>true</GenDll>
 			<GenPackage>true</GenPackage>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_Platform>x86</DCC_Platform>
-			<DCC_Description>Settings Support for VirtualTrees - Design</DCC_Description>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\Settings_VirtualTrees_D120D.bpl</DCC_DependencyCheckOutputName>
-			<DCC_S>false</DCC_S>
-			<GenDll>true</GenDll>
-			<DCC_N>false</DCC_N>
-			<DCC_E>false</DCC_E>
-			<DCC_F>false</DCC_F>
-			<DCC_K>false</DCC_K>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -44,15 +37,18 @@
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="Settings_VirtualTrees_D120D.dpk">
+			<DelphiCompile Include="Exporter_D120.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="..\..\Design\Images_SVST"/>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="Settings_VirtualTrees_D120R.dcp"/>
-			<DCCReference Include="regexp_d120R.dcp"/>
-			<DCCReference Include="..\..\Design\uRegSettingsVST.pas"/>
-			<DCCReference Include="..\..\Design\Images_SVST"/>
+			<DCCReference Include="dbrtl.dcp"/>
+			<DCCReference Include="vcl.dcp"/>
+			<DCCReference Include="XMLTools_D120R.dcp"/>
+			<DCCReference Include="PDSevenzip_d120r.dcp"/>
+			<DCCReference Include="..\..\uExporter.pas"/>
+			<DCCReference Include="..\..\uExporterDestinationCSV.pas"/>
+			<DCCReference Include="..\..\uExporterSourceDataset.pas"/>
+			<DCCReference Include="..\..\uExportDestinationODS.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -72,7 +68,7 @@
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">Settings_VirtualTrees_D120D.dpk</Source>
+						<Source Name="MainSource">Exporter_D120.dpk</Source>
 					</Source>
 					<Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
@@ -80,7 +76,7 @@
 						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
 					</Parameters>
 					<VersionInfo>
-						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
 						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">0</VersionInfo>
@@ -106,11 +102,6 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
-					<Excluded_Packages>
-						<Excluded_Packages Name="$(BDS)\bin\dclwebsnap120.bpl">CodeGear WebSnap-Komponenten</Excluded_Packages>
-						<Excluded_Packages Name="$(BDS)\bin\dclnet120.bpl">CodeGear Internet-Komponenten</Excluded_Packages>
-						<Excluded_Packages Name="$(BDS)\bin\dclsoap120.bpl">CodeGear SOAP-Komponenten</Excluded_Packages>
-					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
