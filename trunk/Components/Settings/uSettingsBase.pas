@@ -485,7 +485,7 @@ var
 begin
   if AIsRegEx then
   begin
-    if APattern = EmptyWideStr then
+    if APattern = EmptyStr then
       raise Exception.Create('Empty pattern not allowed');
 
     Reg := TRegExpr.Create();
@@ -499,7 +499,7 @@ begin
     end;
   end
   else
-    Result := WideSameText(AName, APattern);
+    Result := SameText(AName, APattern);
 end;
 
 function SettingsCheckValueType(AVariant : Variant; ARaiseException : Boolean = true) : Boolean; 
@@ -544,11 +544,11 @@ var
   Setting : TSetting;
   Path : TStringList;
 begin
-  Result := EmptyWideStr;
+  Result := EmptyStr;
 
   Path := TStringList.Create;
   try
-    SettingsSplitPath(EmptyWideStr, Path); //init list
+    SettingsSplitPath(EmptyStr, Path); //init list
     Path.Clear;
 
     Setting := Self;
@@ -577,7 +577,7 @@ end;
 constructor TSetting.Create();
 begin
   FParent := nil;
-  FName := EmptyWideStr;
+  FName := EmptyStr;
   VarClear(FValue);
 
   FChildren := TSettingList.Create;
@@ -1034,7 +1034,7 @@ begin
           Result[idx].Name := Setts[idx].Name
       end
       else
-        Result[idx].Name := EmptyWideStr;
+        Result[idx].Name := EmptyStr;
     end;
 
   finally
@@ -1075,7 +1075,7 @@ begin
 
   if Length(NameValues) = 0 then
   begin
-    Result.Name := EmptyWideStr;
+    Result.Name := EmptyStr;
     Result.Value := ADefault;
   end
   else
@@ -1115,7 +1115,7 @@ begin
           Result[idx].Name := Setts[idx].Name
       end
       else
-        Result[idx].Name := EmptyWideStr;
+        Result[idx].Name := EmptyStr;
     end;
 
   finally
@@ -1651,7 +1651,7 @@ begin
 
   Path := TStringList.Create;
   try
-    SettingsSplitPath(EmptyWideStr, Path); //Init the list;
+    SettingsSplitPath(EmptyStr, Path); //Init the list;
 
     while Assigned(Compo) do
     begin
@@ -1664,7 +1664,7 @@ begin
     end;
 
     Path.Insert(0, 'GUI');
-    Path.Insert(0, EmptyWideStr);
+    Path.Insert(0, EmptyStr);
 
     Result := Path.DelimitedText;
   finally
@@ -1696,7 +1696,7 @@ begin
     if Assigned(FComponent) then
       FComponent.FreeNotification(Self);
 
-    if WideSameText(FDefaultRootSetting, EmptyWideStr) then
+    if SameText(FDefaultRootSetting, EmptyStr) then
       DefaultRootSetting := GenerateRootSettingName(FComponent);
 
     if Assigned(FComponent) then
