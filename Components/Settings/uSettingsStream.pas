@@ -244,10 +244,11 @@ var
   Len : Integer;
 begin
   ReadValue(AStream, Len);
-  Inc(Len);
+  Len := Len * SizeOf(Char);
+  Inc(Len, SizeOf(Char));
   GetMem(Buffer, Len);
   FillChar(Buffer^, Len, 0);
-  AStream.ReadBuffer(Buffer^, Len - 1);
+  AStream.ReadBuffer(Buffer^, Len - SizeOf(Char));
   AValue := String(Buffer);
   FreeMem(Buffer, Len);
 end;
@@ -415,7 +416,7 @@ procedure TCustomSettingsStream.WriteValue(const AStream: TStream;
   AValue: String);
 begin
   WriteValue(AStream, Length(AValue));
-  Astream.WriteBuffer(PChar(AValue)^, Length(AValue));
+  Astream.WriteBuffer(PChar(AValue)^, Length(AValue) * SizeOf(Char));
 end;
 
 procedure TCustomSettingsStream.WriteValue(const AStream: TStream;
