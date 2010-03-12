@@ -653,9 +653,10 @@ var
   idx : integer;
 begin
   try
-    if not (csDesigning in Self.ComponentState) then
+    if (not (csDesigning in Self.ComponentState))
+       and (AActionList.ComponentState<>[csDestroying]) then
     begin
-      for idx:=0 to AActionList.ActionCount-1 do
+      for idx:=AActionList.ActionCount-1 downto 0 do
         RemoveAction(AActionList.Actions[idx]);
     end;
   except
