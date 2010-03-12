@@ -562,6 +562,13 @@ begin
         New(Result.VInt64);
         Result.VInt64^ := Item;
       end;
+    {$IFDEF UNICODE}
+    varUString:
+      begin
+        Result.VType:=vtUnicodeString;
+        Result.VUnicodeString := PChar(String(Item));
+      end;
+    {$ENDIF}
   end;
 end;
 
