@@ -47,34 +47,34 @@ type
   TListGroup = class(TCollectionItem)
   private
     FGroupID : Integer;
-    FHeader: WideString;
-    FFooter: WideString;
+    FHeader: string;
+    FFooter: string;
     FHeaderAlign: TListGroupAlign;
     FFooterAlign: TListGroupAlign;
     FState: TListGroupState;
     FExtendedImage: Integer;
-    FDescriptionBottom: WideString;
-    FSubtitle: WideString;
-    FDescriptionTop: WideString;
-    FSubsetTitle: WideString;
+    FDescriptionBottom: string;
+    FSubtitle: string;
+    FDescriptionTop: string;
+    FSubsetTitle: string;
     FTitleImage: Integer;
-    FTask: WideString;
+    FTask: string;
     procedure SetState(const Value: TListGroupState);
     procedure SetFooterAlign(const Value: TListGroupAlign);
     procedure SetHeaderAlign(const Value: TListGroupAlign);
-    procedure SetFooter(const Value: WideString);
-    procedure SetHeader(const Value: WideString);
+    procedure SetFooter(const Value: string);
+    procedure SetHeader(const Value: string);
 
     function GetOwnerListviewHandle : HWND;
     function SetGroupInfo(AGroupInfo : PLVGroup) : Boolean;
     function IDInUse(AID : Integer) : Boolean;
     function Designing() : Boolean;
-    procedure SetDescriptionBottom(const Value: WideString);
-    procedure SetDescriptionTop(const Value: WideString);
+    procedure SetDescriptionBottom(const Value: string);
+    procedure SetDescriptionTop(const Value: string);
     procedure SetExtendedImage(const Value: Integer);
-    procedure SetSubsetTitle(const Value: WideString);
-    procedure SetSubtitle(const Value: WideString);
-    procedure SetTask(const Value: WideString);
+    procedure SetSubsetTitle(const Value: string);
+    procedure SetSubtitle(const Value: string);
+    procedure SetTask(const Value: string);
     procedure SetTitleImage(const Value: Integer);
   protected
     procedure SetIndex(Value: Integer); override;
@@ -83,15 +83,15 @@ type
     procedure Assign(Source: TPersistent); override;
     function GetDisplayName():String; override;
   published
-    property Header : WideString read FHeader write SetHeader;
-    property Footer : WideString read FFooter write SetFooter;
-    property Subtitle : WideString read FSubtitle write SetSubtitle;
-    property Task : WideString read FTask write SetTask;
-    property DescriptionTop : WideString read FDescriptionTop write SetDescriptionTop;
-    property DescriptionBottom : WideString read FDescriptionBottom write SetDescriptionBottom;
+    property Header : string read FHeader write SetHeader;
+    property Footer : string read FFooter write SetFooter;
+    property Subtitle : string read FSubtitle write SetSubtitle;
+    property Task : string read FTask write SetTask;
+    property DescriptionTop : string read FDescriptionTop write SetDescriptionTop;
+    property DescriptionBottom : string read FDescriptionBottom write SetDescriptionBottom;
     property TitleImage : Integer read FTitleImage write SetTitleImage default -1;
     property ExtendedImage : Integer read FExtendedImage write SetExtendedImage default -1;
-    property SubsetTitle : WideString read FSubsetTitle write SetSubsetTitle;
+    property SubsetTitle : string read FSubsetTitle write SetSubsetTitle;
     property GroupID : Integer read FGroupID;
     property HeaderAlign : TListGroupAlign read FHeaderAlign write SetHeaderAlign default lgaLeft;
     property FooterAlign : TListGroupAlign read FFooterAlign write SetFooterAlign default lgaLeft;
@@ -377,7 +377,7 @@ begin
   end;
 end;
 
-procedure TListGroup.SetDescriptionBottom(const Value: WideString);
+procedure TListGroup.SetDescriptionBottom(const Value: string);
 var
   Group : PLVGroup;
 begin
@@ -385,7 +385,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_DESCRIPTIONBOTTOM;
-    Group^.pszDescriptionBottom:=PWidechar(Value);
+    Group^.pszDescriptionBottom:=pchar(Value);
     Group^.cchDescriptionBottom:=Length(Value);
 
     if SetGroupInfo(Group) then
@@ -398,7 +398,7 @@ begin
   end;
 end;
 
-procedure TListGroup.SetDescriptionTop(const Value: WideString);
+procedure TListGroup.SetDescriptionTop(const Value: string);
 var
   Group : PLVGroup;
 begin
@@ -406,7 +406,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_DESCRIPTIONTOP;
-    Group^.pszDescriptionTop:=PWidechar(Value);
+    Group^.pszDescriptionTop:=pchar(Value);
     Group^.cchDescriptionTop:=Length(Value);
 
     if SetGroupInfo(Group) then
@@ -438,7 +438,7 @@ begin
     Dispose(Group);
   end;
 end;
-procedure TListGroup.SetFooter(const Value: WideString);
+procedure TListGroup.SetFooter(const Value: string);
 var
   Group : PLVGroup;
 begin
@@ -446,7 +446,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_FOOTER;
-    Group^.pszFooter:=PWidechar(Value);
+    Group^.pszFooter:=pchar(Value);
     Group^.cchFooter:=Length(Value);
 
     if SetGroupInfo(Group) then
@@ -498,7 +498,7 @@ begin
   Result:=ListView_SetGroupInfo(GetOwnerListviewHandle,UniqueID,AGroupInfo)<>-1;
 end;
 
-procedure TListGroup.SetHeader(const Value: WideString);
+procedure TListGroup.SetHeader(const Value: string);
 var
   Group : PLVGroup;
 begin
@@ -506,7 +506,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_HEADER;
-    Group^.pszHeader:=PWideChar(Value);
+    Group^.pszHeader:=pchar(Value);
     Group^.cchHeader:=Length(Value);
 
     if SetGroupInfo(Group) then
@@ -584,7 +584,7 @@ begin
   end;
 end;
 
-procedure TListGroup.SetSubsetTitle(const Value: WideString);
+procedure TListGroup.SetSubsetTitle(const Value: string);
 var
   Group : PLVGroup;
 begin
@@ -592,7 +592,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_SUBSET;
-    Group^.pszSubsetTitle:=PWidechar(Value);
+    Group^.pszSubsetTitle:=pchar(Value);
     Group^.cchSubsetTitle:=Length(Value);
 
     if SetGroupInfo(Group) then
@@ -605,7 +605,7 @@ begin
   end;
 end;
 
-procedure TListGroup.SetSubtitle(const Value: WideString);
+procedure TListGroup.SetSubtitle(const Value: string);
 var
   Group : PLVGroup;
 begin
@@ -613,7 +613,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_SUBTITLE;
-    Group^.pszSubtitle:=PWidechar(Value);
+    Group^.pszSubtitle:=pchar(Value);
     Group^.cchSubtitle:=Length(Value);
 
     if SetGroupInfo(Group) then
@@ -626,7 +626,7 @@ begin
   end;
 end;
 
-procedure TListGroup.SetTask(const Value: WideString);
+procedure TListGroup.SetTask(const Value: string);
 var
   Group : PLVGroup;
 begin
@@ -634,7 +634,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_TASK;
-    Group^.pszTask:=PWidechar(Value);
+    Group^.pszTask:=pchar(Value);
     Group^.cchTask:=Length(Value);
 
     if SetGroupInfo(Group) then

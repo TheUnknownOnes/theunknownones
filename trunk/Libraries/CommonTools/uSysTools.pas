@@ -499,7 +499,7 @@ begin
       Result :=  AValue.VInt64^;
     {$IFDEF UNICODE}
     vtUnicodeString:
-      Result := String(PChar(AValue.VUnicodeString)^);
+      Result := String(PChar(AValue.VUnicodeString));
     {$ENDIF}
     else
     raise Exception.Create ('invalid data type ' + IntToStr(AValue.VType));
