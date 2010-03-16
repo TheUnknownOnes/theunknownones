@@ -1,8 +1,8 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{28419B82-7F2C-426E-A463-0D5283508E61}</ProjectGuid>
-			<MainSource>Settings_VirtualTrees_D120R.dpk</MainSource>
-			<Config Condition="'$(Config)'==''">Release</Config>
+			<ProjectGuid>{A1FD9498-0283-4F82-B048-105F6EEBCD00}</ProjectGuid>
+			<MainSource>VirtualActionTree_D100R.dpk</MainSource>
+			<Config Condition="'$(Config)'==''">Debug</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<ProjectVersion>12.0</ProjectVersion>
 		</PropertyGroup>
@@ -20,17 +20,18 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DesignOnlyPackage>false</DesignOnlyPackage>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\VirtualActionTree_D100R.bpl</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
-			<GenPackage>true</GenPackage>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\Settings_VirtualTrees_D120R.bpl</DCC_DependencyCheckOutputName>
-			<DCC_Platform>x86</DCC_Platform>
-			<DCC_Description>Settings Support for VirtualTrees - Runtime</DCC_Description>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_Platform>x86</DCC_Platform>
+			<DCC_Description>VirtualActionTree - Runtime</DCC_Description>
+			<GenPackage>true</GenPackage>
 			<DCC_S>false</DCC_S>
+			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<GenDll>true</GenDll>
-			<DCC_N>false</DCC_N>
+			<DCC_N>true</DCC_N>
 			<DCC_E>false</DCC_E>
 			<DCC_F>false</DCC_F>
 			<DCC_K>false</DCC_K>
@@ -45,19 +46,20 @@
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="Settings_VirtualTrees_D120R.dpk">
+			<DelphiCompile Include="VirtualActionTree_D100R.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="Settings_D120R.dcp"/>
-			<DCCReference Include="VirtualTreesD12.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
-			<DCCReference Include="designide.dcp"/>
-			<DCCReference Include="xmlrtl.dcp"/>
+			<DCCReference Include="VirtualTreesD10.dcp"/>
+			<DCCReference Include="TntUnicodeVcl.dcp"/>
 			<DCCReference Include="vclactnband.dcp"/>
 			<DCCReference Include="vclx.dcp"/>
-			<DCCReference Include="XMLTools_D120R.dcp"/>
-			<DCCReference Include="..\..\uSettingsLinkVirtualTrees.pas"/>
+			<DCCReference Include="vcldb.dcp"/>
+			<DCCReference Include="dbrtl.dcp"/>
+			<DCCReference Include="GDIPlus100.dcp"/>
+			<DCCReference Include="DirectX9_D10.dcp"/>
+			<DCCReference Include="..\..\uVirtualActionTree.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -77,7 +79,7 @@
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">Settings_VirtualTrees_D120R.dpk</Source>
+						<Source Name="MainSource">VirtualActionTree_D100R.dpk</Source>
 					</Source>
 					<Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
@@ -111,6 +113,16 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
+					<Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\RegExp_D100.bpl">(Unbenannt)</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\ConsoleTools_D100D.bpl">ConsoleTools - Design</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\SettingsBase_D100.bpl">Datei C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\SettingsBase_D100.bpl nicht gefunden</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\VirtualActionTree100.bpl">Datei C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\VirtualActionTree100.bpl nicht gefunden</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\PowerShotRemoteCapture_100.bpl">Datei C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\PowerShotRemoteCapture_100.bpl nicht gefunden</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\Fastreport_Components_D100.bpl">Fastreport Components</Excluded_Packages>
+						<Excluded_Packages Name="d:\programme\borland\bds\4.0\Bin\dclbcbsmp100.bpl">Datei d:\programme\borland\bds\4.0\Bin\dclbcbsmp100.bpl nicht gefunden</Excluded_Packages>
+						<Excluded_Packages Name="d:\programme\borland\bds\4.0\Bin\bcbie100.bpl">Datei d:\programme\borland\bds\4.0\Bin\bcbie100.bpl nicht gefunden</Excluded_Packages>
+					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>

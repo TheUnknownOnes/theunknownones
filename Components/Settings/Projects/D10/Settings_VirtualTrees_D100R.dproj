@@ -1,0 +1,159 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{DD83CCE9-D01A-402E-BB1D-DAF1682A5DC4}</ProjectGuid>
+			<MainSource>Settings_VirtualTrees_D100R.dpk</MainSource>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+			<ProjectVersion>12.0</ProjectVersion>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Basis' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\Settings_VirtualTrees_D100R.bpl</DCC_DependencyCheckOutputName>
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_Platform>x86</DCC_Platform>
+			<DCC_Description>Settings Support for VirtualTrees - Runtime</DCC_Description>
+			<GenPackage>true</GenPackage>
+			<DCC_S>false</DCC_S>
+			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
+			<GenDll>true</GenDll>
+			<DCC_N>true</DCC_N>
+			<DCC_E>false</DCC_E>
+			<DCC_F>false</DCC_F>
+			<DCC_K>false</DCC_K>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DCC_DebugInformation>false</DCC_DebugInformation>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="Settings_VirtualTrees_D100R.dpk">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="Settings_D100R.dcp"/>
+			<DCCReference Include="VirtualTreesD10.dcp"/>
+			<DCCReference Include="vcl.dcp"/>
+			<DCCReference Include="designide.dcp"/>
+			<DCCReference Include="xmlrtl.dcp"/>
+			<DCCReference Include="vclactnband.dcp"/>
+			<DCCReference Include="vclx.dcp"/>
+			<DCCReference Include="XMLTools_D100R.dcp"/>
+			<DCCReference Include="RegExp_d100R.dcp"/>
+			<DCCReference Include="..\..\uSettingsLinkVirtualTrees.pas"/>
+			<BuildConfiguration Include="Basis">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_2</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<ProjectExtensions>
+			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
+			<Borland.ProjectType>Package</Borland.ProjectType>
+			<BorlandProject>
+				<Delphi.Personality>
+					<Source>
+						<Source Name="MainSource">Settings_VirtualTrees_D100R.dpk</Source>
+					</Source>
+					<Parameters>
+						<Parameters Name="UseLauncher">False</Parameters>
+						<Parameters Name="LoadAllSymbols">True</Parameters>
+						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+					</Parameters>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+						<VersionInfo Name="MajorVer">1</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">0</VersionInfo>
+						<VersionInfo Name="Build">0</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">1031</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName"/>
+						<VersionInfoKeys Name="FileDescription"/>
+						<VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName"/>
+						<VersionInfoKeys Name="LegalCopyright"/>
+						<VersionInfoKeys Name="LegalTrademarks"/>
+						<VersionInfoKeys Name="OriginalFilename"/>
+						<VersionInfoKeys Name="ProductName"/>
+						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="Comments"/>
+					</VersionInfoKeys>
+					<Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\eltreeD10.bpl">EldoS Visual Components</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\qrpt100.bpl">QuickReport Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\VirtualTreesD10.bpl">Virtual Treeview runtime package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\Jcl100.bpl">JEDI Code Library RTL package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvCmpD10R.bpl">JVCL Non-Visual Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvCoreD10R.bpl">JVCL Core Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JclVcl100.bpl">JEDI Code Library VCL package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvCryptD10R.bpl">JVCL Encryption and Compression Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvStdCtrlsD10R.bpl">JVCL Standard Controls Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvSystemD10R.bpl">JVCL System Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvCustomD10R.bpl">JVCL Custom Controls Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvCtrlsD10R.bpl">JVCL Visual Controls Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvMMD10R.bpl">JVCL Multimedia and Image Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvNetD10R.bpl">JVCL Network Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvAppFrmD10R.bpl">JVCL Application and Form Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvBandsD10R.bpl">JVCL Band Objects Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvJansD10R.bpl">JVCL Jans Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvGlobusD10R.bpl">JVCL Globus Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvPrintPreviewD10R.bpl">JVCL Print Preview Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvValidatorsD10R.bpl">JVCL Validators and Error Provider Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvWizardD10R.bpl">JVCL Wizard Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvTimeFrameworkD10R.bpl">JVCL Time Framework Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvHMID10R.bpl">JVCL HMI Controls Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvManagedThreadsD10R.bpl">JVCL Managed Threads Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvXPCtrlsD10R.bpl">JVCL XP Controls Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvDockingD10R.bpl">JVCL Docking Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvDotNetCtrlsD10R.bpl">JVCL DotNet Controls Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvEDID10R.bpl">JVCL EDI Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvRuntimeDesignD10R.bpl">JVCL Runtime Design Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvPageCompsD10R.bpl">JVCL Page Style Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvDBD10R.bpl">JVCL Database Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvDlgsD10R.bpl">JVCL Dialog Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvBDED10R.bpl">JVCL BDE Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvInterpreterD10R.bpl">JVCL Interpreter Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\JvPluginD10R.bpl">JVCL Plugin Components Runtime Package</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\TntUnicodeVcl100.bpl">TntWare Unicode Controls - Runtime</Excluded_Packages>
+						<Excluded_Packages Name="D:\Documents\Borland Studio-Projekte\Bpl\Etikettendruck_D100.bpl">(Unbenannt)</Excluded_Packages>
+					</Excluded_Packages>
+				</Delphi.Personality>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>
