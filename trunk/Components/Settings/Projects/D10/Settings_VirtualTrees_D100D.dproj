@@ -1,8 +1,8 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{28419B82-7F2C-426E-A463-0D5283508E61}</ProjectGuid>
-			<MainSource>Settings_VirtualTrees_D120R.dpk</MainSource>
-			<Config Condition="'$(Config)'==''">Release</Config>
+			<ProjectGuid>{E4D1EA9E-2B4C-49D0-AD7B-EFD6C72CAB4D}</ProjectGuid>
+			<MainSource>Settings_VirtualTrees_D100D.dpk</MainSource>
+			<Config Condition="'$(Config)'==''">Debug</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<ProjectVersion>12.0</ProjectVersion>
 		</PropertyGroup>
@@ -20,17 +20,18 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DesignOnlyPackage>true</DesignOnlyPackage>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
-			<GenPackage>true</GenPackage>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\Settings_VirtualTrees_D120R.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\Settings_VirtualTrees_D100D.bpl</DCC_DependencyCheckOutputName>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DCC_Platform>x86</DCC_Platform>
-			<DCC_Description>Settings Support for VirtualTrees - Runtime</DCC_Description>
-			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
+			<DCC_Description>Settings Support for VirtualTrees - Design</DCC_Description>
+			<GenPackage>true</GenPackage>
 			<DCC_S>false</DCC_S>
+			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<GenDll>true</GenDll>
-			<DCC_N>false</DCC_N>
+			<DCC_N>true</DCC_N>
 			<DCC_E>false</DCC_E>
 			<DCC_F>false</DCC_F>
 			<DCC_K>false</DCC_K>
@@ -45,19 +46,13 @@
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="Settings_VirtualTrees_D120R.dpk">
+			<DelphiCompile Include="Settings_VirtualTrees_D100D.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
+			<DCCReference Include="..\..\Design\Images_SVST"/>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="Settings_D120R.dcp"/>
-			<DCCReference Include="VirtualTreesD12.dcp"/>
-			<DCCReference Include="vcl.dcp"/>
-			<DCCReference Include="designide.dcp"/>
-			<DCCReference Include="xmlrtl.dcp"/>
-			<DCCReference Include="vclactnband.dcp"/>
-			<DCCReference Include="vclx.dcp"/>
-			<DCCReference Include="XMLTools_D120R.dcp"/>
-			<DCCReference Include="..\..\uSettingsLinkVirtualTrees.pas"/>
+			<DCCReference Include="settings_virtualtrees_d100R.dcp"/>
+			<DCCReference Include="..\..\Design\uRegSettingsVST.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -77,7 +72,7 @@
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">Settings_VirtualTrees_D120R.dpk</Source>
+						<Source Name="MainSource">Settings_VirtualTrees_D100D.dpk</Source>
 					</Source>
 					<Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
@@ -111,6 +106,9 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
+					<Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\DBIni100.bpl">(Unbenannt)</Excluded_Packages>
+					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
