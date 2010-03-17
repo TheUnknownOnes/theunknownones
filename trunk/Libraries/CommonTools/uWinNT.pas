@@ -12,17 +12,17 @@ uses
 
 //function ConvertSidToStringSid(Sid: PSID; var StringSid: PChar): Boolean; stdcall; external 'advapi32.dll' name 'ConvertSidToStringSidA';
 
-function GetSIDStringFromUser(AUsername : String; AServerName : String = '') : String;
+function GetSIDStringFromUser(AUsername : AnsiString; AServerName : AnsiString = '') : String;
 
 implementation
 
 type
-  TConvertSidToStringSid = function(Sid: PSID; var StringSid: PChar): Boolean; stdcall;
-  TLookupAccountName = function(lpSystemName, lpAccountName: PChar;
-                                Sid: PSID; var cbSid: DWORD; ReferencedDomainName: PChar;
+  TConvertSidToStringSid = function(Sid: PSID; var StringSid: PAnsiChar): Boolean; stdcall;
+  TLookupAccountName = function(lpSystemName, lpAccountName: PAnsiChar;
+                                Sid: PSID; var cbSid: DWORD; ReferencedDomainName: PAnsiChar;
                                 var cbReferencedDomainName: DWORD; var peUse: SID_NAME_USE): BOOL; stdcall;
 
-function ConvertSidToStringSid(Sid: PSID; var StringSid: PChar): Boolean;
+function ConvertSidToStringSid(Sid: PSID; var StringSid: PAnsiChar): Boolean;
 var
   DLL : Cardinal;
   Func : TConvertSidToStringSid;
@@ -43,8 +43,8 @@ begin
   end;
 end;
 
-function MyLookupAccountName(lpSystemName, lpAccountName: PChar;
-                             Sid: PSID; var cbSid: DWORD; ReferencedDomainName: PChar;
+function MyLookupAccountName(lpSystemName, lpAccountName: PAnsiChar;
+                             Sid: PSID; var cbSid: DWORD; ReferencedDomainName: PAnsiChar;
                              var cbReferencedDomainName: DWORD; var peUse: SID_NAME_USE): Boolean;
 var
   DLL : Cardinal;
@@ -66,23 +66,23 @@ begin
 end;
 
 
-function GetSIDStringFromUser(AUsername : String; AServerName : String = '') : String;
+function GetSIDStringFromUser(AUsername : AnsiString; AServerName : AnsiString = '') : String;
 var
   SID : PSID;
   DomainLen,
   SIDSize : DWORD;
   SIDType : SID_NAME_USE;
-  Buffer : PChar;
-  Domain : String;
+  Buffer : PAnsiChar;
+  Domain : AnsiString;
 begin
   SIDSize:=0;
   DomainLen:=0;
   
-  if not LookupAccountName(PChar(AServerName), PChar(AUsername), nil, SIDSize, nil, DomainLen, sidtype) then
+  if not LookupAccountNameA(PAnsiChar(AServerName), PAnsiChar(AUsername), nil, SIDSize, nil, DomainLen, sidtype) then
   begin
     SetLength(domain, domainlen);
     GetMem(SID, SIDSize);
-    if MyLookupAccountName(PChar(AServerName), PChar(AUsername), SID, SIDSize, Pchar(domain), DomainLen, sidtype) then
+    if MyLookupAccountName(PAnsiChar(AServerName), PAnsiChar(AUsername), SID, SIDSize, PAnsiChar(domain), DomainLen, sidtype) then
     begin
       ConvertSidToStringSid(sid, buffer);
       Result:=buffer;
