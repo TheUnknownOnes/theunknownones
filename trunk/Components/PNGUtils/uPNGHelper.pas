@@ -13,7 +13,7 @@ uses
   gdiputil;
 
 type
-  TPNGHelper = class helper for TPngImage
+  TPNGHelper = class helper for TPNGObject
   public
     procedure LoadFromResourceName(AInstance: HINST; AResourceGroup : string; AResourceName: String); overload;
   end;
