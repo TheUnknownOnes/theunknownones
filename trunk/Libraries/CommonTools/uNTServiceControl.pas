@@ -38,10 +38,10 @@ var
 	hStat: DWord;
 begin
 	hStat := 1;
-	srvManager := OpenSCManager(PChar(sMachine), nil, SC_MANAGER_CONNECT);
+	srvManager := OpenSCManagerA(PAnsiChar(sMachine), nil, SC_MANAGER_CONNECT);
 	if srvManager > 0 then
 	begin
-		srvHandle := OpenService(srvManager, PChar(sService), SERVICE_QUERY_STATUS);
+		srvHandle := OpenServiceA(srvManager, PAnsiChar(sService), SERVICE_QUERY_STATUS);
 		if srvHandle > 0 then
 		begin
 			if QueryServiceStatus(srvHandle, srvStatus) then
@@ -59,20 +59,20 @@ function ServiceStart(
 var
 	srvManager, srvHandle: SC_Handle;
 	srvStatus: TServiceStatus;
-	Temp: PChar;
+	Temp: PAnsiChar;
 	Start: TDateTime;
 begin
 	srvStatus.dwCurrentState := 1;
-	srvManager := OpenSCManager(PChar(aMachine), nil, SC_MANAGER_CONNECT);
+	srvManager := OpenSCManagerA(PAnsiChar(aMachine), nil, SC_MANAGER_CONNECT);
 	if srvManager > 0 then
 	begin
-		srvHandle := OpenService(
-      srvManager, PChar(aServiceName), SERVICE_START or SERVICE_QUERY_STATUS
+		srvHandle := OpenServiceA(
+      srvManager, PAnsiChar(aServiceName), SERVICE_START or SERVICE_QUERY_STATUS
     );
 		if srvHandle > 0 then
 		begin
 			Temp := nil;
-			if StartService(srvHandle, 0, Temp) then
+			if StartServiceA(srvHandle, 0, Temp) then
 				if QueryServiceStatus(srvHandle, srvStatus) then
 				begin
 					Start := Now;
@@ -102,11 +102,11 @@ var
 	Start: TDateTime;
   Err : array[0..1024] of char;
 begin
-	srvManager := OpenSCManager(PChar(aMachine), nil, SC_MANAGER_CONNECT);
+	srvManager := OpenSCManagerA(PAnsiChar(aMachine), nil, SC_MANAGER_CONNECT);
 	if srvManager > 0 then
 	begin
-		srvHandle := OpenService(
-      srvManager, PChar(aServiceName), SERVICE_STOP or SERVICE_QUERY_STATUS
+		srvHandle := OpenServiceA(
+      srvManager, PAnsiChar(aServiceName), SERVICE_STOP or SERVICE_QUERY_STATUS
     );
 		if srvHandle > 0 then
 		begin
@@ -140,15 +140,15 @@ var
 	srvManager, srvHandle: SC_Handle;
 	srvStatus: TServiceStatus;
 	I, dwCheckPoint, Running: DWord;
-	Chars: PChar;
+	Chars: PAnsiChar;
 	Services: array[0..255] of ENUM_SERVICE_STATUSA;
 begin
 	srvStatus.dwCurrentState := 1;
-	srvManager := OpenSCManager(PChar(aMachine), nil, SC_MANAGER_CONNECT);
+	srvManager := OpenSCManagerA(PAnsiChar(aMachine), nil, SC_MANAGER_CONNECT);
 	if srvManager > 0 then
 	begin
-		srvHandle := OpenService(
-      srvManager, PChar(aServiceName), SERVICE_ALL_ACCESS or
+		srvHandle := OpenServiceA(
+      srvManager, PAnsiChar(aServiceName), SERVICE_ALL_ACCESS or
       SERVICE_ENUMERATE_DEPENDENTS or SERVICE_QUERY_STATUS
     );
 		if srvHandle > 0 then
@@ -202,7 +202,7 @@ begin
     GetCurrentProcess, TOKEN_ADJUST_PRIVILEGES or TOKEN_QUERY, Token
   );
 	TP.PrivilegeCount := 1;
-	if (LookupPrivilegeValue(nil, PChar(aPrivilegeName), TP.Privileges[0].LUID))
+	if (LookupPrivilegeValueA(nil, PAnsiChar(AnsiString(aPrivilegeName)), TP.Privileges[0].LUID))
 	then
   begin
 		if aEnabled then
