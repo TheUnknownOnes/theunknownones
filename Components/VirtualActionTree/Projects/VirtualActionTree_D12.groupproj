@@ -9,6 +9,9 @@
 			<Projects Include="D12\VirtualActionTree_D120D.dproj">
 				<Dependencies/>
 			</Projects>
+			<Projects Include="..\..\..\..\..\..\RAD Studio\Projekte\Project1.dproj">
+				<Dependencies/>
+			</Projects>
 		</ItemGroup>
 		<ProjectExtensions>
 			<Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +38,23 @@
 		<Target Name="VirtualActionTree_D120D:Make">
 			<MSBuild Targets="Make" Projects="D12\VirtualActionTree_D120D.dproj"/>
 		</Target>
+		<Target Name="Project1">
+			<MSBuild Projects="..\..\..\..\..\..\RAD Studio\Projekte\Project1.dproj"/>
+		</Target>
+		<Target Name="Project1:Clean">
+			<MSBuild Targets="Clean" Projects="..\..\..\..\..\..\RAD Studio\Projekte\Project1.dproj"/>
+		</Target>
+		<Target Name="Project1:Make">
+			<MSBuild Targets="Make" Projects="..\..\..\..\..\..\RAD Studio\Projekte\Project1.dproj"/>
+		</Target>
 		<Target Name="Build">
-			<CallTarget Targets="VirtualActionTree_D120R;VirtualActionTree_D120D"/>
+			<CallTarget Targets="VirtualActionTree_D120R;VirtualActionTree_D120D;Project1"/>
 		</Target>
 		<Target Name="Clean">
-			<CallTarget Targets="VirtualActionTree_D120R:Clean;VirtualActionTree_D120D:Clean"/>
+			<CallTarget Targets="VirtualActionTree_D120R:Clean;VirtualActionTree_D120D:Clean;Project1:Clean"/>
 		</Target>
 		<Target Name="Make">
-			<CallTarget Targets="VirtualActionTree_D120R:Make;VirtualActionTree_D120D:Make"/>
+			<CallTarget Targets="VirtualActionTree_D120R:Make;VirtualActionTree_D120D:Make;Project1:Make"/>
 		</Target>
 		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 	</Project>

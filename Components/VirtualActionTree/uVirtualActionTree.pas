@@ -654,6 +654,7 @@ var
 begin
   try
     if     (not (csDesigning in Self.ComponentState))
+       and (not (csDestroying in Self.ComponentState))
        and (not (csDestroying in AActionList.ComponentState)) then
     begin
       for idx:=AActionList.ActionCount-1 downto 0 do
