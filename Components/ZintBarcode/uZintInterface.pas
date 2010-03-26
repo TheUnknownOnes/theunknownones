@@ -37,10 +37,10 @@ type
     rows : Integer;
     width : Integer;
     primary : array [0..127] of AnsiChar;
-    encoded_data : array[0..177] of array[0..142] of Char;
+    encoded_data : array[0..177] of array[0..142] of AnsiChar;
     row_height : array[0..177] of Integer; // Largest symbol is 177x177 QR Code
     errtxt : array[0..99] of AnsiChar;
-    bitmap : PChar;
+    bitmap : PAnsiChar;
     bitmap_width : Integer;
     bitmap_height : Integer;
     show_human_readable_text : Integer;
