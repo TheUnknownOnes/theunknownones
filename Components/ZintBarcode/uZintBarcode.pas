@@ -539,9 +539,10 @@ end;
 
 procedure TZintBarcode.SetColor(const Index: Integer; const Value: TColor);
 var
-  S : String;
+  S : AnsiString;
 begin
-  S := Format('%.6x', [Value]);
+
+  S := Format('%.6x', [ColorToRGB(Value)]);
 
   case Index of
     0: StrPCopy(@FSymbol.fgcolour, S);
