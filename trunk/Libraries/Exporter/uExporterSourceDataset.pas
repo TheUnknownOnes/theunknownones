@@ -13,7 +13,7 @@ type
     procedure ValidateDataSet;
 
     function GetValue: Variant; override;
-    function GetCaption(ADimension: Integer): WideString; override;
+    function GetCaption(ADimension: Integer): String; override;
 
     function Navigate(ADimension: Integer; ANavigateDirection: TExporterNavigateDirections): TExporterNavigateResult; override;
     function NavigateRow(ANavigateDirection: TExporterNavigateDirections): TExporterNavigateResult; override;
@@ -36,7 +36,7 @@ begin
   FDataSet:=ADataSet;
 end;
 
-function TExporterSourceDataSet.GetCaption(ADimension: Integer): WideString;
+function TExporterSourceDataSet.GetCaption(ADimension: Integer): String;
 begin
   ValidateDataSet;
   Result:='';

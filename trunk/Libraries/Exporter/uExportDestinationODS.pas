@@ -31,8 +31,8 @@ type
     function GenTagTableEnd() : String;
     function GenTagRowStart() : String;
     function GenTagRowEnd() : String;
-    function GenTagCell(AData: Variant) : WideString;
-    function GenManifest : WideString;
+    function GenTagCell(AData: Variant) : String;
+    function GenManifest : String;
 
     procedure WriteFile(AContent : TStream);
   published
@@ -63,15 +63,14 @@ end;
 function TExporterDestinationODS.Execute1D(
   ASource: TExporterSource1DBase): Boolean;
 var
-  content : Widestring;
-  utf8 : String;
-  fs : TFileStream;
+  content : String;
+  utf8 : UTF8String;
   MS_Content: TMemoryStream;
 
   procedure WriteContent;
   begin
-    utf8 := UTF8Encode(content);
-    MS_Content.Write(PChar(UTF8)^, length(utf8));
+    utf8 := content;
+    MS_Content.Write(PAnsiChar(UTF8)^, length(utf8));
     content := EmptyStr;
   end;
   
@@ -101,15 +100,14 @@ end;
 function TExporterDestinationODS.Execute2D(
   ASource: TExporterSource2DBase): Boolean;
 var
-  content : Widestring;
-  utf8 : String;
-  fs : TFileStream;
+  content : String;
+  utf8 : UTF8String;
   MS_Content: TMemoryStream;
 
   procedure WriteContent;
   begin
-    utf8 := UTF8Encode(content);
-    MS_Content.Write(PChar(UTF8)^, length(utf8));
+    utf8 := content;
+    MS_Content.Write(PAnsiChar(UTF8)^, length(utf8));
     content := EmptyStr;
   end;
 
@@ -156,15 +154,14 @@ end;
 function TExporterDestinationODS.Execute3D(
   ASource: TExporterSource3DBase): Boolean;
 var
-  content : Widestring;
-  utf8 : String;
-  fs : TFileStream;
+  content : String;
+  utf8 : UTF8String;
   MS_Content: TMemoryStream;
 
   procedure WriteContent;
   begin
-    utf8 := UTF8Encode(content);
-    MS_Content.Write(PChar(UTF8)^, length(utf8));
+    utf8 := content;
+    MS_Content.Write(PAnsiChar(UTF8)^, length(utf8));
     content := EmptyStr;
   end;
 
@@ -217,7 +214,7 @@ begin
   end;
 end;
 
-function TExporterDestinationODS.GenManifest: WideString;
+function TExporterDestinationODS.GenManifest: String;
 begin
   Result := '<?xml version="1.0" encoding="UTF-8"?> ';
   Result := Result + '<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">';
@@ -225,7 +222,7 @@ begin
   Result := Result + '</manifest:manifest>';
 end;
 
-function TExporterDestinationODS.GenTagCell(AData: Variant): WideString;
+function TExporterDestinationODS.GenTagCell(AData: Variant): String;
 var
   valuetype : String;
   valuetag : String;
@@ -264,7 +261,8 @@ begin
         valuetype := 'int';
       end;
       varString,
-      varOleStr: valuetype := 'string';
+      varOleStr
+      {$IFDEF UNICODE},varUString{$ENDIF}: valuetype := 'string';
       else
       begin
         try
@@ -401,13 +399,13 @@ end;
 procedure TExporterDestinationODS.WriteFile(AContent: TStream);
 var
   MS_Manifest : TMemoryStream;
-  s : String;
+  s : UTF8String;
   arch : I7zOutArchive;
 begin
   MS_Manifest := TMemoryStream.Create;
   try
-    s := UTF8Encode(GenManifest);
-    MS_Manifest.Write(PChar(s)^, Length(s));
+    s := GenManifest;
+    MS_Manifest.Write(PAnsiChar(s)^, Length(s));
 
     arch := CreateOutArchive(CLSID_CFormatZip);
     arch.AddStream(AContent, soReference, faArchive, CurrentFileTime, CurrentFileTime, 'content.xml', false, false);

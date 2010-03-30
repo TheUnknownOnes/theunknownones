@@ -15,14 +15,14 @@ type
     FQuotChar: Char;
     FLineSep: String;
   protected
-    function QuoteValue(AValue: Variant): WideString;
+    function QuoteValue(AValue: Variant): String;
 
     function Execute(ASource: TExporterSourceBase): Boolean; override;
     function Execute1D(ASource: TExporterSource1DBase): Boolean;
     function Execute2D(ASource: TExporterSource2DBase): Boolean;
     function Execute3D(ASource: TExporterSource3DBase): Boolean;
-    procedure DoWriteLine(AFile, ALine: WideString); virtual; abstract;
-    procedure DoFinalTasks(AFile: WideString); virtual; abstract;
+    procedure DoWriteLine(AFile, ALine: String); virtual; abstract;
+    procedure DoFinalTasks(AFile: String); virtual; abstract;
   public
     constructor Create;
 
@@ -42,9 +42,9 @@ type
     procedure SetFilename(const Value: String);
     procedure SetFilePath(const Value: TFileName);
   protected
-    function GetFileStream(AFile: WideString): TFileStream;
-    procedure DoWriteLine(AFile, ALine: WideString); override;
-    procedure DoFinalTasks(AFile: WideString); override;
+    function GetFileStream(AFile: String): TFileStream;
+    procedure DoWriteLine(AFile, ALine: String); override;
+    procedure DoFinalTasks(AFile: String); override;
   public
     constructor Create(AFileName: String);
     destructor Destroy; override;
@@ -104,8 +104,8 @@ end;
 function TExporterDestinationCSVBase.Execute2D(
   ASource: TExporterSource2DBase): Boolean;
 var
-  Line : WideString;
-  sep : WideString;
+  Line : String;
+  sep : String;
 begin    
   if SeperatorChar=#0 then
     sep:=''
@@ -139,9 +139,9 @@ end;
 function TExporterDestinationCSVBase.Execute3D(
   ASource: TExporterSource3DBase): Boolean;
 var
-  Line : WideString;
-  sep : WideString;
-  PageName : WideString;
+  Line : String;
+  sep : String;
+  PageName : String;
 begin
   if SeperatorChar=#0 then
     sep:=''
@@ -177,7 +177,7 @@ begin
   until ASource.NavigatePage(ndNext)<>nrOK;
 end;
 
-function TExporterDestinationCSVBase.QuoteValue(AValue: Variant): WideString;
+function TExporterDestinationCSVBase.QuoteValue(AValue: Variant): String;
 begin
   Result:=VarToWideStrDef(AValue, '');
   if QuotationChar<>#0 then
@@ -205,7 +205,7 @@ begin
   inherited;
 end;
 
-procedure TExporterDestinationCSVFile.DoFinalTasks(AFile: WideString);
+procedure TExporterDestinationCSVFile.DoFinalTasks(AFile: String);
 var
   fs : TFileStream;
   idx : integer;
@@ -219,7 +219,7 @@ begin
   end;
 end;
 
-procedure TExporterDestinationCSVFile.DoWriteLine(AFile, ALine: WideString);
+procedure TExporterDestinationCSVFile.DoWriteLine(AFile, ALine: String);
 var
   txt : String;
 begin
@@ -234,7 +234,7 @@ begin
 end;
 
 function TExporterDestinationCSVFile.GetFileStream(
-  AFile: WideString): TFileStream;
+  AFile: String): TFileStream;
 var
   idx : Integer;
   FNam: string;
