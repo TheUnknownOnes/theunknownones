@@ -20,7 +20,7 @@ type
     function GetDimensionCount: Integer; virtual;
   public
     function GetValue: Variant; virtual;
-    function GetCaption(ADimension: Integer): WideString; virtual;
+    function GetCaption(ADimension: Integer): String; virtual;
     function Navigate(ADimension: Integer; ANavigateDirection: TExporterNavigateDirections): TExporterNavigateResult; virtual; abstract;
 
     property CurrentPos: TExporterPos read FCurrentPos;
@@ -83,7 +83,7 @@ begin
   SetLength(FCurrentPos, GetDimensionCount);
 end;
 
-function TExporterSourceBase.GetCaption(ADimension: Integer): WideString;
+function TExporterSourceBase.GetCaption(ADimension: Integer): String;
 begin
   Result:='';
 end;
