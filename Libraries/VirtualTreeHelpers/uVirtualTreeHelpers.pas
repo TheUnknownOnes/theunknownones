@@ -21,14 +21,16 @@ type
 
   TVirtualTreeExpandStates = Array of TVirtualTreeExpandState;
 
-
   TBaseVirtualTreeHelper = class helper for TBaseVirtualTree
   private
     function GetVisibleRecursive(Node: PVirtualNode): Boolean;
     procedure SetVisibleRecursive(Node: PVirtualNode; const Value: Boolean);
 
+  protected
 
   public
+
+
     property VisibleRecursive[Node: PVirtualNode]: Boolean read GetVisibleRecursive write SetVisibleRecursive;
 
     function GetCheckedChildrenCountRecursive(Node: PVirtualNode; VisibleOnly : Boolean = false): Integer; deprecated;
