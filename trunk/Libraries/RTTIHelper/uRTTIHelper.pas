@@ -490,7 +490,7 @@ begin
   if Assigned(TypeData) then
     Result := TypeData.UnitName
   else
-    Result := EmptyWideStr;
+    Result := EmptyStr;
 end;
 
 function rttihGetUnit(AClass : TClass) : String;
@@ -523,7 +523,7 @@ begin
       if Value in AsciiChars then
         Result := '''' + Chr(Value) + ''''
       else
-        Result := WideFormat('#%d', [Value]);
+        Result := Format('#%d', [Value]);
     end;
     tkEnumeration:
     begin
@@ -550,7 +550,7 @@ begin
 
   for Element := TypeDataComp.MinValue to TypeDataComp.MaxValue do
   begin
-    AList.AddObject(WideFormat('%s%s%d', [rttihOrdinalToString(TypeInfoComp, Element),
+    AList.AddObject(Format('%s%s%d', [rttihOrdinalToString(TypeInfoComp, Element),
                                           AList.NameValueSeparator,
                                           Trunc(Power(2, Element))]),
                     TObject(Trunc(Power(2, Element))));
@@ -571,7 +571,7 @@ begin
 
   for Element := TypeData.MinValue to TypeData.MaxValue do
   begin
-    AList.AddObject(WideFormat('%s%s%d', [rttihOrdinalToString(ATypeInfo, Element),
+    AList.AddObject(Format('%s%s%d', [rttihOrdinalToString(ATypeInfo, Element),
                                           AList.NameValueSeparator,
                                           Element]),
                    TObject(Element));
