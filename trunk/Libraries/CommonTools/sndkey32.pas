@@ -6,17 +6,17 @@ Written by Ken Henderson
 Copyright (c) 1995 Ken Henderson
 
 This unit includes two routines that simulate popular Visual Basic
-routines: Sendkeys and AppActivate.  SendKeys takes a PChar
+routines: Sendkeys and AppActivate.  SendKeys takes a PAnsiChar
 as its first parameter and a boolean as its second, like so:
 
 SendKeys('KeyString', Wait);
 
-where KeyString is a string of key names and modifiers that you want
+where KeyString is a AnsiString of key names and modifiers that you want
 to send to the current input focus and Wait is a boolean variable or value
 that indicates whether SendKeys should wait for each key message to be
 processed before proceeding.  See the table below for more information.
 
-AppActivate also takes a PChar as its only parameter, like so:
+AppActivate also takes a PAnsiChar as its only parameter, like so:
 
 AppActivate('WindowName');
 
@@ -100,16 +100,16 @@ interface
 
 Uses SysUtils, Windows, Messages;
 
-Function SendKeys(SendKeysString : PChar; Wait : Boolean) : Boolean;
-function AppActivate(WindowName : PChar) : boolean; overload;
+Function SendKeys(SendKeysString : PAnsiChar; Wait : Boolean) : Boolean;
+function AppActivate(WindowName : PAnsiChar) : boolean; overload;
 function AppActivate(WindowHandle : HWND) : boolean; overload;
 
-{Buffer for working with PChar's}
+{Buffer for working with PAnsiChar's}
 
 const
   WorkBufLen = 40;
 var
-  WorkBuf : array[0..WorkBufLen] of Char;
+  WorkBuf : array[0..WorkBufLen] of AnsiChar;
 
 implementation
 type
@@ -118,7 +118,7 @@ var
   AllocationSize : integer;
 
 (*
-Converts a string of characters and key names to keyboard events and
+Converts a AnsiString of characters and key names to keyboard events and
 passes them to Windows.
 
 Example syntax:
@@ -127,7 +127,7 @@ SendKeys('abc123{left}{left}{left}def{end}456{left 6}ghi{end}789', True);
 
 *)
 
-Function SendKeys(SendKeysString : PChar; Wait : Boolean) : Boolean;
+Function SendKeys(SendKeysString : PAnsiChar; Wait : Boolean) : Boolean;
 type
   WBytes = array[0..pred(SizeOf(Word))] of Byte;
 
@@ -228,9 +228,9 @@ var
   NumTimes, MKey : Word;
   KeyString : String[20];
 
-procedure DisplayMessage(Message : PChar);
+procedure DisplayMessage(Message : PAnsiChar);
 begin
-  MessageBox(0,Message,UNITNAME,0);
+  MessageBoxA(0,Message,UNITNAME,0);
 end;
 
 function BitSet(BitTable, BitMask : Byte) : Boolean;
@@ -248,9 +248,9 @@ var
   KeyboardMsg : TMsg;
 begin
   keybd_event(VKey, ScanCode, Flags,0);
-  If (Wait) then While (PeekMessage(KeyboardMsg,0,WM_KEYFIRST, WM_KEYLAST, PM_REMOVE)) do begin
+  If (Wait) then While (PeekMessageA(KeyboardMsg,0,WM_KEYFIRST, WM_KEYLAST, PM_REMOVE)) do begin
     TranslateMessage(KeyboardMsg);
-    DispatchMessage(KeyboardMsg);
+    DispatchMessageA(KeyboardMsg);
   end;
 end;
 
@@ -270,7 +270,7 @@ begin
     exit;
   end;
 
-  ScanCode:=Lo(MapVirtualKey(VKey,0));
+  ScanCode:=Lo(MapVirtualKeyA(VKey,0));
   For Cnt:=1 to NumTimes do
     If (VKey in ExtendedVKeys)then begin
       KeyboardEvent(VKey, ScanCode, KEYEVENTF_EXTENDEDKEY);
@@ -431,7 +431,7 @@ begin
             Inc(I);
           end;
     else  begin
-             MKey:=vkKeyScan(SendKeysString[I]);
+             MKey:=vkKeyScanA(SendKeysString[I]);
              If (MKey<>INVALIDKEY) then begin
                SendKey(MKey,1,True);
                PopUpShiftKeys;
@@ -460,34 +460,34 @@ var
 
 function EnumWindowsProc(WHandle: HWND; lParam: LPARAM): BOOL; export; stdcall;
 var
-  WindowName : array[0..MAX_PATH] of char;
+  WindowName : array[0..MAX_PATH] of AnsiChar;
 begin
   {Can't test GetWindowText's return value since some windows don't have a title}
-  GetWindowText(WHandle,WindowName,MAX_PATH);
-  Result := (StrLIComp(WindowName,PChar(lParam), StrLen(PChar(lParam))) <> 0);
+  GetWindowTextA(WHandle,WindowName,MAX_PATH);
+  Result := (StrLIComp(WindowName,PAnsiChar(lParam), StrLen(PAnsiChar(lParam))) <> 0);
   If (not Result) then WindowHandle:=WHandle;
 end;
 
 function AppActivate(WindowHandle : HWND) : boolean; overload;
 begin
   try
-    SendMessage(WindowHandle, WM_SYSCOMMAND, SC_HOTKEY, WindowHandle);
-    SendMessage(WindowHandle, WM_SYSCOMMAND, SC_RESTORE, WindowHandle);
+    SendMessageA(WindowHandle, WM_SYSCOMMAND, SC_HOTKEY, WindowHandle);
+    SendMessageA(WindowHandle, WM_SYSCOMMAND, SC_RESTORE, WindowHandle);
     result := SetForegroundWindow(WindowHandle);
   except
     on Exception do Result:=false;
   end;
 end;
 
-function AppActivate(WindowName : PChar) : boolean; overload;
+function AppActivate(WindowName : PAnsiChar) : boolean; overload;
 begin
   try
     Result:=true;
-    WindowHandle:=FindWindow(nil,WindowName);
-    If (WindowHandle=0) then EnumWindows(@EnumWindowsProc,Integer(PChar(WindowName)));
+    WindowHandle:=FindWindowA(nil,WindowName);
+    If (WindowHandle=0) then EnumWindows(@EnumWindowsProc,Integer(PAnsiChar(WindowName)));
     If (WindowHandle<>0) then begin
-      SendMessage(WindowHandle, WM_SYSCOMMAND, SC_HOTKEY, WindowHandle);
-      SendMessage(WindowHandle, WM_SYSCOMMAND, SC_RESTORE, WindowHandle);
+      SendMessageA(WindowHandle, WM_SYSCOMMAND, SC_HOTKEY, WindowHandle);
+      SendMessageA(WindowHandle, WM_SYSCOMMAND, SC_RESTORE, WindowHandle);
       SetForegroundWindow(WindowHandle);
     end else Result:=false;
   except
