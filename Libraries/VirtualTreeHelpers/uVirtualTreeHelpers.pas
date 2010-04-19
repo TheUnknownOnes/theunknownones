@@ -257,7 +257,7 @@ procedure TBaseVirtualTreeHelper.ScanEditorKeys(var AKey: Word);
 //Beim Tastendruck auf einem VST wird automatisch ein Editor geöffnet
 // Aufruf im OnKeyDown Event
 var
-  InputStr : String;
+  InputStr : AnsiString;
 
   {$REGION 'VirtualKey in Char übersetzen'}
  
@@ -295,7 +295,7 @@ begin
         begin
           if EditNode(FocusedNode, FocusedColumn) and
              (Length(trim(InputStr))>0) then
-            SendKeys(PChar(Copy(InputStr,1,1)), True);
+            SendKeys(PAnsiChar(Copy(InputStr,1,1)), True);
 
           AKey:=0;
         end;
