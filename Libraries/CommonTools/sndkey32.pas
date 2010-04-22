@@ -326,7 +326,7 @@ begin
        Middle:=(Succ(Bottom+Top)) div 2;
     end;
   Until (Found or Collided);
-  If (Result=INVALIDKEY) then DisplayMessage('Invalid Key Name');
+  If (Result=INVALIDKEY) then DisplayMessage(PAnsiChar(AnsiString('Invalid Key Name in StringToVKey("'+KeyString+'")')));
 end;
 
 procedure PopUpShiftKeys;
@@ -435,7 +435,7 @@ begin
              If (MKey<>INVALIDKEY) then begin
                SendKey(MKey,1,True);
                PopUpShiftKeys;
-             end else DisplayMessage('Invalid KeyName');
+             end else DisplayMessage(PAnsiChar(AnsiString('Invalid Key Name in SendKeys("'+SendKeysString+'")')));
              Inc(I);
           end;
     end;
