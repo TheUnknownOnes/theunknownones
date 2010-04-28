@@ -261,7 +261,7 @@ var
 
   {$REGION 'VirtualKey in Char übersetzen'}
  
-  function GetCharFromVirtualKey(Key: Word): string;
+  function GetCharFromVirtualKey(Key: Word): AnsiString;
   var
      keyboardState: TKeyboardState;
      asciiResult: Integer;
@@ -295,7 +295,7 @@ begin
         begin
           if EditNode(FocusedNode, FocusedColumn) and
              (Length(trim(InputStr))>0) then
-            SendKeys(PAnsiChar(Copy(InputStr,1,1)), True);
+            SendKeys(PAnsiChar(AnsiString(Copy(InputStr,1,1))), True);
 
           AKey:=0;
         end;
