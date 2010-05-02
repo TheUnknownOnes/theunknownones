@@ -13,9 +13,11 @@ uses
 type
   TPosCryptKey = array of AnsiChar;
 
-procedure PosCrypt_Encode(const AData, AEncryptedData : TStream; AKey : TPosCryptKey);
+procedure PosCrypt_Encode(const AData, AEncryptedData : TStream; AKey : TPosCryptKey); overload;
+procedure PosCrypt_Encode(const AData : String; out AEncryptedData : String; AKey : TPosCryptKey); overload;
 
-procedure PosCrypt_Decode(const AEncryptedData, AData : TStream; AKey : TPosCryptKey);
+procedure PosCrypt_Decode(const AEncryptedData, AData : TStream; AKey : TPosCryptKey); overload;
+procedure PosCrypt_Decode(const AEncryptedData : String; out AData : String; AKey : TPosCryptKey); overload;
 
 function PosCrypt_KeyFromString(AString : AnsiString) : TPosCryptKey;
 
@@ -95,6 +97,23 @@ begin
   end;
 end;
 
+procedure PosCrypt_Encode(const AData : String; out AEncryptedData : String; AKey : TPosCryptKey);
+var
+  sFrom,
+  sTo : TStringStream;
+begin
+  sFrom := TStringStream.Create;
+  sTo := TStringStream.Create;
+  try
+    sFrom.WriteString(AData);
+    PosCrypt_Encode(sFrom, sTo, AKey);
+    AEncryptedData := sTo.DataString;
+  finally
+    sFrom.Free;
+    sTo.Free;
+  end;
+end;
+
 function PosOfCharInKey(AChar : AnsiChar; const AKey : TPosCryptKey) : Cardinal; inline;
 var
   idx : Cardinal;
@@ -162,6 +181,23 @@ begin
 
   finally
     FreeMem(InBuffer, InBufferSize);
+  end;
+end;
+
+procedure PosCrypt_Decode(const AEncryptedData : String; out AData : String; AKey : TPosCryptKey); overload;
+var
+  sFrom,
+  sTo : TStringStream;
+begin
+  sFrom := TStringStream.Create;
+  sTo := TStringStream.Create;
+  try
+    sFrom.WriteString(AEncryptedData);
+    PosCrypt_Decode(sFrom, sTo, AKey);
+    AData := sTo.DataString;
+  finally
+    sFrom.Free;
+    sTo.Free;
   end;
 end;
 
