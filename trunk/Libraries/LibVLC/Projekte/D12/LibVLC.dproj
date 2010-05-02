@@ -1,10 +1,10 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{D9114258-06E7-4CE7-8BB4-CF3CF8BF0F79}</ProjectGuid>
-			<MainSource>CommonTools_D120R.dpk</MainSource>
-			<Config Condition="'$(Config)'==''">Release</Config>
-			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+			<ProjectGuid>{AD7467E8-4016-4772-89CE-4C771F5F47BF}</ProjectGuid>
+			<MainSource>LibVLC.dpk</MainSource>
 			<ProjectVersion>12.0</ProjectVersion>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Basis' or '$(Base)'!=''">
 			<Base>true</Base>
@@ -21,18 +21,16 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DesignOnlyPackage>false</DesignOnlyPackage>
-			<DCC_ImageBase>00400000</DCC_ImageBase>
-			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
-			<GenPackage>true</GenPackage>
-			<DCC_Platform>x86</DCC_Platform>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\CommonTools_D120R.bpl</DCC_DependencyCheckOutputName>
-			<DCC_E>false</DCC_E>
-			<DCC_S>false</DCC_S>
+			<DCC_Description>LibVLC for Delphi</DCC_Description>
+			<DllSuffix>_D120</DllSuffix>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\LibVLC_D120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
 			<GenDll>true</GenDll>
-			<DCC_F>false</DCC_F>
-			<DCC_K>false</DCC_K>
-			<DCC_N>false</DCC_N>
+			<GenPackage>true</GenPackage>
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DCC_Platform>x86</DCC_Platform>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -44,40 +42,11 @@
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="CommonTools_D120R.dpk">
+			<DelphiCompile Include="LibVLC.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="dbrtl.dcp"/>
-			<DCCReference Include="VirtualTreesD12.dcp"/>
-			<DCCReference Include="vclactnband.dcp"/>
-			<DCCReference Include="vclx.dcp"/>
-			<DCCReference Include="vcldb.dcp"/>
-			<DCCReference Include="DirectX9_D12.dcp"/>
-			<DCCReference Include="GDIPlus120.dcp"/>
-			<DCCReference Include="RegExp_D120R.dcp"/>
-			<DCCReference Include="vclimg.dcp"/>
-			<DCCReference Include="Jcl.dcp"/>
-			<DCCReference Include="JediApi_SingleUnits.dcp"/>
-			<DCCReference Include="..\..\sndkey32.pas"/>
-			<DCCReference Include="..\..\uCanvasClassHelper.pas"/>
-			<DCCReference Include="..\..\uCommonTypes.pas"/>
-			<DCCReference Include="..\..\uControlTools.pas"/>
-			<DCCReference Include="..\..\uDateTools.pas"/>
-			<DCCReference Include="..\..\uGraphicalTools.pas"/>
-			<DCCReference Include="..\..\uImageTools.pas"/>
-			<DCCReference Include="..\..\uInterfacedTools.pas"/>
-			<DCCReference Include="..\..\uLogForDebug.pas"/>
-			<DCCReference Include="..\..\uNetworkTools.pas"/>
-			<DCCReference Include="..\..\uNNumber.pas"/>
-			<DCCReference Include="..\..\uStreamTools.pas"/>
-			<DCCReference Include="..\..\uSysTools.pas"/>
-			<DCCReference Include="..\..\uTaskbar.pas"/>
-			<DCCReference Include="..\..\uWinNT.pas"/>
-			<DCCReference Include="..\..\wm_helper.pas"/>
-			<DCCReference Include="..\..\uVirtualEarth.pas"/>
-			<DCCReference Include="..\..\uRDPHash.pas"/>
+			<DCCReference Include="..\..\uLibVLC.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -96,9 +65,6 @@
 			<Borland.ProjectType>Package</Borland.ProjectType>
 			<BorlandProject>
 				<Delphi.Personality>
-					<Source>
-						<Source Name="MainSource">CommonTools_D120R.dpk</Source>
-					</Source>
 					<Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
 						<Parameters Name="LoadAllSymbols">True</Parameters>
@@ -131,6 +97,9 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
+					<Source>
+						<Source Name="MainSource">LibVLC.dpk</Source>
+					</Source>
 				</Delphi.Personality>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>

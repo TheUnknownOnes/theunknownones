@@ -58,6 +58,7 @@ type
   procedure XSetAttribute(const ANode : IXMLDOMNode; AName: WideString; AValue : OleVariant); overload;
   function XAddChildOrGetIfExists(const AParent : IXMLDOMNode; AChildTag : WideString) : IXMLDOMNode;
   function XReadAttribute(const ANode : IXMLDOMNode; AAtrributeName : WideString; var AAttribute : IXMLDOMNode) : Boolean;
+  function XGetAttributeText(const ANode : IXMLDOMNode; AAttributeName : WideString; ADefault : WideString = '') : String;
   function XGetText(const ANode : IXMLDOMNode) : WideString;
 
   function CreateMSXMLV1Document : IXMLDOMDocument;
@@ -212,6 +213,16 @@ begin
   Result:=Assigned(Attr);
   if Result then
     AAttribute:=Attr;
+end;
+
+function XGetAttributeText(const ANode : IXMLDOMNode; AAttributeName : WideString; ADefault : WideString = '') : String;
+var
+  Attr : IXMLDOMNode;
+begin
+  if XReadAttribute(ANode, AAttributeName, Attr) then
+    Result := Attr.text
+  else
+    Result := ADefault;
 end;
 
 { TXMLIni }

@@ -536,7 +536,7 @@ begin
       begin
         Result.VType:=vtString;
         New(Result.VString);
-        Result.VString^ := Item;
+        Result.VString^ := ShortString(Item);
       end;
     varCurrency:
       begin
