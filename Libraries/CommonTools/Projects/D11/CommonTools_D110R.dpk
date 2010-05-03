@@ -35,7 +35,8 @@ requires
   vcldb,
   Jcl,
   PNGSupport_D110,
-  RegExp_D110R;
+  RegExp_D110R,
+  JediApi_SingleUnits;
 
 contains
   sndkey32 in '..\..\sndkey32.pas',
