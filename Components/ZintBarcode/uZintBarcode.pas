@@ -1,4 +1,4 @@
-{----------------------------------------------------------------------------- 
+{-----------------------------------------------------------------------------
  Purpose: The interface to the zint.dll 
  Created: 03.12.2009 14:28:36
 
@@ -267,10 +267,10 @@ begin
 end;
 
 procedure TZintBarcode.Clear;
-var
-  temp : PZSymbol;
+{var
+  temp : PZSymbol;}
 begin
-  New(temp);
+  {New(temp);
 
   CopyMemory(temp, FSymbol, SizeOf(TZSymbol));
 
@@ -289,7 +289,10 @@ begin
   FillMemory(@FSymbol.row_height, SizeOf(FSymbol.row_height), 0);
 
 
-  Dispose(temp);
+  Dispose(temp);}
+
+  if Assigned(FSymbol) then
+    ZBarcode_Clear(FSymbol);
 end;
 
 constructor TZintBarcode.Create;

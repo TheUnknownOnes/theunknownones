@@ -22,7 +22,7 @@
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DllSuffix>120</DllSuffix>
 			<DesignOnlyPackage>false</DesignOnlyPackage>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\frxZintBarcode120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\frxZintBarcode120.bpl</DCC_DependencyCheckOutputName>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
 			<GenDll>true</GenDll>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
@@ -47,7 +47,6 @@
 			<DCCReference Include="frx12.dcp"/>
 			<DCCReference Include="ZintBarcode.dcp"/>
 			<DCCReference Include="..\..\ufrxZintBarcode.pas"/>
-			<DCCReference Include="frx10.dcp"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
