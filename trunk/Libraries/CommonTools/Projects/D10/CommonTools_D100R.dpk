@@ -37,7 +37,8 @@ requires
   PNGSupport_D100,
   DirectX9_D10,
   GDIPlus100,
-  RegExp_D100R;
+  RegExp_D100R,
+  JediApi_SingleUnits;
 
 contains
   sndkey32 in '..\..\sndkey32.pas',
