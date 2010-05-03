@@ -169,7 +169,8 @@ const
 
 
   function ZBarcode_Create() : PZSymbol; cdecl; external LibName;
-  function ZBarcode_Delete(symbol : PZSymbol) : Integer; cdecl; external LibName;
+  procedure ZBarcode_Delete(symbol : PZSymbol); cdecl; external LibName;
+  procedure ZBarcode_Clear(symbol : PZSymbol); cdecl; external LibName;
 
   function ZBarcode_Buffer(symbol : PZSymbol; rotate_angle : Integer) : Integer; cdecl; external LibName;
   function ZBarcode_Encode_and_Buffer(symbol : PZSymbol; input : PAnsiChar; length : Integer; rotate_angle : Integer) : Integer; cdecl; external LibName;
