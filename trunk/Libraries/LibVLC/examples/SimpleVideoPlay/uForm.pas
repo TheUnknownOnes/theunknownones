@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, uLibVLC;
+  Dialogs, StdCtrls, ExtCtrls, uLibVLC, ComCtrls;
 
 type
   TForm5 = class(TForm)
@@ -15,12 +15,16 @@ type
     btn_Play: TButton;
     btn_Pause: TButton;
     btn_Stop: TButton;
+    track: TTrackBar;
+    tm_RefreshTrack: TTimer;
     procedure btn_OpenFileClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btn_PlayClick(Sender: TObject);
     procedure btn_PauseClick(Sender: TObject);
     procedure btn_StopClick(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
+    procedure tm_RefreshTrackTimer(Sender: TObject);
+    procedure trackChange(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     FLib : ILibVLC;
     FLibInstance : Plibvlc_instance_t;
@@ -50,6 +54,7 @@ begin
     if Assigned(FMedia) then
       FLib.libvlc_media_release(FMedia);
     FMedia := nil;
+    track.Max := 1;
 
     FMedia := FLib.libvlc_media_new(FLibInstance, PAnsiChar(AnsiString(dlg_Video.FileName)), @FException);
     CheckVLCException;
@@ -91,6 +96,18 @@ begin
   end;
 end;
 
+procedure TForm5.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  if FLib.libvlc_media_player_is_playing(FPlayer, @FException) <> 0 then
+    FLib.libvlc_media_player_stop(FPlayer, @FException);
+
+  if Assigned(FMedia) then
+    FLib.libvlc_media_release(FMedia);
+
+  FLib.libvlc_media_player_release(FPlayer);
+  FLib.libvlc_release(FLibInstance);
+end;
+
 procedure TForm5.FormCreate(Sender: TObject);
 var
   Params : array[0..1] of PAnsiChar;
@@ -110,16 +127,26 @@ begin
   CheckVLCException;
 end;
 
-procedure TForm5.FormDestroy(Sender: TObject);
+procedure TForm5.tm_RefreshTrackTimer(Sender: TObject);
 begin
   if FLib.libvlc_media_player_is_playing(FPlayer, @FException) <> 0 then
-    FLib.libvlc_media_player_stop(FPlayer, @FException);
+  begin
+    if track.Max = 1 then
+    begin
+      if FLib.libvlc_media_get_state(FMedia, @FException) <> libvlc_NothingSpecial then
+        track.Max := Round(FLib.libvlc_media_player_get_length(FPlayer, @FException) / 1000)
+    end
+    else
+      track.Position := Round(FLib.libvlc_media_player_get_time(FPlayer, @FException) / 1000);
+  end;
+end;
 
-  if Assigned(FMedia) then
-    FLib.libvlc_media_release(FMedia);
-
-  FLib.libvlc_media_player_release(FPlayer);
-  FLib.libvlc_release(FLibInstance);
+procedure TForm5.trackChange(Sender: TObject);
+begin
+  if FLib.libvlc_media_player_is_playing(FPlayer, @FException) <> 0 then
+  begin
+    FLib.libvlc_media_player_set_time(FPlayer, track.Position * 1000, @FException)
+  end;
 end;
 
 end.
