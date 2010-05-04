@@ -8,6 +8,10 @@
     - locale folder
 }
 
+{$IFDEF FPC}
+  {$MODE Delphi}
+{$ENDIF}
+
 unit uLibVLC;
 
 {$DEFINE AutoFixFloatingPointOverflowError}
@@ -2068,6 +2072,7 @@ begin
   inherited Create();
 
   FLibrary := LoadLibrary(PChar(ALibraryName));
+
   if FLibrary = 0 then
     RaiseLastOSError;
 
@@ -2589,7 +2594,7 @@ function TLibVLC.libvlc_media_get_mrl(p_media: Plibvlc_media_t;
   p_exception: Plibvlc_exception_t): PAnsiChar;
 begin
   if Assigned(Flibvlc_media_get_mrl) then
-    Flibvlc_media_get_mrl(p_media, p_exception)
+    Result := Flibvlc_media_get_mrl(p_media, p_exception)
   else
     RaiseNotSupported('libvlc_media_get_mrl');
 end;
@@ -2607,7 +2612,7 @@ function TLibVLC.libvlc_media_get_user_data(p_media: Plibvlc_media_t;
   p_exception: Plibvlc_exception_t): Pointer;
 begin
   if Assigned(Flibvlc_media_get_user_data) then
-    Flibvlc_media_get_user_data(p_media, p_exception)
+    Result := Flibvlc_media_get_user_data(p_media, p_exception)
   else
     RaiseNotSupported('libvlc_media_get_user_data');
 end;
@@ -4018,7 +4023,7 @@ function TLibVLC.libvlc_vlm_show_media(p_instance: Plibvlc_instance_t;
   psz_name: PAnsiChar; p_exception: Plibvlc_exception_t): PAnsiChar;
 begin
   if Assigned(Flibvlc_vlm_show_media) then
-    Flibvlc_vlm_show_media(p_instance, psz_name, p_exception)
+    Result := Flibvlc_vlm_show_media(p_instance, psz_name, p_exception)
   else
     RaiseNotSupported('libvlc_vlm_show_media');
 end;
