@@ -275,7 +275,7 @@ type
 
   TCustomSettingsLink = class(TComponent)
   { - a Settings-Link connects something (a component, ...) with a
-      Settings-Cbject in order to store/restore Settings of the "something"}
+      Settings-Object in order to store/restore Settings of the "something"}
   protected
     FSettings: TCustomSettings;
     FDefaultRootSetting: TSettingName;
@@ -301,6 +301,9 @@ type
 
     procedure ApplySettings;
     procedure SaveSettings;
+
+    class procedure ApplySettingsRecursive(AParent : TComponent);
+    class procedure SaveSettingsRecursive(AParent : TComponent);
 
     property Active : Boolean read FActive write SetActive default true;
 
@@ -1434,6 +1437,17 @@ begin
   end;
 end;
 
+class procedure TCustomSettingsLink.ApplySettingsRecursive(AParent: TComponent);
+var
+  idx : Integer;
+begin
+  if AParent is TCustomSettingsLink then
+    TCustomSettingsLink(AParent).ApplySettings;
+
+  for idx := 0 to AParent.ComponentCount - 1 do
+    ApplySettingsRecursive(AParent.Components[idx]);
+end;
+
 constructor TCustomSettingsLink.Create(AOwner: TComponent);
 begin
   inherited;
@@ -1480,6 +1494,17 @@ begin
     if Assigned(FOnAfterSaveSettings) then
       FOnAfterSaveSettings(Self)
   end;
+end;
+
+class procedure TCustomSettingsLink.SaveSettingsRecursive(AParent: TComponent);
+var
+  idx : Integer;
+begin
+  if AParent is TCustomSettingsLink then
+    TCustomSettingsLink(AParent).SaveSettings;
+
+  for idx := 0 to AParent.ComponentCount - 1 do
+    SaveSettingsRecursive(AParent.Components[idx]);
 end;
 
 procedure TCustomSettingsLink.SetActive(const Value: Boolean);
