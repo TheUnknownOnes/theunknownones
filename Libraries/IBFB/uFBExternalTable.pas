@@ -61,6 +61,8 @@ var
   LPos : Cardinal;
 begin
   LPos := Position;
+  if AIsChar then
+    exit;
 
   if (LPos and 3) <> 0 then
   begin
