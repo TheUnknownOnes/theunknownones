@@ -1,3 +1,16 @@
+//**********************************************************
+// Developed by TheUnkownOnes.net
+//
+// for more information look at www.TheUnknownOnes.net
+//**********************************************************
+
+
+{Warning: This code doesnt work fully correct.
+ If you wanna use it, only uses the varchar/char routines.
+ Other routines may write an unreadable file due to missing
+ knowledge about the correct way to pad 0-bytes.
+}
+
 unit uFBExternalTable;
 
 interface
