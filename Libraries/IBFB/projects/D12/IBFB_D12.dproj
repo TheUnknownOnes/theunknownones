@@ -44,6 +44,7 @@
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="..\..\uIB2007.pas"/>
 			<DCCReference Include="..\..\uIBFBGlobals.pas"/>
+			<DCCReference Include="..\..\uFBExternalTable.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
