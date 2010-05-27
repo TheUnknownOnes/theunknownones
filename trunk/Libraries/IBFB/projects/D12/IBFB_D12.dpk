@@ -29,6 +29,7 @@ requires
 
 contains
   uIB2007 in '..\..\uIB2007.pas',
-  uIBFBGlobals in '..\..\uIBFBGlobals.pas';
+  uIBFBGlobals in '..\..\uIBFBGlobals.pas',
+  uFBExternalTable in '..\..\uFBExternalTable.pas';
 
 end.
