@@ -63,7 +63,7 @@ type
                                   AAfterCallbackProc : TIBESCAfterExecStatementCallbackProc;
                                   AIBEBlockProgressProc : TIBESCIBEBlockProgressCallbackProc); stdcall;
 
-  TIBESCConnectDBProc = function (AConnectParams : PChar;
+  TIBESCConnectDBProc = function (AConnectParams : PAnsiChar;
                              AConnectErrorCallbacFunc : TIBESCConnectErrorCallbackProc) : Integer; stdcall;
 
   TIBESCDLLConnection = class
@@ -211,7 +211,7 @@ end;
 function TIBESCDLLConnection.Connect(AConnectionString: AnsiString) : Boolean;
 begin
   FActiveConnection := Self;
-  Result := FConnectProc(PChar(AConnectionString), @CBConnectError) = 0;
+  Result := FConnectProc(PAnsiChar(AConnectionString), @CBConnectError) = 0;
 end;
 
 constructor TIBESCDLLConnection.Create(AParent: TIBEScriptComponent);
