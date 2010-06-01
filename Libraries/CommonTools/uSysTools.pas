@@ -566,7 +566,8 @@ begin
     varUString:
       begin
         Result.VType:=vtUnicodeString;
-        Result.VUnicodeString := PChar(String(Item));
+        Result.VUnicodeString:=nil;
+        UnicodeString(Result.VUnicodeString) := UnicodeString(Item);
       end;
     {$ENDIF}
   end;
@@ -585,6 +586,9 @@ begin
     vtInterface: IInterface(Item.VInterface) := nil;
     vtWideString: WideString(Item.VWideString) := '';
     vtInt64: Dispose(Item.VInt64);
+    {$IFDEF UNICODE}
+    vtUnicodeString: UnicodeString(Item.VUnicodeString) := '';
+    {$ENDIF}
   end;
   Item.VInteger := 0;
 end;
