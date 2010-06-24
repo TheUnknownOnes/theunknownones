@@ -24,13 +24,6 @@ uses
 type
   Plibvlc_instance_t = type Pointer;
 
-  libvlc_exception_t = record
-    b_raised : Integer;
-    i_code : Integer;
-    psz_message : PAnsiChar;
-  end;
-  Plibvlc_exception_t = ^libvlc_exception_t;
-
   libvlc_time_t = Int64;
 
   libvlc_playlist_item_t = record
@@ -296,22 +289,15 @@ type
   ILibVLC = interface
     ['{751843F3-0D38-4B19-8863-5D57B6E19A2E}']
 
-    procedure libvlc_exception_init(p_exception : Plibvlc_exception_t);
-    function libvlc_exception_raised(p_exception : Plibvlc_exception_t) : Integer;
-    procedure libvlc_exception_raise(p_exception : Plibvlc_exception_t;
-                                     psz_format : PAnsiChar;
-                                     var AData);
-    procedure libvlc_exception_clear(p_exception : Plibvlc_exception_t);
-    function libvlc_exception_get_message(p_exception : Plibvlc_exception_t) : PAnsiChar;
+    procedure libvlc_clearerr();
+    function libvlc_errmsg : PAnsiChar;
 
     function libvlc_new(argc : Integer;
-                        argv : PPAnsiChar;
-                        p_exception : Plibvlc_exception_t) : Plibvlc_instance_t;
+                        argv : PPAnsiChar) : Plibvlc_instance_t;
     procedure libvlc_release(p_instance : Plibvlc_instance_t);
     procedure libvlc_retain(p_instance : Plibvlc_instance_t);
     procedure libvlc_add_intf(p_instance : Plibvlc_instance_t;
-                              name : PAnsiChar;
-                              p_exception : Plibvlc_exception_t);
+                              name : PAnsiChar);
     procedure libvlc_wait(p_instance : Plibvlc_instance_t);
     function libvlc_get_version() : PAnsiChar;
     function libvlc_get_compiler() : PAnsiChar;
@@ -321,307 +307,194 @@ type
     procedure libvlc_event_attach(p_event_manager : Plibvlc_event_manager_t;
                                   event_type : libvlc_event_type_t;
                                   f_callback : libvlc_callback_t;
-                                  userdata : Pointer;
-                                  p_e : Plibvlc_exception_t);
+                                  userdata : Pointer);
     procedure libvlc_event_detach(p_event_manager : Plibvlc_event_manager_t;
                                   event_type : libvlc_event_type_t;
                                   f_callback : libvlc_callback_t;
-                                  userdata : Pointer;
-                                  p_e : Plibvlc_exception_t);
+                                  userdata : Pointer);
     function libvlc_event_type_name(event_type : libvlc_event_type_t) : PAnsiChar;
 
-    function libvlc_get_log_verbosity(p_instance : Plibvlc_instance_t;
-                                      p_e : Plibvlc_exception_t) : Cardinal;
+    function libvlc_get_log_verbosity(p_instance : Plibvlc_instance_t) : Cardinal;
     procedure libvlc_set_log_verbosity(p_instance : Plibvlc_instance_t;
-                                       level : Cardinal;
-                                       p_e : Plibvlc_exception_t);
-    function libvlc_log_open(p_instance : Plibvlc_instance_t;
-                             p_exception : Plibvlc_exception_t) : Plibvlc_log_t;
-    procedure libvlc_log_close(p_log : Plibvlc_log_t;
-                               p_exception : Plibvlc_exception_t);
-    function libvlc_log_count(p_log : Plibvlc_log_t;
-                              p_exception : Plibvlc_exception_t) : Cardinal;
-    procedure libvlc_log_clear(p_log : Plibvlc_log_t;
-                               p_exception : Plibvlc_exception_t);
-    function libvlc_log_get_iterator(p_log : Plibvlc_log_t;
-                                     p_exception : Plibvlc_exception_t) : Plibvlc_log_iterator_t;
-    procedure libvlc_log_iterator_free(p_iter : Plibvlc_log_iterator_t;
-                                       p_exception : Plibvlc_exception_t);
-    function libvlc_log_iterator_has_next(p_iter : Plibvlc_log_iterator_t;
-                                          p_exception : Plibvlc_exception_t) : Integer;
+                                       level : Cardinal);
+    function libvlc_log_open(p_instance : Plibvlc_instance_t) : Plibvlc_log_t;
+    procedure libvlc_log_close(p_log : Plibvlc_log_t);
+    function libvlc_log_count(p_log : Plibvlc_log_t) : Cardinal;
+    procedure libvlc_log_clear(p_log : Plibvlc_log_t);
+    function libvlc_log_get_iterator(p_log : Plibvlc_log_t) : Plibvlc_log_iterator_t;
+    procedure libvlc_log_iterator_free(p_iter : Plibvlc_log_iterator_t);
+    function libvlc_log_iterator_has_next(p_iter : Plibvlc_log_iterator_t) : Integer;
     function libvlc_log_iterator_next(p_iter : Plibvlc_log_iterator_t;
-                                      p_buffer : Plibvlc_log_message_t;
-                                      p_exception : Plibvlc_exception_t) : Plibvlc_log_message_t;
+                                      p_buffer : Plibvlc_log_message_t) : Plibvlc_log_message_t;
 
-    function libvlc_media_new(p_instance : Plibvlc_instance_t;
-                               psz_mrl : PAnsiChar;
-                               p_exception : Plibvlc_exception_t) : Plibvlc_media_t;
+    function libvlc_media_new_location(p_instance : Plibvlc_instance_t;
+                                       psz_mrl : PAnsiChar) : Plibvlc_media_t;
     function libvlc_media_new_as_node(p_instance : Plibvlc_instance_t;
-                                      psz_name : PAnsiChar;
-                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_t;
+                                      psz_name : PAnsiChar) : Plibvlc_media_t;
     procedure libvlc_media_add_option(p_media : Plibvlc_media_t;
-                                      ppsz_options : PAnsiChar;
-                                      p_exception : Plibvlc_exception_t);
+                                      ppsz_options : PAnsiChar);
     procedure libvlc_media_add_option_untrusted(p_media : Plibvlc_media_t;
-                                                ppsz_options : PAnsiChar;
-                                                p_exception : Plibvlc_exception_t);
+                                                ppsz_options : PAnsiChar);
     procedure libvlc_media_retain(p_media : Plibvlc_media_t);
     procedure libvlc_media_release(p_media : Plibvlc_media_t);
-    function libvlc_media_get_mrl(p_media : Plibvlc_media_t;
-                                  p_exception : Plibvlc_exception_t) : PAnsiChar;
+    function libvlc_media_get_mrl(p_media : Plibvlc_media_t) : PAnsiChar;
     function libvlc_media_duplicate(p_media : Plibvlc_media_t) : Plibvlc_media_t;
     function libvlc_media_get_meta(p_media : Plibvlc_media_t;
-                                   e_meta : libvlc_meta_t;
-                                   p_exception : Plibvlc_exception_t) : PAnsiChar;
-    function libvlc_media_get_state(p_media : Plibvlc_media_t;
-                                    p_exception : Plibvlc_exception_t) : libvlc_state_t;
-    function libvlc_media_subitems(p_media : Plibvlc_media_t;
-                                   p_exception : Plibvlc_exception_t) : Plibvlc_media_list_t;
-    function libvlc_media_event_manager(p_media : Plibvlc_media_t;
-                                        p_exception : Plibvlc_exception_t) : Plibvlc_event_manager_t;
-    function libvlc_media_get_duration(p_media : Plibvlc_media_t;
-                                       p_exception : Plibvlc_exception_t) : libvlc_time_t;
-    function libvlc_media_is_preparsed(p_media : Plibvlc_media_t;
-                                       p_exception : Plibvlc_exception_t) : Integer;
+                                   e_meta : libvlc_meta_t) : PAnsiChar;
+    function libvlc_media_get_state(p_media : Plibvlc_media_t) : libvlc_state_t;
+    function libvlc_media_subitems(p_media : Plibvlc_media_t) : Plibvlc_media_list_t;
+    function libvlc_media_event_manager(p_media : Plibvlc_media_t) : Plibvlc_event_manager_t;
+    function libvlc_media_get_duration(p_media : Plibvlc_media_t) : libvlc_time_t;
+    function libvlc_media_is_preparsed(p_media : Plibvlc_media_t) : Integer;
     procedure libvlc_media_set_user_data(p_media : Plibvlc_media_t;
-                                         p_new_user_data : Pointer;
-                                         p_exception : Plibvlc_exception_t);
-    function libvlc_media_get_user_data(p_media : Plibvlc_media_t;
-                                        p_exception : Plibvlc_exception_t) : Pointer;
+                                         p_new_user_data : Pointer);
+    function libvlc_media_get_user_data(p_media : Plibvlc_media_t) : Pointer;
 
-    function libvlc_media_list_new(p_instance : Plibvlc_instance_t;
-                                   p_exception : Plibvlc_exception_t) : Plibvlc_media_list_t;
+    function libvlc_media_list_new(p_instance : Plibvlc_instance_t) : Plibvlc_media_list_t;
     procedure libvlc_media_list_release(p_media_list : Plibvlc_media_list_t);
     procedure libvlc_media_list_retain(p_media_list : Plibvlc_media_list_t);
     procedure libvlc_media_list_set_media(p_media_list : Plibvlc_media_list_t;
-                                          p_media : Plibvlc_media_t;
-                                          p_exception : Plibvlc_exception_t);
-    function libvlc_media_list_media(p_media_list : Plibvlc_media_list_t;
-                                     p_exception : Plibvlc_exception_t) : Plibvlc_media_t;
+                                          p_media : Plibvlc_media_t);
+    function libvlc_media_list_media(p_media_list : Plibvlc_media_list_t) : Plibvlc_media_t;
     procedure libvlc_media_list_add_media(p_media_list : Plibvlc_media_list_t;
-                                          p_media : Plibvlc_media_t;
-                                          p_exception : Plibvlc_exception_t);
+                                          p_media : Plibvlc_media_t);
     procedure libvlc_media_list_insert_media(p_media_list : Plibvlc_media_list_t;
                                              p_media : Plibvlc_media_t;
-                                             index : Integer;
-                                             p_exception : Plibvlc_exception_t);
+                                             index : Integer);
     procedure libvlc_media_list_remove_index(p_media_list : Plibvlc_media_list_t;
-                                             index : Integer;
-                                             p_exception : Plibvlc_exception_t);
-    function libvlc_media_list_count(p_media_list : Plibvlc_media_list_t;
-                                     p_exception : Plibvlc_exception_t) : Integer;
+                                             index : Integer);
+    function libvlc_media_list_count(p_media_list : Plibvlc_media_list_t) : Integer;
     function libvlc_media_list_item_at_index(p_media_list : Plibvlc_media_list_t;
-                                             index : Integer;
-                                             p_exception : Plibvlc_exception_t) : Plibvlc_media_t;
+                                             index : Integer) : Plibvlc_media_t;
     function libvlc_media_list_index_of_item(p_media_list : Plibvlc_media_list_t;
-                                             p_media : Plibvlc_media_t;
-                                             p_exception : Plibvlc_exception_t) : Integer;
+                                             p_media : Plibvlc_media_t) : Integer;
     function libvlc_media_list_is_readonly(p_media_list : Plibvlc_media_list_t) : Integer;
     procedure libvlc_media_list_lock(p_media_list : Plibvlc_media_list_t);
     procedure libvlc_media_list_unlock(p_media_list : Plibvlc_media_list_t);
-    function libvlc_media_list_flat_view(p_media_list : Plibvlc_media_list_t;
-                                         p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t;
-    function libvlc_media_list_hierarchical_view(p_media_list : Plibvlc_media_list_t;
-                                                 p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t;
-    function libvlc_media_list_hierarchical_node_view(p_media_list : Plibvlc_media_list_t;
-                                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t;
-    function libvlc_media_list_event_manager(p_media_list : Plibvlc_media_list_t;
-                                             p_exception : Plibvlc_exception_t) : Plibvlc_event_manager_t;
+    function libvlc_media_list_flat_view(p_media_list : Plibvlc_media_list_t) : Plibvlc_media_list_view_t;
+    function libvlc_media_list_hierarchical_view(p_media_list : Plibvlc_media_list_t) : Plibvlc_media_list_view_t;
+    function libvlc_media_list_hierarchical_node_view(p_media_list : Plibvlc_media_list_t) : Plibvlc_media_list_view_t;
+    function libvlc_media_list_event_manager(p_media_list : Plibvlc_media_list_t) : Plibvlc_event_manager_t;
 
     procedure libvlc_media_list_view_retain(p_media_list_view : Plibvlc_media_list_view_t);
     procedure libvlc_media_list_view_release(p_media_list_view : Plibvlc_media_list_view_t);
     function libvlc_media_list_view_event_manager(p_media_list_view : Plibvlc_media_list_view_t) : Plibvlc_event_manager_t;
-    function libvlc_media_list_view_count(p_media_list_view : Plibvlc_media_list_view_t;
-                                          p_exception : Plibvlc_exception_t) : Integer;
+    function libvlc_media_list_view_count(p_media_list_view : Plibvlc_media_list_view_t) : Integer;
     function libvlc_media_list_view_item_at_index(p_media_list_view : Plibvlc_media_list_view_t;
-                                                  i_index : Integer;
-                                                  p_exception : Plibvlc_exception_t) : Plibvlc_media_t;
+                                                  i_index : Integer) : Plibvlc_media_t;
     function libvlc_media_list_view_children_at_index(p_media_list_view : Plibvlc_media_list_view_t;
-                                                      index : Integer;
-                                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t;
+                                                      index : Integer) : Plibvlc_media_list_view_t;
     function libvlc_media_list_view_children_for_item(p_media_list_view : Plibvlc_media_list_view_t;
-                                                      p_media : Plibvlc_media_t;
-                                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t;
+                                                      p_media : Plibvlc_media_t) : Plibvlc_media_list_view_t;
     function libvlc_media_list_view_index_of_item(p_media_list_view : Plibvlc_media_list_view_t;
-                                                  p_media : Plibvlc_media_t;
-                                                  p_exception : Plibvlc_exception_t) : Integer;
+                                                  p_media : Plibvlc_media_t) : Integer;
     procedure libvlc_media_list_view_insert_at_index(p_media_list_view : Plibvlc_media_list_view_t;
                                                      p_media : Plibvlc_media_t;
-                                                     index : Integer;
-                                                     p_exception : Plibvlc_exception_t);
+                                                     index : Integer);
     procedure libvlc_media_list_view_remove_at_index(p_media_list_view : Plibvlc_media_list_view_t;
-                                                     index : Integer;
-                                                     p_exception : Plibvlc_exception_t);
+                                                     index : Integer);
     procedure libvlc_media_list_view_add_item(p_media_list_view : Plibvlc_media_list_view_t;
-                                              p_media : Plibvlc_media_t;
-                                              p_exception : Plibvlc_exception_t);
-    function libvlc_media_list_view_parent_media_list(p_media_list_view : Plibvlc_media_list_view_t;
-                                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_list_t;
+                                              p_media : Plibvlc_media_t);
+    function libvlc_media_list_view_parent_media_list(p_media_list_view : Plibvlc_media_list_view_t) : Plibvlc_media_list_t;
 
-    function libvlc_media_library_new(p_instance : Plibvlc_instance_t;
-                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_library_t;
+    function libvlc_media_library_new(p_instance : Plibvlc_instance_t) : Plibvlc_media_library_t;
     procedure libvlc_media_library_release(p_mlib : Plibvlc_media_library_t);
     procedure libvlc_media_library_retain(p_mlib : Plibvlc_media_library_t);
-    procedure libvlc_media_library_load(p_mlib : Plibvlc_media_library_t;
-                                        p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_library_save(p_mlib : Plibvlc_media_library_t;
-                                        p_exception : Plibvlc_exception_t);
-    function libvlc_media_library_media_list(p_mlib : Plibvlc_media_library_t;
-                                             p_exception : Plibvlc_exception_t) : Plibvlc_media_list_t;
+    procedure libvlc_media_library_load(p_mlib : Plibvlc_media_library_t);
+    procedure libvlc_media_library_save(p_mlib : Plibvlc_media_library_t);
+    function libvlc_media_library_media_list(p_mlib : Plibvlc_media_library_t) : Plibvlc_media_list_t;
 
-    function libvlc_media_player_new(p_instance : Plibvlc_instance_t;
-                                     p_exception : Plibvlc_exception_t) : Plibvlc_media_player_t;
-    function libvlc_media_player_new_from_media(p_media : Plibvlc_media_t;
-                                                p_exception : Plibvlc_exception_t) : Plibvlc_media_player_t;
+    function libvlc_media_player_new(p_instance : Plibvlc_instance_t) : Plibvlc_media_player_t;
+    function libvlc_media_player_new_from_media(p_media : Plibvlc_media_t) : Plibvlc_media_player_t;
     procedure libvlc_media_player_release(p_media_player : Plibvlc_media_player_t);
     procedure libvlc_media_player_retain(p_media_player : Plibvlc_media_player_t);
     procedure libvlc_media_player_set_media(p_media_player : Plibvlc_media_player_t;
-                                            p_media : Plibvlc_media_t;
-                                            p_exception : Plibvlc_exception_t);
-    function libvlc_media_player_get_media(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Plibvlc_media_t;
-    function libvlc_media_player_event_manager(p_media_player : Plibvlc_media_player_t;
-                                               p_exception : Plibvlc_exception_t) : Plibvlc_event_manager_t;
-    function libvlc_media_player_is_playing(p_media_player : Plibvlc_media_player_t;
-                                            p_exception : Plibvlc_exception_t) : Integer;
-    procedure libvlc_media_player_play(p_media_player : Plibvlc_media_player_t;
-                                       p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_player_pause(p_media_player : Plibvlc_media_player_t;
-                                        p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_player_stop(p_media_player : Plibvlc_media_player_t;
-                                       p_exception : Plibvlc_exception_t);
+                                            p_media : Plibvlc_media_t);
+    function libvlc_media_player_get_media(p_media_player : Plibvlc_media_player_t) : Plibvlc_media_t;
+    function libvlc_media_player_event_manager(p_media_player : Plibvlc_media_player_t) : Plibvlc_event_manager_t;
+    function libvlc_media_player_is_playing(p_media_player : Plibvlc_media_player_t) : Integer;
+    procedure libvlc_media_player_play(p_media_player : Plibvlc_media_player_t);
+    procedure libvlc_media_player_pause(p_media_player : Plibvlc_media_player_t);
+    procedure libvlc_media_player_stop(p_media_player : Plibvlc_media_player_t);
     procedure libvlc_media_player_set_nsobject(p_media_player : Plibvlc_media_player_t;
-                                               drawable : Pointer;
-                                               p_exception : Plibvlc_exception_t);
+                                               drawable : Pointer);
     function libvlc_media_player_get_nsobject(p_media_player : Plibvlc_media_player_t) : Pointer;
     procedure libvlc_media_player_set_agl(p_media_player : Plibvlc_media_player_t;
-                                          drawable : Cardinal;
-                                          p_exception : Plibvlc_exception_t);
+                                          drawable : Cardinal);
     function libvlc_media_player_get_agl(p_media_player : Plibvlc_media_player_t) : Cardinal;
     procedure libvlc_media_player_set_xwindow(p_media_player : Plibvlc_media_player_t;
-                                              drawable : Cardinal;
-                                              p_exception : Plibvlc_exception_t);
+                                              drawable : Cardinal);
     function libvlc_media_player_get_xwindow(p_media_player : Plibvlc_media_player_t) : Cardinal;
     procedure libvlc_media_player_set_hwnd(p_media_player : Plibvlc_media_player_t;
-                                           drawable : Pointer;
-                                           p_exception : Plibvlc_exception_t);
+                                           drawable : Pointer);
     function libvlc_media_player_get_hwnd(p_media_player : Plibvlc_media_player_t) : Pointer;
-    function libvlc_media_player_get_length(p_media_player : Plibvlc_media_player_t;
-                                            p_exception : Plibvlc_exception_t) : libvlc_time_t;
-    function libvlc_media_player_get_time(p_media_player : Plibvlc_media_player_t;
-                                          p_exception : Plibvlc_exception_t) : libvlc_time_t;
+    function libvlc_media_player_get_length(p_media_player : Plibvlc_media_player_t) : libvlc_time_t;
+    function libvlc_media_player_get_time(p_media_player : Plibvlc_media_player_t) : libvlc_time_t;
     procedure libvlc_media_player_set_time(p_media_player : Plibvlc_media_player_t;
-                                           time : libvlc_time_t;
-                                           p_exception : Plibvlc_exception_t);
-    function libvlc_media_player_get_position(p_media_player : Plibvlc_media_player_t;
-                                              p_exception : Plibvlc_exception_t) : Single;
+                                           time : libvlc_time_t);
+    function libvlc_media_player_get_position(p_media_player : Plibvlc_media_player_t) : Single;
     procedure libvlc_media_player_set_position(p_media_player : Plibvlc_media_player_t;
-                                               position : Single;
-                                               p_exception : Plibvlc_exception_t);
+                                               position : Single);
     procedure libvlc_media_player_set_chapter(p_media_player : Plibvlc_media_player_t;
-                                              chapter : Integer;
-                                              p_exception : Plibvlc_exception_t);
-    function libvlc_media_player_get_chapter(p_media_player : Plibvlc_media_player_t;
-                                             p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_media_player_get_chapter_count(p_media_player : Plibvlc_media_player_t;
-                                                   p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_media_player_will_play(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Integer;
+                                              chapter : Integer);
+    function libvlc_media_player_get_chapter(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_media_player_get_chapter_count(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_media_player_will_play(p_media_player : Plibvlc_media_player_t) : Integer;
     function libvlc_media_player_get_chapter_count_for_title(p_media_player : Plibvlc_media_player_t;
-                                                             title : Integer;
-                                                             p_exception : Plibvlc_exception_t) : Integer;
+                                                             title : Integer) : Integer;
     procedure libvlc_media_player_set_title(p_media_player : Plibvlc_media_player_t;
-                                            title : Integer;
-                                            p_exception : Plibvlc_exception_t);
-    function libvlc_media_player_get_title(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_media_player_get_title_count(p_media_player : Plibvlc_media_player_t;
-                                                 p_exception : Plibvlc_exception_t) : Integer;
-    procedure libvlc_media_player_previous_chapter(p_media_player : Plibvlc_media_player_t;
-                                                   p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_player_next_chapter(p_media_player : Plibvlc_media_player_t;
-                                               p_exception : Plibvlc_exception_t);
-    function libvlc_media_player_get_rate(p_media_player : Plibvlc_media_player_t;
-                                          p_exception : Plibvlc_exception_t) : Single;
+                                            title : Integer);
+    function libvlc_media_player_get_title(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_media_player_get_title_count(p_media_player : Plibvlc_media_player_t) : Integer;
+    procedure libvlc_media_player_previous_chapter(p_media_player : Plibvlc_media_player_t);
+    procedure libvlc_media_player_next_chapter(p_media_player : Plibvlc_media_player_t);
+    function libvlc_media_player_get_rate(p_media_player : Plibvlc_media_player_t) : Single;
     procedure libvlc_media_player_set_rate(p_media_player : Plibvlc_media_player_t;
-                                           rate : Single;
-                                           p_exception : Plibvlc_exception_t);
-    function libvlc_media_player_get_state(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : libvlc_state_t;
-    function libvlc_media_player_get_fps(p_media_player : Plibvlc_media_player_t;
-                                         p_exception : Plibvlc_exception_t) : Single;
-    function libvlc_media_player_has_vout(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_media_player_is_seekable(p_media_player : Plibvlc_media_player_t;
-                                             p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_media_player_can_pause(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Integer;
+                                           rate : Single);
+    function libvlc_media_player_get_state(p_media_player : Plibvlc_media_player_t) : libvlc_state_t;
+    function libvlc_media_player_get_fps(p_media_player : Plibvlc_media_player_t) : Single;
+    function libvlc_media_player_has_vout(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_media_player_is_seekable(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_media_player_can_pause(p_media_player : Plibvlc_media_player_t) : Integer;
     procedure libvlc_track_description_release(p_track_description : Plibvlc_track_description_t);
-    procedure libvlc_toggle_fullscreen(p_media_player : Plibvlc_media_player_t;
-                                       p_exception : Plibvlc_exception_t);
+    procedure libvlc_toggle_fullscreen(p_media_player : Plibvlc_media_player_t);
     procedure libvlc_set_fullscreen(p_media_player : Plibvlc_media_player_t;
-                                    enabled : Integer;
-                                    p_exception : Plibvlc_exception_t);
-    function libvlc_get_fullscreen(p_media_player : Plibvlc_media_player_t;
-                                   p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_height(p_media_player : Plibvlc_media_player_t;
-                                     p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_width(p_media_player : Plibvlc_media_player_t;
-                                    p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_scale(p_media_player : Plibvlc_media_player_t;
-                                     p_exception : Plibvlc_exception_t) : Single;
+                                    enabled : Integer);
+    function libvlc_get_fullscreen(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_video_get_height(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_video_get_width(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_video_get_scale(p_media_player : Plibvlc_media_player_t) : Single;
     procedure libvlc_video_set_scale(p_media_player : Plibvlc_media_player_t;
-                                     scale : Single;
-                                     p_exception : Plibvlc_exception_t);
-    function libvlc_video_get_aspect_ratio(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : PAnsiChar;
+                                     scale : Single);
+    function libvlc_video_get_aspect_ratio(p_media_player : Plibvlc_media_player_t) : PAnsiChar;
     procedure libvlc_video_set_aspect_ratio(p_media_player : Plibvlc_media_player_t;
-                                            psz_aspect : PAnsiChar;
-                                            p_exception : Plibvlc_exception_t);
-    function libvlc_video_get_spu(p_media_player : Plibvlc_media_player_t;
-                                  p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_spu_count(p_media_player : Plibvlc_media_player_t;
-                                        p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_spu_description(p_media_player : Plibvlc_media_player_t;
-                                              p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t;
+                                            psz_aspect : PAnsiChar);
+    function libvlc_video_get_spu(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_video_get_spu_count(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_video_get_spu_description(p_media_player : Plibvlc_media_player_t) : Plibvlc_track_description_t;
     procedure libvlc_video_set_spu(p_media_player : Plibvlc_media_player_t;
-                                   i_spu : Integer;
-                                   p_exception : Plibvlc_exception_t);
+                                   i_spu : Integer);
     function libvlc_video_set_subtitle_file(p_media_player : Plibvlc_media_player_t;
-                                            filename : PAnsiChar;
-                                            p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_title_description(p_media_player : Plibvlc_media_player_t;
-                                                p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t;
+                                            filename : PAnsiChar) : Integer;
+    function libvlc_video_get_title_description(p_media_player : Plibvlc_media_player_t) : Plibvlc_track_description_t;
     function libvlc_video_get_chapter_description(p_media_player : Plibvlc_media_player_t;
-                                                  title : Integer;
-                                                  p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t;
-    function libvlc_video_get_crop_geometry(p_media_player : Plibvlc_media_player_t;
-                                            p_exception : Plibvlc_exception_t) : PAnsiChar;
+                                                  title : Integer) : Plibvlc_track_description_t;
+    function libvlc_video_get_crop_geometry(p_media_player : Plibvlc_media_player_t) : PAnsiChar;
     procedure libvlc_video_set_crop_geometry(p_media_player : Plibvlc_media_player_t;
-                                             geometry : PAnsiChar;
-                                             p_exception : Plibvlc_exception_t);
-    procedure libvlc_toggle_teletext(p_media_player : Plibvlc_media_player_t;
-                                     p_exception : Plibvlc_exception_t);
-    function libvlc_video_get_teletext(p_media_player : Plibvlc_media_player_t;
-                                       p_exception : Plibvlc_exception_t) : Integer;
+                                             geometry : PAnsiChar);
+    procedure libvlc_toggle_teletext(p_media_player : Plibvlc_media_player_t);
+    function libvlc_video_get_teletext(p_media_player : Plibvlc_media_player_t) : Integer;
     procedure libvlc_video_set_teletext(p_media_player : Plibvlc_media_player_t;
-                                        page : Integer;
-                                        p_exception : Plibvlc_exception_t);
-    function libvlc_video_get_track_count(p_media_player : Plibvlc_media_player_t;
-                                          p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_track_description(p_media_player : Plibvlc_media_player_t;
-                                                p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t;
-    function libvlc_video_get_track(p_media_player : Plibvlc_media_player_t;
-                                    p_exception : Plibvlc_exception_t) : Integer;
+                                        page : Integer);
+    function libvlc_video_get_track_count(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_video_get_track_description(p_media_player : Plibvlc_media_player_t) : Plibvlc_track_description_t;
+    function libvlc_video_get_track(p_media_player : Plibvlc_media_player_t) : Integer;
     procedure libvlc_video_set_track(p_media_player : Plibvlc_media_player_t;
-                                     track : Integer;
-                                     p_exception : Plibvlc_exception_t);
+                                     track : Integer);
     procedure libvlc_video_take_snapshot(p_media_player : Plibvlc_media_player_t;
                                          filepath : PAnsiChar;
-                                         width, height : Integer;
-                                         p_exception : Plibvlc_exception_t);
-    function libvlc_audio_output_list_get(p_instance : Plibvlc_instance_t;
-                                          p_exception : Plibvlc_exception_t) : Plibvlc_audio_output_t;
+                                         width, height : Integer);
+    function libvlc_audio_output_list_get(p_instance : Plibvlc_instance_t) : Plibvlc_audio_output_t;
     procedure libvlc_audio_output_list_release(audio_output_list : Plibvlc_audio_output_t);
     function libvlc_audio_output_set(p_instance : Plibvlc_instance_t;
                                      psz_audio_output : PAnsiChar) : Integer;
@@ -636,67 +509,44 @@ type
     procedure libvlc_audio_output_device_set(p_instance : Plibvlc_instance_t;
                                               psz_audio_output : PAnsiChar;
                                               device : PAnsiChar);
-    function libvlc_audio_output_get_device_type(p_instance : Plibvlc_instance_t;
-                                                 p_exception : Plibvlc_exception_t) : Integer;
+    function libvlc_audio_output_get_device_type(p_instance : Plibvlc_instance_t) : Integer;
     procedure libvlc_audio_output_set_device_type(p_instance : Plibvlc_instance_t;
-                                                  device_type : Integer;
-                                                  p_exception : Plibvlc_exception_t);
-    procedure libvlc_audio_toggle_mute(p_instance : Plibvlc_instance_t;
-                                       p_exception : Plibvlc_exception_t);
-    function libvlc_audio_get_mute(p_instance : Plibvlc_instance_t;
-                                   p_exception : Plibvlc_exception_t) : Integer;
+                                                  device_type : Integer);
+    procedure libvlc_audio_toggle_mute(p_instance : Plibvlc_instance_t);
+    function libvlc_audio_get_mute(p_instance : Plibvlc_instance_t) : Integer;
     procedure libvlc_audio_set_mute(p_instance : Plibvlc_instance_t;
-                                    status : Integer;
-                                    p_exception : Plibvlc_exception_t);
-    function libvlc_audio_get_volume(p_instance : Plibvlc_instance_t;
-                                     p_exception : Plibvlc_exception_t) : Integer;
+                                    status : Integer);
+    function libvlc_audio_get_volume(p_instance : Plibvlc_instance_t) : Integer;
     procedure libvlc_audio_set_volume(p_instance : Plibvlc_instance_t;
-                                      volume : Integer;
-                                      p_exception : Plibvlc_exception_t);
-    function libvlc_audio_get_track_count(p_media_player : Plibvlc_media_player_t;
-                                          p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_audio_get_track_description(p_media_player : Plibvlc_media_player_t;
-                                                p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t;
-    function libvlc_audio_get_track(p_media_player : Plibvlc_media_player_t;
-                                    p_exception : Plibvlc_exception_t) : Integer;
-    procedure libvlc_audio_set_track(p_media_player : Plibvlc_media_player_t;
-                                     p_exception : Plibvlc_exception_t);
-    function libvlc_audio_get_channel(p_instance : Plibvlc_instance_t;
-                                      p_exception : Plibvlc_exception_t) : Integer;
+                                      volume : Integer);
+    function libvlc_audio_get_track_count(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_audio_get_track_description(p_media_player : Plibvlc_media_player_t) : Plibvlc_track_description_t;
+    function libvlc_audio_get_track(p_media_player : Plibvlc_media_player_t) : Integer;
+    procedure libvlc_audio_set_track(p_media_player : Plibvlc_media_player_t);
+    function libvlc_audio_get_channel(p_instance : Plibvlc_instance_t) : Integer;
     procedure libvlc_audio_set_channel(p_instance : Plibvlc_instance_t;
-                                       channel : Integer;
-                                       p_exception : Plibvlc_exception_t);
+                                       channel : Integer);
 
-    procedure libvlc_media_list_player_play(p_mlp : Plibvlc_media_list_player_t;
-                                            p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_list_player_pause(p_mlp : Plibvlc_media_list_player_t;
-                                             p_exception : Plibvlc_exception_t);
-    function libvlc_media_list_player_is_playing(p_mlp : Plibvlc_media_list_player_t;
-                                                 p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_media_list_player_get_state(p_mlp : Plibvlc_media_list_player_t;
-                                                p_exception : Plibvlc_exception_t) : libvlc_state_t;
+    procedure libvlc_media_list_player_play(p_mlp : Plibvlc_media_list_player_t);
+    procedure libvlc_media_list_player_pause(p_mlp : Plibvlc_media_list_player_t);
+    function libvlc_media_list_player_is_playing(p_mlp : Plibvlc_media_list_player_t) : Integer;
+    function libvlc_media_list_player_get_state(p_mlp : Plibvlc_media_list_player_t) : libvlc_state_t;
     procedure libvlc_media_list_player_play_item_at_index(p_mlp : Plibvlc_media_list_player_t;
-                                                          i_index : Integer;
-                                                          p_exception : Plibvlc_exception_t);
+                                                          i_index : Integer);
     procedure libvlc_media_list_player_play_item(p_mlp : Plibvlc_media_list_player_t;
-                                                 p_media : Plibvlc_media_t;
-                                                 p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_list_player_stop(p_mlp : Plibvlc_media_list_player_t;
-                                            p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_list_player_next(p_mlp : Plibvlc_media_list_player_t;
-                                            p_exception : Plibvlc_exception_t);
+                                                 p_media : Plibvlc_media_t);
+    procedure libvlc_media_list_player_stop(p_mlp : Plibvlc_media_list_player_t);
+    procedure libvlc_media_list_player_next(p_mlp : Plibvlc_media_list_player_t);
 
     function libvlc_media_discoverer_new_from_name(p_instance : Plibvlc_instance_t;
-                                                   psz_name : PAnsiChar;
-                                                   p_exception : Plibvlc_exception_t) : Plibvlc_media_discoverer_t;
+                                                   psz_name : PAnsiChar) : Plibvlc_media_discoverer_t;
     procedure libvlc_media_discoverer_release(p_mdis : Plibvlc_media_discoverer_t);
     function libvlc_media_discoverer_localized_name(p_mdis : Plibvlc_media_discoverer_t) : PAnsiChar;
     function libvlc_media_discoverer_media_list(p_mdis : Plibvlc_media_discoverer_t) : Plibvlc_media_list_t;
     function libvlc_media_discoverer_event_manager(p_mdis : Plibvlc_media_discoverer_t) : Plibvlc_event_manager_t;
     function libvlc_media_discoverer_is_running(p_mdis : Plibvlc_media_discoverer_t) : Integer;
 
-    procedure libvlc_vlm_release(p_instance : Plibvlc_instance_t;
-                                 p_exception : Plibvlc_exception_t);
+    procedure libvlc_vlm_release(p_instance : Plibvlc_instance_t);
     procedure libvlc_vlm_add_broadcast(p_instance : Plibvlc_instance_t;
                                        psz_name,
                                        psz_input,
@@ -704,44 +554,35 @@ type
                                        options : Integer;
                                        ppsz_options : Pointer;
                                        b_enabled : Integer;
-                                       b_loop : Integer;
-                                       p_exception : Plibvlc_exception_t);
+                                       b_loop : Integer);
     procedure libvlc_vlm_add_vod(p_instance : Plibvlc_instance_t;
                                  psz_name,
                                  psz_input : PAnsiChar;
                                  i_options : Integer;
                                  ppsz_options : Pointer;
                                  b_enabled : Integer;
-                                 psz_mux : PAnsiChar;
-                                 p_exception : Plibvlc_exception_t);
+                                 psz_mux : PAnsiChar);
 
     procedure libvlc_vlm_del_media(p_instance : Plibvlc_instance_t;
-                                   psz_name : PAnsiChar;
-                                   p_exception : Plibvlc_exception_t);
+                                   psz_name : PAnsiChar);
     procedure libvlc_vlm_set_enabled(p_instance : Plibvlc_instance_t;
                                      psz_name : PAnsiChar;
-                                     b_enabled : Integer;
-                                     p_exception : Plibvlc_exception_t);
+                                     b_enabled : Integer);
     procedure libvlc_vlm_set_output(p_instance : Plibvlc_instance_t;
                                     psz_name : PAnsiChar;
-                                    psz_output : PAnsiChar;
-                                    p_exception : Plibvlc_exception_t);
+                                    psz_output : PAnsiChar);
     procedure libvlc_vlm_set_input(p_instance : Plibvlc_instance_t;
                                    psz_name : PAnsiChar;
-                                   psz_input : PAnsiChar;
-                                   p_exception : Plibvlc_exception_t);
+                                   psz_input : PAnsiChar);
     procedure libvlc_vlm_add_input(p_instance : Plibvlc_instance_t;
                                    psz_name : PAnsiChar;
-                                   pst_input : PAnsiChar;
-                                   p_exception : Plibvlc_exception_t);
+                                   pst_input : PAnsiChar);
     procedure libvlc_vlm_set_loop(p_instance : Plibvlc_instance_t;
                                   psz_name : PAnsiChar;
-                                  b_loop : Integer;
-                                  p_exception : Plibvlc_exception_t);
+                                  b_loop : Integer);
     procedure libvlc_vlm_set_mux(p_instance : Plibvlc_instance_t;
                                  psz_name : PAnsiChar;
-                                 psz_mux : PAnsiChar;
-                                 p_exception : Plibvlc_exception_t);
+                                 psz_mux : PAnsiChar);
     procedure libvlc_vlm_change_media(p_instance : Plibvlc_instance_t;
                                       psz_name,
                                       psz_input,
@@ -749,52 +590,39 @@ type
                                       i_options : Integer;
                                       ppsz_options : Pointer;
                                       b_enabled : Integer;
-                                      b_loop : Integer;
-                                      p_exception : Plibvlc_exception_t);
+                                      b_loop : Integer);
     procedure libvlc_vlm_play_media(p_instance : Plibvlc_instance_t;
-                                    psz_name : PAnsiChar;
-                                    p_exception : Plibvlc_exception_t);
+                                    psz_name : PAnsiChar);
     procedure libvlc_vlm_stop_media(p_instance : Plibvlc_instance_t;
-                                    psz_name : PAnsiChar;
-                                    p_exception : Plibvlc_exception_t);
+                                    psz_name : PAnsiChar);
     procedure libvlc_vlm_pause_media(p_instance : Plibvlc_instance_t;
-                                     psz_name : PAnsiChar;
-                                     p_exception : Plibvlc_exception_t);
+                                     psz_name : PAnsiChar);
     procedure libvlc_vlm_seek_media(p_instance : Plibvlc_instance_t;
                                     psz_name : PAnsiChar;
-                                    f_percentage : Single;
-                                    p_exception : Plibvlc_exception_t);
+                                    f_percentage : Single);
     function libvlc_vlm_show_media(p_instance : Plibvlc_instance_t;
-                                   psz_name : PAnsiChar;
-                                   p_exception : Plibvlc_exception_t) : PAnsiChar;
+                                   psz_name : PAnsiChar) : PAnsiChar;
     function libvlc_vlm_get_media_instance_position(p_instance : Plibvlc_instance_t;
                                                     psz_name : PAnsiChar;
-                                                    i_instance : Integer;
-                                                    p_exception : Plibvlc_exception_t) : Single;
+                                                    i_instance : Integer) : Single;
     function libvlc_vlm_get_media_instance_time(p_instance : Plibvlc_instance_t;
                                                 psz_name : PAnsiChar;
-                                                i_instance : Integer;
-                                                p_exception : Plibvlc_exception_t) : Integer;
+                                                i_instance : Integer) : Integer;
     function libvlc_vlm_get_media_instance_length(p_instance : Plibvlc_instance_t;
                                                   psz_name : PAnsiChar;
-                                                  i_instance : Integer;
-                                                  p_exception : Plibvlc_exception_t) : Integer;
+                                                  i_instance : Integer) : Integer;
     function libvlc_vlm_get_media_instance_rate(p_instance : Plibvlc_instance_t;
                                                 psz_name : PAnsiChar;
-                                                i_instance : Integer;
-                                                p_exception : Plibvlc_exception_t) : Integer;
+                                                i_instance : Integer) : Integer;
     function libvlc_vlm_get_media_instance_title(p_instance : Plibvlc_instance_t;
                                                  psz_name : PAnsiChar;
-                                                 i_instance : Integer;
-                                                 p_exception : Plibvlc_exception_t) : Integer;
+                                                 i_instance : Integer) : Integer;
     function libvlc_vlm_get_media_instance_chapter(p_instance : Plibvlc_instance_t;
                                                    psz_name : PAnsiChar;
-                                                   i_instance : Integer;
-                                                   p_exception : Plibvlc_exception_t) : Integer;
+                                                   i_instance : Integer) : Integer;
     function libvlc_vlm_get_media_instance_seekable(p_instance : Plibvlc_instance_t;
                                                     psz_name : PAnsiChar;
-                                                    i_instance : Integer;
-                                                    p_exception : Plibvlc_exception_t) : Integer;
+                                                    i_instance : Integer) : Integer;
   end;
 
   ELibVLCNotSupported = type Exception;
@@ -806,22 +634,15 @@ implementation
 type
 
 
-  Tlibvlc_exception_init = procedure(p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_exception_raised = function(p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_exception_raise = procedure(p_exception : Plibvlc_exception_t;
-                                      psz_format : PAnsiChar;
-                                      var AData); cdecl;
-  Tlibvlc_exception_clear = procedure(p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_exception_get_message = function (p_exception : Plibvlc_exception_t) : PAnsiChar; cdecl;
+  Tlibvlc_errmsg = function : PAnsiChar; cdecl;
+  Tlibvlc_clearerr = procedure; cdecl;
 
   Tlibvlc_new = function(argc : Integer;
-                         argv : PPAnsiChar;
-                         p_exception : Plibvlc_exception_t) : Plibvlc_instance_t; cdecl;
+                         argv : PPAnsiChar) : Plibvlc_instance_t; cdecl;
   Tlibvlc_release = procedure(p_instance : Plibvlc_instance_t); cdecl;
   Tlibvlc_retain = procedure(p_instance : Plibvlc_instance_t); cdecl;
   Tlibvlc_add_intf = procedure(p_instalce : Plibvlc_instance_t;
-                               name : PAnsiChar;
-                               p_exception : Plibvlc_exception_t); cdecl;
+                               name : PAnsiChar); cdecl;
   Tlibvlc_wait = procedure(p_instance : Plibvlc_instance_t); cdecl;
   Tlibvlc_get_version = function() : PAnsiChar; cdecl;
   Tlibvlc_get_compiler = function() : PAnsiChar; cdecl;
@@ -831,307 +652,194 @@ type
   Tlibvlc_event_attach = procedure(p_event_manager : Plibvlc_event_manager_t;
                                    event_type : libvlc_event_type_t;
                                    f_callback : libvlc_callback_t;
-                                   userdata : Pointer;
-                                   p_e : Plibvlc_exception_t); cdecl;
+                                   userdata : Pointer); cdecl;
   Tlibvlc_event_detach = procedure(p_event_manager : Plibvlc_event_manager_t;
                                    event_type : libvlc_event_type_t;
                                    f_callback : libvlc_callback_t;
-                                   userdata : Pointer;
-                                   p_e : Plibvlc_exception_t); cdecl;
+                                   userdata : Pointer); cdecl;
   Tlibvlc_event_type_name = function(event_type : libvlc_event_type_t) : PAnsiChar; cdecl;
 
-  Tlibvlc_get_log_verbosity = function(p_instance : Plibvlc_instance_t;
-                                       p_e : Plibvlc_exception_t) : Cardinal; cdecl;
+  Tlibvlc_get_log_verbosity = function(p_instance : Plibvlc_instance_t) : Cardinal; cdecl;
   Tlibvlc_set_log_verbosity = procedure(p_instance : Plibvlc_instance_t;
-                                        level : Cardinal;
-                                        p_e : Plibvlc_exception_t); cdecl;
-  Tlibvlc_log_open = function(p_instance : Plibvlc_instance_t;
-                              p_exception : Plibvlc_exception_t) : Plibvlc_log_t; cdecl;
-  Tlibvlc_log_close = procedure(p_log : Plibvlc_log_t;
-                                p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_log_count = function(p_log : Plibvlc_log_t;
-                               p_exception : Plibvlc_exception_t) : Cardinal; cdecl;
-  Tlibvlc_log_clear = procedure(p_log : Plibvlc_log_t;
-                                p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_log_get_iterator = function(p_log : Plibvlc_log_t;
-                                      p_exception : Plibvlc_exception_t) : Plibvlc_log_iterator_t; cdecl;
-  Tlibvlc_log_iterator_free = procedure(p_iter : Plibvlc_log_iterator_t;
-                                        p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_log_iterator_has_next = function(p_iter : Plibvlc_log_iterator_t;
-                                           p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                        level : Cardinal); cdecl;
+  Tlibvlc_log_open = function(p_instance : Plibvlc_instance_t) : Plibvlc_log_t; cdecl;
+  Tlibvlc_log_close = procedure(p_log : Plibvlc_log_t); cdecl;
+  Tlibvlc_log_count = function(p_log : Plibvlc_log_t) : Cardinal; cdecl;
+  Tlibvlc_log_clear = procedure(p_log : Plibvlc_log_t); cdecl;
+  Tlibvlc_log_get_iterator = function(p_log : Plibvlc_log_t) : Plibvlc_log_iterator_t; cdecl;
+  Tlibvlc_log_iterator_free = procedure(p_iter : Plibvlc_log_iterator_t); cdecl;
+  Tlibvlc_log_iterator_has_next = function(p_iter : Plibvlc_log_iterator_t) : Integer; cdecl;
   Tlibvlc_log_iterator_next = function(p_iter : Plibvlc_log_iterator_t;
-                                       p_buffer : Plibvlc_log_message_t;
-                                       p_exception : Plibvlc_exception_t) : Plibvlc_log_message_t; cdecl;
+                                       p_buffer : Plibvlc_log_message_t) : Plibvlc_log_message_t; cdecl;
 
-  Tlibvlc_media_new = function(p_instance : Plibvlc_instance_t;
-                               psz_mrl : PAnsiChar;
-                               p_exception : Plibvlc_exception_t) : Plibvlc_media_t; cdecl;
+  Tlibvlc_media_new_location = function(p_instance : Plibvlc_instance_t;
+                                        psz_mrl : PAnsiChar) : Plibvlc_media_t; cdecl;
   Tlibvlc_media_new_as_node = function(p_instance : Plibvlc_instance_t;
-                                       psz_name : PAnsiChar;
-                                       p_exception : Plibvlc_exception_t) : Plibvlc_media_t; cdecl;
+                                       psz_name : PAnsiChar) : Plibvlc_media_t; cdecl;
   Tlibvlc_media_add_option = procedure(p_media : Plibvlc_media_t;
-                                       ppsz_options : PAnsiChar;
-                                       p_exception : Plibvlc_exception_t); cdecl;
+                                       ppsz_options : PAnsiChar); cdecl;
   Tlibvlc_media_add_option_untrusted = procedure(p_media : Plibvlc_media_t;
-                                                 ppsz_options : PAnsiChar;
-                                                 p_exception : Plibvlc_exception_t); cdecl;
+                                                 ppsz_options : PAnsiChar); cdecl;
   Tlibvlc_media_retain = procedure(p_media : Plibvlc_media_t); cdecl;
   Tlibvlc_media_release = procedure(p_media : Plibvlc_media_t); cdecl;
-  Tlibvlc_media_get_mrl = function(p_media : Plibvlc_media_t;
-                                   p_exception : Plibvlc_exception_t) : PAnsiChar; cdecl;
+  Tlibvlc_media_get_mrl = function(p_media : Plibvlc_media_t) : PAnsiChar; cdecl;
   Tlibvlc_media_duplicate = function(p_media : Plibvlc_media_t) : Plibvlc_media_t; cdecl;
   Tlibvlc_media_get_meta = function(p_media : Plibvlc_media_t;
-                                    e_meta : libvlc_meta_t;
-                                    p_exception : Plibvlc_exception_t) : PAnsiChar; cdecl;
-  Tlibvlc_media_get_state = function(p_media : Plibvlc_media_t;
-                                     p_exception : Plibvlc_exception_t) : libvlc_state_t; cdecl;
-  Tlibvlc_media_subitems = function(p_media : Plibvlc_media_t;
-                                    p_exception : Plibvlc_exception_t) : Plibvlc_media_list_t; cdecl;
-  Tlibvlc_media_event_manager = function(p_media : Plibvlc_media_t;
-                                         p_exception : Plibvlc_exception_t) : Plibvlc_event_manager_t; cdecl;
-  Tlibvlc_media_get_duration = function(p_media : Plibvlc_media_t;
-                                        p_exception : Plibvlc_exception_t) : libvlc_time_t; cdecl;
-  Tlibvlc_media_is_preparsed = function(p_media : Plibvlc_media_t;
-                                        p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                    e_meta : libvlc_meta_t) : PAnsiChar; cdecl;
+  Tlibvlc_media_get_state = function(p_media : Plibvlc_media_t) : libvlc_state_t; cdecl;
+  Tlibvlc_media_subitems = function(p_media : Plibvlc_media_t) : Plibvlc_media_list_t; cdecl;
+  Tlibvlc_media_event_manager = function(p_media : Plibvlc_media_t) : Plibvlc_event_manager_t; cdecl;
+  Tlibvlc_media_get_duration = function(p_media : Plibvlc_media_t) : libvlc_time_t; cdecl;
+  Tlibvlc_media_is_preparsed = function(p_media : Plibvlc_media_t) : Integer; cdecl;
   Tlibvlc_media_set_user_data = procedure(p_media : Plibvlc_media_t;
-                                          p_new_user_data : Pointer;
-                                          p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_get_user_data = function(p_media : Plibvlc_media_t;
-                                         p_exception : Plibvlc_exception_t) : Pointer; cdecl;
+                                          p_new_user_data : Pointer); cdecl;
+  Tlibvlc_media_get_user_data = function(p_media : Plibvlc_media_t) : Pointer; cdecl;
 
-  Tlibvlc_media_list_new = function(p_instance : Plibvlc_instance_t;
-                                   p_exception : Plibvlc_exception_t) : Plibvlc_media_list_t; cdecl;
+  Tlibvlc_media_list_new = function(p_instance : Plibvlc_instance_t) : Plibvlc_media_list_t; cdecl;
   Tlibvlc_media_list_release = procedure(p_media_list : Plibvlc_media_list_t); cdecl;
   Tlibvlc_media_list_retain = procedure(p_media_list : Plibvlc_media_list_t); cdecl;
   Tlibvlc_media_list_set_media = procedure(p_media_list : Plibvlc_media_list_t;
-                                           p_media : Plibvlc_media_t;
-                                           p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_list_media = function(p_media_list : Plibvlc_media_list_t;
-                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_t; cdecl;
+                                           p_media : Plibvlc_media_t); cdecl;
+  Tlibvlc_media_list_media = function(p_media_list : Plibvlc_media_list_t) : Plibvlc_media_t; cdecl;
   Tlibvlc_media_list_add_media = procedure(p_media_list : Plibvlc_media_list_t;
-                                           p_media : Plibvlc_media_t;
-                                           p_exception : Plibvlc_exception_t); cdecl;
+                                           p_media : Plibvlc_media_t); cdecl;
   Tlibvlc_media_list_insert_media = procedure(p_media_list : Plibvlc_media_list_t;
                                               p_media : Plibvlc_media_t;
-                                              index : Integer;
-                                              p_exception : Plibvlc_exception_t); cdecl;
+                                              index : Integer); cdecl;
   Tlibvlc_media_list_remove_index = procedure(p_media_list : Plibvlc_media_list_t;
-                                              index : Integer;
-                                              p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_list_count = function(p_media_list : Plibvlc_media_list_t;
-                                      p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                              index : Integer); cdecl;
+  Tlibvlc_media_list_count = function(p_media_list : Plibvlc_media_list_t) : Integer; cdecl;
   Tlibvlc_media_list_item_at_index = function(p_media_list : Plibvlc_media_list_t;
-                                              index : Integer;
-                                              p_exception : Plibvlc_exception_t) : Plibvlc_media_t; cdecl;
+                                              index : Integer) : Plibvlc_media_t; cdecl;
   Tlibvlc_media_list_index_of_item = function(p_media_list : Plibvlc_media_list_t;
-                                              p_media : Plibvlc_media_t;
-                                              p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                              p_media : Plibvlc_media_t) : Integer; cdecl;
   Tlibvlc_media_list_is_readonly = function(p_media_list : Plibvlc_media_list_t) : Integer; cdecl;
   Tlibvlc_media_list_lock = procedure(p_media_list : Plibvlc_media_list_t); cdecl;
   Tlibvlc_media_list_unlock = procedure(p_media_list : Plibvlc_media_list_t); cdecl;
-  Tlibvlc_media_list_flat_view = function(p_media_list : Plibvlc_media_list_t;
-                                          p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t; cdecl;
-  Tlibvlc_media_list_hierarchical_view = function(p_media_list : Plibvlc_media_list_t;
-                                                  p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t; cdecl;
-  Tlibvlc_media_list_hierarchical_node_view = function(p_media_list : Plibvlc_media_list_t;
-                                                       p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t; cdecl;
-  Tlibvlc_media_list_event_manager = function(p_media_list : Plibvlc_media_list_t;
-                                              p_exception : Plibvlc_exception_t) : Plibvlc_event_manager_t; cdecl;
+  Tlibvlc_media_list_flat_view = function(p_media_list : Plibvlc_media_list_t) : Plibvlc_media_list_view_t; cdecl;
+  Tlibvlc_media_list_hierarchical_view = function(p_media_list : Plibvlc_media_list_t) : Plibvlc_media_list_view_t; cdecl;
+  Tlibvlc_media_list_hierarchical_node_view = function(p_media_list : Plibvlc_media_list_t) : Plibvlc_media_list_view_t; cdecl;
+  Tlibvlc_media_list_event_manager = function(p_media_list : Plibvlc_media_list_t) : Plibvlc_event_manager_t; cdecl;
 
   Tlibvlc_media_list_view_retain = procedure(p_media_list_view : Plibvlc_media_list_view_t); cdecl;
   Tlibvlc_media_list_view_release = procedure(p_media_list_view : Plibvlc_media_list_view_t); cdecl;
   Tlibvlc_media_list_view_event_manager = function(p_media_list_view : Plibvlc_media_list_view_t) : Plibvlc_event_manager_t; cdecl;
-  Tlibvlc_media_list_view_count = function(p_media_list_view : Plibvlc_media_list_view_t;
-                                           p_exception : Plibvlc_exception_t) : Integer; cdecl;
+  Tlibvlc_media_list_view_count = function(p_media_list_view : Plibvlc_media_list_view_t) : Integer; cdecl;
   Tlibvlc_media_list_view_item_at_index = function(p_media_list_view : Plibvlc_media_list_view_t;
-                                                   i_index : Integer;
-                                                   p_exception : Plibvlc_exception_t) : Plibvlc_media_t; cdecl;
+                                                   i_index : Integer) : Plibvlc_media_t; cdecl;
   Tlibvlc_media_list_view_children_at_index = function(p_media_list_view : Plibvlc_media_list_view_t;
-                                                      index : Integer;
-                                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t; cdecl;
+                                                      index : Integer) : Plibvlc_media_list_view_t; cdecl;
   Tlibvlc_media_list_view_children_for_item = function(p_media_list_view : Plibvlc_media_list_view_t;
-                                                       p_media : Plibvlc_media_t;
-                                                       p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t; cdecl;
+                                                       p_media : Plibvlc_media_t) : Plibvlc_media_list_view_t; cdecl;
   Tlibvlc_media_list_view_index_of_item = function(p_media_list_view : Plibvlc_media_list_view_t;
-                                                   p_media : Plibvlc_media_t;
-                                                   p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                                   p_media : Plibvlc_media_t) : Integer; cdecl;
   Tlibvlc_media_list_view_insert_at_index = procedure(p_media_list_view : Plibvlc_media_list_view_t;
                                                       p_media : Plibvlc_media_t;
-                                                      index : Integer;
-                                                      p_exception : Plibvlc_exception_t); cdecl;
+                                                      index : Integer); cdecl;
   Tlibvlc_media_list_view_remove_at_index = procedure(p_media_list_view : Plibvlc_media_list_view_t;
-                                                      index : Integer;
-                                                      p_exception : Plibvlc_exception_t); cdecl;
+                                                      index : Integer); cdecl;
   Tlibvlc_media_list_view_add_item = procedure(p_media_list_view : Plibvlc_media_list_view_t;
-                                               p_media : Plibvlc_media_t;
-                                               p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_list_view_parent_media_list = function(p_media_list_view : Plibvlc_media_list_view_t;
-                                                       p_exception : Plibvlc_exception_t) : Plibvlc_media_list_t; cdecl;
+                                               p_media : Plibvlc_media_t); cdecl;
+  Tlibvlc_media_list_view_parent_media_list = function(p_media_list_view : Plibvlc_media_list_view_t) : Plibvlc_media_list_t; cdecl;
 
-  Tlibvlc_media_library_new = function(p_instance : Plibvlc_instance_t;
-                                       p_exception : Plibvlc_exception_t) : Plibvlc_media_library_t; cdecl;
+  Tlibvlc_media_library_new = function(p_instance : Plibvlc_instance_t) : Plibvlc_media_library_t; cdecl;
   Tlibvlc_media_library_release = procedure(p_mlib : Plibvlc_media_library_t); cdecl;
   Tlibvlc_media_library_retain = procedure(p_mlib : Plibvlc_media_library_t); cdecl;
-  Tlibvlc_media_library_load = procedure(p_mlib : Plibvlc_media_library_t;
-                                         p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_library_save = procedure(p_mlib : Plibvlc_media_library_t;
-                                         p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_library_media_list = function(p_mlib : Plibvlc_media_library_t;
-                                              p_exception : Plibvlc_exception_t) : Plibvlc_media_list_t; cdecl;
+  Tlibvlc_media_library_load = procedure(p_mlib : Plibvlc_media_library_t); cdecl;
+  Tlibvlc_media_library_save = procedure(p_mlib : Plibvlc_media_library_t); cdecl;
+  Tlibvlc_media_library_media_list = function(p_mlib : Plibvlc_media_library_t) : Plibvlc_media_list_t; cdecl;
 
-  Tlibvlc_media_player_new = function(p_instance : Plibvlc_instance_t;
-                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_player_t; cdecl;
-  Tlibvlc_media_player_new_from_media = function(p_media : Plibvlc_media_t;
-                                                 p_exception : Plibvlc_exception_t) : Plibvlc_media_player_t; cdecl;
+  Tlibvlc_media_player_new = function(p_instance : Plibvlc_instance_t) : Plibvlc_media_player_t; cdecl;
+  Tlibvlc_media_player_new_from_media = function(p_media : Plibvlc_media_t) : Plibvlc_media_player_t; cdecl;
   Tlibvlc_media_player_release = procedure(p_media_player : Plibvlc_media_player_t); cdecl;
   Tlibvlc_media_player_retain = procedure(p_media_player : Plibvlc_media_player_t); cdecl;
   Tlibvlc_media_player_set_media = procedure(p_media_player : Plibvlc_media_player_t;
-                                             p_media : Plibvlc_media_t;
-                                             p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_player_get_media = function(p_media_player : Plibvlc_media_player_t;
-                                            p_exception : Plibvlc_exception_t) : Plibvlc_media_t; cdecl;
-  Tlibvlc_media_player_event_manager = function(p_media_player : Plibvlc_media_player_t;
-                                                p_exception : Plibvlc_exception_t) : Plibvlc_event_manager_t; cdecl;
-  Tlibvlc_media_player_is_playing = function(p_media_player : Plibvlc_media_player_t;
-                                             p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_media_player_play = procedure(p_media_player : Plibvlc_media_player_t;
-                                        p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_player_pause = procedure(p_media_player : Plibvlc_media_player_t;
-                                         p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_player_stop = procedure(p_media_player : Plibvlc_media_player_t;
-                                        p_exception : Plibvlc_exception_t); cdecl;
+                                             p_media : Plibvlc_media_t); cdecl;
+  Tlibvlc_media_player_get_media = function(p_media_player : Plibvlc_media_player_t) : Plibvlc_media_t; cdecl;
+  Tlibvlc_media_player_event_manager = function(p_media_player : Plibvlc_media_player_t) : Plibvlc_event_manager_t; cdecl;
+  Tlibvlc_media_player_is_playing = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_media_player_play = procedure(p_media_player : Plibvlc_media_player_t); cdecl;
+  Tlibvlc_media_player_pause = procedure(p_media_player : Plibvlc_media_player_t); cdecl;
+  Tlibvlc_media_player_stop = procedure(p_media_player : Plibvlc_media_player_t); cdecl;
   Tlibvlc_media_player_set_nsobject = procedure(p_media_player : Plibvlc_media_player_t;
-                                                drawable : Pointer;
-                                                p_exception : Plibvlc_exception_t); cdecl;
+                                                drawable : Pointer); cdecl;
   Tlibvlc_media_player_get_nsobject = function(p_media_player : Plibvlc_media_player_t) : Pointer; cdecl;
   Tlibvlc_media_player_set_agl = procedure(p_media_player : Plibvlc_media_player_t;
-                                           drawable : Cardinal;
-                                           p_exception : Plibvlc_exception_t); cdecl;
+                                           drawable : Cardinal); cdecl;
   Tlibvlc_media_player_get_agl = function(p_media_player : Plibvlc_media_player_t) : Cardinal; cdecl;
   Tlibvlc_media_player_set_xwindow = procedure(p_media_player : Plibvlc_media_player_t;
-                                               drawable : Cardinal;
-                                               p_exception : Plibvlc_exception_t); cdecl;
+                                               drawable : Cardinal); cdecl;
   Tlibvlc_media_player_get_xwindow = function(p_media_player : Plibvlc_media_player_t) : Cardinal; cdecl;
   Tlibvlc_media_player_set_hwnd = procedure(p_media_player : Plibvlc_media_player_t;
-                                            drawable : Pointer;
-                                            p_exception : Plibvlc_exception_t); cdecl;
+                                            drawable : Pointer); cdecl;
   Tlibvlc_media_player_get_hwnd = function(p_media_player : Plibvlc_media_player_t) : Pointer; cdecl;
-  Tlibvlc_media_player_get_length = function(p_media_player : Plibvlc_media_player_t;
-                                             p_exception : Plibvlc_exception_t) : libvlc_time_t; cdecl;
-  Tlibvlc_media_player_get_time = function(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : libvlc_time_t; cdecl;
+  Tlibvlc_media_player_get_length = function(p_media_player : Plibvlc_media_player_t) : libvlc_time_t; cdecl;
+  Tlibvlc_media_player_get_time = function(p_media_player : Plibvlc_media_player_t) : libvlc_time_t; cdecl;
   Tlibvlc_media_player_set_time = procedure(p_media_player : Plibvlc_media_player_t;
-                                            time : libvlc_time_t;
-                                            p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_player_get_position = function(p_media_player : Plibvlc_media_player_t;
-                                               p_exception : Plibvlc_exception_t) : Single; cdecl;
+                                            time : libvlc_time_t); cdecl;
+  Tlibvlc_media_player_get_position = function(p_media_player : Plibvlc_media_player_t) : Single; cdecl;
   Tlibvlc_media_player_set_position = procedure(p_media_player : Plibvlc_media_player_t;
-                                                position : Single;
-                                                p_exception : Plibvlc_exception_t); cdecl;
+                                                position : Single); cdecl;
   Tlibvlc_media_player_set_chapter = procedure(p_media_player : Plibvlc_media_player_t;
-                                               chapter : Integer;
-                                               p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_player_get_chapter = function(p_media_player : Plibvlc_media_player_t;
-                                              p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_media_player_get_chapter_count = function(p_media_player : Plibvlc_media_player_t;
-                                                    p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_media_player_will_play = function(p_media_player : Plibvlc_media_player_t;
-                                            p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                               chapter : Integer); cdecl;
+  Tlibvlc_media_player_get_chapter = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_media_player_get_chapter_count = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_media_player_will_play = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
   Tlibvlc_media_player_get_chapter_count_for_title = function(p_media_player : Plibvlc_media_player_t;
-                                                              title : Integer;
-                                                              p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                                              title : Integer) : Integer; cdecl;
   Tlibvlc_media_player_set_title = procedure(p_media_player : Plibvlc_media_player_t;
-                                             title : Integer;
-                                             p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_player_get_title = function(p_media_player : Plibvlc_media_player_t;
-                                            p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_media_player_get_title_count = function(p_media_player : Plibvlc_media_player_t;
-                                                  p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_media_player_previous_chapter = procedure(p_media_player : Plibvlc_media_player_t;
-                                                    p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_player_next_chapter = procedure(p_media_player : Plibvlc_media_player_t;
-                                                p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_player_get_rate = function(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Single; cdecl;
+                                             title : Integer); cdecl;
+  Tlibvlc_media_player_get_title = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_media_player_get_title_count = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_media_player_previous_chapter = procedure(p_media_player : Plibvlc_media_player_t); cdecl;
+  Tlibvlc_media_player_next_chapter = procedure(p_media_player : Plibvlc_media_player_t); cdecl;
+  Tlibvlc_media_player_get_rate = function(p_media_player : Plibvlc_media_player_t) : Single; cdecl;
   Tlibvlc_media_player_set_rate = procedure(p_media_player : Plibvlc_media_player_t;
-                                            rate : Single;
-                                            p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_player_get_state = function(p_media_player : Plibvlc_media_player_t;
-                                            p_exception : Plibvlc_exception_t) : libvlc_state_t; cdecl;
-  Tlibvlc_media_player_get_fps = function(p_media_player : Plibvlc_media_player_t;
-                                          p_exception : Plibvlc_exception_t) : Single; cdecl;
-  Tlibvlc_media_player_has_vout = function(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_media_player_is_seekable = function(p_media_player : Plibvlc_media_player_t;
-                                              p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_media_player_can_pause = function(p_media_player : Plibvlc_media_player_t;
-                                            p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                            rate : Single); cdecl;
+  Tlibvlc_media_player_get_state = function(p_media_player : Plibvlc_media_player_t) : libvlc_state_t; cdecl;
+  Tlibvlc_media_player_get_fps = function(p_media_player : Plibvlc_media_player_t) : Single; cdecl;
+  Tlibvlc_media_player_has_vout = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_media_player_is_seekable = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_media_player_can_pause = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
   Tlibvlc_track_description_release = procedure(p_track_description : Plibvlc_track_description_t); cdecl;
-  Tlibvlc_toggle_fullscreen = procedure(p_media_player : Plibvlc_media_player_t;
-                                        p_exception : Plibvlc_exception_t); cdecl;
+  Tlibvlc_toggle_fullscreen = procedure(p_media_player : Plibvlc_media_player_t); cdecl;
   Tlibvlc_set_fullscreen = procedure(p_media_player : Plibvlc_media_player_t;
-                                     enabled : Integer;
-                                     p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_get_fullscreen = function(p_media_player : Plibvlc_media_player_t;
-                                    p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_video_get_height = function(p_media_player : Plibvlc_media_player_t;
-                                      p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_video_get_width = function(p_media_player : Plibvlc_media_player_t;
-                                     p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_video_get_scale = function(p_media_player : Plibvlc_media_player_t;
-                                     p_exception : Plibvlc_exception_t) : Single; cdecl;
+                                     enabled : Integer); cdecl;
+  Tlibvlc_get_fullscreen = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_video_get_height = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_video_get_width = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_video_get_scale = function(p_media_player : Plibvlc_media_player_t) : Single; cdecl;
   Tlibvlc_video_set_scale = procedure(p_media_player : Plibvlc_media_player_t;
-                                      scale : Single;
-                                      p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_video_get_aspect_ratio = function(p_media_player : Plibvlc_media_player_t;
-                                            p_exception : Plibvlc_exception_t) : PAnsiChar; cdecl;
+                                      scale : Single); cdecl;
+  Tlibvlc_video_get_aspect_ratio = function(p_media_player : Plibvlc_media_player_t) : PAnsiChar; cdecl;
   Tlibvlc_video_set_aspect_ratio = procedure(p_media_player : Plibvlc_media_player_t;
-                                             psz_aspect : PAnsiChar;
-                                             p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_video_get_spu = function(p_media_player : Plibvlc_media_player_t;
-                                   p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_video_get_spu_count = function(p_media_player : Plibvlc_media_player_t;
-                                         p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_video_get_spu_description = function(p_media_player : Plibvlc_media_player_t;
-                                               p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t; cdecl;
+                                             psz_aspect : PAnsiChar); cdecl;
+  Tlibvlc_video_get_spu = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_video_get_spu_count = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_video_get_spu_description = function(p_media_player : Plibvlc_media_player_t) : Plibvlc_track_description_t; cdecl;
   Tlibvlc_video_set_spu = procedure(p_media_player : Plibvlc_media_player_t;
-                                    i_spu : Integer;
-                                    p_exception : Plibvlc_exception_t); cdecl;
+                                    i_spu : Integer); cdecl;
   Tlibvlc_video_set_subtitle_file = function(p_media_player : Plibvlc_media_player_t;
-                                             filename : PAnsiChar;
-                                             p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_video_get_title_description = function(p_media_player : Plibvlc_media_player_t;
-                                                 p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t; cdecl;
+                                             filename : PAnsiChar) : Integer; cdecl;
+  Tlibvlc_video_get_title_description = function(p_media_player : Plibvlc_media_player_t) : Plibvlc_track_description_t; cdecl;
   Tlibvlc_video_get_chapter_description = function(p_media_player : Plibvlc_media_player_t;
-                                                   title : Integer;
-                                                   p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t; cdecl;
-  Tlibvlc_video_get_crop_geometry = function(p_media_player : Plibvlc_media_player_t;
-                                             p_exception : Plibvlc_exception_t) : PAnsiChar; cdecl;
+                                                   title : Integer) : Plibvlc_track_description_t; cdecl;
+  Tlibvlc_video_get_crop_geometry = function(p_media_player : Plibvlc_media_player_t) : PAnsiChar; cdecl;
   Tlibvlc_video_set_crop_geometry = procedure(p_media_player : Plibvlc_media_player_t;
-                                              geometry : PAnsiChar;
-                                              p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_toggle_teletext = procedure(p_media_player : Plibvlc_media_player_t;
-                                      p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_video_get_teletext = function(p_media_player : Plibvlc_media_player_t;
-                                        p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                              geometry : PAnsiChar); cdecl;
+  Tlibvlc_toggle_teletext = procedure(p_media_player : Plibvlc_media_player_t); cdecl;
+  Tlibvlc_video_get_teletext = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
   Tlibvlc_video_set_teletext = procedure(p_media_player : Plibvlc_media_player_t;
-                                         page : Integer;
-                                         p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_video_get_track_count = function(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_video_get_track_description = function(p_media_player : Plibvlc_media_player_t;
-                                                 p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t; cdecl;
-  Tlibvlc_video_get_track = function(p_media_player : Plibvlc_media_player_t;
-                                     p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                         page : Integer); cdecl;
+  Tlibvlc_video_get_track_count = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_video_get_track_description = function(p_media_player : Plibvlc_media_player_t) : Plibvlc_track_description_t; cdecl;
+  Tlibvlc_video_get_track = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
   Tlibvlc_video_set_track = procedure(p_media_player : Plibvlc_media_player_t;
-                                      track : Integer;
-                                      p_exception : Plibvlc_exception_t); cdecl;
+                                      track : Integer); cdecl;
   Tlibvlc_video_take_snapshot = procedure(p_media_player : Plibvlc_media_player_t;
                                           filepath : PAnsiChar;
-                                          width, height : Integer;
-                                          p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_audio_output_list_get = function(p_instance : Plibvlc_instance_t;
-                                           p_exception : Plibvlc_exception_t) : Plibvlc_audio_output_t; cdecl;
+                                          width, height : Integer); cdecl;
+  Tlibvlc_audio_output_list_get = function(p_instance : Plibvlc_instance_t) : Plibvlc_audio_output_t; cdecl;
   Tlibvlc_audio_output_list_release = procedure(audio_output_list : Plibvlc_audio_output_t); cdecl;
   Tlibvlc_audio_output_set = function(p_instance : Plibvlc_instance_t;
                                       psz_audio_output : PAnsiChar) : Integer; cdecl;
@@ -1146,76 +854,50 @@ type
   Tlibvlc_audio_output_device_set = procedure(p_instance : Plibvlc_instance_t;
                                               psz_audio_output : PAnsiChar;
                                               device : PAnsiChar); cdecl;
-  Tlibvlc_audio_output_get_device_type = function(p_instance : Plibvlc_instance_t;
-                                                  p_exception : Plibvlc_exception_t) : Integer; cdecl;
+  Tlibvlc_audio_output_get_device_type = function(p_instance : Plibvlc_instance_t) : Integer; cdecl;
   Tlibvlc_audio_output_set_device_type = procedure(p_instance : Plibvlc_instance_t;
-                                                   device_type : Integer;
-                                                   p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_audio_toggle_mute = procedure(p_instance : Plibvlc_instance_t;
-                                        p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_audio_get_mute = function(p_instance : Plibvlc_instance_t;
-                                    p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                                   device_type : Integer); cdecl;
+  Tlibvlc_audio_toggle_mute = procedure(p_instance : Plibvlc_instance_t); cdecl;
+  Tlibvlc_audio_get_mute = function(p_instance : Plibvlc_instance_t) : Integer; cdecl;
   Tlibvlc_audio_set_mute = procedure(p_instance : Plibvlc_instance_t;
-                                     status : Integer;
-                                     p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_audio_get_volume = function(p_instance : Plibvlc_instance_t;
-                                      p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                     status : Integer); cdecl;
+  Tlibvlc_audio_get_volume = function(p_instance : Plibvlc_instance_t) : Integer; cdecl;
   Tlibvlc_audio_set_volume = procedure(p_instance : Plibvlc_instance_t;
-                                       volume : Integer;
-                                       p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_audio_get_track_count = function(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_audio_get_track_description = function(p_media_player : Plibvlc_media_player_t;
-                                                 p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t; cdecl;
-  Tlibvlc_audio_get_track = function(p_media_player : Plibvlc_media_player_t;
-                                     p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_audio_set_track = procedure(p_media_player : Plibvlc_media_player_t;
-                                      p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_audio_get_channel = function(p_instance : Plibvlc_instance_t;
-                                       p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                       volume : Integer); cdecl;
+  Tlibvlc_audio_get_track_count = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_audio_get_track_description = function(p_media_player : Plibvlc_media_player_t) : Plibvlc_track_description_t; cdecl;
+  Tlibvlc_audio_get_track = function(p_media_player : Plibvlc_media_player_t) : Integer; cdecl;
+  Tlibvlc_audio_set_track = procedure(p_media_player : Plibvlc_media_player_t); cdecl;
+  Tlibvlc_audio_get_channel = function(p_instance : Plibvlc_instance_t) : Integer; cdecl;
   Tlibvlc_audio_set_channel = procedure(p_instance : Plibvlc_instance_t;
-                                        channel : Integer;
-                                        p_exception : Plibvlc_exception_t); cdecl;
+                                        channel : Integer); cdecl;
 
-  Tlibvlc_media_list_player_new = function(p_instance : Plibvlc_instance_t;
-                                           p_exception : Plibvlc_exception_t) : Plibvlc_media_list_player_t; cdecl;
+  Tlibvlc_media_list_player_new = function(p_instance : Plibvlc_instance_t) : Plibvlc_media_list_player_t; cdecl;
   Tlibvlc_media_list_player_release = procedure(p_mlp : Plibvlc_media_list_player_t); cdecl;
   Tlibvlc_media_list_player_set_media_player = procedure(p_mlp : Plibvlc_media_list_player_t;
-                                                         p_media_player : Plibvlc_media_player_t;
-                                                         p_exception : Plibvlc_exception_t); cdecl;
+                                                         p_media_player : Plibvlc_media_player_t); cdecl;
   Tlibvlc_media_list_player_set_media_list = procedure(p_mlp : Plibvlc_media_list_player_t;
-                                                       p_media_list : Plibvlc_media_list_t;
-                                                       p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_list_player_play = procedure(p_mlp : Plibvlc_media_list_player_t;
-                                             p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_list_player_pause = procedure(p_mlp : Plibvlc_media_list_player_t;
-                                              p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_list_player_is_playing = function(p_mlp : Plibvlc_media_list_player_t;
-                                                  p_exception : Plibvlc_exception_t) : Integer; cdecl;
-  Tlibvlc_media_list_player_get_state = function(p_mlp : Plibvlc_media_list_player_t;
-                                                 p_exception : Plibvlc_exception_t) : libvlc_state_t; cdecl;
+                                                       p_media_list : Plibvlc_media_list_t); cdecl;
+  Tlibvlc_media_list_player_play = procedure(p_mlp : Plibvlc_media_list_player_t); cdecl;
+  Tlibvlc_media_list_player_pause = procedure(p_mlp : Plibvlc_media_list_player_t); cdecl;
+  Tlibvlc_media_list_player_is_playing = function(p_mlp : Plibvlc_media_list_player_t) : Integer; cdecl;
+  Tlibvlc_media_list_player_get_state = function(p_mlp : Plibvlc_media_list_player_t) : libvlc_state_t; cdecl;
   Tlibvlc_media_list_player_play_item_at_index = procedure(p_mlp : Plibvlc_media_list_player_t;
-                                                           i_index : Integer;
-                                                           p_exception : Plibvlc_exception_t); cdecl;
+                                                           i_index : Integer); cdecl;
   Tlibvlc_media_list_player_play_item = procedure(p_mlp : Plibvlc_media_list_player_t;
-                                                  p_media : Plibvlc_media_t;
-                                                  p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_list_player_stop = procedure(p_mlp : Plibvlc_media_list_player_t;
-                                             p_exception : Plibvlc_exception_t); cdecl;
-  Tlibvlc_media_list_player_next = procedure(p_mlp : Plibvlc_media_list_player_t;
-                                             p_exception : Plibvlc_exception_t); cdecl;
+                                                  p_media : Plibvlc_media_t); cdecl;
+  Tlibvlc_media_list_player_stop = procedure(p_mlp : Plibvlc_media_list_player_t); cdecl;
+  Tlibvlc_media_list_player_next = procedure(p_mlp : Plibvlc_media_list_player_t); cdecl;
 
   Tlibvlc_media_discoverer_new_from_name = function(p_instance : Plibvlc_instance_t;
-                                                    psz_name : PAnsiChar;
-                                                    p_exception : Plibvlc_exception_t) : Plibvlc_media_discoverer_t; cdecl;
+                                                    psz_name : PAnsiChar) : Plibvlc_media_discoverer_t; cdecl;
   Tlibvlc_media_discoverer_release = procedure(p_mdis : Plibvlc_media_discoverer_t); cdecl;
   Tlibvlc_media_discoverer_localized_name = function(p_mdis : Plibvlc_media_discoverer_t) : PAnsiChar; cdecl;
   Tlibvlc_media_discoverer_media_list = function(p_mdis : Plibvlc_media_discoverer_t) : Plibvlc_media_list_t; cdecl;
   Tlibvlc_media_discoverer_event_manager = function(p_mdis : Plibvlc_media_discoverer_t) : Plibvlc_event_manager_t; cdecl;
   Tlibvlc_media_discoverer_is_running = function(p_mdis : Plibvlc_media_discoverer_t) : Integer; cdecl;
 
-  Tlibvlc_vlm_release = procedure(p_instance : Plibvlc_instance_t;
-                                  p_exception : Plibvlc_exception_t); cdecl;
+  Tlibvlc_vlm_release = procedure(p_instance : Plibvlc_instance_t); cdecl;
   Tlibvlc_vlm_add_broadcast = procedure(p_instance : Plibvlc_instance_t;
                                         psz_name,
                                         psz_input,
@@ -1223,43 +905,34 @@ type
                                         options : Integer;
                                         ppsz_options : Pointer;
                                         b_enabled : Integer;
-                                        b_loop : Integer;
-                                        p_exception : Plibvlc_exception_t); cdecl;
+                                        b_loop : Integer); cdecl;
   Tlibvlc_vlm_add_vod = procedure(p_instance : Plibvlc_instance_t;
                                   psz_name,
                                   psz_input : PAnsiChar;
                                   i_options : Integer;
                                   ppsz_options : Pointer;
                                   b_enabled : Integer;
-                                  psz_mux : PAnsiChar;
-                                  p_exception : Plibvlc_exception_t); cdecl;
+                                  psz_mux : PAnsiChar); cdecl;
   Tlibvlc_vlm_del_media = procedure(p_instance : Plibvlc_instance_t;
-                                    psz_name : PAnsiChar;
-                                    p_exception : Plibvlc_exception_t); cdecl;
+                                    psz_name : PAnsiChar); cdecl;
   Tlibvlc_vlm_set_enabled = procedure(p_instance : Plibvlc_instance_t;
                                       psz_name : PAnsiChar;
-                                      b_enabled : Integer;
-                                      p_exception : Plibvlc_exception_t); cdecl;
+                                      b_enabled : Integer); cdecl;
   Tlibvlc_vlm_set_output = procedure(p_instance : Plibvlc_instance_t;
                                      psz_name : PAnsiChar;
-                                     psz_output : PAnsiChar;
-                                     p_exception : Plibvlc_exception_t); cdecl;
+                                     psz_output : PAnsiChar); cdecl;
   Tlibvlc_vlm_set_input = procedure(p_instance : Plibvlc_instance_t;
                                     psz_name : PAnsiChar;
-                                    psz_input : PAnsiChar;
-                                    p_exception : Plibvlc_exception_t); cdecl;
+                                    psz_input : PAnsiChar); cdecl;
   Tlibvlc_vlm_add_input = procedure(p_instance : Plibvlc_instance_t;
                                     psz_name : PAnsiChar;
-                                    pst_input : PAnsiChar;
-                                    p_exception : Plibvlc_exception_t); cdecl;
+                                    pst_input : PAnsiChar); cdecl;
   Tlibvlc_vlm_set_loop = procedure(p_instance : Plibvlc_instance_t;
                                    psz_name : PAnsiChar;
-                                   b_loop : Integer;
-                                   p_exception : Plibvlc_exception_t); cdecl;
+                                   b_loop : Integer); cdecl;
   Tlibvlc_vlm_set_mux = procedure(p_instance : Plibvlc_instance_t;
                                   psz_name : PAnsiChar;
-                                  psz_mux : PAnsiChar;
-                                  p_exception : Plibvlc_exception_t); cdecl;
+                                  psz_mux : PAnsiChar); cdecl;
   Tlibvlc_vlm_change_media = procedure(p_instance : Plibvlc_instance_t;
                                        psz_name,
                                        psz_input,
@@ -1267,63 +940,47 @@ type
                                        i_options : Integer;
                                        ppsz_options : Pointer;
                                        b_enabled : Integer;
-                                       b_loop : Integer;
-                                       p_exception : Plibvlc_exception_t); cdecl;
+                                       b_loop : Integer); cdecl;
   Tlibvlc_vlm_play_media = procedure(p_instance : Plibvlc_instance_t;
-                                     psz_name : PAnsiChar;
-                                     p_exception : Plibvlc_exception_t); cdecl;
+                                     psz_name : PAnsiChar); cdecl;
   Tlibvlc_vlm_stop_media = procedure(p_instance : Plibvlc_instance_t;
-                                     psz_name : PAnsiChar;
-                                     p_exception : Plibvlc_exception_t); cdecl;
+                                     psz_name : PAnsiChar); cdecl;
   Tlibvlc_vlm_pause_media = procedure(p_instance : Plibvlc_instance_t;
-                                      psz_name : PAnsiChar;
-                                      p_exception : Plibvlc_exception_t); cdecl;
+                                      psz_name : PAnsiChar); cdecl;
   Tlibvlc_vlm_seek_media = procedure(p_instance : Plibvlc_instance_t;
                                      psz_name : PAnsiChar;
-                                     f_percentage : Single;
-                                     p_exception : Plibvlc_exception_t); cdecl;
+                                     f_percentage : Single); cdecl;
   Tlibvlc_vlm_show_media = function(p_instance : Plibvlc_instance_t;
-                                    psz_name : PAnsiChar;
-                                    p_exception : Plibvlc_exception_t) : PAnsiChar; cdecl;
+                                    psz_name : PAnsiChar) : PAnsiChar; cdecl;
   Tlibvlc_vlm_get_media_instance_position = function(p_instance : Plibvlc_instance_t;
                                                      psz_name : PAnsiChar;
-                                                     i_instance : Integer;
-                                                     p_exception : Plibvlc_exception_t) : Single; cdecl;
+                                                     i_instance : Integer) : Single; cdecl;
   Tlibvlc_vlm_get_media_instance_time = function(p_instance : Plibvlc_instance_t;
                                                  psz_name : PAnsiChar;
-                                                 i_instance : Integer;
-                                                 p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                                 i_instance : Integer) : Integer; cdecl;
   Tlibvlc_vlm_get_media_instance_length = function(p_instance : Plibvlc_instance_t;
                                                    psz_name : PAnsiChar;
-                                                   i_instance : Integer;
-                                                   p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                                   i_instance : Integer) : Integer; cdecl;
   Tlibvlc_vlm_get_media_instance_rate = function(p_instance : Plibvlc_instance_t;
                                                  psz_name : PAnsiChar;
-                                                 i_instance : Integer;
-                                                 p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                                 i_instance : Integer) : Integer; cdecl;
   Tlibvlc_vlm_get_media_instance_title = function(p_instance : Plibvlc_instance_t;
                                                   psz_name : PAnsiChar;
-                                                  i_instance : Integer;
-                                                  p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                                  i_instance : Integer) : Integer; cdecl;
   Tlibvlc_vlm_get_media_instance_chapter = function(p_instance : Plibvlc_instance_t;
                                                     psz_name : PAnsiChar;
-                                                    i_instance : Integer;
-                                                    p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                                    i_instance : Integer) : Integer; cdecl;
   Tlibvlc_vlm_get_media_instance_seekable = function(p_instance : Plibvlc_instance_t;
                                                      psz_name : PAnsiChar;
-                                                     i_instance : Integer;
-                                                     p_exception : Plibvlc_exception_t) : Integer; cdecl;
+                                                     i_instance : Integer) : Integer; cdecl;
 
   TLibVLC = class(TInterfacedObject, ILibVLC)
   private
     FLibrary : Cardinal;
     FVersion : Cardinal;
 
-    Flibvlc_exception_init : Tlibvlc_exception_init;
-    Flibvlc_exception_raised : Tlibvlc_exception_raised;
-    Flibvlc_exception_raise : Tlibvlc_exception_raise;
-    Flibvlc_exception_clear : Tlibvlc_exception_clear;
-    Flibvlc_exception_get_message : Tlibvlc_exception_get_message;
+    Flibvlc_errmsg : Tlibvlc_errmsg;
+    Flibvlc_clearerr : Tlibvlc_clearerr;
 
     Flibvlc_new : Tlibvlc_new;
     Flibvlc_release : Tlibvlc_release;
@@ -1350,7 +1007,7 @@ type
     Flibvlc_log_iterator_has_next : Tlibvlc_log_iterator_has_next;
     Flibvlc_log_iterator_next : Tlibvlc_log_iterator_next;
 
-    Flibvlc_media_new : Tlibvlc_media_new;
+    Flibvlc_media_new_location : Tlibvlc_media_new_location;
     Flibvlc_media_new_as_node : Tlibvlc_media_new_as_node;
     Flibvlc_media_add_option : Tlibvlc_media_add_option;
     Flibvlc_media_add_option_untrusted : Tlibvlc_media_add_option_untrusted;
@@ -1549,22 +1206,15 @@ type
     constructor Create(ALibraryName : String);
     destructor Destroy(); override;
 
-    procedure libvlc_exception_init(p_exception : Plibvlc_exception_t);
-    function libvlc_exception_raised(p_exception : Plibvlc_exception_t) : Integer;
-    procedure libvlc_exception_raise(p_exception : Plibvlc_exception_t;
-                                     psz_format : PAnsiChar;
-                                     var AData);
-    procedure libvlc_exception_clear(p_exception : Plibvlc_exception_t);
-    function libvlc_exception_get_message(p_exception : Plibvlc_exception_t) : PAnsiChar;
+    function libvlc_errmsg : PAnsiChar;
+    procedure libvlc_clearerr;
 
     function libvlc_new(argc : Integer;
-                        argv : PPAnsiChar;
-                        p_exception : Plibvlc_exception_t) : Plibvlc_instance_t;
+                        argv : PPAnsiChar) : Plibvlc_instance_t;
     procedure libvlc_release(p_instance : Plibvlc_instance_t);
     procedure libvlc_retain(p_instance : Plibvlc_instance_t);
     procedure libvlc_add_intf(p_instance : Plibvlc_instance_t;
-                              name : PAnsiChar;
-                              p_exception : Plibvlc_exception_t);
+                              name : PAnsiChar);
     procedure libvlc_wait(p_instance : Plibvlc_instance_t);
     function libvlc_get_version() : PAnsiChar;
     function libvlc_get_compiler() : PAnsiChar;
@@ -1574,307 +1224,194 @@ type
     procedure libvlc_event_attach(p_event_manager : Plibvlc_event_manager_t;
                                   event_type : libvlc_event_type_t;
                                   f_callback : libvlc_callback_t;
-                                  userdata : Pointer;
-                                  p_e : Plibvlc_exception_t);
+                                  userdata : Pointer);
     procedure libvlc_event_detach(p_event_manager : Plibvlc_event_manager_t;
                                   event_type : libvlc_event_type_t;
                                   f_callback : libvlc_callback_t;
-                                  userdata : Pointer;
-                                  p_e : Plibvlc_exception_t);
+                                  userdata : Pointer);
     function libvlc_event_type_name(event_type : libvlc_event_type_t) : PAnsiChar;
 
-    function libvlc_get_log_verbosity(p_instance : Plibvlc_instance_t;
-                                      p_e : Plibvlc_exception_t) : Cardinal;
+    function libvlc_get_log_verbosity(p_instance : Plibvlc_instance_t) : Cardinal;
     procedure libvlc_set_log_verbosity(p_instance : Plibvlc_instance_t;
-                                       level : Cardinal;
-                                       p_e : Plibvlc_exception_t);
-    function libvlc_log_open(p_instance : Plibvlc_instance_t;
-                             p_exception : Plibvlc_exception_t) : Plibvlc_log_t;
-    procedure libvlc_log_close(p_log : Plibvlc_log_t;
-                               p_exception : Plibvlc_exception_t);
-    function libvlc_log_count(p_log : Plibvlc_log_t;
-                              p_exception : Plibvlc_exception_t) : Cardinal;
-    procedure libvlc_log_clear(p_log : Plibvlc_log_t;
-                               p_exception : Plibvlc_exception_t);
-    function libvlc_log_get_iterator(p_log : Plibvlc_log_t;
-                                     p_exception : Plibvlc_exception_t) : Plibvlc_log_iterator_t;
-    procedure libvlc_log_iterator_free(p_iter : Plibvlc_log_iterator_t;
-                                       p_exception : Plibvlc_exception_t);
-    function libvlc_log_iterator_has_next(p_iter : Plibvlc_log_iterator_t;
-                                          p_exception : Plibvlc_exception_t) : Integer;
+                                       level : Cardinal);
+    function libvlc_log_open(p_instance : Plibvlc_instance_t) : Plibvlc_log_t;
+    procedure libvlc_log_close(p_log : Plibvlc_log_t);
+    function libvlc_log_count(p_log : Plibvlc_log_t) : Cardinal;
+    procedure libvlc_log_clear(p_log : Plibvlc_log_t);
+    function libvlc_log_get_iterator(p_log : Plibvlc_log_t) : Plibvlc_log_iterator_t;
+    procedure libvlc_log_iterator_free(p_iter : Plibvlc_log_iterator_t);
+    function libvlc_log_iterator_has_next(p_iter : Plibvlc_log_iterator_t) : Integer;
     function libvlc_log_iterator_next(p_iter : Plibvlc_log_iterator_t;
-                                      p_buffer : Plibvlc_log_message_t;
-                                      p_exception : Plibvlc_exception_t) : Plibvlc_log_message_t;
+                                      p_buffer : Plibvlc_log_message_t) : Plibvlc_log_message_t;
 
-    function libvlc_media_new(p_instance : Plibvlc_instance_t;
-                               psz_mrl : PAnsiChar;
-                               p_exception : Plibvlc_exception_t) : Plibvlc_media_t;
+    function libvlc_media_new_location(p_instance : Plibvlc_instance_t;
+                                       psz_mrl : PAnsiChar) : Plibvlc_media_t;
     function libvlc_media_new_as_node(p_instance : Plibvlc_instance_t;
-                                      psz_name : PAnsiChar;
-                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_t;
+                                      psz_name : PAnsiChar) : Plibvlc_media_t;
     procedure libvlc_media_add_option(p_media : Plibvlc_media_t;
-                                      ppsz_options : PAnsiChar;
-                                      p_exception : Plibvlc_exception_t);
+                                      ppsz_options : PAnsiChar);
     procedure libvlc_media_add_option_untrusted(p_media : Plibvlc_media_t;
-                                                ppsz_options : PAnsiChar;
-                                                p_exception : Plibvlc_exception_t);
+                                                ppsz_options : PAnsiChar);
     procedure libvlc_media_retain(p_media : Plibvlc_media_t);
     procedure libvlc_media_release(p_media : Plibvlc_media_t);
-    function libvlc_media_get_mrl(p_media : Plibvlc_media_t;
-                                  p_exception : Plibvlc_exception_t) : PAnsiChar;
+    function libvlc_media_get_mrl(p_media : Plibvlc_media_t) : PAnsiChar;
     function libvlc_media_duplicate(p_media : Plibvlc_media_t) : Plibvlc_media_t;
     function libvlc_media_get_meta(p_media : Plibvlc_media_t;
-                                   e_meta : libvlc_meta_t;
-                                   p_exception : Plibvlc_exception_t) : PAnsiChar;
-    function libvlc_media_get_state(p_media : Plibvlc_media_t;
-                                    p_exception : Plibvlc_exception_t) : libvlc_state_t;
-    function libvlc_media_subitems(p_media : Plibvlc_media_t;
-                                   p_exception : Plibvlc_exception_t) : Plibvlc_media_list_t;
-    function libvlc_media_event_manager(p_media : Plibvlc_media_t;
-                                        p_exception : Plibvlc_exception_t) : Plibvlc_event_manager_t;
-    function libvlc_media_get_duration(p_media : Plibvlc_media_t;
-                                       p_exception : Plibvlc_exception_t) : libvlc_time_t;
-    function libvlc_media_is_preparsed(p_media : Plibvlc_media_t;
-                                       p_exception : Plibvlc_exception_t) : Integer;
+                                   e_meta : libvlc_meta_t) : PAnsiChar;
+    function libvlc_media_get_state(p_media : Plibvlc_media_t) : libvlc_state_t;
+    function libvlc_media_subitems(p_media : Plibvlc_media_t) : Plibvlc_media_list_t;
+    function libvlc_media_event_manager(p_media : Plibvlc_media_t) : Plibvlc_event_manager_t;
+    function libvlc_media_get_duration(p_media : Plibvlc_media_t) : libvlc_time_t;
+    function libvlc_media_is_preparsed(p_media : Plibvlc_media_t) : Integer;
     procedure libvlc_media_set_user_data(p_media : Plibvlc_media_t;
-                                         p_new_user_data : Pointer;
-                                         p_exception : Plibvlc_exception_t);
-    function libvlc_media_get_user_data(p_media : Plibvlc_media_t;
-                                        p_exception : Plibvlc_exception_t) : Pointer;
+                                         p_new_user_data : Pointer);
+    function libvlc_media_get_user_data(p_media : Plibvlc_media_t) : Pointer;
 
-    function libvlc_media_list_new(p_instance : Plibvlc_instance_t;
-                                   p_exception : Plibvlc_exception_t) : Plibvlc_media_list_t;
+    function libvlc_media_list_new(p_instance : Plibvlc_instance_t) : Plibvlc_media_list_t;
     procedure libvlc_media_list_release(p_media_list : Plibvlc_media_list_t);
     procedure libvlc_media_list_retain(p_media_list : Plibvlc_media_list_t);
     procedure libvlc_media_list_set_media(p_media_list : Plibvlc_media_list_t;
-                                          p_media : Plibvlc_media_t;
-                                          p_exception : Plibvlc_exception_t);
-    function libvlc_media_list_media(p_media_list : Plibvlc_media_list_t;
-                                     p_exception : Plibvlc_exception_t) : Plibvlc_media_t;
+                                          p_media : Plibvlc_media_t);
+    function libvlc_media_list_media(p_media_list : Plibvlc_media_list_t) : Plibvlc_media_t;
     procedure libvlc_media_list_add_media(p_media_list : Plibvlc_media_list_t;
-                                          p_media : Plibvlc_media_t;
-                                          p_exception : Plibvlc_exception_t);
+                                          p_media : Plibvlc_media_t);
     procedure libvlc_media_list_insert_media(p_media_list : Plibvlc_media_list_t;
                                              p_media : Plibvlc_media_t;
-                                             index : Integer;
-                                             p_exception : Plibvlc_exception_t);
+                                             index : Integer);
     procedure libvlc_media_list_remove_index(p_media_list : Plibvlc_media_list_t;
-                                             index : Integer;
-                                             p_exception : Plibvlc_exception_t);
-    function libvlc_media_list_count(p_media_list : Plibvlc_media_list_t;
-                                     p_exception : Plibvlc_exception_t) : Integer;
+                                             index : Integer);
+    function libvlc_media_list_count(p_media_list : Plibvlc_media_list_t) : Integer;
     function libvlc_media_list_item_at_index(p_media_list : Plibvlc_media_list_t;
-                                             index : Integer;
-                                             p_exception : Plibvlc_exception_t) : Plibvlc_media_t;
+                                             index : Integer) : Plibvlc_media_t;
     function libvlc_media_list_index_of_item(p_media_list : Plibvlc_media_list_t;
-                                             p_media : Plibvlc_media_t;
-                                             p_exception : Plibvlc_exception_t) : Integer;
+                                             p_media : Plibvlc_media_t) : Integer;
     function libvlc_media_list_is_readonly(p_media_list : Plibvlc_media_list_t) : Integer;
     procedure libvlc_media_list_lock(p_media_list : Plibvlc_media_list_t);
     procedure libvlc_media_list_unlock(p_media_list : Plibvlc_media_list_t);
-    function libvlc_media_list_flat_view(p_media_list : Plibvlc_media_list_t;
-                                         p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t;
-    function libvlc_media_list_hierarchical_view(p_media_list : Plibvlc_media_list_t;
-                                                 p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t;
-    function libvlc_media_list_hierarchical_node_view(p_media_list : Plibvlc_media_list_t;
-                                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t;
-    function libvlc_media_list_event_manager(p_media_list : Plibvlc_media_list_t;
-                                             p_exception : Plibvlc_exception_t) : Plibvlc_event_manager_t;
+    function libvlc_media_list_flat_view(p_media_list : Plibvlc_media_list_t) : Plibvlc_media_list_view_t;
+    function libvlc_media_list_hierarchical_view(p_media_list : Plibvlc_media_list_t) : Plibvlc_media_list_view_t;
+    function libvlc_media_list_hierarchical_node_view(p_media_list : Plibvlc_media_list_t) : Plibvlc_media_list_view_t;
+    function libvlc_media_list_event_manager(p_media_list : Plibvlc_media_list_t) : Plibvlc_event_manager_t;
 
     procedure libvlc_media_list_view_retain(p_media_list_view : Plibvlc_media_list_view_t);
     procedure libvlc_media_list_view_release(p_media_list_view : Plibvlc_media_list_view_t);
     function libvlc_media_list_view_event_manager(p_media_list_view : Plibvlc_media_list_view_t) : Plibvlc_event_manager_t;
-    function libvlc_media_list_view_count(p_media_list_view : Plibvlc_media_list_view_t;
-                                          p_exception : Plibvlc_exception_t) : Integer;
+    function libvlc_media_list_view_count(p_media_list_view : Plibvlc_media_list_view_t) : Integer;
     function libvlc_media_list_view_item_at_index(p_media_list_view : Plibvlc_media_list_view_t;
-                                                  i_index : Integer;
-                                                  p_exception : Plibvlc_exception_t) : Plibvlc_media_t;
+                                                  i_index : Integer) : Plibvlc_media_t;
     function libvlc_media_list_view_children_at_index(p_media_list_view : Plibvlc_media_list_view_t;
-                                                      index : Integer;
-                                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t;
+                                                      index : Integer) : Plibvlc_media_list_view_t;
     function libvlc_media_list_view_children_for_item(p_media_list_view : Plibvlc_media_list_view_t;
-                                                      p_media : Plibvlc_media_t;
-                                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_list_view_t;
+                                                      p_media : Plibvlc_media_t) : Plibvlc_media_list_view_t;
     function libvlc_media_list_view_index_of_item(p_media_list_view : Plibvlc_media_list_view_t;
-                                                  p_media : Plibvlc_media_t;
-                                                  p_exception : Plibvlc_exception_t) : Integer;
+                                                  p_media : Plibvlc_media_t) : Integer;
     procedure libvlc_media_list_view_insert_at_index(p_media_list_view : Plibvlc_media_list_view_t;
                                                      p_media : Plibvlc_media_t;
-                                                     index : Integer;
-                                                     p_exception : Plibvlc_exception_t);
+                                                     index : Integer);
     procedure libvlc_media_list_view_remove_at_index(p_media_list_view : Plibvlc_media_list_view_t;
-                                                     index : Integer;
-                                                     p_exception : Plibvlc_exception_t);
+                                                     index : Integer);
     procedure libvlc_media_list_view_add_item(p_media_list_view : Plibvlc_media_list_view_t;
-                                              p_media : Plibvlc_media_t;
-                                              p_exception : Plibvlc_exception_t);
-    function libvlc_media_list_view_parent_media_list(p_media_list_view : Plibvlc_media_list_view_t;
-                                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_list_t;
+                                              p_media : Plibvlc_media_t);
+    function libvlc_media_list_view_parent_media_list(p_media_list_view : Plibvlc_media_list_view_t) : Plibvlc_media_list_t;
 
-    function libvlc_media_library_new(p_instance : Plibvlc_instance_t;
-                                      p_exception : Plibvlc_exception_t) : Plibvlc_media_library_t;
+    function libvlc_media_library_new(p_instance : Plibvlc_instance_t) : Plibvlc_media_library_t;
     procedure libvlc_media_library_release(p_mlib : Plibvlc_media_library_t);
     procedure libvlc_media_library_retain(p_mlib : Plibvlc_media_library_t);
-    procedure libvlc_media_library_load(p_mlib : Plibvlc_media_library_t;
-                                        p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_library_save(p_mlib : Plibvlc_media_library_t;
-                                        p_exception : Plibvlc_exception_t);
-    function libvlc_media_library_media_list(p_mlib : Plibvlc_media_library_t;
-                                             p_exception : Plibvlc_exception_t) : Plibvlc_media_list_t;
+    procedure libvlc_media_library_load(p_mlib : Plibvlc_media_library_t);
+    procedure libvlc_media_library_save(p_mlib : Plibvlc_media_library_t);
+    function libvlc_media_library_media_list(p_mlib : Plibvlc_media_library_t) : Plibvlc_media_list_t;
 
-    function libvlc_media_player_new(p_instance : Plibvlc_instance_t;
-                                     p_exception : Plibvlc_exception_t) : Plibvlc_media_player_t;
-    function libvlc_media_player_new_from_media(p_media : Plibvlc_media_t;
-                                                p_exception : Plibvlc_exception_t) : Plibvlc_media_player_t;
+    function libvlc_media_player_new(p_instance : Plibvlc_instance_t) : Plibvlc_media_player_t;
+    function libvlc_media_player_new_from_media(p_media : Plibvlc_media_t) : Plibvlc_media_player_t;
     procedure libvlc_media_player_release(p_media_player : Plibvlc_media_player_t);
     procedure libvlc_media_player_retain(p_media_player : Plibvlc_media_player_t);
     procedure libvlc_media_player_set_media(p_media_player : Plibvlc_media_player_t;
-                                            p_media : Plibvlc_media_t;
-                                            p_exception : Plibvlc_exception_t);
-    function libvlc_media_player_get_media(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Plibvlc_media_t;
-    function libvlc_media_player_event_manager(p_media_player : Plibvlc_media_player_t;
-                                               p_exception : Plibvlc_exception_t) : Plibvlc_event_manager_t;
-    function libvlc_media_player_is_playing(p_media_player : Plibvlc_media_player_t;
-                                            p_exception : Plibvlc_exception_t) : Integer;
-    procedure libvlc_media_player_play(p_media_player : Plibvlc_media_player_t;
-                                       p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_player_pause(p_media_player : Plibvlc_media_player_t;
-                                        p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_player_stop(p_media_player : Plibvlc_media_player_t;
-                                       p_exception : Plibvlc_exception_t);
+                                            p_media : Plibvlc_media_t);
+    function libvlc_media_player_get_media(p_media_player : Plibvlc_media_player_t) : Plibvlc_media_t;
+    function libvlc_media_player_event_manager(p_media_player : Plibvlc_media_player_t) : Plibvlc_event_manager_t;
+    function libvlc_media_player_is_playing(p_media_player : Plibvlc_media_player_t) : Integer;
+    procedure libvlc_media_player_play(p_media_player : Plibvlc_media_player_t);
+    procedure libvlc_media_player_pause(p_media_player : Plibvlc_media_player_t);
+    procedure libvlc_media_player_stop(p_media_player : Plibvlc_media_player_t);
     procedure libvlc_media_player_set_nsobject(p_media_player : Plibvlc_media_player_t;
-                                               drawable : Pointer;
-                                               p_exception : Plibvlc_exception_t);
+                                               drawable : Pointer);
     function libvlc_media_player_get_nsobject(p_media_player : Plibvlc_media_player_t) : Pointer;
     procedure libvlc_media_player_set_agl(p_media_player : Plibvlc_media_player_t;
-                                          drawable : Cardinal;
-                                          p_exception : Plibvlc_exception_t);
+                                          drawable : Cardinal);
     function libvlc_media_player_get_agl(p_media_player : Plibvlc_media_player_t) : Cardinal;
     procedure libvlc_media_player_set_xwindow(p_media_player : Plibvlc_media_player_t;
-                                              drawable : Cardinal;
-                                              p_exception : Plibvlc_exception_t);
+                                              drawable : Cardinal);
     function libvlc_media_player_get_xwindow(p_media_player : Plibvlc_media_player_t) : Cardinal;
     procedure libvlc_media_player_set_hwnd(p_media_player : Plibvlc_media_player_t;
-                                           drawable : Pointer;
-                                           p_exception : Plibvlc_exception_t);
+                                           drawable : Pointer);
     function libvlc_media_player_get_hwnd(p_media_player : Plibvlc_media_player_t) : Pointer;
-    function libvlc_media_player_get_length(p_media_player : Plibvlc_media_player_t;
-                                            p_exception : Plibvlc_exception_t) : libvlc_time_t;
-    function libvlc_media_player_get_time(p_media_player : Plibvlc_media_player_t;
-                                          p_exception : Plibvlc_exception_t) : libvlc_time_t;
+    function libvlc_media_player_get_length(p_media_player : Plibvlc_media_player_t) : libvlc_time_t;
+    function libvlc_media_player_get_time(p_media_player : Plibvlc_media_player_t) : libvlc_time_t;
     procedure libvlc_media_player_set_time(p_media_player : Plibvlc_media_player_t;
-                                           time : libvlc_time_t;
-                                           p_exception : Plibvlc_exception_t);
-    function libvlc_media_player_get_position(p_media_player : Plibvlc_media_player_t;
-                                              p_exception : Plibvlc_exception_t) : Single;
+                                           time : libvlc_time_t);
+    function libvlc_media_player_get_position(p_media_player : Plibvlc_media_player_t) : Single;
     procedure libvlc_media_player_set_position(p_media_player : Plibvlc_media_player_t;
-                                               position : Single;
-                                               p_exception : Plibvlc_exception_t);
+                                               position : Single);
     procedure libvlc_media_player_set_chapter(p_media_player : Plibvlc_media_player_t;
-                                              chapter : Integer;
-                                              p_exception : Plibvlc_exception_t);
-    function libvlc_media_player_get_chapter(p_media_player : Plibvlc_media_player_t;
-                                             p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_media_player_get_chapter_count(p_media_player : Plibvlc_media_player_t;
-                                                   p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_media_player_will_play(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Integer;
+                                              chapter : Integer);
+    function libvlc_media_player_get_chapter(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_media_player_get_chapter_count(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_media_player_will_play(p_media_player : Plibvlc_media_player_t) : Integer;
     function libvlc_media_player_get_chapter_count_for_title(p_media_player : Plibvlc_media_player_t;
-                                                             title : Integer;
-                                                             p_exception : Plibvlc_exception_t) : Integer;
+                                                             title : Integer) : Integer;
     procedure libvlc_media_player_set_title(p_media_player : Plibvlc_media_player_t;
-                                            title : Integer;
-                                            p_exception : Plibvlc_exception_t);
-    function libvlc_media_player_get_title(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_media_player_get_title_count(p_media_player : Plibvlc_media_player_t;
-                                                 p_exception : Plibvlc_exception_t) : Integer;
-    procedure libvlc_media_player_previous_chapter(p_media_player : Plibvlc_media_player_t;
-                                                   p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_player_next_chapter(p_media_player : Plibvlc_media_player_t;
-                                               p_exception : Plibvlc_exception_t);
-    function libvlc_media_player_get_rate(p_media_player : Plibvlc_media_player_t;
-                                          p_exception : Plibvlc_exception_t) : Single;
+                                            title : Integer);
+    function libvlc_media_player_get_title(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_media_player_get_title_count(p_media_player : Plibvlc_media_player_t) : Integer;
+    procedure libvlc_media_player_previous_chapter(p_media_player : Plibvlc_media_player_t);
+    procedure libvlc_media_player_next_chapter(p_media_player : Plibvlc_media_player_t);
+    function libvlc_media_player_get_rate(p_media_player : Plibvlc_media_player_t) : Single;
     procedure libvlc_media_player_set_rate(p_media_player : Plibvlc_media_player_t;
-                                           rate : Single;
-                                           p_exception : Plibvlc_exception_t);
-    function libvlc_media_player_get_state(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : libvlc_state_t;
-    function libvlc_media_player_get_fps(p_media_player : Plibvlc_media_player_t;
-                                         p_exception : Plibvlc_exception_t) : Single;
-    function libvlc_media_player_has_vout(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_media_player_is_seekable(p_media_player : Plibvlc_media_player_t;
-                                             p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_media_player_can_pause(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : Integer;
+                                           rate : Single);
+    function libvlc_media_player_get_state(p_media_player : Plibvlc_media_player_t) : libvlc_state_t;
+    function libvlc_media_player_get_fps(p_media_player : Plibvlc_media_player_t) : Single;
+    function libvlc_media_player_has_vout(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_media_player_is_seekable(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_media_player_can_pause(p_media_player : Plibvlc_media_player_t) : Integer;
     procedure libvlc_track_description_release(p_track_description : Plibvlc_track_description_t);
-    procedure libvlc_toggle_fullscreen(p_media_player : Plibvlc_media_player_t;
-                                       p_exception : Plibvlc_exception_t);
+    procedure libvlc_toggle_fullscreen(p_media_player : Plibvlc_media_player_t);
     procedure libvlc_set_fullscreen(p_media_player : Plibvlc_media_player_t;
-                                    enabled : Integer;
-                                    p_exception : Plibvlc_exception_t);
-    function libvlc_get_fullscreen(p_media_player : Plibvlc_media_player_t;
-                                   p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_height(p_media_player : Plibvlc_media_player_t;
-                                     p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_width(p_media_player : Plibvlc_media_player_t;
-                                    p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_scale(p_media_player : Plibvlc_media_player_t;
-                                     p_exception : Plibvlc_exception_t) : Single;
+                                    enabled : Integer);
+    function libvlc_get_fullscreen(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_video_get_height(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_video_get_width(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_video_get_scale(p_media_player : Plibvlc_media_player_t) : Single;
     procedure libvlc_video_set_scale(p_media_player : Plibvlc_media_player_t;
-                                     scale : Single;
-                                     p_exception : Plibvlc_exception_t);
-    function libvlc_video_get_aspect_ratio(p_media_player : Plibvlc_media_player_t;
-                                           p_exception : Plibvlc_exception_t) : PAnsiChar;
+                                     scale : Single);
+    function libvlc_video_get_aspect_ratio(p_media_player : Plibvlc_media_player_t) : PAnsiChar;
     procedure libvlc_video_set_aspect_ratio(p_media_player : Plibvlc_media_player_t;
-                                            psz_aspect : PAnsiChar;
-                                            p_exception : Plibvlc_exception_t);
-    function libvlc_video_get_spu(p_media_player : Plibvlc_media_player_t;
-                                  p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_spu_count(p_media_player : Plibvlc_media_player_t;
-                                        p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_spu_description(p_media_player : Plibvlc_media_player_t;
-                                              p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t;
+                                            psz_aspect : PAnsiChar);
+    function libvlc_video_get_spu(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_video_get_spu_count(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_video_get_spu_description(p_media_player : Plibvlc_media_player_t) : Plibvlc_track_description_t;
     procedure libvlc_video_set_spu(p_media_player : Plibvlc_media_player_t;
-                                   i_spu : Integer;
-                                   p_exception : Plibvlc_exception_t);
+                                   i_spu : Integer);
     function libvlc_video_set_subtitle_file(p_media_player : Plibvlc_media_player_t;
-                                            filename : PAnsiChar;
-                                            p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_title_description(p_media_player : Plibvlc_media_player_t;
-                                                p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t;
+                                            filename : PAnsiChar) : Integer;
+    function libvlc_video_get_title_description(p_media_player : Plibvlc_media_player_t) : Plibvlc_track_description_t;
     function libvlc_video_get_chapter_description(p_media_player : Plibvlc_media_player_t;
-                                                  title : Integer;
-                                                  p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t;
-    function libvlc_video_get_crop_geometry(p_media_player : Plibvlc_media_player_t;
-                                            p_exception : Plibvlc_exception_t) : PAnsiChar;
+                                                  title : Integer) : Plibvlc_track_description_t;
+    function libvlc_video_get_crop_geometry(p_media_player : Plibvlc_media_player_t) : PAnsiChar;
     procedure libvlc_video_set_crop_geometry(p_media_player : Plibvlc_media_player_t;
-                                             geometry : PAnsiChar;
-                                             p_exception : Plibvlc_exception_t);
-    procedure libvlc_toggle_teletext(p_media_player : Plibvlc_media_player_t;
-                                     p_exception : Plibvlc_exception_t);
-    function libvlc_video_get_teletext(p_media_player : Plibvlc_media_player_t;
-                                       p_exception : Plibvlc_exception_t) : Integer;
+                                             geometry : PAnsiChar);
+    procedure libvlc_toggle_teletext(p_media_player : Plibvlc_media_player_t);
+    function libvlc_video_get_teletext(p_media_player : Plibvlc_media_player_t) : Integer;
     procedure libvlc_video_set_teletext(p_media_player : Plibvlc_media_player_t;
-                                        page : Integer;
-                                        p_exception : Plibvlc_exception_t);
-    function libvlc_video_get_track_count(p_media_player : Plibvlc_media_player_t;
-                                          p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_video_get_track_description(p_media_player : Plibvlc_media_player_t;
-                                                p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t;
-    function libvlc_video_get_track(p_media_player : Plibvlc_media_player_t;
-                                    p_exception : Plibvlc_exception_t) : Integer;
+                                        page : Integer);
+    function libvlc_video_get_track_count(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_video_get_track_description(p_media_player : Plibvlc_media_player_t) : Plibvlc_track_description_t;
+    function libvlc_video_get_track(p_media_player : Plibvlc_media_player_t) : Integer;
     procedure libvlc_video_set_track(p_media_player : Plibvlc_media_player_t;
-                                     track : Integer;
-                                     p_exception : Plibvlc_exception_t);
+                                     track : Integer);
     procedure libvlc_video_take_snapshot(p_media_player : Plibvlc_media_player_t;
                                          filepath : PAnsiChar;
-                                         width, height : Integer;
-                                         p_exception : Plibvlc_exception_t);
-    function libvlc_audio_output_list_get(p_instance : Plibvlc_instance_t;
-                                          p_exception : Plibvlc_exception_t) : Plibvlc_audio_output_t;
+                                         width, height : Integer);
+    function libvlc_audio_output_list_get(p_instance : Plibvlc_instance_t) : Plibvlc_audio_output_t;
     procedure libvlc_audio_output_list_release(audio_output_list : Plibvlc_audio_output_t);
     function libvlc_audio_output_set(p_instance : Plibvlc_instance_t;
                                      psz_audio_output : PAnsiChar) : Integer;
@@ -1889,77 +1426,50 @@ type
     procedure libvlc_audio_output_device_set(p_instance : Plibvlc_instance_t;
                                               psz_audio_output : PAnsiChar;
                                               device : PAnsiChar);
-    function libvlc_audio_output_get_device_type(p_instance : Plibvlc_instance_t;
-                                                 p_exception : Plibvlc_exception_t) : Integer;
+    function libvlc_audio_output_get_device_type(p_instance : Plibvlc_instance_t) : Integer;
     procedure libvlc_audio_output_set_device_type(p_instance : Plibvlc_instance_t;
-                                                  device_type : Integer;
-                                                  p_exception : Plibvlc_exception_t);
-    procedure libvlc_audio_toggle_mute(p_instance : Plibvlc_instance_t;
-                                       p_exception : Plibvlc_exception_t);
-    function libvlc_audio_get_mute(p_instance : Plibvlc_instance_t;
-                                   p_exception : Plibvlc_exception_t) : Integer;
+                                                  device_type : Integer);
+    procedure libvlc_audio_toggle_mute(p_instance : Plibvlc_instance_t);
+    function libvlc_audio_get_mute(p_instance : Plibvlc_instance_t) : Integer;
     procedure libvlc_audio_set_mute(p_instance : Plibvlc_instance_t;
-                                    status : Integer;
-                                    p_exception : Plibvlc_exception_t);
-    function libvlc_audio_get_volume(p_instance : Plibvlc_instance_t;
-                                     p_exception : Plibvlc_exception_t) : Integer;
-    procedure libvlc_audio_set_volume(p_instance : Plibvlc_instance_t;
-                                      volume : Integer;
-                                      p_exception : Plibvlc_exception_t);
-    function libvlc_audio_get_track_count(p_media_player : Plibvlc_media_player_t;
-                                          p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_audio_get_track_description(p_media_player : Plibvlc_media_player_t;
-                                                p_exception : Plibvlc_exception_t) : Plibvlc_track_description_t;
-    function libvlc_audio_get_track(p_media_player : Plibvlc_media_player_t;
-                                    p_exception : Plibvlc_exception_t) : Integer;
-    procedure libvlc_audio_set_track(p_media_player : Plibvlc_media_player_t;
-                                     p_exception : Plibvlc_exception_t);
-    function libvlc_audio_get_channel(p_instance : Plibvlc_instance_t;
-                                      p_exception : Plibvlc_exception_t) : Integer;
+                                    status : Integer);
+    function libvlc_audio_get_volume(p_instance : Plibvlc_instance_t) : Integer;
+    procedure libvlc_audio_set_volume(p_instance : Plibvlc_instance_t; volume : Integer);
+    function libvlc_audio_get_track_count(p_media_player : Plibvlc_media_player_t) : Integer;
+    function libvlc_audio_get_track_description(p_media_player : Plibvlc_media_player_t) : Plibvlc_track_description_t;
+    function libvlc_audio_get_track(p_media_player : Plibvlc_media_player_t) : Integer;
+    procedure libvlc_audio_set_track(p_media_player : Plibvlc_media_player_t);
+    function libvlc_audio_get_channel(p_instance : Plibvlc_instance_t) : Integer;
     procedure libvlc_audio_set_channel(p_instance : Plibvlc_instance_t;
-                                       channel : Integer;
-                                       p_exception : Plibvlc_exception_t);
+                                       channel : Integer);
 
-    function libvlc_media_list_player_new(p_instance : Plibvlc_instance_t;
-                                          p_exception : Plibvlc_exception_t) : Plibvlc_media_list_player_t;
+    function libvlc_media_list_player_new(p_instance : Plibvlc_instance_t) : Plibvlc_media_list_player_t;
     procedure libvlc_media_list_player_release(p_mlp : Plibvlc_media_list_player_t);
     procedure libvlc_media_list_player_set_media_player(p_mlp : Plibvlc_media_list_player_t;
-                                                        p_media_player : Plibvlc_media_player_t;
-                                                        p_exception : Plibvlc_exception_t);
+                                                        p_media_player : Plibvlc_media_player_t);
     procedure libvlc_media_list_player_set_media_list(p_mlp : Plibvlc_media_list_player_t;
-                                                      p_media_list : Plibvlc_media_list_t;
-                                                      p_exception : Plibvlc_exception_t);
+                                                      p_media_list : Plibvlc_media_list_t);
 
-    procedure libvlc_media_list_player_play(p_mlp : Plibvlc_media_list_player_t;
-                                            p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_list_player_pause(p_mlp : Plibvlc_media_list_player_t;
-                                             p_exception : Plibvlc_exception_t);
-    function libvlc_media_list_player_is_playing(p_mlp : Plibvlc_media_list_player_t;
-                                                 p_exception : Plibvlc_exception_t) : Integer;
-    function libvlc_media_list_player_get_state(p_mlp : Plibvlc_media_list_player_t;
-                                                p_exception : Plibvlc_exception_t) : libvlc_state_t;
+    procedure libvlc_media_list_player_play(p_mlp : Plibvlc_media_list_player_t);
+    procedure libvlc_media_list_player_pause(p_mlp : Plibvlc_media_list_player_t);
+    function libvlc_media_list_player_is_playing(p_mlp : Plibvlc_media_list_player_t) : Integer;
+    function libvlc_media_list_player_get_state(p_mlp : Plibvlc_media_list_player_t) : libvlc_state_t;
     procedure libvlc_media_list_player_play_item_at_index(p_mlp : Plibvlc_media_list_player_t;
-                                                          i_index : Integer;
-                                                          p_exception : Plibvlc_exception_t);
+                                                          i_index : Integer);
     procedure libvlc_media_list_player_play_item(p_mlp : Plibvlc_media_list_player_t;
-                                                 p_media : Plibvlc_media_t;
-                                                 p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_list_player_stop(p_mlp : Plibvlc_media_list_player_t;
-                                            p_exception : Plibvlc_exception_t);
-    procedure libvlc_media_list_player_next(p_mlp : Plibvlc_media_list_player_t;
-                                            p_exception : Plibvlc_exception_t);
+                                                 p_media : Plibvlc_media_t);
+    procedure libvlc_media_list_player_stop(p_mlp : Plibvlc_media_list_player_t);
+    procedure libvlc_media_list_player_next(p_mlp : Plibvlc_media_list_player_t);
 
     function libvlc_media_discoverer_new_from_name(p_instance : Plibvlc_instance_t;
-                                                   psz_name : PAnsiChar;
-                                                   p_exception : Plibvlc_exception_t) : Plibvlc_media_discoverer_t;
+                                                   psz_name : PAnsiChar) : Plibvlc_media_discoverer_t;
     procedure libvlc_media_discoverer_release(p_mdis : Plibvlc_media_discoverer_t);
     function libvlc_media_discoverer_localized_name(p_mdis : Plibvlc_media_discoverer_t) : PAnsiChar;
     function libvlc_media_discoverer_media_list(p_mdis : Plibvlc_media_discoverer_t) : Plibvlc_media_list_t;
     function libvlc_media_discoverer_event_manager(p_mdis : Plibvlc_media_discoverer_t) : Plibvlc_event_manager_t;
     function libvlc_media_discoverer_is_running(p_mdis : Plibvlc_media_discoverer_t) : Integer;
 
-    procedure libvlc_vlm_release(p_instance : Plibvlc_instance_t;
-                                 p_exception : Plibvlc_exception_t);
+    procedure libvlc_vlm_release(p_instance : Plibvlc_instance_t);
     procedure libvlc_vlm_add_broadcast(p_instance : Plibvlc_instance_t;
                                        psz_name,
                                        psz_input,
@@ -1967,44 +1477,35 @@ type
                                        options : Integer;
                                        ppsz_options : Pointer;
                                        b_enabled : Integer;
-                                       b_loop : Integer;
-                                       p_exception : Plibvlc_exception_t);
+                                       b_loop : Integer);
     procedure libvlc_vlm_add_vod(p_instance : Plibvlc_instance_t;
                                  psz_name,
                                  psz_input : PAnsiChar;
                                  i_options : Integer;
                                  ppsz_options : Pointer;
                                  b_enabled : Integer;
-                                 psz_mux : PAnsiChar;
-                                 p_exception : Plibvlc_exception_t);
+                                 psz_mux : PAnsiChar);
 
     procedure libvlc_vlm_del_media(p_instance : Plibvlc_instance_t;
-                                   psz_name : PAnsiChar;
-                                   p_exception : Plibvlc_exception_t);
+                                   psz_name : PAnsiChar);
     procedure libvlc_vlm_set_enabled(p_instance : Plibvlc_instance_t;
                                      psz_name : PAnsiChar;
-                                     b_enabled : Integer;
-                                     p_exception : Plibvlc_exception_t);
+                                     b_enabled : Integer);
     procedure libvlc_vlm_set_output(p_instance : Plibvlc_instance_t;
                                     psz_name : PAnsiChar;
-                                    psz_output : PAnsiChar;
-                                    p_exception : Plibvlc_exception_t);
+                                    psz_output : PAnsiChar);
     procedure libvlc_vlm_set_input(p_instance : Plibvlc_instance_t;
                                    psz_name : PAnsiChar;
-                                   psz_input : PAnsiChar;
-                                   p_exception : Plibvlc_exception_t);
+                                   psz_input : PAnsiChar);
     procedure libvlc_vlm_add_input(p_instance : Plibvlc_instance_t;
                                    psz_name : PAnsiChar;
-                                   pst_input : PAnsiChar;
-                                   p_exception : Plibvlc_exception_t);
+                                   pst_input : PAnsiChar);
     procedure libvlc_vlm_set_loop(p_instance : Plibvlc_instance_t;
                                   psz_name : PAnsiChar;
-                                  b_loop : Integer;
-                                  p_exception : Plibvlc_exception_t);
+                                  b_loop : Integer);
     procedure libvlc_vlm_set_mux(p_instance : Plibvlc_instance_t;
                                  psz_name : PAnsiChar;
-                                 psz_mux : PAnsiChar;
-                                 p_exception : Plibvlc_exception_t);
+                                 psz_mux : PAnsiChar);
     procedure libvlc_vlm_change_media(p_instance : Plibvlc_instance_t;
                                       psz_name,
                                       psz_input,
@@ -2012,52 +1513,39 @@ type
                                       i_options : Integer;
                                       ppsz_options : Pointer;
                                       b_enabled : Integer;
-                                      b_loop : Integer;
-                                      p_exception : Plibvlc_exception_t);
+                                      b_loop : Integer);
     procedure libvlc_vlm_play_media(p_instance : Plibvlc_instance_t;
-                                    psz_name : PAnsiChar;
-                                    p_exception : Plibvlc_exception_t);
+                                    psz_name : PAnsiChar);
     procedure libvlc_vlm_stop_media(p_instance : Plibvlc_instance_t;
-                                    psz_name : PAnsiChar;
-                                    p_exception : Plibvlc_exception_t);
+                                    psz_name : PAnsiChar);
     procedure libvlc_vlm_pause_media(p_instance : Plibvlc_instance_t;
-                                     psz_name : PAnsiChar;
-                                     p_exception : Plibvlc_exception_t);
+                                     psz_name : PAnsiChar);
     procedure libvlc_vlm_seek_media(p_instance : Plibvlc_instance_t;
                                     psz_name : PAnsiChar;
-                                    f_percentage : Single;
-                                    p_exception : Plibvlc_exception_t);
+                                    f_percentage : Single);
     function libvlc_vlm_show_media(p_instance : Plibvlc_instance_t;
-                                   psz_name : PAnsiChar;
-                                   p_exception : Plibvlc_exception_t) : PAnsiChar;
+                                   psz_name : PAnsiChar) : PAnsiChar;
     function libvlc_vlm_get_media_instance_position(p_instance : Plibvlc_instance_t;
                                                     psz_name : PAnsiChar;
-                                                    i_instance : Integer;
-                                                    p_exception : Plibvlc_exception_t) : Single;
+                                                    i_instance : Integer) : Single;
     function libvlc_vlm_get_media_instance_time(p_instance : Plibvlc_instance_t;
                                                 psz_name : PAnsiChar;
-                                                i_instance : Integer;
-                                                p_exception : Plibvlc_exception_t) : Integer;
+                                                i_instance : Integer) : Integer;
     function libvlc_vlm_get_media_instance_length(p_instance : Plibvlc_instance_t;
                                                   psz_name : PAnsiChar;
-                                                  i_instance : Integer;
-                                                  p_exception : Plibvlc_exception_t) : Integer;
+                                                  i_instance : Integer) : Integer;
     function libvlc_vlm_get_media_instance_rate(p_instance : Plibvlc_instance_t;
                                                 psz_name : PAnsiChar;
-                                                i_instance : Integer;
-                                                p_exception : Plibvlc_exception_t) : Integer;
+                                                i_instance : Integer) : Integer;
     function libvlc_vlm_get_media_instance_title(p_instance : Plibvlc_instance_t;
                                                  psz_name : PAnsiChar;
-                                                 i_instance : Integer;
-                                                 p_exception : Plibvlc_exception_t) : Integer;
+                                                 i_instance : Integer) : Integer;
     function libvlc_vlm_get_media_instance_chapter(p_instance : Plibvlc_instance_t;
                                                    psz_name : PAnsiChar;
-                                                   i_instance : Integer;
-                                                   p_exception : Plibvlc_exception_t) : Integer;
+                                                   i_instance : Integer) : Integer;
     function libvlc_vlm_get_media_instance_seekable(p_instance : Plibvlc_instance_t;
                                                     psz_name : PAnsiChar;
-                                                    i_instance : Integer;
-                                                    p_exception : Plibvlc_exception_t) : Integer;
+                                                    i_instance : Integer) : Integer;
   end;
 
 function LoadLibVLC(ALibraryName : String = 'libvlc.dll') : ILibVLC;
@@ -2077,6 +1565,10 @@ begin
     RaiseLastOSError;
 
   ReadVersion;
+
+  if FVersion < EncodeVersion(1, 1, 0) then
+    raise Exception.Create('Unsupported version of libvlc');
+
   LoadFunctions;
 end;
 
@@ -2093,67 +1585,69 @@ begin
   Result := (V1 * 1000000) + (V2 * 1000) + V3;
 end;
 
+procedure TLibVLC.libvlc_clearerr;
+begin
+ if Assigned(Flibvlc_clearerr) then
+    Flibvlc_clearerr()
+  else
+    RaiseNotSupported('liblvc_clearerr');
+end;
+
 procedure TLibVLC.libvlc_add_intf(p_instance: Plibvlc_instance_t;
-  name: PAnsiChar; p_exception: Plibvlc_exception_t);
+  name: PAnsiChar);
 begin
   if Assigned(Flibvlc_add_intf) then
-    Flibvlc_add_intf(p_instance, name, p_exception)
+    Flibvlc_add_intf(p_instance, name)
   else
     RaiseNotSupported('libvlc_add_intf');
 end;
 
-function TLibVLC.libvlc_audio_get_channel(p_instance: Plibvlc_instance_t;
-  p_exception: Plibvlc_exception_t): Integer;
+function TLibVLC.libvlc_audio_get_channel(p_instance: Plibvlc_instance_t): Integer;
 begin
   if Assigned(Flibvlc_audio_get_channel) then
-    Result := Flibvlc_audio_get_channel(p_instance, p_exception)
+    Result := Flibvlc_audio_get_channel(p_instance)
   else
     RaiseNotSupported('libvlc_audio_get_channel');
 end;
 
-function TLibVLC.libvlc_audio_get_mute(p_instance: Plibvlc_instance_t;
-  p_exception: Plibvlc_exception_t): Integer;
+function TLibVLC.libvlc_audio_get_mute(p_instance: Plibvlc_instance_t): Integer;
 begin
   if Assigned(Flibvlc_audio_get_mute) then
-    Result := Flibvlc_audio_get_mute(p_instance, p_exception)
+    Result := Flibvlc_audio_get_mute(p_instance)
   else
     RaiseNotSupported('libvlc_audio_get_mute');
 end;
 
-function TLibVLC.libvlc_audio_get_track(p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+function TLibVLC.libvlc_audio_get_track(p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_audio_get_track) then
-    Result := Flibvlc_audio_get_track(p_media_player, p_exception)
+    Result := Flibvlc_audio_get_track(p_media_player)
   else
     RaiseNotSupported('libvlc_audio_get_track');
 end;
 
 function TLibVLC.libvlc_audio_get_track_count(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_audio_get_track_count) then
-    Result := Flibvlc_audio_get_track_count(p_media_player, p_exception)
+    Result := Flibvlc_audio_get_track_count(p_media_player)
   else
     RaiseNotSupported('libvlc_audio_get_track_count');
 end;
 
 function TLibVLC.libvlc_audio_get_track_description(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_track_description_t;
+  p_media_player: Plibvlc_media_player_t): Plibvlc_track_description_t;
 begin
   if Assigned(Flibvlc_audio_get_track_description) then
-    Result := Flibvlc_audio_get_track_description(p_media_player, p_exception)
+    Result := Flibvlc_audio_get_track_description(p_media_player)
   else
     RaiseNotSupported('libvlc_audio_get_track_description');
 end;
 
-function TLibVLC.libvlc_audio_get_volume(p_instance: Plibvlc_instance_t;
-  p_exception: Plibvlc_exception_t): Integer;
+function TLibVLC.libvlc_audio_get_volume(p_instance: Plibvlc_instance_t): Integer;
 begin
   if Assigned(Flibvlc_audio_get_volume) then
-    Result := Flibvlc_audio_get_volume(p_instance, p_exception)
+    Result := Flibvlc_audio_get_volume(p_instance)
   else
     RaiseNotSupported('libvlc_audio_get_volume');
 end;
@@ -2196,19 +1690,18 @@ begin
 end;
 
 function TLibVLC.libvlc_audio_output_get_device_type(
-  p_instance: Plibvlc_instance_t; p_exception: Plibvlc_exception_t): Integer;
+  p_instance: Plibvlc_instance_t): Integer;
 begin
   if Assigned(Flibvlc_audio_output_get_device_type) then
-    Result := Flibvlc_audio_output_get_device_type(p_instance, p_exception)
+    Result := Flibvlc_audio_output_get_device_type(p_instance)
   else
     RaiseNotSupported('libvlc_audio_output_get_device_type');
 end;
 
-function TLibVLC.libvlc_audio_output_list_get(p_instance: Plibvlc_instance_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_audio_output_t;
+function TLibVLC.libvlc_audio_output_list_get(p_instance: Plibvlc_instance_t): Plibvlc_audio_output_t;
 begin
   if Assigned(Flibvlc_audio_output_list_get) then
-    Result := Flibvlc_audio_output_list_get(p_instance, p_exception)
+    Result := Flibvlc_audio_output_list_get(p_instance)
   else
     RaiseNotSupported('libvlc_audio_output_list_get');
 end;
@@ -2232,76 +1725,81 @@ begin
 end;
 
 procedure TLibVLC.libvlc_audio_output_set_device_type(
-  p_instance: Plibvlc_instance_t; device_type: Integer;
-  p_exception: Plibvlc_exception_t);
+  p_instance: Plibvlc_instance_t; device_type: Integer);
 begin
   if Assigned(Flibvlc_audio_output_set_device_type) then
-    Flibvlc_audio_output_set_device_type(p_instance, device_type, p_exception)
+    Flibvlc_audio_output_set_device_type(p_instance, device_type)
   else
     RaiseNotSupported('libvlc_audio_output_set_device_type');
 end;
 
 procedure TLibVLC.libvlc_audio_set_channel(p_instance: Plibvlc_instance_t;
-  channel: Integer; p_exception: Plibvlc_exception_t);
+  channel : Integer);
 begin
   if Assigned(Flibvlc_audio_set_channel) then
-    Flibvlc_audio_set_channel(p_instance, channel, p_exception)
+    Flibvlc_audio_set_channel(p_instance, channel)
   else
     RaiseNotSupported('libvlc_audio_set_channel');
 end;
 
 procedure TLibVLC.libvlc_audio_set_mute(p_instance: Plibvlc_instance_t;
-  status: Integer; p_exception: Plibvlc_exception_t);
+  status : Integer);
 begin
   if Assigned(Flibvlc_audio_set_mute) then
-    Flibvlc_audio_set_mute(p_instance, status, p_exception)
+    Flibvlc_audio_set_mute(p_instance, status)
   else
     RaiseNotSupported('libvlc_audio_set_mute');
 end;
 
-procedure TLibVLC.libvlc_audio_set_track(p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t);
+procedure TLibVLC.libvlc_audio_set_track(p_media_player: Plibvlc_media_player_t);
 begin
   if Assigned(Flibvlc_audio_set_track) then
-    Flibvlc_audio_set_track(p_media_player, p_exception)
+    Flibvlc_audio_set_track(p_media_player)
   else
     RaiseNotSupported('libvlc_audio_set_track');
 end;
 
 procedure TLibVLC.libvlc_audio_set_volume(p_instance: Plibvlc_instance_t;
-  volume: Integer; p_exception: Plibvlc_exception_t);
+  volume : Integer);
 begin
   if Assigned(Flibvlc_audio_set_volume) then
-    Flibvlc_audio_set_volume(p_instance, volume, p_exception)
+    Flibvlc_audio_set_volume(p_instance, volume)
   else
     RaiseNotSupported('libvlc_audio_set_volume');
 end;
 
-procedure TLibVLC.libvlc_audio_toggle_mute(p_instance: Plibvlc_instance_t;
-  p_exception: Plibvlc_exception_t);
+procedure TLibVLC.libvlc_audio_toggle_mute(p_instance: Plibvlc_instance_t);
 begin
   if Assigned(Flibvlc_audio_toggle_mute) then
-    Flibvlc_audio_toggle_mute(p_instance, p_exception)
+    Flibvlc_audio_toggle_mute(p_instance)
   else
     RaiseNotSupported('libvlc_audio_toggle_mute');
 end;
 
+function TLibVLC.libvlc_errmsg: PAnsiChar;
+begin
+  if Assigned(Flibvlc_errmsg) then
+    Result := Flibvlc_errmsg
+  else
+    RaiseNotSupported('libvlc_errmsg');
+end;
+
 procedure TLibVLC.libvlc_event_attach(p_event_manager: Plibvlc_event_manager_t;
   event_type: libvlc_event_type_t; f_callback: libvlc_callback_t;
-  userdata: Pointer; p_e: Plibvlc_exception_t);
+  userdata: Pointer);
 begin
    if Assigned(Flibvlc_event_attach) then
-    Flibvlc_event_attach( p_event_manager,  event_type,  f_callback,  userdata,  p_e)
+    Flibvlc_event_attach( p_event_manager,  event_type,  f_callback,  userdata)
   else
     RaiseNotSupported('libvlc_event_attach');
 end;
 
 procedure TLibVLC.libvlc_event_detach(p_event_manager: Plibvlc_event_manager_t;
   event_type: libvlc_event_type_t; f_callback: libvlc_callback_t;
-  userdata: Pointer; p_e: Plibvlc_exception_t);
+  userdata: Pointer);
 begin
    if Assigned(Flibvlc_event_detach) then
-    Flibvlc_event_detach( p_event_manager,  event_type,  f_callback,  userdata,  p_e)
+    Flibvlc_event_detach( p_event_manager,  event_type,  f_callback,  userdata)
   else
     RaiseNotSupported('libvlc_event_detach');
 end;
@@ -2313,49 +1811,6 @@ begin
     Result := Flibvlc_event_type_name( event_type)
   else
     RaiseNotSupported('libvlc_event_type_name');
-end;
-
-procedure TLibVLC.libvlc_exception_clear(p_exception: Plibvlc_exception_t);
-begin
-  if Assigned(Flibvlc_exception_clear) then
-    Flibvlc_exception_clear(p_exception)
-  else
-    RaiseNotSupported('libvlc_exception_clear');
-end;
-
-function TLibVLC.libvlc_exception_get_message(
-  p_exception: Plibvlc_exception_t): PAnsiChar;
-begin
-  if Assigned(Flibvlc_exception_get_message) then
-    Result := Flibvlc_exception_get_message(p_exception)
-  else
-    RaiseNotSupported('libvlc_exception_get_message');
-end;
-
-procedure TLibVLC.libvlc_exception_init(p_exception: Plibvlc_exception_t);
-begin
-  if Assigned(Flibvlc_exception_init) then
-    Flibvlc_exception_init(p_exception)
-  else
-    RaiseNotSupported('libvlc_exception_init');
-end;
-
-procedure TLibVLC.libvlc_exception_raise(p_exception: Plibvlc_exception_t;
-  psz_format: PAnsiChar; var AData);
-begin
-  if Assigned(Flibvlc_exception_raise) then
-    Flibvlc_exception_raise(p_exception, psz_format, AData)
-  else
-    RaiseNotSupported('libvlc_exception_raise');
-end;
-
-function TLibVLC.libvlc_exception_raised(
-  p_exception: Plibvlc_exception_t): Integer;
-begin
-  if Assigned(Flibvlc_exception_raised) then
-    Result := Flibvlc_exception_raised(p_exception)
-  else
-    RaiseNotSupported('libvlc_exception_raised');
 end;
 
 procedure TLibVLC.libvlc_free(AData: Pointer);
@@ -2382,20 +1837,18 @@ begin
     RaiseNotSupported('libvlc_get_compiler');
 end;
 
-function TLibVLC.libvlc_get_fullscreen(p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+function TLibVLC.libvlc_get_fullscreen(p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_get_fullscreen) then
-    Result := Flibvlc_get_fullscreen(p_media_player, p_exception)
+    Result := Flibvlc_get_fullscreen(p_media_player)
   else
     RaiseNotSupported('libvlc_get_fullscreen');
 end;
 
-function TLibVLC.libvlc_get_log_verbosity(p_instance: Plibvlc_instance_t;
-  p_e: Plibvlc_exception_t): Cardinal;
+function TLibVLC.libvlc_get_log_verbosity(p_instance: Plibvlc_instance_t): Cardinal;
 begin
   if Assigned(Flibvlc_get_log_verbosity) then
-    Result := Flibvlc_get_log_verbosity( p_instance,  p_e)
+    Result := Flibvlc_get_log_verbosity( p_instance)
   else
     RaiseNotSupported('libvlc_get_log_verbosity');
 end;
@@ -2408,93 +1861,85 @@ begin
     RaiseNotSupported('libvlc_get_version');
 end;
 
-procedure TLibVLC.libvlc_log_clear(p_log: Plibvlc_log_t;
-  p_exception: Plibvlc_exception_t);
+procedure TLibVLC.libvlc_log_clear(p_log: Plibvlc_log_t);
 begin
   if Assigned(Flibvlc_log_clear) then
-    Flibvlc_log_clear(p_log, p_exception)
+    Flibvlc_log_clear(p_log)
   else
     RaiseNotSupported('libvlc_log_clear');
 end;
 
-procedure TLibVLC.libvlc_log_close(p_log: Plibvlc_log_t;
-  p_exception: Plibvlc_exception_t);
+procedure TLibVLC.libvlc_log_close(p_log: Plibvlc_log_t);
 begin
   if Assigned(Flibvlc_log_close) then
-    Flibvlc_log_close(p_log, p_exception)
+    Flibvlc_log_close(p_log)
   else
     RaiseNotSupported('libvlc_log_close');
 end;
 
-function TLibVLC.libvlc_log_count(p_log: Plibvlc_log_t;
-  p_exception: Plibvlc_exception_t): Cardinal;
+function TLibVLC.libvlc_log_count(p_log: Plibvlc_log_t): Cardinal;
 begin
   if Assigned(Flibvlc_log_count) then
-    Result := Flibvlc_log_count(p_log, p_exception)
+    Result := Flibvlc_log_count(p_log)
   else
     RaiseNotSupported('libvlc_log_count');
 end;
 
-function TLibVLC.libvlc_log_get_iterator(p_log: Plibvlc_log_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_log_iterator_t;
+function TLibVLC.libvlc_log_get_iterator(p_log: Plibvlc_log_t): Plibvlc_log_iterator_t;
 begin
   if Assigned(Flibvlc_log_get_iterator) then
-    Result := Flibvlc_log_get_iterator(p_log, p_exception)
+    Result := Flibvlc_log_get_iterator(p_log)
   else
     RaiseNotSupported('libvlc_log_get_iterator');
 end;
 
-procedure TLibVLC.libvlc_log_iterator_free(p_iter: Plibvlc_log_iterator_t;
-  p_exception: Plibvlc_exception_t);
+procedure TLibVLC.libvlc_log_iterator_free(p_iter: Plibvlc_log_iterator_t);
 begin
   if Assigned(Flibvlc_log_iterator_free) then
-    Flibvlc_log_iterator_free(p_iter, p_exception)
+    Flibvlc_log_iterator_free(p_iter)
   else
     RaiseNotSupported('libvlc_log_iterator_free');
 end;
 
-function TLibVLC.libvlc_log_iterator_has_next(p_iter: Plibvlc_log_iterator_t;
-  p_exception: Plibvlc_exception_t): Integer;
+function TLibVLC.libvlc_log_iterator_has_next(p_iter: Plibvlc_log_iterator_t): Integer;
 begin
   if Assigned(Flibvlc_log_iterator_has_next) then
-    Result := Flibvlc_log_iterator_has_next(p_iter, p_exception)
+    Result := Flibvlc_log_iterator_has_next(p_iter)
   else
     RaiseNotSupported('libvlc_log_iterator_has_next');
 end;
 
 function TLibVLC.libvlc_log_iterator_next(p_iter: Plibvlc_log_iterator_t;
-  p_buffer: Plibvlc_log_message_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_log_message_t;
+  p_buffer: Plibvlc_log_message_t): Plibvlc_log_message_t;
 begin
   if Assigned(Flibvlc_log_iterator_next) then
-    Result := Flibvlc_log_iterator_next(p_iter, p_buffer, p_exception)
+    Result := Flibvlc_log_iterator_next(p_iter, p_buffer)
   else
     RaiseNotSupported('libvlc_log_iterator_next');
 end;
 
-function TLibVLC.libvlc_log_open(p_instance: Plibvlc_instance_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_log_t;
+function TLibVLC.libvlc_log_open(p_instance: Plibvlc_instance_t): Plibvlc_log_t;
 begin
   if Assigned(Flibvlc_log_open) then
-    Result := Flibvlc_log_open(p_instance, p_exception)
+    Result := Flibvlc_log_open(p_instance)
   else
     RaiseNotSupported('libvlc_log_open');
 end;
 
 procedure TLibVLC.libvlc_media_add_option(p_media: Plibvlc_media_t;
-  ppsz_options: PAnsiChar; p_exception: Plibvlc_exception_t);
+  ppsz_options: PAnsiChar);
 begin
   if Assigned(Flibvlc_media_add_option) then
-    Flibvlc_media_add_option(p_media, ppsz_options, p_exception)
+    Flibvlc_media_add_option(p_media, ppsz_options)
   else
     RaiseNotSupported('libvlc_media_add_option');
 end;
 
 procedure TLibVLC.libvlc_media_add_option_untrusted(p_media: Plibvlc_media_t;
-  ppsz_options: PAnsiChar; p_exception: Plibvlc_exception_t);
+  ppsz_options: PAnsiChar);
 begin
   if Assigned(Flibvlc_media_add_option_untrusted) then
-    Flibvlc_media_add_option_untrusted(p_media, ppsz_options, p_exception)
+    Flibvlc_media_add_option_untrusted(p_media, ppsz_options)
   else
     RaiseNotSupported('libvlc_media_add_option_untrusted');
 end;
@@ -2536,11 +1981,10 @@ begin
 end;
 
 function TLibVLC.libvlc_media_discoverer_new_from_name(
-  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_discoverer_t;
+  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar): Plibvlc_media_discoverer_t;
 begin
   if Assigned(Flibvlc_media_discoverer_new_from_name) then
-    Result := Flibvlc_media_discoverer_new_from_name(p_instance, psz_name, p_exception)
+    Result := Flibvlc_media_discoverer_new_from_name(p_instance, psz_name)
   else
     RaiseNotSupported('libvlc_media_discoverer_new_from_name');
 end;
@@ -2563,93 +2007,84 @@ begin
     RaiseNotSupported('libvlc_media_duplicate');
 end;
 
-function TLibVLC.libvlc_media_event_manager(p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_event_manager_t;
+function TLibVLC.libvlc_media_event_manager(p_media: Plibvlc_media_t): Plibvlc_event_manager_t;
 begin
   if Assigned(Flibvlc_media_event_manager) then
-    Result := Flibvlc_media_event_manager(p_media, p_exception)
+    Result := Flibvlc_media_event_manager(p_media)
   else
     RaiseNotSupported('libvlc_media_event_manager');
 end;
 
-function TLibVLC.libvlc_media_get_duration(p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t): libvlc_time_t;
+function TLibVLC.libvlc_media_get_duration(p_media: Plibvlc_media_t): libvlc_time_t;
 begin
   if Assigned(Flibvlc_media_get_duration) then
-    Result := Flibvlc_media_get_duration(p_media, p_exception)
+    Result := Flibvlc_media_get_duration(p_media)
   else
     RaiseNotSupported('libvlc_media_get_duration');
 end;
 
 function TLibVLC.libvlc_media_get_meta(p_media: Plibvlc_media_t;
-  e_meta: libvlc_meta_t; p_exception: Plibvlc_exception_t): PAnsiChar;
+  e_meta: libvlc_meta_t): PAnsiChar;
 begin
   if Assigned(Flibvlc_media_get_meta) then
-    Result := Flibvlc_media_get_meta(p_media, e_meta, p_exception)
+    Result := Flibvlc_media_get_meta(p_media, e_meta)
   else
     RaiseNotSupported('libvlc_media_get_meta');
 end;
 
-function TLibVLC.libvlc_media_get_mrl(p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t): PAnsiChar;
+function TLibVLC.libvlc_media_get_mrl(p_media: Plibvlc_media_t): PAnsiChar;
 begin
   if Assigned(Flibvlc_media_get_mrl) then
-    Result := Flibvlc_media_get_mrl(p_media, p_exception)
+    Result := Flibvlc_media_get_mrl(p_media)
   else
     RaiseNotSupported('libvlc_media_get_mrl');
 end;
 
-function TLibVLC.libvlc_media_get_state(p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t): libvlc_state_t;
+function TLibVLC.libvlc_media_get_state(p_media: Plibvlc_media_t): libvlc_state_t;
 begin
   if Assigned(Flibvlc_media_get_state) then
-    Result := Flibvlc_media_get_state(p_media, p_exception)
+    Result := Flibvlc_media_get_state(p_media)
   else
     RaiseNotSupported('libvlc_media_get_state');
 end;
 
-function TLibVLC.libvlc_media_get_user_data(p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t): Pointer;
+function TLibVLC.libvlc_media_get_user_data(p_media: Plibvlc_media_t): Pointer;
 begin
   if Assigned(Flibvlc_media_get_user_data) then
-    Result := Flibvlc_media_get_user_data(p_media, p_exception)
+    Result := Flibvlc_media_get_user_data(p_media)
   else
     RaiseNotSupported('libvlc_media_get_user_data');
 end;
 
-function TLibVLC.libvlc_media_is_preparsed(p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t): Integer;
+function TLibVLC.libvlc_media_is_preparsed(p_media: Plibvlc_media_t): Integer;
 begin
   if Assigned(Flibvlc_media_is_preparsed) then
-    Result := Flibvlc_media_is_preparsed(p_media, p_exception)
+    Result := Flibvlc_media_is_preparsed(p_media)
   else
     RaiseNotSupported('libvlc_media_is_preparsed');
 end;
 
-procedure TLibVLC.libvlc_media_library_load(p_mlib: Plibvlc_media_library_t;
-  p_exception: Plibvlc_exception_t);
+procedure TLibVLC.libvlc_media_library_load(p_mlib: Plibvlc_media_library_t);
 begin
   if Assigned(Flibvlc_media_library_load) then
-    Flibvlc_media_library_load(p_mlib, p_exception)
+    Flibvlc_media_library_load(p_mlib)
   else
     RaiseNotSupported('libvlc_media_library_load');
 end;
 
 function TLibVLC.libvlc_media_library_media_list(
-  p_mlib: Plibvlc_media_library_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_list_t;
+  p_mlib: Plibvlc_media_library_t): Plibvlc_media_list_t;
 begin
   if Assigned(Flibvlc_media_library_media_list) then
-    Result := Flibvlc_media_library_media_list(p_mlib, p_exception)
+    Result := Flibvlc_media_library_media_list(p_mlib)
   else
     RaiseNotSupported('libvlc_media_library_media_list');
 end;
 
-function TLibVLC.libvlc_media_library_new(p_instance: Plibvlc_instance_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_library_t;
+function TLibVLC.libvlc_media_library_new(p_instance: Plibvlc_instance_t): Plibvlc_media_library_t;
 begin
   if Assigned(Flibvlc_media_library_new) then
-    Result := Flibvlc_media_library_new(p_instance, p_exception)
+    Result := Flibvlc_media_library_new(p_instance)
   else
     RaiseNotSupported('libvlc_media_library_new');
 end;
@@ -2670,89 +2105,80 @@ begin
     RaiseNotSupported('libvlc_media_library_retain');
 end;
 
-procedure TLibVLC.libvlc_media_library_save(p_mlib: Plibvlc_media_library_t;
-  p_exception: Plibvlc_exception_t);
+procedure TLibVLC.libvlc_media_library_save(p_mlib: Plibvlc_media_library_t);
 begin
   if Assigned(Flibvlc_media_library_save) then
-    Flibvlc_media_library_save(p_mlib, p_exception)
+    Flibvlc_media_library_save(p_mlib)
   else
     RaiseNotSupported('libvlc_media_library_save');
 end;
 
 procedure TLibVLC.libvlc_media_list_add_media(
-  p_media_list: Plibvlc_media_list_t; p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t);
+  p_media_list: Plibvlc_media_list_t; p_media: Plibvlc_media_t);
 begin
   if Assigned(Flibvlc_media_list_add_media) then
-    Flibvlc_media_list_add_media(p_media_list, p_media, p_exception)
+    Flibvlc_media_list_add_media(p_media_list, p_media)
   else
     RaiseNotSupported('libvlc_media_list_add_media');
 end;
 
-function TLibVLC.libvlc_media_list_count(p_media_list: Plibvlc_media_list_t;
-  p_exception: Plibvlc_exception_t): Integer;
+function TLibVLC.libvlc_media_list_count(p_media_list: Plibvlc_media_list_t): Integer;
 begin
   if Assigned(Flibvlc_media_list_count) then
-    Result := Flibvlc_media_list_count(p_media_list, p_exception)
+    Result := Flibvlc_media_list_count(p_media_list)
   else
     RaiseNotSupported('libvlc_media_list_count');
 end;
 
 function TLibVLC.libvlc_media_list_event_manager(
-  p_media_list: Plibvlc_media_list_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_event_manager_t;
+  p_media_list: Plibvlc_media_list_t): Plibvlc_event_manager_t;
 begin
   if Assigned(Flibvlc_media_list_event_manager) then
-    Result := Flibvlc_media_list_event_manager(p_media_list, p_exception)
+    Result := Flibvlc_media_list_event_manager(p_media_list)
   else
     RaiseNotSupported('libvlc_media_list_event_manager');
 end;
 
-function TLibVLC.libvlc_media_list_flat_view(p_media_list: Plibvlc_media_list_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_list_view_t;
+function TLibVLC.libvlc_media_list_flat_view(p_media_list: Plibvlc_media_list_t): Plibvlc_media_list_view_t;
 begin
   if Assigned(Flibvlc_media_list_flat_view) then
-    Result := Flibvlc_media_list_flat_view(p_media_list, p_exception)
+    Result := Flibvlc_media_list_flat_view(p_media_list)
   else
     RaiseNotSupported('libvlc_media_list_flat_view');
 end;
 
 function TLibVLC.libvlc_media_list_hierarchical_node_view(
-  p_media_list: Plibvlc_media_list_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_list_view_t;
+  p_media_list: Plibvlc_media_list_t): Plibvlc_media_list_view_t;
 begin
   if Assigned(Flibvlc_media_list_hierarchical_node_view) then
-    Result := Flibvlc_media_list_hierarchical_node_view(p_media_list, p_exception)
+    Result := Flibvlc_media_list_hierarchical_node_view(p_media_list)
   else
     RaiseNotSupported('libvlc_media_list_hierarchical_node_view');
 end;
 
 function TLibVLC.libvlc_media_list_hierarchical_view(
-  p_media_list: Plibvlc_media_list_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_list_view_t;
+  p_media_list: Plibvlc_media_list_t): Plibvlc_media_list_view_t;
 begin
   if Assigned(Flibvlc_media_list_hierarchical_view) then
-    Result := Flibvlc_media_list_hierarchical_view(p_media_list, p_exception)
+    Result := Flibvlc_media_list_hierarchical_view(p_media_list)
   else
     RaiseNotSupported('libvlc_media_list_hierarchical_view');
 end;
 
 function TLibVLC.libvlc_media_list_index_of_item(
-  p_media_list: Plibvlc_media_list_t; p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_list: Plibvlc_media_list_t; p_media: Plibvlc_media_t): Integer;
 begin
   if Assigned(Flibvlc_media_list_index_of_item) then
-    Result := Flibvlc_media_list_index_of_item(p_media_list, p_media, p_exception)
+    Result := Flibvlc_media_list_index_of_item(p_media_list, p_media)
   else
     RaiseNotSupported('libvlc_media_list_index_of_item');
 end;
 
 procedure TLibVLC.libvlc_media_list_insert_media(
-  p_media_list: Plibvlc_media_list_t; p_media: Plibvlc_media_t;
-  index: Integer; p_exception: Plibvlc_exception_t);
+  p_media_list: Plibvlc_media_list_t; p_media: Plibvlc_media_t; index : Integer);
 begin
   if Assigned(Flibvlc_media_list_insert_media) then
-    Flibvlc_media_list_insert_media(p_media_list, p_media, index, p_exception)
+    Flibvlc_media_list_insert_media(p_media_list, p_media, index)
   else
     RaiseNotSupported('libvlc_media_list_insert_media');
 end;
@@ -2767,11 +2193,10 @@ begin
 end;
 
 function TLibVLC.libvlc_media_list_item_at_index(
-  p_media_list: Plibvlc_media_list_t; index: Integer;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_t;
+  p_media_list: Plibvlc_media_list_t; index : Integer): Plibvlc_media_t;
 begin
   if Assigned(Flibvlc_media_list_item_at_index) then
-    Result := Flibvlc_media_list_item_at_index(p_media_list, index, p_exception)
+    Result := Flibvlc_media_list_item_at_index(p_media_list, index)
   else
     RaiseNotSupported('libvlc_media_list_item_at_index');
 end;
@@ -2784,96 +2209,89 @@ begin
     RaiseNotSupported('libvlc_media_list_lock');
 end;
 
-function TLibVLC.libvlc_media_list_media(p_media_list: Plibvlc_media_list_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_t;
+function TLibVLC.libvlc_media_list_media(p_media_list: Plibvlc_media_list_t): Plibvlc_media_t;
 begin
   if Assigned(Flibvlc_media_list_media) then
-    Result := Flibvlc_media_list_media(p_media_list, p_exception)
+    Result := Flibvlc_media_list_media(p_media_list)
   else
     RaiseNotSupported('libvlc_media_list_media');
 end;
 
-function TLibVLC.libvlc_media_list_new(p_instance: Plibvlc_instance_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_list_t;
+function TLibVLC.libvlc_media_list_new(p_instance: Plibvlc_instance_t): Plibvlc_media_list_t;
 begin
   if Assigned(Flibvlc_media_list_new) then
-    Result := Flibvlc_media_list_new(p_instance, p_exception)
+    Result := Flibvlc_media_list_new(p_instance)
   else
     RaiseNotSupported('libvlc_media_list_new');
 end;
 
 function TLibVLC.libvlc_media_list_player_get_state(
-  p_mlp: Plibvlc_media_list_player_t;
-  p_exception: Plibvlc_exception_t): libvlc_state_t;
+  p_mlp: Plibvlc_media_list_player_t): libvlc_state_t;
 begin
   if Assigned(Flibvlc_media_list_player_get_state) then
-    Result := Flibvlc_media_list_player_get_state(p_mlp, p_exception)
+    Result := Flibvlc_media_list_player_get_state(p_mlp)
   else
     RaiseNotSupported('libvlc_media_list_player_get_state');
 end;
 
 function TLibVLC.libvlc_media_list_player_is_playing(
-  p_mlp: Plibvlc_media_list_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_mlp: Plibvlc_media_list_player_t): Integer;
 begin
   if Assigned(Flibvlc_media_list_player_is_playing) then
-    Result := Flibvlc_media_list_player_is_playing(p_mlp, p_exception)
+    Result := Flibvlc_media_list_player_is_playing(p_mlp)
   else
     RaiseNotSupported('libvlc_media_list_player_is_playing');
 end;
 
-function TLibVLC.libvlc_media_list_player_new(p_instance: Plibvlc_instance_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_list_player_t;
+function TLibVLC.libvlc_media_list_player_new(p_instance: Plibvlc_instance_t): Plibvlc_media_list_player_t;
 begin
   if Assigned(Flibvlc_media_list_player_new) then
-    Result := Flibvlc_media_list_player_new(p_instance, p_exception)
+    Result := Flibvlc_media_list_player_new(p_instance)
   else
     RaiseNotSupported('libvlc_media_list_player_new');
 end;
 
 procedure TLibVLC.libvlc_media_list_player_next(
-  p_mlp: Plibvlc_media_list_player_t; p_exception: Plibvlc_exception_t);
+  p_mlp: Plibvlc_media_list_player_t);
 begin
   if Assigned(Flibvlc_media_list_player_next) then
-    Flibvlc_media_list_player_next(p_mlp, p_exception)
+    Flibvlc_media_list_player_next(p_mlp)
   else
     RaiseNotSupported('libvlc_media_list_player_next');
 end;
 
 procedure TLibVLC.libvlc_media_list_player_pause(
-  p_mlp: Plibvlc_media_list_player_t; p_exception: Plibvlc_exception_t);
+  p_mlp: Plibvlc_media_list_player_t);
 begin
   if Assigned(Flibvlc_media_list_player_pause) then
-    Flibvlc_media_list_player_pause(p_mlp, p_exception)
+    Flibvlc_media_list_player_pause(p_mlp)
   else
     RaiseNotSupported('libvlc_media_list_player_pause');
 end;
 
 procedure TLibVLC.libvlc_media_list_player_play(
-  p_mlp: Plibvlc_media_list_player_t; p_exception: Plibvlc_exception_t);
+  p_mlp: Plibvlc_media_list_player_t);
 begin
   if Assigned(Flibvlc_media_list_player_play) then
-    Flibvlc_media_list_player_play(p_mlp, p_exception)
+    Flibvlc_media_list_player_play(p_mlp)
   else
     RaiseNotSupported('libvlc_media_list_player_play');
 end;
 
 procedure TLibVLC.libvlc_media_list_player_play_item(
-  p_mlp: Plibvlc_media_list_player_t; p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t);
+  p_mlp: Plibvlc_media_list_player_t; p_media: Plibvlc_media_t);
 begin
   if Assigned(Flibvlc_media_list_player_play_item) then
-    Flibvlc_media_list_player_play_item(p_mlp, p_media, p_exception)
+    Flibvlc_media_list_player_play_item(p_mlp, p_media)
   else
     RaiseNotSupported('libvlc_media_list_player_play_item');
 end;
 
 procedure TLibVLC.libvlc_media_list_player_play_item_at_index(
-  p_mlp: Plibvlc_media_list_player_t; i_index: Integer;
-  p_exception: Plibvlc_exception_t);
+  p_mlp: Plibvlc_media_list_player_t; i_index: Integer);
 begin
   if Assigned(Flibvlc_media_list_player_play_item_at_index) then
-    Flibvlc_media_list_player_play_item_at_index(p_mlp, i_index, p_exception)
+    Flibvlc_media_list_player_play_item_at_index(p_mlp, i_index)
   else
     RaiseNotSupported('libvlc_media_list_player_play_item_at_index');
 end;
@@ -2888,30 +2306,28 @@ begin
 end;
 
 procedure TLibVLC.libvlc_media_list_player_set_media_list(
-  p_mlp: Plibvlc_media_list_player_t; p_media_list: Plibvlc_media_list_t;
-  p_exception: Plibvlc_exception_t);
+  p_mlp: Plibvlc_media_list_player_t; p_media_list: Plibvlc_media_list_t);
 begin
   if Assigned(Flibvlc_media_list_player_set_media_list) then
-    Flibvlc_media_list_player_set_media_list(p_mlp, p_media_list, p_exception)
+    Flibvlc_media_list_player_set_media_list(p_mlp, p_media_list)
   else
     RaiseNotSupported('libvlc_media_list_player_set_media_list');
 end;
 
 procedure TLibVLC.libvlc_media_list_player_set_media_player(
-  p_mlp: Plibvlc_media_list_player_t; p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t);
+  p_mlp: Plibvlc_media_list_player_t; p_media_player: Plibvlc_media_player_t);
 begin
   if Assigned(Flibvlc_media_list_player_set_media_player) then
-    Flibvlc_media_list_player_set_media_player(p_mlp, p_media_player, p_exception)
+    Flibvlc_media_list_player_set_media_player(p_mlp, p_media_player)
   else
     RaiseNotSupported('libvlc_media_list_player_set_media_player');
 end;
 
 procedure TLibVLC.libvlc_media_list_player_stop(
-  p_mlp: Plibvlc_media_list_player_t; p_exception: Plibvlc_exception_t);
+  p_mlp: Plibvlc_media_list_player_t);
 begin
   if Assigned(Flibvlc_media_list_player_stop) then
-    Flibvlc_media_list_player_stop(p_mlp, p_exception)
+    Flibvlc_media_list_player_stop(p_mlp)
   else
     RaiseNotSupported('libvlc_media_list_player_stop');
 end;
@@ -2925,10 +2341,10 @@ begin
 end;
 
 procedure TLibVLC.libvlc_media_list_remove_index(
-  p_media_list: Plibvlc_media_list_t; index : Integer; p_exception: Plibvlc_exception_t);
+  p_media_list: Plibvlc_media_list_t; index : Integer);
 begin
   if Assigned(Flibvlc_media_list_remove_index) then
-    Flibvlc_media_list_remove_index(p_media_list, index, p_exception)
+    Flibvlc_media_list_remove_index(p_media_list, index)
   else
     RaiseNotSupported('libvlc_media_list_remove_index');
 end;
@@ -2942,11 +2358,10 @@ begin
 end;
 
 procedure TLibVLC.libvlc_media_list_set_media(
-  p_media_list: Plibvlc_media_list_t; p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t);
+  p_media_list: Plibvlc_media_list_t; p_media: Plibvlc_media_t);
 begin
   if Assigned(Flibvlc_media_list_set_media) then
-    Flibvlc_media_list_set_media(p_media_list, p_media, p_exception)
+    Flibvlc_media_list_set_media(p_media_list, p_media)
   else
     RaiseNotSupported('libvlc_media_list_set_media');
 end;
@@ -2960,41 +2375,37 @@ begin
 end;
 
 procedure TLibVLC.libvlc_media_list_view_add_item(
-  p_media_list_view: Plibvlc_media_list_view_t; p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t);
+  p_media_list_view: Plibvlc_media_list_view_t; p_media: Plibvlc_media_t);
 begin
   if Assigned(Flibvlc_media_list_view_add_item) then
-    Flibvlc_media_list_view_add_item(p_media_list_view, p_media, p_exception)
+    Flibvlc_media_list_view_add_item(p_media_list_view, p_media)
   else
     RaiseNotSupported('libvlc_media_list_view_add_item');
 end;
 
 function TLibVLC.libvlc_media_list_view_children_at_index(
-  p_media_list_view: Plibvlc_media_list_view_t; index: Integer;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_list_view_t;
+  p_media_list_view: Plibvlc_media_list_view_t; index : Integer): Plibvlc_media_list_view_t;
 begin
   if Assigned(Flibvlc_media_list_view_children_at_index) then
-    Result := Flibvlc_media_list_view_children_at_index(p_media_list_view, index, p_exception)
+    Result := Flibvlc_media_list_view_children_at_index(p_media_list_view, index)
   else
     RaiseNotSupported('libvlc_media_list_view_children_at_index');
 end;
 
 function TLibVLC.libvlc_media_list_view_children_for_item(
-  p_media_list_view: Plibvlc_media_list_view_t; p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_list_view_t;
+  p_media_list_view: Plibvlc_media_list_view_t; p_media: Plibvlc_media_t): Plibvlc_media_list_view_t;
 begin
   if Assigned(Flibvlc_media_list_view_children_for_item) then
-    Result := Flibvlc_media_list_view_children_for_item(p_media_list_view, p_media, p_exception)
+    Result := Flibvlc_media_list_view_children_for_item(p_media_list_view, p_media)
   else
     RaiseNotSupported('libvlc_media_list_view_children_for_item');
 end;
 
 function TLibVLC.libvlc_media_list_view_count(
-  p_media_list_view: Plibvlc_media_list_view_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_list_view: Plibvlc_media_list_view_t): Integer;
 begin
   if Assigned(Flibvlc_media_list_view_count) then
-    Result := Flibvlc_media_list_view_count(p_media_list_view, p_exception)
+    Result := Flibvlc_media_list_view_count(p_media_list_view)
   else
     RaiseNotSupported('libvlc_media_list_view_count');
 end;
@@ -3009,41 +2420,37 @@ begin
 end;
 
 function TLibVLC.libvlc_media_list_view_index_of_item(
-  p_media_list_view: Plibvlc_media_list_view_t; p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_list_view: Plibvlc_media_list_view_t; p_media: Plibvlc_media_t): Integer;
 begin
   if Assigned(Flibvlc_media_list_view_index_of_item) then
-    Result := Flibvlc_media_list_view_index_of_item(p_media_list_view, p_media, p_exception)
+    Result := Flibvlc_media_list_view_index_of_item(p_media_list_view, p_media)
   else
     RaiseNotSupported('libvlc_media_list_view_index_of_item');
 end;
 
 procedure TLibVLC.libvlc_media_list_view_insert_at_index(
-  p_media_list_view: Plibvlc_media_list_view_t; p_media: Plibvlc_media_t;
-  index: Integer; p_exception: Plibvlc_exception_t);
+  p_media_list_view: Plibvlc_media_list_view_t; p_media: Plibvlc_media_t; index : Integer);
 begin
   if Assigned(Flibvlc_media_list_view_insert_at_index) then
-    Flibvlc_media_list_view_insert_at_index(p_media_list_view, p_media, index, p_exception)
+    Flibvlc_media_list_view_insert_at_index(p_media_list_view, p_media, index)
   else
     RaiseNotSupported('libvlc_media_list_view_insert_at_index');
 end;
 
 function TLibVLC.libvlc_media_list_view_item_at_index(
-  p_media_list_view: Plibvlc_media_list_view_t; i_index: Integer;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_t;
+  p_media_list_view: Plibvlc_media_list_view_t; i_index: Integer): Plibvlc_media_t;
 begin
   if Assigned(Flibvlc_media_list_view_item_at_index) then
-    Result := Flibvlc_media_list_view_item_at_index(p_media_list_view, i_index, p_exception)
+    Result := Flibvlc_media_list_view_item_at_index(p_media_list_view, i_index)
   else
     RaiseNotSupported('libvlc_media_list_view_item_at_index');
 end;
 
 function TLibVLC.libvlc_media_list_view_parent_media_list(
-  p_media_list_view: Plibvlc_media_list_view_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_list_t;
+  p_media_list_view: Plibvlc_media_list_view_t): Plibvlc_media_list_t;
 begin
   if Assigned(Flibvlc_media_list_view_parent_media_list) then
-    Result := Flibvlc_media_list_view_parent_media_list(p_media_list_view, p_exception)
+    Result := Flibvlc_media_list_view_parent_media_list(p_media_list_view)
   else
     RaiseNotSupported('libvlc_media_list_view_parent_media_list');
 end;
@@ -3058,11 +2465,10 @@ begin
 end;
 
 procedure TLibVLC.libvlc_media_list_view_remove_at_index(
-  p_media_list_view: Plibvlc_media_list_view_t; index: Integer;
-  p_exception: Plibvlc_exception_t);
+  p_media_list_view: Plibvlc_media_list_view_t; index : Integer);
 begin
   if Assigned(Flibvlc_media_list_view_remove_at_index) then
-    Flibvlc_media_list_view_remove_at_index(p_media_list_view, index, p_exception)
+    Flibvlc_media_list_view_remove_at_index(p_media_list_view, index)
   else
     RaiseNotSupported('libvlc_media_list_view_remove_at_index');
 end;
@@ -3076,40 +2482,38 @@ begin
     RaiseNotSupported('libvlc_media_list_view_retain');
 end;
 
-function TLibVLC.libvlc_media_new(p_instance: Plibvlc_instance_t;
-  psz_mrl: PAnsiChar; p_exception: Plibvlc_exception_t): Plibvlc_media_t;
+function TLibVLC.libvlc_media_new_location(p_instance: Plibvlc_instance_t;
+  psz_mrl: PAnsiChar): Plibvlc_media_t;
 begin
-  if Assigned(Flibvlc_media_new) then
-    Result := Flibvlc_media_new(p_instance, psz_mrl, p_exception)
+  if Assigned(Flibvlc_media_new_location) then
+    Result := Flibvlc_media_new_location(p_instance, psz_mrl)
   else
-    RaiseNotSupported('libvlc_media_new');
+    RaiseNotSupported('libvlc_media_new_location');
 end;
 
 function TLibVLC.libvlc_media_new_as_node(p_instance: Plibvlc_instance_t;
-  psz_name: PAnsiChar; p_exception: Plibvlc_exception_t): Plibvlc_media_t;
+  psz_name: PAnsiChar): Plibvlc_media_t;
 begin
   if Assigned(Flibvlc_media_new_as_node) then
-    Result := Flibvlc_media_new_as_node(p_instance, psz_name, p_exception)
+    Result := Flibvlc_media_new_as_node(p_instance, psz_name)
   else
     RaiseNotSupported('libvlc_media_new_as_node');
 end;
 
 function TLibVLC.libvlc_media_player_can_pause(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_media_player_can_pause) then
-    Result := Flibvlc_media_player_can_pause(p_media_player, p_exception)
+    Result := Flibvlc_media_player_can_pause(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_can_pause');
 end;
 
 function TLibVLC.libvlc_media_player_event_manager(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_event_manager_t;
+  p_media_player: Plibvlc_media_player_t): Plibvlc_event_manager_t;
 begin
   if Assigned(Flibvlc_media_player_event_manager) then
-    Result := Flibvlc_media_player_event_manager(p_media_player, p_exception)
+    Result := Flibvlc_media_player_event_manager(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_event_manager');
 end;
@@ -3124,41 +2528,37 @@ begin
 end;
 
 function TLibVLC.libvlc_media_player_get_chapter(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_media_player_get_chapter) then
-    Result := Flibvlc_media_player_get_chapter(p_media_player, p_exception)
+    Result := Flibvlc_media_player_get_chapter(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_get_chapter');
 end;
 
 function TLibVLC.libvlc_media_player_get_chapter_count(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_media_player_get_chapter_count) then
-    Result := Flibvlc_media_player_get_chapter_count(p_media_player, p_exception)
+    Result := Flibvlc_media_player_get_chapter_count(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_get_chapter_count');
 end;
 
 function TLibVLC.libvlc_media_player_get_chapter_count_for_title(
-  p_media_player: Plibvlc_media_player_t; title: Integer;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t; title : Integer): Integer;
 begin
   if Assigned(Flibvlc_media_player_get_chapter_count_for_title) then
-    Result := Flibvlc_media_player_get_chapter_count_for_title(p_media_player, title, p_exception)
+    Result := Flibvlc_media_player_get_chapter_count_for_title(p_media_player, title)
   else
     RaiseNotSupported('libvlc_media_player_get_chapter_count_for_title');
 end;
 
 function TLibVLC.libvlc_media_player_get_fps(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Single;
+  p_media_player: Plibvlc_media_player_t): Single;
 begin
   if Assigned(Flibvlc_media_player_get_fps) then
-    Result := Flibvlc_media_player_get_fps(p_media_player, p_exception)
+    Result := Flibvlc_media_player_get_fps(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_get_fps');
 end;
@@ -3173,21 +2573,19 @@ begin
 end;
 
 function TLibVLC.libvlc_media_player_get_length(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): libvlc_time_t;
+  p_media_player: Plibvlc_media_player_t): libvlc_time_t;
 begin
   if Assigned(Flibvlc_media_player_get_length) then
-    Result := Flibvlc_media_player_get_length(p_media_player, p_exception)
+    Result := Flibvlc_media_player_get_length(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_get_length');
 end;
 
 function TLibVLC.libvlc_media_player_get_media(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_t;
+  p_media_player: Plibvlc_media_player_t): Plibvlc_media_t;
 begin
   if Assigned(Flibvlc_media_player_get_media) then
-    Result := Flibvlc_media_player_get_media(p_media_player, p_exception)
+    Result := Flibvlc_media_player_get_media(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_get_media');
 end;
@@ -3202,61 +2600,55 @@ begin
 end;
 
 function TLibVLC.libvlc_media_player_get_position(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Single;
+  p_media_player: Plibvlc_media_player_t): Single;
 begin
   if Assigned(Flibvlc_media_player_get_position) then
-    Result := Flibvlc_media_player_get_position(p_media_player, p_exception)
+    Result := Flibvlc_media_player_get_position(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_get_position');
 end;
 
 function TLibVLC.libvlc_media_player_get_rate(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Single;
+  p_media_player: Plibvlc_media_player_t): Single;
 begin
   if Assigned(Flibvlc_media_player_get_rate) then
-    Result := Flibvlc_media_player_get_rate(p_media_player, p_exception)
+    Result := Flibvlc_media_player_get_rate(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_get_rate');
 end;
 
 function TLibVLC.libvlc_media_player_get_state(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): libvlc_state_t;
+  p_media_player: Plibvlc_media_player_t): libvlc_state_t;
 begin
   if Assigned(Flibvlc_media_player_get_state) then
-    Result := Flibvlc_media_player_get_state(p_media_player, p_exception)
+    Result := Flibvlc_media_player_get_state(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_get_state');
 end;
 
 function TLibVLC.libvlc_media_player_get_time(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): libvlc_time_t;
+  p_media_player: Plibvlc_media_player_t): libvlc_time_t;
 begin
   if Assigned(Flibvlc_media_player_get_time) then
-    Result := Flibvlc_media_player_get_time(p_media_player, p_exception)
+    Result := Flibvlc_media_player_get_time(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_get_time');
 end;
 
 function TLibVLC.libvlc_media_player_get_title(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_media_player_get_title) then
-    Result := Flibvlc_media_player_get_title(p_media_player, p_exception)
+    Result := Flibvlc_media_player_get_title(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_get_title');
 end;
 
 function TLibVLC.libvlc_media_player_get_title_count(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_media_player_get_title_count) then
-    Result := Flibvlc_media_player_get_title_count(p_media_player, p_exception)
+    Result := Flibvlc_media_player_get_title_count(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_get_title_count');
 end;
@@ -3271,85 +2663,80 @@ begin
 end;
 
 function TLibVLC.libvlc_media_player_has_vout(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_media_player_has_vout) then
-    Result := Flibvlc_media_player_has_vout(p_media_player, p_exception)
+    Result := Flibvlc_media_player_has_vout(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_has_vout');
 end;
 
 function TLibVLC.libvlc_media_player_is_playing(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_media_player_is_playing) then
-    Result := Flibvlc_media_player_is_playing(p_media_player, p_exception)
+    Result := Flibvlc_media_player_is_playing(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_is_playing');
 end;
 
 function TLibVLC.libvlc_media_player_is_seekable(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_media_player_is_seekable) then
-    Result := Flibvlc_media_player_is_seekable(p_media_player, p_exception)
+    Result := Flibvlc_media_player_is_seekable(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_is_seekable');
 end;
 
-function TLibVLC.libvlc_media_player_new(p_instance: Plibvlc_instance_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_player_t;
+function TLibVLC.libvlc_media_player_new(p_instance: Plibvlc_instance_t): Plibvlc_media_player_t;
 begin
   if Assigned(Flibvlc_media_player_new) then
-    Result := Flibvlc_media_player_new(p_instance, p_exception)
+    Result := Flibvlc_media_player_new(p_instance)
   else
     RaiseNotSupported('libvlc_media_player_new');
 end;
 
-function TLibVLC.libvlc_media_player_new_from_media(p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_player_t;
+function TLibVLC.libvlc_media_player_new_from_media(p_media: Plibvlc_media_t): Plibvlc_media_player_t;
 begin
   if Assigned(Flibvlc_media_player_new_from_media) then
-    Result := Flibvlc_media_player_new_from_media(p_media, p_exception)
+    Result := Flibvlc_media_player_new_from_media(p_media)
   else
     RaiseNotSupported('libvlc_media_player_new_from_media');
 end;
 
 procedure TLibVLC.libvlc_media_player_next_chapter(
-  p_media_player: Plibvlc_media_player_t; p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t);
 begin
   if Assigned(Flibvlc_media_player_next_chapter) then
-    Flibvlc_media_player_next_chapter(p_media_player, p_exception)
+    Flibvlc_media_player_next_chapter(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_next_chapter');
 end;
 
 procedure TLibVLC.libvlc_media_player_pause(
-  p_media_player: Plibvlc_media_player_t; p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t);
 begin
   if Assigned(Flibvlc_media_player_pause) then
-    Flibvlc_media_player_pause(p_media_player, p_exception)
+    Flibvlc_media_player_pause(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_pause');
 end;
 
 procedure TLibVLC.libvlc_media_player_play(
-  p_media_player: Plibvlc_media_player_t; p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t);
 begin
   if Assigned(Flibvlc_media_player_play) then
-    Flibvlc_media_player_play(p_media_player, p_exception)
+    Flibvlc_media_player_play(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_play');
 end;
 
 procedure TLibVLC.libvlc_media_player_previous_chapter(
-  p_media_player: Plibvlc_media_player_t; p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t);
 begin
   if Assigned(Flibvlc_media_player_previous_chapter) then
-    Flibvlc_media_player_previous_chapter(p_media_player, p_exception)
+    Flibvlc_media_player_previous_chapter(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_previous_chapter');
 end;
@@ -3373,120 +2760,109 @@ begin
 end;
 
 procedure TLibVLC.libvlc_media_player_set_agl(
-  p_media_player: Plibvlc_media_player_t; drawable: Cardinal;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; drawable : Cardinal);
 begin
   if Assigned(Flibvlc_media_player_set_agl) then
-    Flibvlc_media_player_set_agl(p_media_player, drawable, p_exception)
+    Flibvlc_media_player_set_agl(p_media_player, drawable)
   else
     RaiseNotSupported('libvlc_media_player_set_agl');
 end;
 
 procedure TLibVLC.libvlc_media_player_set_chapter(
-  p_media_player: Plibvlc_media_player_t; chapter: Integer;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; chapter: Integer);
 begin
   if Assigned(Flibvlc_media_player_set_chapter) then
-    Flibvlc_media_player_set_chapter(p_media_player, chapter, p_exception)
+    Flibvlc_media_player_set_chapter(p_media_player, chapter)
   else
     RaiseNotSupported('libvlc_media_player_set_chapter');
 end;
 
 procedure TLibVLC.libvlc_media_player_set_hwnd(
-  p_media_player: Plibvlc_media_player_t; drawable: Pointer;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; drawable: Pointer);
 begin
   if Assigned(Flibvlc_media_player_set_hwnd) then
-    Flibvlc_media_player_set_hwnd(p_media_player, drawable, p_exception)
+    Flibvlc_media_player_set_hwnd(p_media_player, drawable)
   else
     RaiseNotSupported('libvlc_media_player_set_hwnd');
 end;
 
 procedure TLibVLC.libvlc_media_player_set_media(
-  p_media_player: Plibvlc_media_player_t; p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; p_media: Plibvlc_media_t);
 begin
   if Assigned(Flibvlc_media_player_set_media) then
-    Flibvlc_media_player_set_media(p_media_player, p_media, p_exception)
+    Flibvlc_media_player_set_media(p_media_player, p_media)
   else
     RaiseNotSupported('libvlc_media_player_set_media');
 end;
 
 procedure TLibVLC.libvlc_media_player_set_nsobject(
-  p_media_player: Plibvlc_media_player_t; drawable: Pointer;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; drawable: Pointer);
 begin
   if Assigned(Flibvlc_media_player_set_nsobject) then
-    Flibvlc_media_player_set_nsobject(p_media_player, drawable, p_exception)
+    Flibvlc_media_player_set_nsobject(p_media_player, drawable)
   else
     RaiseNotSupported('libvlc_media_player_set_nsobject');
 end;
 
 procedure TLibVLC.libvlc_media_player_set_position(
-  p_media_player: Plibvlc_media_player_t; position: Single;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; position: Single);
 begin
   if Assigned(Flibvlc_media_player_set_position) then
-    Flibvlc_media_player_set_position(p_media_player, position, p_exception)
+    Flibvlc_media_player_set_position(p_media_player, position)
   else
     RaiseNotSupported('libvlc_media_player_set_position');
 end;
 
 procedure TLibVLC.libvlc_media_player_set_rate(
-  p_media_player: Plibvlc_media_player_t; rate: Single;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; rate : Single);
 begin
   if Assigned(Flibvlc_media_player_set_rate) then
-    Flibvlc_media_player_set_rate(p_media_player, rate, p_exception)
+    Flibvlc_media_player_set_rate(p_media_player, rate)
   else
     RaiseNotSupported('libvlc_media_player_set_rate');
 end;
 
 procedure TLibVLC.libvlc_media_player_set_time(
-  p_media_player: Plibvlc_media_player_t; time: libvlc_time_t;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; time: libvlc_time_t);
 begin
   if Assigned(Flibvlc_media_player_set_time) then
-    Flibvlc_media_player_set_time(p_media_player, time, p_exception)
+    Flibvlc_media_player_set_time(p_media_player, time)
   else
     RaiseNotSupported('libvlc_media_player_set_time');
 end;
 
 procedure TLibVLC.libvlc_media_player_set_title(
-  p_media_player: Plibvlc_media_player_t; title: Integer;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; title : Integer);
 begin
   if Assigned(Flibvlc_media_player_set_title) then
-    Flibvlc_media_player_set_title(p_media_player, title, p_exception)
+    Flibvlc_media_player_set_title(p_media_player, title)
   else
     RaiseNotSupported('libvlc_media_player_set_title');
 end;
 
 procedure TLibVLC.libvlc_media_player_set_xwindow(
-  p_media_player: Plibvlc_media_player_t; drawable: Cardinal;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; drawable : Cardinal);
 begin
   if Assigned(Flibvlc_media_player_set_xwindow) then
-    Flibvlc_media_player_set_xwindow(p_media_player, drawable, p_exception)
+    Flibvlc_media_player_set_xwindow(p_media_player, drawable)
   else
     RaiseNotSupported('libvlc_media_player_set_xwindow');
 end;
 
 procedure TLibVLC.libvlc_media_player_stop(
-  p_media_player: Plibvlc_media_player_t; p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t);
 begin
   if Assigned(Flibvlc_media_player_stop) then
-    Flibvlc_media_player_stop(p_media_player, p_exception)
+    Flibvlc_media_player_stop(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_stop');
 end;
 
 function TLibVLC.libvlc_media_player_will_play(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_media_player_will_play) then
-    Result := Flibvlc_media_player_will_play(p_media_player, p_exception)
+    Result := Flibvlc_media_player_will_play(p_media_player)
   else
     RaiseNotSupported('libvlc_media_player_will_play');
 end;
@@ -3508,25 +2884,23 @@ begin
 end;
 
 procedure TLibVLC.libvlc_media_set_user_data(p_media: Plibvlc_media_t;
-  p_new_user_data: Pointer; p_exception: Plibvlc_exception_t);
+  p_new_user_data: Pointer);
 begin
   if Assigned(Flibvlc_media_set_user_data) then
-    Flibvlc_media_set_user_data(p_media, p_new_user_data, p_exception)
+    Flibvlc_media_set_user_data(p_media, p_new_user_data)
   else
     RaiseNotSupported('libvlc_media_set_user_data');
 end;
 
-function TLibVLC.libvlc_media_subitems(p_media: Plibvlc_media_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_media_list_t;
+function TLibVLC.libvlc_media_subitems(p_media: Plibvlc_media_t): Plibvlc_media_list_t;
 begin
   if Assigned(Flibvlc_media_subitems) then
-    Result := Flibvlc_media_subitems(p_media, p_exception)
+    Result := Flibvlc_media_subitems(p_media)
   else
     RaiseNotSupported('libvlc_media_subitems');
 end;
 
-function TLibVLC.libvlc_new(argc: Integer; argv: PPAnsiChar;
-  p_exception: Plibvlc_exception_t): Plibvlc_instance_t;
+function TLibVLC.libvlc_new(argc: Integer; argv: PPAnsiChar): Plibvlc_instance_t;
 begin
   if Assigned(Flibvlc_new) then
   begin
@@ -3534,7 +2908,7 @@ begin
     Set8087CW($133f);
     try
     {$ENDIF}
-      Result := Flibvlc_new(argc, argv, p_exception)
+      Result := Flibvlc_new(argc, argv)
     {$IFDEF AutoFixFloatingPointOverflowError}
     finally
       Set8087CW(Default8087CW);
@@ -3561,38 +2935,36 @@ begin
     RaiseNotSupported('libvlc_retain');
 end;
 
-procedure TLibVLC.libvlc_set_fullscreen(p_media_player: Plibvlc_media_player_t;
-  enabled: Integer; p_exception: Plibvlc_exception_t);
+procedure TLibVLC.libvlc_set_fullscreen(p_media_player: Plibvlc_media_player_t; enabled : Integer);
 begin
   if Assigned(Flibvlc_set_fullscreen) then
-    Flibvlc_set_fullscreen(p_media_player, enabled, p_exception)
+    Flibvlc_set_fullscreen(p_media_player, enabled)
   else
     RaiseNotSupported('libvlc_set_fullscreen');
 end;
 
 procedure TLibVLC.libvlc_set_log_verbosity(p_instance: Plibvlc_instance_t;
-  level: Cardinal; p_e: Plibvlc_exception_t);
+  level: Cardinal);
 begin
   if Assigned(Flibvlc_set_log_verbosity) then
-    Flibvlc_set_log_verbosity( p_instance,  level,  p_e)
+    Flibvlc_set_log_verbosity( p_instance,  level)
   else
     RaiseNotSupported('libvlc_set_log_verbosity');
 end;
 
 procedure TLibVLC.libvlc_toggle_fullscreen(
-  p_media_player: Plibvlc_media_player_t; p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t);
 begin
   if Assigned(Flibvlc_toggle_fullscreen) then
-    Flibvlc_toggle_fullscreen(p_media_player, p_exception)
+    Flibvlc_toggle_fullscreen(p_media_player)
   else
     RaiseNotSupported('libvlc_toggle_fullscreen');
 end;
 
-procedure TLibVLC.libvlc_toggle_teletext(p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t);
+procedure TLibVLC.libvlc_toggle_teletext(p_media_player: Plibvlc_media_player_t);
 begin
   if Assigned(Flibvlc_toggle_teletext) then
-    Flibvlc_toggle_teletext(p_media_player, p_exception)
+    Flibvlc_toggle_teletext(p_media_player)
   else
     RaiseNotSupported('libvlc_toggle_teletext');
 end;
@@ -3607,432 +2979,404 @@ begin
 end;
 
 function TLibVLC.libvlc_video_get_aspect_ratio(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): PAnsiChar;
+  p_media_player: Plibvlc_media_player_t): PAnsiChar;
 begin
   if Assigned(Flibvlc_video_get_aspect_ratio) then
-    Result := Flibvlc_video_get_aspect_ratio(p_media_player, p_exception)
+    Result := Flibvlc_video_get_aspect_ratio(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_aspect_ratio');
 end;
 
 function TLibVLC.libvlc_video_get_chapter_description(
-  p_media_player: Plibvlc_media_player_t; title: Integer;
-  p_exception: Plibvlc_exception_t): Plibvlc_track_description_t;
+  p_media_player: Plibvlc_media_player_t; title : Integer): Plibvlc_track_description_t;
 begin
   if Assigned(Flibvlc_video_get_chapter_description) then
-    Result := Flibvlc_video_get_chapter_description(p_media_player, title, p_exception)
+    Result := Flibvlc_video_get_chapter_description(p_media_player, title)
   else
     RaiseNotSupported('libvlc_video_get_chapter_description');
 end;
 
 function TLibVLC.libvlc_video_get_crop_geometry(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): PAnsiChar;
+  p_media_player: Plibvlc_media_player_t): PAnsiChar;
 begin
   if Assigned(Flibvlc_video_get_crop_geometry) then
-    Result := Flibvlc_video_get_crop_geometry(p_media_player, p_exception)
+    Result := Flibvlc_video_get_crop_geometry(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_crop_geometry');
 end;
 
-function TLibVLC.libvlc_video_get_height(p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+function TLibVLC.libvlc_video_get_height(p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_video_get_height) then
-    Result := Flibvlc_video_get_height(p_media_player, p_exception)
+    Result := Flibvlc_video_get_height(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_height');
 end;
 
-function TLibVLC.libvlc_video_get_scale(p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Single;
+function TLibVLC.libvlc_video_get_scale(p_media_player: Plibvlc_media_player_t): Single;
 begin
   if Assigned(Flibvlc_video_get_scale) then
-    Result := Flibvlc_video_get_scale(p_media_player, p_exception)
+    Result := Flibvlc_video_get_scale(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_scale');
 end;
 
-function TLibVLC.libvlc_video_get_spu(p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+function TLibVLC.libvlc_video_get_spu(p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_video_get_spu) then
-    Result := Flibvlc_video_get_spu(p_media_player, p_exception)
+    Result := Flibvlc_video_get_spu(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_spu');
 end;
 
 function TLibVLC.libvlc_video_get_spu_count(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_video_get_spu_count) then
-    Result := Flibvlc_video_get_spu_count(p_media_player, p_exception)
+    Result := Flibvlc_video_get_spu_count(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_spu_count');
 end;
 
 function TLibVLC.libvlc_video_get_spu_description(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_track_description_t;
+  p_media_player: Plibvlc_media_player_t): Plibvlc_track_description_t;
 begin
   if Assigned(Flibvlc_video_get_spu_description) then
-    Result := Flibvlc_video_get_spu_description(p_media_player, p_exception)
+    Result := Flibvlc_video_get_spu_description(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_spu_description');
 end;
 
 function TLibVLC.libvlc_video_get_teletext(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_video_get_teletext) then
-    Result := Flibvlc_video_get_teletext(p_media_player, p_exception)
+    Result := Flibvlc_video_get_teletext(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_teletext');
 end;
 
 function TLibVLC.libvlc_video_get_title_description(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_track_description_t;
+  p_media_player: Plibvlc_media_player_t): Plibvlc_track_description_t;
 begin
   if Assigned(Flibvlc_video_get_title_description) then
-    Result := Flibvlc_video_get_title_description(p_media_player, p_exception)
+    Result := Flibvlc_video_get_title_description(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_title_description');
 end;
 
-function TLibVLC.libvlc_video_get_track(p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+function TLibVLC.libvlc_video_get_track(p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_video_get_track) then
-    Result := Flibvlc_video_get_track(p_media_player, p_exception)
+    Result := Flibvlc_video_get_track(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_track');
 end;
 
 function TLibVLC.libvlc_video_get_track_count(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_video_get_track_count) then
-    Result := Flibvlc_video_get_track_count(p_media_player, p_exception)
+    Result := Flibvlc_video_get_track_count(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_track_count');
 end;
 
 function TLibVLC.libvlc_video_get_track_description(
-  p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Plibvlc_track_description_t;
+  p_media_player: Plibvlc_media_player_t): Plibvlc_track_description_t;
 begin
   if Assigned(Flibvlc_video_get_track_description) then
-    Result := Flibvlc_video_get_track_description(p_media_player, p_exception)
+    Result := Flibvlc_video_get_track_description(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_track_description');
 end;
 
-function TLibVLC.libvlc_video_get_width(p_media_player: Plibvlc_media_player_t;
-  p_exception: Plibvlc_exception_t): Integer;
+function TLibVLC.libvlc_video_get_width(p_media_player: Plibvlc_media_player_t): Integer;
 begin
   if Assigned(Flibvlc_video_get_width) then
-    Result := Flibvlc_video_get_width(p_media_player, p_exception)
+    Result := Flibvlc_video_get_width(p_media_player)
   else
     RaiseNotSupported('libvlc_video_get_width');
 end;
 
 procedure TLibVLC.libvlc_video_set_aspect_ratio(
-  p_media_player: Plibvlc_media_player_t; psz_aspect: PAnsiChar;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; psz_aspect: PAnsiChar);
 begin
   if Assigned(Flibvlc_video_set_aspect_ratio) then
-    Flibvlc_video_set_aspect_ratio(p_media_player, psz_aspect, p_exception)
+    Flibvlc_video_set_aspect_ratio(p_media_player, psz_aspect)
   else
     RaiseNotSupported('libvlc_video_set_aspect_ratio');
 end;
 
 procedure TLibVLC.libvlc_video_set_crop_geometry(
-  p_media_player: Plibvlc_media_player_t; geometry: PAnsiChar;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; geometry: PAnsiChar);
 begin
   if Assigned(Flibvlc_video_set_crop_geometry) then
-    Flibvlc_video_set_crop_geometry(p_media_player, geometry, p_exception)
+    Flibvlc_video_set_crop_geometry(p_media_player, geometry)
   else
     RaiseNotSupported('libvlc_video_set_crop_geometry');
 end;
 
 procedure TLibVLC.libvlc_video_set_scale(p_media_player: Plibvlc_media_player_t;
-  scale: Single; p_exception: Plibvlc_exception_t);
+ scale : Single);
 begin
   if Assigned(Flibvlc_video_set_scale) then
-    Flibvlc_video_set_scale(p_media_player, scale, p_exception)
+    Flibvlc_video_set_scale(p_media_player, scale)
   else
     RaiseNotSupported('libvlc_video_set_scale');
 end;
 
 procedure TLibVLC.libvlc_video_set_spu(p_media_player: Plibvlc_media_player_t;
-  i_spu: Integer; p_exception: Plibvlc_exception_t);
+  i_spu: Integer);
 begin
   if Assigned(Flibvlc_video_set_spu) then
-    Flibvlc_video_set_spu(p_media_player, i_spu, p_exception)
+    Flibvlc_video_set_spu(p_media_player, i_spu)
   else
     RaiseNotSupported('libvlc_video_set_spu');
 end;
 
 function TLibVLC.libvlc_video_set_subtitle_file(
-  p_media_player: Plibvlc_media_player_t; filename: PAnsiChar;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_media_player: Plibvlc_media_player_t; filename: PAnsiChar): Integer;
 begin
   if Assigned(Flibvlc_video_set_subtitle_file) then
-    Result := Flibvlc_video_set_subtitle_file(p_media_player, filename, p_exception)
+    Result := Flibvlc_video_set_subtitle_file(p_media_player, filename)
   else
     RaiseNotSupported('libvlc_video_set_subtitle_file');
 end;
 
 procedure TLibVLC.libvlc_video_set_teletext(
-  p_media_player: Plibvlc_media_player_t; page: Integer;
-  p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; page: Integer);
 begin
   if Assigned(Flibvlc_video_set_teletext) then
-    Flibvlc_video_set_teletext(p_media_player, page, p_exception)
+    Flibvlc_video_set_teletext(p_media_player, page)
   else
     RaiseNotSupported('libvlc_video_set_teletext');
 end;
 
 procedure TLibVLC.libvlc_video_set_track(p_media_player: Plibvlc_media_player_t;
-  track: Integer; p_exception: Plibvlc_exception_t);
+ track : Integer);
 begin
   if Assigned(Flibvlc_video_set_track) then
-    Flibvlc_video_set_track(p_media_player, track, p_exception)
+    Flibvlc_video_set_track(p_media_player, track)
   else
     RaiseNotSupported('libvlc_video_set_track');
 end;
 
 procedure TLibVLC.libvlc_video_take_snapshot(
-  p_media_player: Plibvlc_media_player_t; filepath: PAnsiChar; width,
-  height: Integer; p_exception: Plibvlc_exception_t);
+  p_media_player: Plibvlc_media_player_t; filepath : PAnsiChar;
+  width, height : Integer);
 begin
   if Assigned(Flibvlc_video_take_snapshot) then
-    Flibvlc_video_take_snapshot(p_media_player, filepath, width, height, p_exception)
+    Flibvlc_video_take_snapshot(p_media_player, filepath, width, height)
   else
     RaiseNotSupported('libvlc_video_take_snapshot');
 end;
 
 procedure TLibVLC.libvlc_vlm_add_broadcast(p_instance: Plibvlc_instance_t;
   psz_name, psz_input, psz_output: PAnsiChar; options: Integer;
-  ppsz_options: Pointer; b_enabled, b_loop: Integer;
-  p_exception: Plibvlc_exception_t);
+  ppsz_options: Pointer; b_enabled, b_loop: Integer);
 begin
   if Assigned(Flibvlc_vlm_add_broadcast) then
-    Flibvlc_vlm_add_broadcast(p_instance, psz_name, psz_input, psz_output, options, ppsz_options, b_enabled, b_loop, p_exception)
+    Flibvlc_vlm_add_broadcast(p_instance, psz_name, psz_input, psz_output, options, ppsz_options, b_enabled, b_loop)
   else
     RaiseNotSupported('libvlc_vlm_add_broadcast');
 end;
 
 procedure TLibVLC.libvlc_vlm_add_input(p_instance: Plibvlc_instance_t; psz_name,
-  pst_input: PAnsiChar; p_exception: Plibvlc_exception_t);
+  pst_input: PAnsiChar);
 begin
   if Assigned(Flibvlc_vlm_add_input) then
-    Flibvlc_vlm_add_input(p_instance, psz_name, pst_input, p_exception)
+    Flibvlc_vlm_add_input(p_instance, psz_name, pst_input)
   else
     RaiseNotSupported('libvlc_vlm_add_input');
 end;
 
 procedure TLibVLC.libvlc_vlm_add_vod(p_instance: Plibvlc_instance_t; psz_name,
   psz_input: PAnsiChar; i_options: Integer; ppsz_options: Pointer;
-  b_enabled: Integer; psz_mux: PAnsiChar; p_exception: Plibvlc_exception_t);
+  b_enabled: Integer; psz_mux: PAnsiChar);
 begin
   if Assigned(Flibvlc_vlm_add_vod) then
-    Flibvlc_vlm_add_vod(p_instance, psz_name, psz_input, i_options, ppsz_options, b_enabled, psz_mux, p_exception)
+    Flibvlc_vlm_add_vod(p_instance, psz_name, psz_input, i_options, ppsz_options, b_enabled, psz_mux)
   else
     RaiseNotSupported('libvlc_vlm_add_vod');
 end;
 
 procedure TLibVLC.libvlc_vlm_change_media(p_instance: Plibvlc_instance_t;
   psz_name, psz_input, psz_output: PAnsiChar; i_options: Integer;
-  ppsz_options: Pointer; b_enabled, b_loop: Integer;
-  p_exception: Plibvlc_exception_t);
+  ppsz_options: Pointer; b_enabled, b_loop: Integer);
 begin
   if Assigned(Flibvlc_vlm_change_media) then
-    Flibvlc_vlm_change_media(p_instance, psz_name, psz_input, psz_output, i_options, ppsz_options, b_enabled, b_loop, p_exception)
+    Flibvlc_vlm_change_media(p_instance, psz_name, psz_input, psz_output, i_options, ppsz_options, b_enabled, b_loop)
   else
     RaiseNotSupported('libvlc_vlm_change_media');
 end;
 
 procedure TLibVLC.libvlc_vlm_del_media(p_instance: Plibvlc_instance_t;
-  psz_name: PAnsiChar; p_exception: Plibvlc_exception_t);
+  psz_name: PAnsiChar);
 begin
   if Assigned(Flibvlc_vlm_del_media) then
-    Flibvlc_vlm_del_media(p_instance, psz_name, p_exception)
+    Flibvlc_vlm_del_media(p_instance, psz_name)
   else
     RaiseNotSupported('libvlc_vlm_del_media');
 end;
 
 function TLibVLC.libvlc_vlm_get_media_instance_chapter(
-  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer): Integer;
 begin
   if Assigned(Flibvlc_vlm_get_media_instance_chapter) then
-    Result := Flibvlc_vlm_get_media_instance_chapter(p_instance, psz_name, i_instance, p_exception)
+    Result := Flibvlc_vlm_get_media_instance_chapter(p_instance, psz_name, i_instance)
   else
     RaiseNotSupported('libvlc_vlm_get_media_instance_chapter');
 end;
 
 function TLibVLC.libvlc_vlm_get_media_instance_length(
-  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer): Integer;
 begin
   if Assigned(Flibvlc_vlm_get_media_instance_length) then
-    Result := Flibvlc_vlm_get_media_instance_length(p_instance, psz_name, i_instance, p_exception)
+    Result := Flibvlc_vlm_get_media_instance_length(p_instance, psz_name, i_instance)
   else
     RaiseNotSupported('libvlc_vlm_get_media_instance_length');
 end;
 
 function TLibVLC.libvlc_vlm_get_media_instance_position(
-  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer;
-  p_exception: Plibvlc_exception_t): Single;
+  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer): Single;
 begin
   if Assigned(Flibvlc_vlm_get_media_instance_position) then
-    Result := Flibvlc_vlm_get_media_instance_position(p_instance, psz_name, i_instance, p_exception)
+    Result := Flibvlc_vlm_get_media_instance_position(p_instance, psz_name, i_instance)
   else
     RaiseNotSupported('libvlc_vlm_get_media_instance_position');
 end;
 
 function TLibVLC.libvlc_vlm_get_media_instance_rate(
-  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer): Integer;
 begin
   if Assigned(Flibvlc_vlm_get_media_instance_rate) then
-    Result := Flibvlc_vlm_get_media_instance_rate(p_instance, psz_name, i_instance, p_exception)
+    Result := Flibvlc_vlm_get_media_instance_rate(p_instance, psz_name, i_instance)
   else
     RaiseNotSupported('libvlc_vlm_get_media_instance_rate');
 end;
 
 function TLibVLC.libvlc_vlm_get_media_instance_seekable(
-  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer): Integer;
 begin
   if Assigned(Flibvlc_vlm_get_media_instance_seekable) then
-    Result := Flibvlc_vlm_get_media_instance_seekable(p_instance, psz_name, i_instance, p_exception)
+    Result := Flibvlc_vlm_get_media_instance_seekable(p_instance, psz_name, i_instance)
   else
     RaiseNotSupported('libvlc_vlm_get_media_instance_seekable');
 end;
 
 function TLibVLC.libvlc_vlm_get_media_instance_time(
-  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer): Integer;
 begin
   if Assigned(Flibvlc_vlm_get_media_instance_time) then
-    Result := Flibvlc_vlm_get_media_instance_time(p_instance, psz_name, i_instance, p_exception)
+    Result := Flibvlc_vlm_get_media_instance_time(p_instance, psz_name, i_instance)
   else
     RaiseNotSupported('libvlc_vlm_get_media_instance_time');
 end;
 
 function TLibVLC.libvlc_vlm_get_media_instance_title(
-  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer;
-  p_exception: Plibvlc_exception_t): Integer;
+  p_instance: Plibvlc_instance_t; psz_name: PAnsiChar; i_instance: Integer): Integer;
 begin
   if Assigned(Flibvlc_vlm_get_media_instance_title) then
-    Result := Flibvlc_vlm_get_media_instance_title(p_instance, psz_name, i_instance, p_exception)
+    Result := Flibvlc_vlm_get_media_instance_title(p_instance, psz_name, i_instance)
   else
     RaiseNotSupported('libvlc_vlm_get_media_instance_title');
 end;
 
 procedure TLibVLC.libvlc_vlm_pause_media(p_instance: Plibvlc_instance_t;
-  psz_name: PAnsiChar; p_exception: Plibvlc_exception_t);
+  psz_name: PAnsiChar);
 begin
   if Assigned(Flibvlc_vlm_pause_media) then
-    Flibvlc_vlm_pause_media(p_instance, psz_name, p_exception)
+    Flibvlc_vlm_pause_media(p_instance, psz_name)
   else
     RaiseNotSupported('libvlc_vlm_pause_media');
 end;
 
 procedure TLibVLC.libvlc_vlm_play_media(p_instance: Plibvlc_instance_t;
-  psz_name: PAnsiChar; p_exception: Plibvlc_exception_t);
+  psz_name: PAnsiChar);
 begin
   if Assigned(Flibvlc_vlm_play_media) then
-    Flibvlc_vlm_play_media(p_instance, psz_name, p_exception)
+    Flibvlc_vlm_play_media(p_instance, psz_name)
   else
     RaiseNotSupported('libvlc_vlm_play_media');
 end;
 
-procedure TLibVLC.libvlc_vlm_release(p_instance: Plibvlc_instance_t;
-  p_exception: Plibvlc_exception_t);
+procedure TLibVLC.libvlc_vlm_release(p_instance: Plibvlc_instance_t);
 begin
   if Assigned(Flibvlc_vlm_release) then
-    Flibvlc_vlm_release(p_instance, p_exception)
+    Flibvlc_vlm_release(p_instance)
   else
     RaiseNotSupported('libvlc_vlm_release');
 end;
 
 procedure TLibVLC.libvlc_vlm_seek_media(p_instance: Plibvlc_instance_t;
-  psz_name: PAnsiChar; f_percentage: Single; p_exception: Plibvlc_exception_t);
+  psz_name: PAnsiChar; f_percentage: Single);
 begin
   if Assigned(Flibvlc_vlm_seek_media) then
-    Flibvlc_vlm_seek_media(p_instance, psz_name, f_percentage, p_exception)
+    Flibvlc_vlm_seek_media(p_instance, psz_name, f_percentage)
   else
     RaiseNotSupported('libvlc_vlm_seek_media');
 end;
 
 procedure TLibVLC.libvlc_vlm_set_enabled(p_instance: Plibvlc_instance_t;
-  psz_name: PAnsiChar; b_enabled: Integer; p_exception: Plibvlc_exception_t);
+  psz_name: PAnsiChar; b_enabled: Integer);
 begin
   if Assigned(Flibvlc_vlm_set_enabled) then
-    Flibvlc_vlm_set_enabled(p_instance, psz_name, b_enabled, p_exception)
+    Flibvlc_vlm_set_enabled(p_instance, psz_name, b_enabled)
   else
     RaiseNotSupported('libvlc_vlm_set_enabled');
 end;
 
 procedure TLibVLC.libvlc_vlm_set_input(p_instance: Plibvlc_instance_t; psz_name,
-  psz_input: PAnsiChar; p_exception: Plibvlc_exception_t);
+  psz_input: PAnsiChar);
 begin
   if Assigned(Flibvlc_vlm_set_input) then
-    Flibvlc_vlm_set_input(p_instance, psz_name, psz_input, p_exception)
+    Flibvlc_vlm_set_input(p_instance, psz_name, psz_input)
   else
     RaiseNotSupported('libvlc_vlm_set_input');
 end;
 
 procedure TLibVLC.libvlc_vlm_set_loop(p_instance: Plibvlc_instance_t;
-  psz_name: PAnsiChar; b_loop: Integer; p_exception: Plibvlc_exception_t);
+  psz_name: PAnsiChar; b_loop: Integer);
 begin
   if Assigned(Flibvlc_vlm_set_loop) then
-    Flibvlc_vlm_set_loop(p_instance, psz_name, b_loop, p_exception)
+    Flibvlc_vlm_set_loop(p_instance, psz_name, b_loop)
   else
     RaiseNotSupported('libvlc_vlm_set_loop');
 end;
 
 procedure TLibVLC.libvlc_vlm_set_mux(p_instance: Plibvlc_instance_t; psz_name,
-  psz_mux: PAnsiChar; p_exception: Plibvlc_exception_t);
+  psz_mux: PAnsiChar);
 begin
   if Assigned(Flibvlc_vlm_set_mux) then
-    Flibvlc_vlm_set_mux(p_instance, psz_name, psz_mux, p_exception)
+    Flibvlc_vlm_set_mux(p_instance, psz_name, psz_mux)
   else
     RaiseNotSupported('libvlc_vlm_set_mux');
 end;
 
 procedure TLibVLC.libvlc_vlm_set_output(p_instance: Plibvlc_instance_t;
-  psz_name, psz_output: PAnsiChar; p_exception: Plibvlc_exception_t);
+  psz_name, psz_output: PAnsiChar);
 begin
   if Assigned(Flibvlc_vlm_set_output) then
-    Flibvlc_vlm_set_output(p_instance, psz_name, psz_output, p_exception)
+    Flibvlc_vlm_set_output(p_instance, psz_name, psz_output)
   else
     RaiseNotSupported('libvlc_vlm_set_output');
 end;
 
 function TLibVLC.libvlc_vlm_show_media(p_instance: Plibvlc_instance_t;
-  psz_name: PAnsiChar; p_exception: Plibvlc_exception_t): PAnsiChar;
+  psz_name: PAnsiChar): PAnsiChar;
 begin
   if Assigned(Flibvlc_vlm_show_media) then
-    Result := Flibvlc_vlm_show_media(p_instance, psz_name, p_exception)
+    Result := Flibvlc_vlm_show_media(p_instance, psz_name)
   else
     RaiseNotSupported('libvlc_vlm_show_media');
 end;
 
 procedure TLibVLC.libvlc_vlm_stop_media(p_instance: Plibvlc_instance_t;
-  psz_name: PAnsiChar; p_exception: Plibvlc_exception_t);
+  psz_name: PAnsiChar);
 begin
   if Assigned(Flibvlc_vlm_stop_media) then
-    Flibvlc_vlm_stop_media(p_instance, psz_name, p_exception)
+    Flibvlc_vlm_stop_media(p_instance, psz_name)
   else
     RaiseNotSupported('libvlc_vlm_stop_media');
 end;
@@ -4047,13 +3391,10 @@ end;
 
 procedure TLibVLC.LoadFunctions;
 begin
-  if FVersion >= EncodeVersion(1,0,5) then
+  if FVersion >= EncodeVersion(1,1,0) then
   begin
-    Flibvlc_exception_init := GetProcAddress(FLibrary, 'libvlc_exception_init');
-    Flibvlc_exception_raised := GetProcAddress(FLibrary, 'libvlc_exception_raised');
-    Flibvlc_exception_raise := GetProcAddress(FLibrary, 'libvlc_exception_raise');
-    Flibvlc_exception_clear := GetProcAddress(FLibrary, 'libvlc_exception_clear');
-    Flibvlc_exception_get_message := GetProcAddress(FLibrary, 'libvlc_exception_get_message');
+    Flibvlc_errmsg := GetProcAddress(FLibrary, 'libvlc_errmsg');
+    Flibvlc_clearerr := GetProcAddress(FLibrary, 'libvlc_clearerr');
 
     Flibvlc_new := GetProcAddress(FLibrary, 'libvlc_new');
     Flibvlc_release := GetProcAddress(FLibrary, 'libvlc_release');
@@ -4080,7 +3421,7 @@ begin
     Flibvlc_log_iterator_has_next := GetProcAddress(FLibrary, 'libvlc_log_iterator_has_next');
     Flibvlc_log_iterator_next := GetProcAddress(FLibrary, 'libvlc_log_iterator_next');
 
-    Flibvlc_media_new := GetProcAddress(FLibrary, 'libvlc_media_new');
+    Flibvlc_media_new_location := GetProcAddress(FLibrary, 'libvlc_media_new_location');
     Flibvlc_media_new_as_node := GetProcAddress(FLibrary, 'libvlc_media_new_as_node');
     Flibvlc_media_add_option := GetProcAddress(FLibrary, 'libvlc_media_add_option');
     Flibvlc_media_add_option_untrusted := GetProcAddress(FLibrary, 'libvlc_media_add_option_untrusted');
