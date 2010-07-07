@@ -20,7 +20,8 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\VSTSearchEdit_D120R.bpl</DCC_DependencyCheckOutputName>
+			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\VSTSearchEdit_D120R.bpl</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
 			<DCC_Platform>x86</DCC_Platform>
