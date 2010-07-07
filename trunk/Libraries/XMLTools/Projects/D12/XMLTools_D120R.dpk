@@ -24,7 +24,7 @@ package XMLTools_D120R;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'XMLTools'}
 {$RUNONLY}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD Off}
 
 requires
   rtl,
