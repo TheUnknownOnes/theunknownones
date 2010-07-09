@@ -47,35 +47,41 @@ type
   TListGroup = class(TCollectionItem)
   private
     FGroupID : Integer;
-    FHeader: string;
-    FFooter: string;
+    FHeader: WideString;
+    FFooter: WideString;
     FHeaderAlign: TListGroupAlign;
     FFooterAlign: TListGroupAlign;
     FState: TListGroupState;
     FExtendedImage: Integer;
-    FDescriptionBottom: string;
-    FSubtitle: string;
-    FDescriptionTop: string;
-    FSubsetTitle: string;
+    FDescriptionBottom: WideString;
+    FSubtitle: WideString;
+    FDescriptionTop: WideString;
+    FSubsetTitle: WideString;
     FTitleImage: Integer;
-    FTask: string;
+    FTask: WideString;
+    FCollapsible: Boolean;
+    FCollapsed: Boolean;
     procedure SetState(const Value: TListGroupState);
     procedure SetFooterAlign(const Value: TListGroupAlign);
     procedure SetHeaderAlign(const Value: TListGroupAlign);
-    procedure SetFooter(const Value: string);
-    procedure SetHeader(const Value: string);
+    procedure SetFooter(const Value: WideString);
+    procedure SetHeader(const Value: WideString);
 
     function GetOwnerListviewHandle : HWND;
     function SetGroupInfo(AGroupInfo : PLVGroup) : Boolean;
     function IDInUse(AID : Integer) : Boolean;
     function Designing() : Boolean;
-    procedure SetDescriptionBottom(const Value: string);
-    procedure SetDescriptionTop(const Value: string);
+    procedure SetDescriptionBottom(const Value: WideString);
+    procedure SetDescriptionTop(const Value: WideString);
     procedure SetExtendedImage(const Value: Integer);
-    procedure SetSubsetTitle(const Value: string);
-    procedure SetSubtitle(const Value: string);
-    procedure SetTask(const Value: string);
+    procedure SetSubsetTitle(const Value: WideString);
+    procedure SetSubtitle(const Value: WideString);
+    procedure SetTask(const Value: WideString);
     procedure SetTitleImage(const Value: Integer);
+    procedure SetCollapsible(const Value: Boolean);
+    procedure SetCollapsed(const Value: Boolean);
+    procedure InternalSetState(StateMask: Cardinal; Value: Boolean;
+      var Result: Boolean);
   protected
     procedure SetIndex(Value: Integer); override;
   public
@@ -83,19 +89,21 @@ type
     procedure Assign(Source: TPersistent); override;
     function GetDisplayName():String; override;
   published
-    property Header : string read FHeader write SetHeader;
-    property Footer : string read FFooter write SetFooter;
-    property Subtitle : string read FSubtitle write SetSubtitle;
-    property Task : string read FTask write SetTask;
-    property DescriptionTop : string read FDescriptionTop write SetDescriptionTop;
-    property DescriptionBottom : string read FDescriptionBottom write SetDescriptionBottom;
+    property Header : WideString read FHeader write SetHeader;
+    property Footer : WideString read FFooter write SetFooter;
+    property Subtitle : WideString read FSubtitle write SetSubtitle;
+    property Task : WideString read FTask write SetTask;
+    property DescriptionTop : WideString read FDescriptionTop write SetDescriptionTop;
+    property DescriptionBottom : WideString read FDescriptionBottom write SetDescriptionBottom;
     property TitleImage : Integer read FTitleImage write SetTitleImage default -1;
     property ExtendedImage : Integer read FExtendedImage write SetExtendedImage default -1;
-    property SubsetTitle : string read FSubsetTitle write SetSubsetTitle;
+    property SubsetTitle : WideString read FSubsetTitle write SetSubsetTitle;
     property GroupID : Integer read FGroupID;
     property HeaderAlign : TListGroupAlign read FHeaderAlign write SetHeaderAlign default lgaLeft;
     property FooterAlign : TListGroupAlign read FFooterAlign write SetFooterAlign default lgaLeft;
     property State : TListGroupState read FState write SetState default lgsNormal;
+    property Collapsible : Boolean read FCollapsible write SetCollapsible default False;
+    property Collapsed : Boolean read FCollapsed write SetCollapsed default False;
 
     procedure AddItem(AItemIndex : Integer);
   end;
@@ -377,7 +385,39 @@ begin
   end;
 end;
 
-procedure TListGroup.SetDescriptionBottom(const Value: string);
+procedure TListGroup.SetCollapsed(const Value: Boolean);
+begin
+  InternalSetState(LVGS_COLLAPSED, Value, FCollapsed);
+end;
+
+procedure TListGroup.SetCollapsible(const Value: Boolean);
+begin
+  InternalSetState(LVGS_COLLAPSIBLE, Value, FCollapsible);
+end;
+
+procedure TListGroup.InternalSetState(StateMask: Cardinal; Value: Boolean; var Result: Boolean);
+var
+  Group : PLVGroup;
+begin
+  Group:=GetNewLVGroup;
+  Group^.mask:=LVGF_STATE;
+  Group^.stateMask:=StateMask;
+
+  if not Value then
+    Group^.state:=LVGS_NORMAL
+  else
+    Group^.state:=StateMask;
+
+  if SetGroupInfo(Group) then
+  begin
+    Result := Value;
+    Changed(false);
+  end;
+
+  Dispose(Group);
+end;
+
+procedure TListGroup.SetDescriptionBottom(const Value: WideString);
 var
   Group : PLVGroup;
 begin
@@ -385,7 +425,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_DESCRIPTIONBOTTOM;
-    Group^.pszDescriptionBottom:=pchar(Value);
+    Group^.pszDescriptionBottom:=PWideChar(Value);
     Group^.cchDescriptionBottom:=Length(Value);
 
     if SetGroupInfo(Group) then
@@ -398,7 +438,7 @@ begin
   end;
 end;
 
-procedure TListGroup.SetDescriptionTop(const Value: string);
+procedure TListGroup.SetDescriptionTop(const Value: WideString);
 var
   Group : PLVGroup;
 begin
@@ -406,7 +446,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_DESCRIPTIONTOP;
-    Group^.pszDescriptionTop:=pchar(Value);
+    Group^.pszDescriptionTop:=PWideChar(Value);
     Group^.cchDescriptionTop:=Length(Value);
 
     if SetGroupInfo(Group) then
@@ -438,7 +478,7 @@ begin
     Dispose(Group);
   end;
 end;
-procedure TListGroup.SetFooter(const Value: string);
+procedure TListGroup.SetFooter(const Value: WideString);
 var
   Group : PLVGroup;
 begin
@@ -446,7 +486,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_FOOTER;
-    Group^.pszFooter:=pchar(Value);
+    Group^.pszFooter:=PWideChar(Value);
     Group^.cchFooter:=Length(Value);
 
     if SetGroupInfo(Group) then
@@ -498,7 +538,7 @@ begin
   Result:=ListView_SetGroupInfo(GetOwnerListviewHandle,UniqueID,AGroupInfo)<>-1;
 end;
 
-procedure TListGroup.SetHeader(const Value: string);
+procedure TListGroup.SetHeader(const Value: WideString);
 var
   Group : PLVGroup;
 begin
@@ -506,7 +546,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_HEADER;
-    Group^.pszHeader:=pchar(Value);
+    Group^.pszHeader:=PWideChar(Value);
     Group^.cchHeader:=Length(Value);
 
     if SetGroupInfo(Group) then
@@ -584,7 +624,7 @@ begin
   end;
 end;
 
-procedure TListGroup.SetSubsetTitle(const Value: string);
+procedure TListGroup.SetSubsetTitle(const Value: WideString);
 var
   Group : PLVGroup;
 begin
@@ -592,7 +632,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_SUBSET;
-    Group^.pszSubsetTitle:=pchar(Value);
+    Group^.pszSubsetTitle:=PWideChar(Value);
     Group^.cchSubsetTitle:=Length(Value);
 
     if SetGroupInfo(Group) then
@@ -605,7 +645,7 @@ begin
   end;
 end;
 
-procedure TListGroup.SetSubtitle(const Value: string);
+procedure TListGroup.SetSubtitle(const Value: WideString);
 var
   Group : PLVGroup;
 begin
@@ -613,7 +653,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_SUBTITLE;
-    Group^.pszSubtitle:=pchar(Value);
+    Group^.pszSubtitle:=PWideChar(Value);
     Group^.cchSubtitle:=Length(Value);
 
     if SetGroupInfo(Group) then
@@ -626,7 +666,7 @@ begin
   end;
 end;
 
-procedure TListGroup.SetTask(const Value: string);
+procedure TListGroup.SetTask(const Value: WideString);
 var
   Group : PLVGroup;
 begin
@@ -634,7 +674,7 @@ begin
   begin
     Group:=GetNewLVGroup;
     Group^.mask:=LVGF_TASK;
-    Group^.pszTask:=pchar(Value);
+    Group^.pszTask:=PWideChar(Value);
     Group^.cchTask:=Length(Value);
 
     if SetGroupInfo(Group) then
