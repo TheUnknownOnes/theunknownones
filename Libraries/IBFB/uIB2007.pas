@@ -60,7 +60,7 @@ type
 type
   ISC_DATE = long; PISC_DATE = ^ISC_DATE;
   ISC_TIME = unsigned_long; PISC_TIME = ^ISC_TIME;
-  ISC_TIMESTAMP = packed record
+  ISC_TIMESTAMP = record
     timestamp_date : ISC_DATE;
     timestamp_time : ISC_TIME;
   end;
@@ -77,7 +77,7 @@ const
   {*****************************************************************}
 
 type
-  GDS_QUAD = packed record
+  GDS_QUAD = record
     gds_quad_high : ISC_LONG;
     gds_quad_low : ISC_ULONG;
   end;
@@ -86,13 +86,13 @@ type
 
   ISC_QUAD = GDS_QUAD; PISC_QUAD = ^ISC_QUAD;
 
-  ISC_ARRAY_BOUND = packed record
+  ISC_ARRAY_BOUND = record
     array_bound_lower : short;
     array_bound_upper : short;
   end;
   PISC_ARRAY_BOUND = ^ISC_ARRAY_BOUND;
 
-  ISC_ARRAY_DESC_V2 = packed record
+  ISC_ARRAY_DESC_V2 = record
     array_desc_version : short;
     array_desc_dtype : unsigned_char;
     array_desc_subtype : unsigned_char;
@@ -111,7 +111,7 @@ const
   ARR_DESC_CURRENT_VERSION 	= ARR_DESC_VERSION2;
 
 type
-  ISC_BLOB_DESC_V2 = packed record
+  ISC_BLOB_DESC_V2 = record
     blob_desc_version : short;
     blob_desc_subtype : short;
     blob_desc_charset : short;
@@ -133,7 +133,7 @@ type
   ISC_BLOB_CTL_SOURCE_FUNCTION = function() : ISC_STATUS;
 
   PISC_BLOB_CTL = ^ISC_BLOB_CTL;
-  ISC_BLOB_CTL = packed record
+  ISC_BLOB_CTL = record
     ctl_source : ISC_BLOB_CTL_SOURCE_FUNCTION;	{ Source filter }
     ctl_source_handle : PISC_BLOB_CTL; { Argument to pass to source }
             { filter }
@@ -159,7 +159,7 @@ type
   {*************************}
 
 type
-  BSTREAM = packed record
+  BSTREAM = record
     bstr_blob : Pointer;  	{ Blob handle }
     bstr_buffer : PAnsiChar;	{ Address of buffer }
     bstr_ptr : PAnsiChar;	{ Next character }
@@ -183,7 +183,7 @@ type
    * and related XSQLVAR, ISC_BLOB_DESC, ISC_ARRAY_DESC structures.
    **********************************************************************}
 type
-  XSQLVAR_V1 = packed record
+  XSQLVAR_V1 = record
       sqltype : short;		{ datatype of field }
       sqlscale : short;		{ scale factor }
       sqlsubtype : short;		{ datatype subtype }
@@ -209,7 +209,7 @@ const
   SQLDA_VERSION1		        = 1;
 
 type
-  ISC_ARRAY_DESC = packed record
+  ISC_ARRAY_DESC = record
     array_desc_dtype : unsigned_char;
     array_desc_scale : AnsiChar;
     array_desc_length : unsigned_short;
@@ -221,7 +221,7 @@ type
   end; 
   PISC_ARRAY_DESC = ^ISC_ARRAY_DESC;
 
-  ISC_BLOB_DESC = packed record
+  ISC_BLOB_DESC = record
     blob_desc_subtype : short;
     blob_desc_charset : short;
     blob_desc_segment_size : short;
@@ -241,7 +241,7 @@ type
   {****************************}
 
 type
-  XSQLVAR = packed record
+  XSQLVAR = record
     sqltype : short;		{ datatype of field }
     sqlscale : short;		{ scale factor }
     sqlprecision : short;		{ precision : Reserved for future }
@@ -264,7 +264,7 @@ type
   end;
   PXSQLVAR = ^XSQLVAR;
 
-  XSQLDA = packed record
+  XSQLDA = record
     version : short;		{ version of this XSQLDA }
     sqldaid : array[0 .. 7] of AnsiChar;		{ XSQLDA name field }
     sqldabc : ISC_LONG;		{ length in bytes of SQLDA }
@@ -705,7 +705,7 @@ const
   sec_protocol_local            = 4;
 
 type
-  USER_SEC_DATA = packed record
+  USER_SEC_DATA = record
     sec_flags : short;		     { which fields are specified }
     uid : int;			     { the user's id }
     gif : int;			     { the user's group id }
@@ -2241,7 +2241,7 @@ type
                                          buffer : Pointer;
                                          buff_size : ISC_USHORT); cdecl;
 
-  Blob = packed record
+  Blob = record
     blob_get_segment : TBlob_Get_Segment_Function;
     blob_handle : isc_blob_handle;
     number_segments : long;

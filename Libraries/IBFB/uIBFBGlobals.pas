@@ -25,7 +25,7 @@ type
   Unsigned_Char = AnsiChar;
   PUnsigned_Char = ^Unsigned_Char;
 
-  tm = packed record
+  tm = record
     tm_sec : int;   // Seconds
     tm_min : int;   // Minutes
     tm_hour : int;  // Hour (0--23)
