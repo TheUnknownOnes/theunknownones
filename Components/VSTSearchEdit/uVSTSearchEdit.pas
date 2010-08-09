@@ -105,7 +105,7 @@ begin
       end;
 
       if not Assigned(NewNode) then
-        NewNode := FTree.GetNextSibling(Node);
+        NewNode := FTree.GetNext(Node);
 
       Node := NewNode;
     end;
