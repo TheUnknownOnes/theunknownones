@@ -27,7 +27,7 @@
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_Platform>x86</DCC_Platform>
 			<DCC_Description>VSTSearchEdit - Design</DCC_Description>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\VSTSearchEdit_D120D.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\VSTSearchEdit_D120D.bpl</DCC_DependencyCheckOutputName>
 			<DCC_S>false</DCC_S>
 			<GenDll>true</GenDll>
 			<DCC_N>false</DCC_N>
@@ -49,10 +49,14 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="..\..\Design\images.res"/>
+			<DCCReference Include="..\..\Design\images.res"/>
+			<DCCReference Include="..\..\Design\images.res"/>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="VSTSearchEdit_D120R.dcp"/>
 			<DCCReference Include="..\..\Design\uRegVSTSearchEdit.pas"/>
-			<DCCReference Include="..\..\Design\images.res"/>
+			<DCCReference Include="..\..\Design\images.res">
+				<BuildOrder>4</BuildOrder>
+			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -106,6 +110,12 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
+					<Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\bcboffice2k120.bpl">CodeGear C++Builder Office 2000-Server-Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\bcbofficexp120.bpl">CodeGear C++Builder Office XP-Server-Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dcloffice2k120.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dclofficexp120.bpl">Microsoft Office XP Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
+					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>

@@ -52,7 +52,6 @@
 			<DCCReference Include="dbrtl.dcp"/>
 			<DCCReference Include="JclVcl.dcp"/>
 			<DCCReference Include="..\..\uPSBuzz.pas"/>
-			<DCCReference Include="vcljpg.dcp"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
