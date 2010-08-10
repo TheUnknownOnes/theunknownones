@@ -980,7 +980,7 @@ begin
     WriteProviderToRegistry('1',
       'DP DelphiReference',
       'Search with Daniels Cool Tool',
-      'http://ref.dp200x.de/dp_reference.php?query=' +
+      'http://www.delphipraxis.net/dp_reference.php?query=' +
       EnvVarToken(ENVVAR_NAME_KEYWORD),
       nstoTrimFirst,
       ptStandard,
