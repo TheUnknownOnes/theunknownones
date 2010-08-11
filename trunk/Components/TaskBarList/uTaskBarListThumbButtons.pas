@@ -97,7 +97,6 @@ type
 
   TTaskBarListThumbButtons = class(TTaskBarListComponent)
   private
-    FButtonsAdded: Boolean;
     FAppEvents : TApplicationEvents;
 
     FThumbBarButtons : TThumbBarButtons;
@@ -107,7 +106,6 @@ type
 
     procedure DoHandleEvent(var Msg: TMsg; var Handled: Boolean);
   protected
-    function TestButtonsAdded: boolean;
     procedure DoInitialize; override;
     procedure DoUpdate; override;
   public
@@ -131,7 +129,7 @@ uses
 
 procedure TThumbBarButtons.CheckCanAdd;
 begin
-  if FOwner.TestButtonsAdded then
+  if FOwner.Initialized then
     raise ETaskBarListError.Create('All Buttons are already added.');
 end;
 
@@ -339,12 +337,6 @@ begin
   ThumbBarButtons.Images:=Value;
 end;
 
-
-function TTaskBarListThumbButtons.TestButtonsAdded: boolean;
-begin
-  Result:=FButtonsAdded;
-end;
-
 function TTaskBarListThumbButtons.GetImages: TCustomImageList;
 begin
   Result:=ThumbBarButtons.Images;
@@ -353,7 +345,6 @@ end;
 constructor TTaskBarListThumbButtons.Create(AOwner: TComponent);
 begin
   inherited;
-  FButtonsAdded:=False;
   FThumbBarButtons:=TThumbBarButtons.Create(self);
 
   FAppEvents:=TApplicationEvents.Create(self);
@@ -389,7 +380,6 @@ begin
   begin
     Buttons:=ThumbBarButtons.GetAllAsArray;
     DefaultInterface.ThumbBarAddButtons(TCustomForm(Owner).Handle, Length(Buttons), @Buttons[0]);
-    FButtonsAdded:=True;
 
     FInitialized:=True;
 

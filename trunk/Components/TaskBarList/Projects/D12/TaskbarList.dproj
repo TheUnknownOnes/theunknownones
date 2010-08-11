@@ -50,6 +50,7 @@
 			<DCCReference Include="..\..\uTaskBarListThumbButtons.pas"/>
 			<DCCReference Include="..\..\uTaskBarList_Reg.pas"/>
 			<DCCReference Include="..\..\uTaskBarList.pas"/>
+			<DCCReference Include="..\..\uTaskBarListOverlayIcon.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

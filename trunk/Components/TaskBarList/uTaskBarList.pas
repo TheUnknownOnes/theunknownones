@@ -147,7 +147,6 @@ end;
 
 procedure TTaskBarListComponent.DoUpdate;
 begin
-
 end;
 
 function TTaskBarListComponent.GetTaskBarEntryHandle: THandle;
