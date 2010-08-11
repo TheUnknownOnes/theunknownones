@@ -28,7 +28,10 @@ package TaskbarList;
 requires
   rtl,
   vcl,
-  JediApi_SingleUnits;
+  JediApi_SingleUnits,
+  dbrtl,
+  CommonTools_D120R,
+  RegExp_D120R;
 
 contains
   uTaskBarListThumbButtons in '..\..\uTaskBarListThumbButtons.pas',
