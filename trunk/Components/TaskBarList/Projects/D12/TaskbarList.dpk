@@ -27,11 +27,12 @@ package TaskbarList;
 
 requires
   rtl,
-  vcl;
+  vcl,
+  JediApi_SingleUnits;
 
 contains
-  uTaskBarList in '..\..\uTaskBarList.pas',
-  uTaskBarList_Intf in '..\..\uTaskBarList_Intf.pas',
-  uTaskBarList_Reg in '..\..\uTaskBarList_Reg.pas';
+  uTaskBarListThumbButtons in '..\..\uTaskBarListThumbButtons.pas',
+  uTaskBarList_Reg in '..\..\uTaskBarList_Reg.pas',
+  uTaskBarList in '..\..\uTaskBarList.pas';
 
 end.
