@@ -51,6 +51,7 @@
 			<DCCReference Include="..\..\uTaskBarList_Reg.pas"/>
 			<DCCReference Include="..\..\uTaskBarList.pas"/>
 			<DCCReference Include="..\..\uTaskBarListOverlayIcon.pas"/>
+			<DCCReference Include="..\..\uTaskBarListTab.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
