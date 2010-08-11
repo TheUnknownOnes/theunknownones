@@ -2235,7 +2235,7 @@ type
   TBlob_Get_Segment_Function = function(blob_handle : isc_blob_handle;
                                         buffer : Pointer;
                                         buffer_size : ISC_USHORT;
-                                        var result_length : ISC_USHORT): Short cdecl;
+                                        out result_length : ISC_USHORT): Short cdecl;
 
   TBlob_Put_Segment_Function = procedure(blob_handle : isc_blob_handle;
                                          buffer : Pointer;
