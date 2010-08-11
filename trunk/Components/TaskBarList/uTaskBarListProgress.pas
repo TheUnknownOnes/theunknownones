@@ -7,35 +7,37 @@ uses
   jwaShlObj,
   Controls,
   Classes,
-  AppEvnts,
   Windows,
   jwaWinType,
   ComCtrls,
+  Messages,
   CommCtrl;
+
+{$i JEDI.inc}
 
 type
   TTaskbarListProgressState = (psNoProgress,
-                               psIndeterminate,
                                psNormal,
                                psPaused,
                                psError);
 
   TTaskbarListProgress = class(TTaskBarListComponent)
   private
-    FAppEvents : TApplicationEvents;
     FMin,
     FMax,
     FPosition : ULONGLONG;
 
     FProgressbar : TProgressbar;
+    FOrigProgressWndProc : ULong;
     FState: TTaskbarListProgressState;
+    FMarquee: Boolean;
 
-    procedure OnMessage(var Msg: TMsg; var Handled: Boolean);
     procedure SetMax(const Value: ULONGLONG);
     procedure SetMin(const Value: ULONGLONG);
     procedure SetPosition(const Value: ULONGLONG);
     procedure SetState(const Value: TTaskbarListProgressState);
     procedure SetProgressbar(const Value: TProgressBar);
+    procedure SetMarquee(const Value: Boolean);
   protected
     procedure DoUpdate; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -49,9 +51,37 @@ type
     property Position : ULONGLONG read FPosition write SetPosition default 0;
     property State : TTaskbarListProgressState read FState write SetState default psNormal;
     property ProgressBar : TProgressBar read FProgressBar write SetProgressbar;
+    property Marquee : Boolean read FMarquee write SetMarquee default false;
   end;
 
 implementation
+
+var
+  Progresses : TList;
+
+function MyWndProc(hwnd : HWND; uMsg : UINT; wParam : WPARAM; lParam : LPARAM) : LRESULT; stdcall;
+var
+  idx : Integer;
+  prog : TTaskbarListProgress;
+begin
+  for idx := 0 to Progresses.Count - 1 do
+  begin
+    prog := TTaskbarListProgress(Progresses[idx]);
+
+    if Assigned(Prog.ProgressBar) and
+       (hwnd = Prog.ProgressBar.Handle) then
+    begin
+      Result := CallWindowProc(Pointer(Prog.FOrigProgressWndProc), hwnd, uMsg, wParam, lParam);
+
+      case uMsg of
+        PBM_SETRANGE..PBM_SETRANGE32
+        {$IFDEF DELPHI12_UP}, PBM_SETMARQUEE, PBM_SETSTATE{$ENDIF}:
+          Prog.PostUpdateMessage;
+      end;
+
+    end;
+  end;
+end;
 
 { TTaskbarListProgress }
 
@@ -66,17 +96,15 @@ begin
   FMax := 100;
   FPosition := 0;
   FProgressbar := nil;
+  FMarquee := false;
 
-  if not (csDesigning in ComponentState) then
-  begin
-    FAppEvents := TApplicationEvents.Create(Self);
-    FAppEvents.OnMessage := OnMessage;
-  end;
+  Progresses.Add(Self);
 end;
 
 destructor TTaskbarListProgress.Destroy;
 begin
-
+  Progresses.Remove(Self);
+  ProgressBar := nil;
   inherited;
 end;
 
@@ -91,11 +119,21 @@ begin
     FMin := FProgressbar.Min;
     FMax := FProgressbar.Max;
     FPosition := FProgressbar.Position;
+
+    {$IFDEF DELPHI12_UP}
+    case FProgressbar.State of
+      pbsNormal: FState := psNormal;
+      pbsError: FState := psError;
+      pbsPaused: FState := psPaused;
+    end;
+    FMarquee := FProgressbar.Style = pbstMarquee;
+    {$ENDIF}
   end;
 
   if Assigned(FTaskbarList3) then
   begin
-    FTaskbarList3.SetProgressValue(TaskBarEntryHandle, FPosition - FMin, FMax - FMin);
+    if not FMarquee then
+      FTaskbarList3.SetProgressValue(TaskBarEntryHandle, FPosition - FMin, FMax - FMin);
 
     NewState := TBPF_NOPROGRESS;
 
@@ -103,14 +141,16 @@ begin
     begin
       case FState of
         psNoProgress: NewState := TBPF_NOPROGRESS;
-        psIndeterminate: NewState := TBPF_INDETERMINATE;
         psNormal: NewState := TBPF_NORMAL;
         psPaused: NewState := TBPF_PAUSED;
         psError: NewState := TBPF_ERROR;
       end;
     end;
 
+
     FTaskbarList3.SetProgressState(TaskBarEntryHandle, NewState);
+    if FMarquee then
+      FTaskbarList3.SetProgressState(TaskBarEntryHandle, TBPF_INDETERMINATE);
   end;
 end;
 
@@ -123,14 +163,10 @@ begin
     FProgressbar := nil;
 end;
 
-procedure TTaskbarListProgress.OnMessage(var Msg: TMsg; var Handled: Boolean);
+procedure TTaskbarListProgress.SetMarquee(const Value: Boolean);
 begin
-  Handled := false;
-
-  if Assigned(FProgressbar) and
-     FProgressbar.HandleAllocated and
-     (FProgressbar.Handle = Msg.hwnd)  then
-    PostUpdateMessage;
+  FMarquee := Value;
+  PostUpdateMessage;
 end;
 
 procedure TTaskbarListProgress.SetMax(const Value: ULONGLONG);
@@ -154,13 +190,17 @@ end;
 procedure TTaskbarListProgress.SetProgressbar(const Value: TProgressBar);
 begin
   if Assigned(FProgressbar) then
+  begin
+    SetWindowLong(FProgressbar.Handle, GWL_WNDPROC, FOrigProgressWndProc);
     FProgressbar.RemoveFreeNotification(Self);
+  end;
 
   FProgressBar := Value;
 
   if Assigned(FProgressbar) then
   begin
     FProgressbar.FreeNotification(Self);
+    FOrigProgressWndProc := SetWindowLong(FProgressbar.Handle, GWL_WNDPROC, Integer(@MyWndProc));
     PostUpdateMessage;
   end;
 end;
@@ -170,5 +210,11 @@ begin
   FState := Value;
   PostUpdateMessage;
 end;
+
+initialization
+  Progresses := TList.Create;
+
+finalization
+  Progresses.Free;
 
 end.
