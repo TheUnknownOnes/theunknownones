@@ -51,7 +51,8 @@ end;
 
 procedure TTaskBarListOverlayIcon.DoUpdate;
 begin
-  DefaultInterface.SetOverlayIcon(TaskBarEntryHandle, FOverlayIcon.Handle, @FDescription);
+  if Assigned(FTaskbarList3) then
+    FTaskbarList3.SetOverlayIcon(TaskBarEntryHandle, FOverlayIcon.Handle, @FDescription);
 end;
 
 procedure TTaskBarListOverlayIcon.Initialize;

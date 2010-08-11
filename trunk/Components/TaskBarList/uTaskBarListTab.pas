@@ -8,7 +8,10 @@ uses
 type
   TTaskbarListTab = class(TTaskBarListComponent)
   private
-    FControl : TWinControl;
+    FControl: TWinControl;
+    FIsSupported: Boolean;
+    FIsActive: Boolean;
+
     procedure SetControl(const Value: TWinControl);
   protected
     property WinControl : TWinControl read FControl write SetControl;
@@ -40,7 +43,7 @@ begin
 
   FControl:=TWinControl(AOwner);
 
-  FIsSupported := (TaskbarList3 <> nil) and (not (csDesigning in ComponentState));
+  FIsSupported := Assigned(FTaskbarList3) and (not (csDesigning in ComponentState));
   FIsActive := False;
 end;
 

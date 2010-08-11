@@ -11,14 +11,9 @@ uses
 type
   ETaskBarListError = class(Exception);
 
-  TTaskBarListComponent = class(TComponent, ITaskbarList4)
+  TTaskBarListComponent = class(TComponent)
   private
     FHandle    : HWND;
-
-    FTaskbarList: ITaskbarList;
-    FTaskbarList2: ITaskbarList2;
-    FTaskbarList3: ITaskbarList3;
-    FTaskbarList4: ITaskbarList4;
 
     FMsgAutoInitialize: Cardinal;
 
@@ -30,6 +25,11 @@ type
 
   protected
     FInitialized : Boolean;
+
+    FTaskbarList: ITaskbarList;
+    FTaskbarList2: ITaskbarList2;
+    FTaskbarList3: ITaskbarList3;
+    FTaskbarList4: ITaskbarList4;
 
     procedure WndProc(var Message: TMessage); virtual;
 
@@ -45,8 +45,6 @@ type
 
     property AutoInitialize: Boolean read FAutoInit write FAutoInit default False;
     property Handle: HWND read FHandle write FHandle;
-
-    property DefaultInterface: ITaskbarList4 read FTaskbarList4 implements ITaskbarList4;
 
     property Initialized: Boolean read FInitialized;
 
