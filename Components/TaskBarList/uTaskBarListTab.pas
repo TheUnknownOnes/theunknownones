@@ -51,6 +51,8 @@ type
 
     property Control : TControl read FControl write SetControl;
     property Icon: TIcon read GetIcon write SetIcon;
+
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -167,7 +169,7 @@ end;
 
 procedure TTaskbarListTab.ActivateTaskWindow;
 begin
-  if FIsActive then
+  if (FIsActive) or (not Assigned(Control)) then
     Exit;
 
   if Assigned(FTaskbarList3) then
@@ -447,6 +449,17 @@ begin
   Result:='';
 end;
 
+procedure TTaskbarListTab.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited;
+  if Operation=opRemove then
+  begin
+    if AComponent=Control then
+      Control:=Nil;
+  end;
+end;
+
 procedure TTaskbarListTab.SetActive(const Value: Boolean);
 begin
   if Value then
@@ -457,7 +470,13 @@ end;
 
 procedure TTaskbarListTab.SetControl(const Value: TControl);
 begin
+  if Assigned(FControl) then
+    FControl.RemoveFreeNotification(self);
+
   FControl := Value;
+
+  if Assigned(FControl) then
+    FControl.FreeNotification(self);
 end;
 
 procedure TTaskbarListTab.SetIcon(const Value: TIcon);
