@@ -9,9 +9,9 @@ type
   TTaskBarListOverlayIcon = class(TTaskBarListComponent)
   private
     FOverlayIcon: TIcon;
-    FDescription: String;
+    FDescription: WideString;
     procedure SetOverlayIcon(const Value: TIcon);
-    procedure SetDescription(const Value: String);
+    procedure SetDescription(const Value: WideString);
   protected
     procedure DoInitialize; override;
     procedure DoUpdate; override;
@@ -22,7 +22,7 @@ type
     procedure Initialize;
   published
     property OverlayIcon : TIcon read FOverlayIcon write SetOverlayIcon;
-    property Description : String read FDescription write SetDescription;
+    property Description : WideString read FDescription write SetDescription;
 
     property AutoInitialize;
   end;
@@ -59,7 +59,7 @@ begin
   DoInitialize;
 end;
 
-procedure TTaskBarListOverlayIcon.SetDescription(const Value: String);
+procedure TTaskBarListOverlayIcon.SetDescription(const Value: WideString);
 begin
   FDescription := Value;
   PostUpdateMessage;

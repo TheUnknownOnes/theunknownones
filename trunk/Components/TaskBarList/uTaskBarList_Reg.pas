@@ -12,7 +12,7 @@ unit uTaskBarList_Reg;
 interface
 
 uses
-  Classes, uTaskBarListThumbButtons, uTaskBarListOverlayIcon;
+  Classes, uTaskBarListThumbButtons, uTaskBarListOverlayIcon, uTaskBarListTab;
 
 procedure Register;
 
@@ -20,7 +20,9 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('TUO', [TTaskBarListThumbButtons,TTaskBarListOverlayIcon]);
+  RegisterComponents('TUO', [TTaskBarListThumbButtons,
+                             TTaskBarListOverlayIcon,
+                             TTaskbarListTab]);
 end;
 
 
