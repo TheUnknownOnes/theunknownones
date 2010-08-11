@@ -379,7 +379,8 @@ begin
   if ThumbBarButtons.Count>0 then
   begin
     Buttons:=ThumbBarButtons.GetAllAsArray;
-    DefaultInterface.ThumbBarAddButtons(TCustomForm(Owner).Handle, Length(Buttons), @Buttons[0]);
+    if Assigned(FTaskbarList3) then
+      FTaskbarList3.ThumbBarAddButtons(TCustomForm(Owner).Handle, Length(Buttons), @Buttons[0]);
 
     FInitialized:=True;
 
@@ -395,12 +396,15 @@ begin
 
   if Initialized then
   begin
-    DefaultInterface.ThumbBarUpdateButtons(TaskBarEntryHandle, Length(Buttons), @Buttons[0]);
+    if Assigned(FTaskbarList3) then
+    begin
+      FTaskbarList3.ThumbBarUpdateButtons(TaskBarEntryHandle, Length(Buttons), @Buttons[0]);
 
-    if Assigned(FThumbBarButtons.Images) then
-      DefaultInterface.ThumbBarSetImageList(TaskBarEntryHandle, FThumbBarButtons.FImages.Handle)
-    else
-      DefaultInterface.ThumbBarSetImageList(TaskBarEntryHandle, 0);
+      if Assigned(FThumbBarButtons.Images) then
+        FTaskbarList3.ThumbBarSetImageList(TaskBarEntryHandle, FThumbBarButtons.FImages.Handle)
+      else
+        FTaskbarList3.ThumbBarSetImageList(TaskBarEntryHandle, 0);
+    end;
   end;
 end;
 
