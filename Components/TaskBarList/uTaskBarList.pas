@@ -136,6 +136,7 @@ begin
   FTaskbarList2:=nil;
   FTaskbarList3:=nil;
   FTaskbarList4:=Nil;
+  DeallocateHWnd(FHandle);
   inherited;
 end;
 

@@ -23,7 +23,8 @@ procedure Register;
 begin
   RegisterComponents('TUO', [TTaskBarListThumbButtons,
                              TTaskBarListOverlayIcon,
-                             TTaskbarListTab,
+                             TTaskbarListFormTab,
+                             TTaskbarListControlTab,
                              TTaskbarListProgress]);
 end;
 
