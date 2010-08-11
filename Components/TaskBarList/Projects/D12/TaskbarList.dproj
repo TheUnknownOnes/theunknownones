@@ -46,9 +46,10 @@
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
-			<DCCReference Include="..\..\uTaskBarList.pas"/>
-			<DCCReference Include="..\..\uTaskBarList_Intf.pas"/>
+			<DCCReference Include="JediApi_SingleUnits.dcp"/>
+			<DCCReference Include="..\..\uTaskBarListThumbButtons.pas"/>
 			<DCCReference Include="..\..\uTaskBarList_Reg.pas"/>
+			<DCCReference Include="..\..\uTaskBarList.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
