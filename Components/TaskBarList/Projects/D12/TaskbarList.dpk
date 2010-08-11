@@ -33,6 +33,7 @@ requires
 contains
   uTaskBarListThumbButtons in '..\..\uTaskBarListThumbButtons.pas',
   uTaskBarList_Reg in '..\..\uTaskBarList_Reg.pas',
-  uTaskBarList in '..\..\uTaskBarList.pas';
+  uTaskBarList in '..\..\uTaskBarList.pas',
+  uTaskBarListOverlayIcon in '..\..\uTaskBarListOverlayIcon.pas';
 
 end.
