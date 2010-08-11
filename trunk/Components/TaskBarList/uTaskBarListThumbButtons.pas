@@ -108,6 +108,7 @@ type
   protected
     procedure DoInitialize; override;
     procedure DoUpdate; override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     procedure Initialize;
 
@@ -234,8 +235,8 @@ end;
 
 procedure TThumbBarButton.DoClick;
 begin
-  if Assigned(FAction) then
-    FAction.Execute
+  if Assigned(FActionLink) then
+    FActionLink.Execute
   else
   if Assigned(FOnClick) then
     FOnClick(Self);
@@ -260,7 +261,6 @@ end;
 
 procedure TThumbBarButton.SetAction(const Value: TAction);
 begin
-  FAction := Value;
   FActionLink.Action:=FAction;
 end;
 
@@ -334,7 +334,13 @@ end;
 
 procedure TTaskBarListThumbButtons.SetImages(const Value: TCustomImageList);
 begin
+  if Assigned(ThumbBarButtons.Images) then
+    ThumbBarButtons.Images.RemoveFreeNotification(self);
+
   ThumbBarButtons.Images:=Value;
+
+  if Assigned(ThumbBarButtons.Images) then
+    ThumbBarButtons.Images.FreeNotification(Self);
 end;
 
 function TTaskBarListThumbButtons.GetImages: TCustomImageList;
@@ -411,6 +417,18 @@ end;
 procedure TTaskBarListThumbButtons.Initialize;
 begin
   DoInitialize;
+end;
+
+procedure TTaskBarListThumbButtons.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited;
+  if Operation=opRemove then
+  begin
+    if AComponent=ThumbBarImages then
+      ThumbBarImages:=Nil;
+  end;
+
 end;
 
 end.
