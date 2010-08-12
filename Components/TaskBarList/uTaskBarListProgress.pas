@@ -63,6 +63,7 @@ var
   idx : Integer;
   prog : TTaskbarListProgress;
 begin
+  Result:=0;
   for idx := 0 to Progresses.Count - 1 do
   begin
     prog := TTaskbarListProgress(Progresses[idx]);

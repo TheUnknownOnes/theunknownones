@@ -30,7 +30,6 @@ type
     FIsActiveWindow: Boolean;
 
     FIcon : TIcon;
-    FCaption : TCaption;
     FOnGetPreviewRect : TOnGetPreviewRect;
     FOnDrawPreview : TOnDrawPreview;
     FOnCloseTab : TCloseTabEvent;
@@ -132,6 +131,7 @@ end;
 
 function TTaskbarListFormTab.DoCloseWindow: Boolean;
 begin
+  Result:=False;
   if Assigned(FOnCloseTab) then
     inherited
   else
@@ -144,6 +144,7 @@ end;
 
 function TTaskbarListFormTab.GetIcon: TIcon;
 begin
+  Result:=nil;
   if FControl is TForm then
     Result:=TForm(FControl).Icon;
 end;
@@ -263,27 +264,17 @@ end;
 
 procedure TTaskbarListTab.DoCreatePreview(Message: TMessage);
 var
-  PreviewWindow
-  , PreviewArea
-  , PreviewThumb
-    : TBitmap;
-  Pt
-    : TPoint;
-  CtlParent,
-  AbsoulteParent
-    : TControl;
-  W
-  , H ,i
-    : Integer;
-  FrameAspect
-  , ThumbAspect
-    : Double;
-  OldVisibility
-    : Boolean;
-  PreviewRect
-    : TRect;
-  PreviewMode
-    : TPreviewMode;
+  PreviewWindow,
+  PreviewArea,
+  PreviewThumb   : TBitmap;
+  Pt             : TPoint;
+  AbsoulteParent : TControl;
+  W, H           : Integer;
+  FrameAspect,
+  ThumbAspect    : Double;
+  OldVisibility  : Boolean;
+  PreviewRect    : TRect;
+  PreviewMode    : TPreviewMode;
 begin
   if Message.Msg = WM_DWMSENDICONICLIVEPREVIEWBITMAP then
     PreviewMode := pmLive
@@ -481,6 +472,7 @@ end;
 
 function TTaskbarListTab.GetIcon: TIcon;
 begin
+  Result:=nil;
   if Assigned(FIcon) then
     Result:=FIcon
   else
