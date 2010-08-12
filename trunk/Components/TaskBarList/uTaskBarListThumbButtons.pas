@@ -262,6 +262,7 @@ end;
 
 procedure TThumbBarButton.SetAction(const Value: TAction);
 begin
+  FAction:=Value;
   FActionLink.Action:=FAction;
 end;
 
