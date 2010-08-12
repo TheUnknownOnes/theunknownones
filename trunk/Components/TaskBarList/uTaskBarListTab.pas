@@ -541,7 +541,11 @@ begin
 end;
 
 procedure TTaskbarListTab.SetInsertBefore(const Value: TTaskbarListTab);
+var
+  OldActive : Boolean;
 begin
+  OldActive:=Self.Active;
+  DeactivateTaskWindow;
   if Assigned(FInsertBefore) then
     FInsertBefore.RemoveFreeNotification(Self);
 
@@ -549,6 +553,9 @@ begin
 
   if Assigned(FInsertBefore) then
     FInsertBefore.FreeNotification(Self);
+
+  if OldActive then
+    ActivateTaskWindow;
 end;
 
 procedure TTaskbarListTab.UpdateTaskWindow;
