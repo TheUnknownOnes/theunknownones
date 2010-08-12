@@ -235,7 +235,8 @@ end;
 
 procedure TThumbBarButton.DoClick;
 begin
-  if Assigned(FActionLink) then
+  if Assigned(FActionLink) and
+     Assigned(FAction) then
     FActionLink.Execute
   else
   if Assigned(FOnClick) then

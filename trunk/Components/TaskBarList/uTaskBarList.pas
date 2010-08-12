@@ -41,8 +41,6 @@ type
 
     procedure PostUpdateMessage;
   public
-    property TaskbarList: ITaskbarList read FTaskbarList;
-
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
