@@ -44,7 +44,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-
   published
     property Min : ULONGLONG read FMin write SetMin default 0;
     property Max : ULONGLONG read FMax write SetMax default 100;
@@ -74,7 +73,7 @@ begin
       Result := CallWindowProc(Pointer(Prog.FOrigProgressWndProc), hwnd, uMsg, wParam, lParam);
 
       case uMsg of
-        PBM_SETRANGE..PBM_SETRANGE32
+        PBM_SETRANGE..PBM_SETRANGE32, WM_USER
         {$IFDEF DELPHI12_UP}, PBM_SETMARQUEE, PBM_SETSTATE{$ENDIF}:
           Prog.PostUpdateMessage;
       end;
@@ -89,8 +88,6 @@ constructor TTaskbarListProgress.Create(AOwner: TComponent);
 begin
   inherited;
 
-  FInitialized := true;
-
   FState := psNormal;
   FMin := 0;
   FMax := 100;
@@ -99,6 +96,8 @@ begin
   FMarquee := false;
 
   Progresses.Add(Self);
+
+  FInitialized:=True;
 end;
 
 destructor TTaskbarListProgress.Destroy;
@@ -107,6 +106,7 @@ begin
   ProgressBar := nil;
   inherited;
 end;
+
 
 procedure TTaskbarListProgress.DoUpdate;
 var
@@ -202,6 +202,11 @@ begin
     FProgressbar.FreeNotification(Self);
     FOrigProgressWndProc := SetWindowLong(FProgressbar.Handle, GWL_WNDPROC, Integer(@MyWndProc));
     PostUpdateMessage;
+    PostMessage(FProgressbar.Handle, WM_USER, 0, 0); //use this additional to PostUpdateMessage
+                                                     //for fixing automatic Marquee start
+                                                     //on window show. With Marquee progress
+                                                     //the Progressbar does not get any other
+                                                     //messages :-(
   end;
 end;
 

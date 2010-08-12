@@ -8,6 +8,9 @@ uses
 
 {$i Jedi.inc}
 
+
+{$R Images.res}
+
 type
   ETaskBarListError = class(Exception);
 
@@ -38,6 +41,8 @@ type
 
     procedure PostUpdateMessage;
   public
+    property TaskbarList: ITaskbarList read FTaskbarList;
+
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 

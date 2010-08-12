@@ -3,8 +3,8 @@ unit uTaskBarListTab;
 interface
 
 uses
-  uTaskBarList, Classes, Controls, Windows, jwaDWMAPI, Messages, JwaWinGDI,
-  Graphics;
+  uTaskBarList, JwaWinUser, Classes, Controls, Windows, jwaDWMAPI, Messages, JwaWinGDI,
+  Graphics, Forms, uSysTools, Math, AppEvnts, JwaShlObj;
 
 type
   TPreviewMode = (pmTaskBar, pmLive);
@@ -13,6 +13,13 @@ type
   TCloseTabEvent = procedure(Sender: TObject; var CanClose: Boolean) of object;
   TOnDrawPreview = procedure(Sender: TObject; PreviewMode: TPreviewMode; Canvas: TCanvas; Rect: TRect; var Handled: Boolean) of object;
   TOnGetPreviewRect = procedure(Sender: TObject; PreviewMode: TPreviewMode; var Rect: TRect) of object;
+
+  TTabProperty = (tpUseAppThumbnailAlways,
+                  tpUseAppThumbnailWhenActive,
+                  tpUseAppPeekAlways,
+                  tpUseAppPeekWhenActive);
+
+  TTabProperties = set of TTabProperty;
 
   TTaskbarListTab = class(TTaskBarListComponent)
   private
@@ -28,6 +35,7 @@ type
     FOnDrawPreview : TOnDrawPreview;
     FOnCloseTab : TCloseTabEvent;
     FOnActivateTab: TNotifyEvent;
+    FTabProps: TTabProperties;
 
     procedure SetControl(const Value: TControl);
     procedure SetActive(const Value: Boolean);
@@ -37,12 +45,11 @@ type
     procedure DoWMClose;
     procedure DoWMInvalidate;
     procedure DoActivateWindow;
-    procedure DoUpdateWindowCaption;
-    procedure DoUpdateWindowIcon;
     procedure DoCreatePreview(Message: TMessage);
     procedure SetIcon(const Value: TIcon);
     procedure DoGetPreviewRect(PreviewMode: TPreviewMode; var Rect: TRect);
     function DoDrawPreview(PreviewMode: TPreviewMode; Canvas: TCanvas; Rect: TRect): Boolean;
+    procedure SetAppProps(const Value: TTabProperties);
   protected
     procedure DoRegisterTab;
     function GetIcon: TIcon; virtual;
@@ -53,6 +60,9 @@ type
     property Icon: TIcon read GetIcon write SetIcon;
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+
+    procedure DoInitialize; override;
+    procedure DoUpdate; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -66,6 +76,10 @@ type
     property OnActivateTab: TNotifyEvent read FOnActivateTab write FOnActivateTab;
     property OnGetPreviewRext: TOnGetPreviewRect read FOnGetPreviewRect write FOnGetPreviewRect;
     property OnDrawPreview: TOnDrawPreview read FOnDrawPreview write FOnDrawPreview;
+
+    property AutoInitialize;
+
+    property TabProperties: TTabProperties read FTabProps write SetAppProps;
   end;
 
   TTaskbarListFormTab = class(TTaskbarListTab)
@@ -91,9 +105,6 @@ type
 implementation
 
 { TTaskbarListFormTab }
-
-uses
-  Forms, JwaWinUser, uSysTools, Math;
 
 const
   WM_INVALIDATE = WM_USER + $0001;
@@ -182,6 +193,7 @@ begin
     end;
 
     FIsActive := True;
+    FInitialized:=True;
   end;
 end;
 
@@ -334,8 +346,16 @@ begin
       if AbsoulteParent<>Control then
         pt:=Control.ClientToParent(Point(0,0), TWinControl(AbsoulteParent))
       else
+      begin
         pt:=Point(0,0);
 
+        if (Control is TForm) and
+           (TForm(Control).FormStyle=fsMDIChild) then
+        begin
+          pt.X:=TForm(control).ClientOrigin.X-Application.MainForm.ClientOrigin.X;
+          pt.Y:=TForm(control).ClientOrigin.Y-Application.MainForm.ClientOrigin.Y;
+        end;
+      end;
       DwmSetIconicLivePreviewBitmap(FProxyHandle, PreviewArea.Handle, @Pt, 0);
     end
     else
@@ -383,6 +403,13 @@ begin
     FOnGetPreviewRect(Self, PreviewMode, Rect);
 end;
 
+procedure TTaskbarListTab.DoInitialize;
+begin
+  inherited;
+  ActivateTaskWindow;
+  PostUpdateMessage;
+end;
+
 procedure TTaskbarListTab.DoRegisterTab;
 begin
   if Assigned(FTaskbarList3) then
@@ -391,25 +418,33 @@ begin
     FTaskbarList3.SetTabOrder(fProxyHandle, 0);
   end;
 
-  DoUpdateWindowCaption;
-  DoUpdateWindowIcon;
+  PostUpdateMessage;
 end;
 
-procedure TTaskbarListTab.DoUpdateWindowCaption;
-begin
-  DefWindowProc(FProxyHandle, WM_SETTEXT, 0 , LPARAM(PChar(GetWindowCaption)));
-end;
-
-procedure TTaskbarListTab.DoUpdateWindowIcon;
+procedure TTaskbarListTab.DoUpdate;
 var
   Icon : TIcon;
+  Flags : DWORD;
 begin
+  inherited;
+  if Assigned(FTaskbarList4) then
+  begin
+    Flags:=STPF_NONE;
+    if tpUseAppThumbnailAlways in FTabProps then Flags:=Flags or STPF_USEAPPTHUMBNAILALWAYS;
+    if tpUseAppThumbnailWhenActive in FTabProps then Flags:=Flags or STPF_USEAPPTHUMBNAILWHENACTIVE;
+    if tpUseAppPeekAlways in FTabProps then Flags:=Flags or STPF_USEAPPPEEKALWAYS;
+    if tpUseAppPeekWhenActive in FTabProps then Flags:=Flags or STPF_USEAPPPEEKWHENACTIVE;
+
+    FTaskbarList4.SetTabProperties(FProxyHandle, Flags);
+  end;
+
+  DefWindowProc(FProxyHandle, WM_SETTEXT, 0 , LPARAM(PChar(GetWindowCaption)));
+
   Icon:=GetIcon;
   if Assigned(Icon) then
     SendMessage(FProxyHandle, WM_SETICON, ICON_SMALL, Icon.Handle)
   else
     SendMessage(FProxyHandle, WM_SETICON, ICON_SMALL, 0)
-
 end;
 
 procedure TTaskbarListTab.DoWMActivate;
@@ -468,6 +503,12 @@ begin
     DeactivateTaskWindow;
 end;
 
+procedure TTaskbarListTab.SetAppProps(const Value: TTabProperties);
+begin
+  FTabProps := Value;
+  PostUpdateMessage;
+end;
+
 procedure TTaskbarListTab.SetControl(const Value: TControl);
 begin
   if Assigned(FControl) then
@@ -477,12 +518,16 @@ begin
 
   if Assigned(FControl) then
     FControl.FreeNotification(self);
+
+  UpdateTaskWindow;
 end;
 
 procedure TTaskbarListTab.SetIcon(const Value: TIcon);
 begin
   if Assigned(FIcon) then
     FIcon.Assign(Value);
+
+  PostUpdateMessage;
 end;
 
 procedure TTaskbarListTab.UpdateTaskWindow;
