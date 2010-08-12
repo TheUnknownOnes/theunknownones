@@ -36,6 +36,7 @@ type
     FOnCloseTab : TCloseTabEvent;
     FOnActivateTab: TNotifyEvent;
     FTabProps: TTabProperties;
+    FInsertBefore: TTaskbarListTab;
 
     procedure SetControl(const Value: TControl);
     procedure SetActive(const Value: Boolean);
@@ -50,6 +51,7 @@ type
     procedure DoGetPreviewRect(PreviewMode: TPreviewMode; var Rect: TRect);
     function DoDrawPreview(PreviewMode: TPreviewMode; Canvas: TCanvas; Rect: TRect): Boolean;
     procedure SetAppProps(const Value: TTabProperties);
+    procedure SetInsertBefore(const Value: TTaskbarListTab);
   protected
     procedure DoRegisterTab;
     function GetIcon: TIcon; virtual;
@@ -80,6 +82,7 @@ type
     property AutoInitialize;
 
     property TabProperties: TTabProperties read FTabProps write SetAppProps;
+    property InsertBefore: TTaskbarListTab read FInsertBefore write SetInsertBefore;
   end;
 
   TTaskbarListFormTab = class(TTaskbarListTab)
@@ -350,11 +353,12 @@ begin
         pt:=Point(0,0);
 
         if (Control is TForm) and
-           (TForm(Control).FormStyle=fsMDIChild) then
+           (TForm(Control).Handle <> Self.TaskBarEntryHandle)
+        then
         begin
           pt.X:=TForm(control).ClientOrigin.X-Application.MainForm.ClientOrigin.X;
           pt.Y:=TForm(control).ClientOrigin.Y-Application.MainForm.ClientOrigin.Y;
-        end;
+        end
       end;
       DwmSetIconicLivePreviewBitmap(FProxyHandle, PreviewArea.Handle, @Pt, 0);
     end
@@ -415,7 +419,13 @@ begin
   if Assigned(FTaskbarList3) then
   begin
     FTaskbarList3.RegisterTab(FProxyHandle, TaskBarEntryHandle);
-    FTaskbarList3.SetTabOrder(fProxyHandle, 0);
+    if Assigned(FInsertBefore) and (FInsertBefore<>Self) then
+    begin
+      if FTaskbarList3.SetTabOrder(fProxyHandle, FInsertBefore.FProxyHandle)<>S_OK then
+        FTaskbarList3.SetTabOrder(fProxyHandle, 0);
+    end
+    else
+      FTaskbarList3.SetTabOrder(fProxyHandle, 0);
   end;
 
   PostUpdateMessage;
@@ -465,10 +475,8 @@ end;
 
 procedure TTaskbarListTab.DoWMInvalidate;
 begin
-
   if Control is TWinControl then
-
-   RedrawWindow(TWinControl(Control).Handle, nil, 0, RDW_ERASE or RDW_FRAME or RDW_INVALIDATE or RDW_ALLCHILDREN);
+    RedrawWindow(TWinControl(Control).Handle, nil, 0, RDW_ERASE or RDW_FRAME or RDW_INVALIDATE or RDW_ALLCHILDREN);
 end;
 
 function TTaskbarListTab.GetIcon: TIcon;
@@ -492,6 +500,8 @@ begin
   begin
     if AComponent=Control then
       Control:=Nil;
+    if AComponent=InsertBefore then
+      InsertBefore:=Nil;
   end;
 end;
 
@@ -528,6 +538,17 @@ begin
     FIcon.Assign(Value);
 
   PostUpdateMessage;
+end;
+
+procedure TTaskbarListTab.SetInsertBefore(const Value: TTaskbarListTab);
+begin
+  if Assigned(FInsertBefore) then
+    FInsertBefore.RemoveFreeNotification(Self);
+
+  FInsertBefore := Value;
+
+  if Assigned(FInsertBefore) then
+    FInsertBefore.FreeNotification(Self);
 end;
 
 procedure TTaskbarListTab.UpdateTaskWindow;
