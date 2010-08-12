@@ -73,7 +73,7 @@ begin
       Result := CallWindowProc(Pointer(Prog.FOrigProgressWndProc), hwnd, uMsg, wParam, lParam);
 
       case uMsg of
-        PBM_SETRANGE..PBM_SETRANGE32, WM_USER
+        PBM_SETRANGE..PBM_SETRANGE32
         {$IFDEF DELPHI12_UP}, PBM_SETMARQUEE, PBM_SETSTATE{$ENDIF}:
           Prog.PostUpdateMessage;
       end;
@@ -202,11 +202,6 @@ begin
     FProgressbar.FreeNotification(Self);
     FOrigProgressWndProc := SetWindowLong(FProgressbar.Handle, GWL_WNDPROC, Integer(@MyWndProc));
     PostUpdateMessage;
-    PostMessage(FProgressbar.Handle, WM_USER, 0, 0); //use this additional to PostUpdateMessage
-                                                     //for fixing automatic Marquee start
-                                                     //on window show. With Marquee progress
-                                                     //the Progressbar does not get any other
-                                                     //messages :-(
   end;
 end;
 
