@@ -3,8 +3,8 @@ unit uTaskBarListTab;
 interface
 
 uses
-  uTaskBarList, JwaWinUser, Classes, Controls, Windows, jwaDWMAPI, Messages, JwaWinGDI,
-  Graphics, Forms, uSysTools, Math, AppEvnts, JwaShlObj;
+  uTaskBarList, JwaWinUser, Classes, Controls, Windows, jwaDWMAPI, Messages,
+  JwaWinGDI, SysUtils, Graphics, Forms, uSysTools, Math, AppEvnts, JwaShlObj;
 
 type
   TPreviewMode = (pmTaskBar, pmLive);
@@ -72,6 +72,8 @@ type
     procedure DeactivateTaskWindow;
     procedure UpdateTaskWindow;
     property Active: Boolean read FIsActive write SetActive;
+
+    procedure SetTabActive;
   published
     property OnCloseTab: TCloseTabEvent read FOnCloseTab write FOnCloseTab;
     property OnActivateTab: TNotifyEvent read FOnActivateTab write FOnActivateTab;
@@ -187,7 +189,7 @@ begin
   if (FIsActive) or (not Assigned(Control)) then
     Exit;
 
-  if Assigned(FTaskbarList3) then
+  if Assigned(FTaskbarList3) and CheckWin32Version(6,1) then
   begin
     DoRegisterTab;
 
@@ -214,8 +216,11 @@ begin
   FOnDrawPreview := nil;
 
   B := True;
-  DwmSetWindowAttribute(FProxyHandle, DWMWA_HAS_ICONIC_BITMAP, @B, SizeOf(B));
-  DwmSetWindowAttribute(FProxyHandle, DWMWA_FORCE_ICONIC_REPRESENTATION, @B, SizeOf(B));
+  if CheckWin32Version(6,1) then
+  begin
+    DwmSetWindowAttribute(FProxyHandle, DWMWA_HAS_ICONIC_BITMAP, @B, SizeOf(B));
+    DwmSetWindowAttribute(FProxyHandle, DWMWA_FORCE_ICONIC_REPRESENTATION, @B, SizeOf(B));
+  end;
 end;
 
 procedure TTaskbarListTab.DeactivateTaskWindow;
@@ -223,7 +228,7 @@ begin
   if not FIsActive then
     Exit;
 
-  if Assigned(FTaskbarList3) then
+  if Assigned(FTaskbarList3) and CheckWin32Version(6,1) then
   begin
     FTaskbarList3.UnregisterTab(FProxyHandle);
 
@@ -241,7 +246,7 @@ end;
 
 procedure TTaskbarListTab.DoActivateWindow;
 begin
-  if Assigned(FTaskbarList3) then
+  if Assigned(FTaskbarList3) and CheckWin32Version(6,1) then
   begin
     FTaskbarList3.SetTabActive(FProxyHandle, TaskBarEntryHandle, 0);
     if Assigned(FOnActivateTab) then
@@ -407,7 +412,7 @@ end;
 
 procedure TTaskbarListTab.DoRegisterTab;
 begin
-  if Assigned(FTaskbarList3) then
+  if Assigned(FTaskbarList3) and CheckWin32Version(6,1) then
   begin
     FTaskbarList3.RegisterTab(FProxyHandle, TaskBarEntryHandle);
     if Assigned(FInsertBefore) and (FInsertBefore<>Self) then
@@ -428,24 +433,27 @@ var
   Flags : DWORD;
 begin
   inherited;
-  if Assigned(FTaskbarList4) then
+  if CheckWin32Version(6,1) then
   begin
-    Flags:=STPF_NONE;
-    if tpUseAppThumbnailAlways in FTabProps then Flags:=Flags or STPF_USEAPPTHUMBNAILALWAYS;
-    if tpUseAppThumbnailWhenActive in FTabProps then Flags:=Flags or STPF_USEAPPTHUMBNAILWHENACTIVE;
-    if tpUseAppPeekAlways in FTabProps then Flags:=Flags or STPF_USEAPPPEEKALWAYS;
-    if tpUseAppPeekWhenActive in FTabProps then Flags:=Flags or STPF_USEAPPPEEKWHENACTIVE;
+    if Assigned(FTaskbarList4) then
+    begin
+      Flags:=STPF_NONE;
+      if tpUseAppThumbnailAlways in FTabProps then Flags:=Flags or STPF_USEAPPTHUMBNAILALWAYS;
+      if tpUseAppThumbnailWhenActive in FTabProps then Flags:=Flags or STPF_USEAPPTHUMBNAILWHENACTIVE;
+      if tpUseAppPeekAlways in FTabProps then Flags:=Flags or STPF_USEAPPPEEKALWAYS;
+      if tpUseAppPeekWhenActive in FTabProps then Flags:=Flags or STPF_USEAPPPEEKWHENACTIVE;
 
-    FTaskbarList4.SetTabProperties(FProxyHandle, Flags);
+      FTaskbarList4.SetTabProperties(FProxyHandle, Flags);
+    end;
+
+    DefWindowProc(FProxyHandle, WM_SETTEXT, 0 , LPARAM(PChar(GetWindowCaption)));
+
+    Icon:=GetIcon;
+    if Assigned(Icon) then
+      SendMessage(FProxyHandle, WM_SETICON, ICON_SMALL, Icon.Handle)
+    else
+      SendMessage(FProxyHandle, WM_SETICON, ICON_SMALL, 0)
   end;
-
-  DefWindowProc(FProxyHandle, WM_SETTEXT, 0 , LPARAM(PChar(GetWindowCaption)));
-
-  Icon:=GetIcon;
-  if Assigned(Icon) then
-    SendMessage(FProxyHandle, WM_SETICON, ICON_SMALL, Icon.Handle)
-  else
-    SendMessage(FProxyHandle, WM_SETICON, ICON_SMALL, 0)
 end;
 
 procedure TTaskbarListTab.DoWMActivate;
@@ -550,9 +558,16 @@ begin
     ActivateTaskWindow;
 end;
 
+procedure TTaskbarListTab.SetTabActive;
+begin
+  if CheckWin32Version(6,1) and Assigned(FTaskbarList3) then
+    FTaskbarList3.SetTabActive(FProxyHandle, TaskBarEntryHandle, 0);
+end;
+
 procedure TTaskbarListTab.UpdateTaskWindow;
 begin
-  DwmInvalidateIconicBitmaps(FProxyHandle);
+  if CheckWin32Version(6,1) then
+    DwmInvalidateIconicBitmaps(FProxyHandle);
 end;
 
 { TTaskbarListControlTab }

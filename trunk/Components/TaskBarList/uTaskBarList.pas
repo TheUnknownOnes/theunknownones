@@ -97,9 +97,6 @@ constructor TTaskBarListComponent.Create(AOwner: TComponent);
 var
   Obj: IInterface;
 begin
-  if not (AOwner is TCustomForm) then
-    raise ETaskBarListError.Create('Owner of TTaskbarListComponent must be a TCustomForm descendant.');
-
   inherited;
 
   if not (csDesigning in ComponentState) then
@@ -112,6 +109,7 @@ begin
   end;
 
   Obj:=CreateComObject(CLSID_TaskbarList);
+
   if Obj = nil then
   begin
     FTaskbarList := nil;

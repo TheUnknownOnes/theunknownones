@@ -387,7 +387,7 @@ begin
   if ThumbBarButtons.Count>0 then
   begin
     Buttons:=ThumbBarButtons.GetAllAsArray;
-    if Assigned(FTaskbarList3) then
+    if Assigned(FTaskbarList3) and CheckWin32Version(6,1) then
       FTaskbarList3.ThumbBarAddButtons(TCustomForm(Owner).Handle, Length(Buttons), @Buttons[0]);
 
     FInitialized:=True;

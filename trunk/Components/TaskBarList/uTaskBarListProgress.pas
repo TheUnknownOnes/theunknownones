@@ -55,6 +55,9 @@ type
 
 implementation
 
+uses
+  SysUtils;
+
 var
   Progresses : TList;
 
@@ -131,7 +134,7 @@ begin
     {$ENDIF}
   end;
 
-  if Assigned(FTaskbarList3) then
+  if Assigned(FTaskbarList3) and CheckWin32Version(6,1) then
   begin
     if not FMarquee then
       FTaskbarList3.SetProgressValue(TaskBarEntryHandle, FPosition - FMin, FMax - FMin);

@@ -3,7 +3,7 @@ unit uTaskBarListOverlayIcon;
 interface
 
 uses
-  uTaskBarList, Graphics, Classes;
+  uTaskBarList, Graphics, Classes, SysUtils;
 
 type
   TTaskBarListOverlayIcon = class(TTaskBarListComponent)
@@ -51,7 +51,7 @@ end;
 
 procedure TTaskBarListOverlayIcon.DoUpdate;
 begin
-  if Assigned(FTaskbarList3) then
+  if Assigned(FTaskbarList3) and CheckWin32Version(6,1) then
     FTaskbarList3.SetOverlayIcon(TaskBarEntryHandle, FOverlayIcon.Handle, @FDescription);
 end;
 
