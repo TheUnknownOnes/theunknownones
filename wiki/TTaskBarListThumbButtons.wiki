@@ -8,8 +8,8 @@
   * *property AutoInitialize : Boolean*
     component is initialized on construction
 
-  * *property ThumbBarButtons: TThumbBarButtons*
-    List of buttons that can be displayed in the taskbarlist item of your application
+  * *property ThumbBarButtons: [TThumbBarButtons]*
+    List of [TTaskbarListThumbButton] elements that can be displayed in the taskbarlist item of your application
 
   * *property ThumbBarImages: TCustomImageList*
     Imagelist for the glyps that shall be displayed in the buttons.
