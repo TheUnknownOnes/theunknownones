@@ -1,4 +1,5 @@
 #summary Components for making life easier when using the new Windows 7 Taskbarlist interfaces
+#labels Featured
 
 === What are TaskbarListComponents? ===
 
