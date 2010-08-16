@@ -20,7 +20,7 @@ Currently TUO's TaskbarList components support the following features:
 Checkout or download the source at:
 http://code.google.com/p/theunknownones/source/browse/trunk#trunk/Components/TaskBarList
 
-The folder contains the package for Delphi 2009 already. Simply make a package for your own Delphi version if it is not already there.
+The folder contains the packages for Delphi 2006 and 2009 already. Simply make a package for your own Delphi version if it is not already there.
 
 === Any prerequisites? ===
 
