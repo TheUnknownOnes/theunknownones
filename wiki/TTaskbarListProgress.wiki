@@ -1,5 +1,7 @@
 #summary is a wrapper for connecting Delphi progress bars to the taskbar item of the application
 
+This Component is part of the [TaskbarListComponents] package
+
 === Class members ===
 
   * *property Min : ULONGLONG*                     
