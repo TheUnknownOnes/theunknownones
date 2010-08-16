@@ -1,5 +1,7 @@
 #summary display any control as separate tab in the taskbar
 
+This Component is part of the [TaskbarListComponents] package
+
 === Class members ===
 
   * *procedure UpdateTaskWindow*
