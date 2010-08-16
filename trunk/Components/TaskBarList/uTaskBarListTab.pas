@@ -77,7 +77,7 @@ type
   published
     property OnCloseTab: TCloseTabEvent read FOnCloseTab write FOnCloseTab;
     property OnActivateTab: TNotifyEvent read FOnActivateTab write FOnActivateTab;
-    property OnGetPreviewRext: TOnGetPreviewRect read FOnGetPreviewRect write FOnGetPreviewRect;
+    property OnGetPreviewRect: TOnGetPreviewRect read FOnGetPreviewRect write FOnGetPreviewRect;
     property OnDrawPreview: TOnDrawPreview read FOnDrawPreview write FOnDrawPreview;
 
     property AutoInitialize;
@@ -135,7 +135,7 @@ function TTaskbarListFormTab.DoCloseWindow: Boolean;
 begin
   Result:=False;
   if Assigned(FOnCloseTab) then
-    inherited
+    Result:=inherited DoCloseWindow
   else
   begin
     Result:=TCustomForm(FControl).CloseQuery;
