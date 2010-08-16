@@ -35,7 +35,7 @@
          When the application tab is active and a live representation of its window is available, show the main application frame in the peek feature. At other times, use the tab window.
 
   * *property InsertBefore: TTaskbarListTab*
-    any TTaskbarListFormTab in your application that you want to be inserted before. Note that this tab should be existing before you activate the current tab.
+    any TTaskbarListTab in your application that you want to be inserted before. Note that this tab should be existing before you activate the current tab.
 
 === How to use it ===
 
