@@ -8,7 +8,7 @@ TaskbarlistComponents are a set of components designed as Delphi wrappers for th
 === What's in the box? ===
 
 Currently TUO's TaskbarList components support the following features:
-  * *TTaskbarListProgress* - wrapper for connecting Delphi progress bars to the taskbar item of the application
+  * *[TTaskbarListProgress]* - wrapper for connecting Delphi progress bars to the taskbar item of the application
   * *TTaskBarListOverlayIcon* - easily add an overlay icon to the taskbar item of your application
   * *TTaskBarListThumbButtons* - manage your application's thumb buttons in the taskbar
   * *TTaskbarListFormTab* - display any of your forms as separate tabs in the taskbar
