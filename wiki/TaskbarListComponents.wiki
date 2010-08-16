@@ -1,0 +1,22 @@
+#summary Components for making life easier when using the new Windows 7 Taskbarlist interfaces
+
+=== What are TaskbarList components? ===
+
+TaskbarlistComponents are a set of components designed as Delphi wrappers for the Windows 7 Taskbarlist Interfaces (e.g. [http://msdn.microsoft.com/en-us/library/dd391692%28VS.85%29.aspx ITaskbarlist3])
+
+
+=== What's in the box? ===
+
+Currently TUO's TaskbarList components support the following features:
+  * *TTaskbarListProgress* - wrapper for connecting Delphi progress bars to the taskbar item of the application
+  * *TTaskBarListOverlayIcon* - easily add an overlay icon to the taskbar item of your application
+  * *TTaskBarListThumbButtons* - manage your application's thumb buttons in the taskbar
+  * *TTaskbarListFormTab* - display any of your forms as separate tabs in the taskbar
+  * *TTaskbarListControlTab* - display any control as separate tab in the taskbar
+
+=== How to install? ===
+
+Checkout or download the source at:
+http://code.google.com/p/theunknownones/source/browse/trunk#trunk/Components/TaskBarList
+
+The folder contains the package for Delphi 2009 already. Simply make a package for your own Delphi version if it is not already there.
