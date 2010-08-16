@@ -1,4 +1,4 @@
-#summary manage your application's thumb buttons in the taskbar
+#summary display any of your forms as separate tabs in the taskbar
 
 === Class members ===
 
