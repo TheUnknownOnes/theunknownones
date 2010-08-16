@@ -1,5 +1,7 @@
 #summary display any of your forms as separate tabs in the taskbar
 
+This Component is part of the [TaskbarListComponents] package
+
 === Class members ===
 
   * *procedure UpdateTaskWindow*
