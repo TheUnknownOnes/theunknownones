@@ -1,5 +1,7 @@
 #summary easily add an overlay icon to the taskbar item of your application
 
+This Component is part of the [TaskbarListComponents] package
+
 === Class members ===
 
   * *procedure Initialize* 
