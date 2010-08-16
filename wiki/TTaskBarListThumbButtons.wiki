@@ -1,5 +1,7 @@
 #summary manage your application's thumb buttons in the taskbar
 
+This Component is part of the [TaskbarListComponents] package
+
 === Class members ===
 
   * *procedure Initialize* 
