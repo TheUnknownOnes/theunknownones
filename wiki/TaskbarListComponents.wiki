@@ -1,6 +1,6 @@
 #summary Components for making life easier when using the new Windows 7 Taskbarlist interfaces
 
-=== What are TaskbarList components? ===
+=== What are TaskbarListComponents? ===
 
 TaskbarListComponents are a set of components designed as Delphi wrappers for the Windows 7 Taskbarlist Interfaces (e.g. [http://msdn.microsoft.com/en-us/library/dd391692%28VS.85%29.aspx ITaskbarlist3])
 
