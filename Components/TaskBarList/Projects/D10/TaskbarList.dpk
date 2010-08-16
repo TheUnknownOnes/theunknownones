@@ -1,0 +1,43 @@
+package TaskbarList;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$LIBSUFFIX '_D100'}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl,
+  JediApi_SingleUnits,
+  dbrtl,
+  CommonTools_D100R;
+
+contains
+  uTaskBarListThumbButtons in '..\..\uTaskBarListThumbButtons.pas',
+  uTaskBarList_Reg in '..\..\uTaskBarList_Reg.pas',
+  uTaskBarList in '..\..\uTaskBarList.pas',
+  uTaskBarListOverlayIcon in '..\..\uTaskBarListOverlayIcon.pas',
+  uTaskBarListTab in '..\..\uTaskBarListTab.pas',
+  uTaskBarListProgress in '..\..\uTaskBarListProgress.pas';
+
+end.
