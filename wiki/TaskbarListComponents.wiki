@@ -21,3 +21,10 @@ Checkout or download the source at:
 http://code.google.com/p/theunknownones/source/browse/trunk#trunk/Components/TaskBarList
 
 The folder contains the package for Delphi 2009 already. Simply make a package for your own Delphi version if it is not already there.
+
+=== Any prerequisites? ===
+
+The package has to be compiled against the trunk revision of JEDI Windows API Library found here:
+http://jedi-apilib.svn.sourceforge.net/viewvc/jedi-apilib/jwapi/trunk/
+or checkout here
+https://jedi-apilib.svn.sourceforge.net/svnroot/jedi-apilib/jwapi/trunk/
