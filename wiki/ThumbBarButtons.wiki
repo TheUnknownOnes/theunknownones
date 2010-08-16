@@ -1,3 +1,0 @@
-#summary a buttonlist for the TTaskBarListThumbButtons component
-
-It holds one or more [TTaskbarListThumbButton] elements.
