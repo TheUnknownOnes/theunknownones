@@ -191,15 +191,15 @@ begin
 
   if Assigned(FTaskbarList3) and CheckWin32Version(6,1) then
   begin
+    FIsActive := True;
+    FInitialized:=True;
+
     DoRegisterTab;
 
     if FIsActiveWindow then
     begin
       FTaskbarList3.SetTabActive(FProxyHandle, TaskBarEntryHandle, 0);
     end;
-
-    FIsActive := True;
-    FInitialized:=True;
   end;
 end;
 
@@ -567,7 +567,10 @@ end;
 procedure TTaskbarListTab.UpdateTaskWindow;
 begin
   if CheckWin32Version(6,1) then
+  begin
     DwmInvalidateIconicBitmaps(FProxyHandle);
+    PostUpdateMessage;
+  end;
 end;
 
 { TTaskbarListControlTab }
