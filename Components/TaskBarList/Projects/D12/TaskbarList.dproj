@@ -23,7 +23,7 @@
 			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<DllSuffix>_D120</DllSuffix>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\TaskbarList_D120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\TaskbarList_D120.bpl</DCC_DependencyCheckOutputName>
 			<GenDll>true</GenDll>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
