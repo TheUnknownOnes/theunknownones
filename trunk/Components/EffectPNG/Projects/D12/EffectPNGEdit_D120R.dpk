@@ -24,7 +24,7 @@ package EffectPNGEdit_D120R;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'EffectPNGEdit - Runtime'}
 {$RUNONLY}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,

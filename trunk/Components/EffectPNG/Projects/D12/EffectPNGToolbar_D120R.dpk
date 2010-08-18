@@ -24,7 +24,7 @@ package EffectPNGToolbar_D120R;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'EffectPNGToolbar - Runtime'}
 {$RUNONLY}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,

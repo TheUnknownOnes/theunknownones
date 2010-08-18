@@ -24,7 +24,7 @@ package PNGImageListDesigner_D120D;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'PNGImagelist - Design'}
 {$DESIGNONLY}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,
