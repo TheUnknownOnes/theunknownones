@@ -94,7 +94,7 @@ package ResEd120;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'ResEd (Project Ressource Editor)'}
 {$DESIGNONLY}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD OFF}
 
 requires
   designide,
