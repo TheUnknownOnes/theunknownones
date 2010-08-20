@@ -110,8 +110,6 @@ type
     procedure DoUpdate; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
-    procedure Initialize;
-
     constructor Create(AOwner: TComponent); override;
   published
     property ThumbBarButtons: TThumbBarButtons read FThumbBarButtons write FThumbBarButtons stored true;
@@ -378,6 +376,7 @@ begin
     end;
   end;
 end;
+
 procedure TTaskBarListThumbButtons.DoInitialize;
 var
   Buttons : TThumbBarButtonArray;
@@ -389,7 +388,7 @@ begin
     if Assigned(FTaskbarList3) and CheckWin32Version(6,1) then
       FTaskbarList3.ThumbBarAddButtons(TCustomForm(Owner).Handle, Length(Buttons), @Buttons[0]);
 
-    FInitialized:=True;
+    inherited;
 
     ThumbBarButtons.Update(nil);
   end;
@@ -413,11 +412,6 @@ begin
         FTaskbarList3.ThumbBarSetImageList(TaskBarEntryHandle, 0);
     end;
   end;
-end;
-
-procedure TTaskBarListThumbButtons.Initialize;
-begin
-  DoInitialize;
 end;
 
 procedure TTaskBarListThumbButtons.Notification(AComponent: TComponent;

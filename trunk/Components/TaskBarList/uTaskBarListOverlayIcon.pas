@@ -18,8 +18,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-
-    procedure Initialize;
   published
     property OverlayIcon : TIcon read FOverlayIcon write SetOverlayIcon;
     property Description : WideString read FDescription write SetDescription;
@@ -45,7 +43,8 @@ end;
 
 procedure TTaskBarListOverlayIcon.DoInitialize;
 begin
-  FInitialized:=True;
+  inherited;
+
   DoUpdate;
 end;
 
@@ -53,11 +52,6 @@ procedure TTaskBarListOverlayIcon.DoUpdate;
 begin
   if Assigned(FTaskbarList3) and CheckWin32Version(6,1) then
     FTaskbarList3.SetOverlayIcon(TaskBarEntryHandle, FOverlayIcon.Handle, @FDescription);
-end;
-
-procedure TTaskBarListOverlayIcon.Initialize;
-begin
-  DoInitialize;
 end;
 
 procedure TTaskBarListOverlayIcon.SetDescription(const Value: WideString);

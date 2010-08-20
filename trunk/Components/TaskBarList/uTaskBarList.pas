@@ -19,7 +19,7 @@ type
     FHandle    : HWND;
 
     FMsgAutoInitialize: Cardinal;
-
+    FMsgInitialize: Cardinal;
     FMsgUpdate: Cardinal;
 
     FAutoInit: Boolean;
@@ -46,6 +46,8 @@ type
 
     function HandleAllocated: Boolean;
 
+    procedure Initialize;
+
     property AutoInitialize: Boolean read FAutoInit write FAutoInit default False;
     property Handle: HWND read FHandle write FHandle;
 
@@ -70,6 +72,14 @@ begin
     end;
   end
   else
+  if Message.Msg = FMsgInitialize then
+  begin
+    if not FInitialized then
+    begin
+      DoInitialize;
+    end;
+  end
+  else
   if Message.Msg = FMsgUpdate then
   begin
     if FInitialized then
@@ -84,6 +94,12 @@ end;
 function TTaskBarListComponent.HandleAllocated: Boolean;
 begin
   Result := FHandle <> 0;
+end;
+
+procedure TTaskBarListComponent.Initialize;
+begin
+  if HandleAllocated then
+    PostMessage(Handle, FMsgInitialize, 0, 0);
 end;
 
 procedure TTaskBarListComponent.PostUpdateMessage;
@@ -125,6 +141,7 @@ begin
   end;
 
   FMsgAutoInitialize:=RegisterWindowMessage('TUO.Components.TaskBarList.AutoInit');
+  FMsgInitialize:=RegisterWindowMessage('TUO.Components.TaskBarList.Initialize');
   FMsgUpdate:=RegisterWindowMessage('TUO.Components.TaskBarList.Update');
 
   if HandleAllocated then
@@ -143,6 +160,7 @@ end;
 
 procedure TTaskBarListComponent.DoInitialize;
 begin
+  FInitialized:=True;
 end;
 
 procedure TTaskBarListComponent.DoUpdate;
