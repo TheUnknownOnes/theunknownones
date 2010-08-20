@@ -51,7 +51,9 @@
 			<DCCReference Include="SPPCryptD120.dcp"/>
 			<DCCReference Include="vncserverwrapper.pas"/>
 			<DCCReference Include="vncclientwrapper.pas"/>
-			<DCCReference Include="icon.res"/>
+			<DCCReference Include="icon.res">
+				<BuildOrder>5</BuildOrder>
+			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
