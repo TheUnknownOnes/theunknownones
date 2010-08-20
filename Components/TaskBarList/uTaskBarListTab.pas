@@ -192,7 +192,7 @@ begin
   if Assigned(FTaskbarList3) and CheckWin32Version(6,1) then
   begin
     FIsActive := True;
-    FInitialized:=True;
+    inherited;
 
     DoRegisterTab;
 
