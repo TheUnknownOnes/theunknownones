@@ -108,6 +108,9 @@
 			<Projects Include="VNCWrapper\projects\D120\VNCWrapper_D120.dproj">
 				<Dependencies/>
 			</Projects>
+			<Projects Include="TaskBarList\Projects\D12\TaskbarList.dproj">
+				<Dependencies/>
+			</Projects>
 		</ItemGroup>
 		<ProjectExtensions>
 			<Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -431,14 +434,23 @@
 		<Target Name="VNCWrapper_D120:Make">
 			<MSBuild Targets="Make" Projects="VNCWrapper\projects\D120\VNCWrapper_D120.dproj"/>
 		</Target>
+		<Target Name="TaskbarList">
+			<MSBuild Projects="TaskBarList\Projects\D12\TaskbarList.dproj"/>
+		</Target>
+		<Target Name="TaskbarList:Clean">
+			<MSBuild Targets="Clean" Projects="TaskBarList\Projects\D12\TaskbarList.dproj"/>
+		</Target>
+		<Target Name="TaskbarList:Make">
+			<MSBuild Targets="Make" Projects="TaskBarList\Projects\D12\TaskbarList.dproj"/>
+		</Target>
 		<Target Name="Build">
-			<CallTarget Targets="ConsoleTools_D120D;ConsoleTools_D120R;EffectPNGEdit_D120D;EffectPNGEdit_D120R;EffectPNGImage_D120D;EffectPNGImage_D120R;EffectPNGImageList_D120D;EffectPNGImageList_D120R;EffectPNGToolbar_D120D;EffectPNGToolbar_D120R;EffectPNG_D120R;GroupListView_D120D;GroupListView_D120R;PNGImageList_D120D;PNGImageList_D120R;PNGImageListDesigner_D120D;BaseImageList_D120R;ImageListProvider_D120D;ImageListProvider_D120R;NPipe_D120;PNGUtils_D120R;SearchEdit_D120D;SearchEdit_D120R;Settings_D120D;Settings_D120R;Settings_VirtualTrees_D120D;Settings_VirtualTrees_D120R;VirtualActionTree_D120D;VirtualActionTree_D120R;VSTSearchEdit_D120D;VSTSearchEdit_D120R;Wiimote_D120D;Wiimote_D120R;YearCalendar_D120;VNCWrapper_D120"/>
+			<CallTarget Targets="ConsoleTools_D120D;ConsoleTools_D120R;EffectPNGEdit_D120D;EffectPNGEdit_D120R;EffectPNGImage_D120D;EffectPNGImage_D120R;EffectPNGImageList_D120D;EffectPNGImageList_D120R;EffectPNGToolbar_D120D;EffectPNGToolbar_D120R;EffectPNG_D120R;GroupListView_D120D;GroupListView_D120R;PNGImageList_D120D;PNGImageList_D120R;PNGImageListDesigner_D120D;BaseImageList_D120R;ImageListProvider_D120D;ImageListProvider_D120R;NPipe_D120;PNGUtils_D120R;SearchEdit_D120D;SearchEdit_D120R;Settings_D120D;Settings_D120R;Settings_VirtualTrees_D120D;Settings_VirtualTrees_D120R;VirtualActionTree_D120D;VirtualActionTree_D120R;VSTSearchEdit_D120D;VSTSearchEdit_D120R;Wiimote_D120D;Wiimote_D120R;YearCalendar_D120;VNCWrapper_D120;TaskbarList"/>
 		</Target>
 		<Target Name="Clean">
-			<CallTarget Targets="ConsoleTools_D120D:Clean;ConsoleTools_D120R:Clean;EffectPNGEdit_D120D:Clean;EffectPNGEdit_D120R:Clean;EffectPNGImage_D120D:Clean;EffectPNGImage_D120R:Clean;EffectPNGImageList_D120D:Clean;EffectPNGImageList_D120R:Clean;EffectPNGToolbar_D120D:Clean;EffectPNGToolbar_D120R:Clean;EffectPNG_D120R:Clean;GroupListView_D120D:Clean;GroupListView_D120R:Clean;PNGImageList_D120D:Clean;PNGImageList_D120R:Clean;PNGImageListDesigner_D120D:Clean;BaseImageList_D120R:Clean;ImageListProvider_D120D:Clean;ImageListProvider_D120R:Clean;NPipe_D120:Clean;PNGUtils_D120R:Clean;SearchEdit_D120D:Clean;SearchEdit_D120R:Clean;Settings_D120D:Clean;Settings_D120R:Clean;Settings_VirtualTrees_D120D:Clean;Settings_VirtualTrees_D120R:Clean;VirtualActionTree_D120D:Clean;VirtualActionTree_D120R:Clean;VSTSearchEdit_D120D:Clean;VSTSearchEdit_D120R:Clean;Wiimote_D120D:Clean;Wiimote_D120R:Clean;YearCalendar_D120:Clean;VNCWrapper_D120:Clean"/>
+			<CallTarget Targets="ConsoleTools_D120D:Clean;ConsoleTools_D120R:Clean;EffectPNGEdit_D120D:Clean;EffectPNGEdit_D120R:Clean;EffectPNGImage_D120D:Clean;EffectPNGImage_D120R:Clean;EffectPNGImageList_D120D:Clean;EffectPNGImageList_D120R:Clean;EffectPNGToolbar_D120D:Clean;EffectPNGToolbar_D120R:Clean;EffectPNG_D120R:Clean;GroupListView_D120D:Clean;GroupListView_D120R:Clean;PNGImageList_D120D:Clean;PNGImageList_D120R:Clean;PNGImageListDesigner_D120D:Clean;BaseImageList_D120R:Clean;ImageListProvider_D120D:Clean;ImageListProvider_D120R:Clean;NPipe_D120:Clean;PNGUtils_D120R:Clean;SearchEdit_D120D:Clean;SearchEdit_D120R:Clean;Settings_D120D:Clean;Settings_D120R:Clean;Settings_VirtualTrees_D120D:Clean;Settings_VirtualTrees_D120R:Clean;VirtualActionTree_D120D:Clean;VirtualActionTree_D120R:Clean;VSTSearchEdit_D120D:Clean;VSTSearchEdit_D120R:Clean;Wiimote_D120D:Clean;Wiimote_D120R:Clean;YearCalendar_D120:Clean;VNCWrapper_D120:Clean;TaskbarList:Clean"/>
 		</Target>
 		<Target Name="Make">
-			<CallTarget Targets="ConsoleTools_D120D:Make;ConsoleTools_D120R:Make;EffectPNGEdit_D120D:Make;EffectPNGEdit_D120R:Make;EffectPNGImage_D120D:Make;EffectPNGImage_D120R:Make;EffectPNGImageList_D120D:Make;EffectPNGImageList_D120R:Make;EffectPNGToolbar_D120D:Make;EffectPNGToolbar_D120R:Make;EffectPNG_D120R:Make;GroupListView_D120D:Make;GroupListView_D120R:Make;PNGImageList_D120D:Make;PNGImageList_D120R:Make;PNGImageListDesigner_D120D:Make;BaseImageList_D120R:Make;ImageListProvider_D120D:Make;ImageListProvider_D120R:Make;NPipe_D120:Make;PNGUtils_D120R:Make;SearchEdit_D120D:Make;SearchEdit_D120R:Make;Settings_D120D:Make;Settings_D120R:Make;Settings_VirtualTrees_D120D:Make;Settings_VirtualTrees_D120R:Make;VirtualActionTree_D120D:Make;VirtualActionTree_D120R:Make;VSTSearchEdit_D120D:Make;VSTSearchEdit_D120R:Make;Wiimote_D120D:Make;Wiimote_D120R:Make;YearCalendar_D120:Make;VNCWrapper_D120:Make"/>
+			<CallTarget Targets="ConsoleTools_D120D:Make;ConsoleTools_D120R:Make;EffectPNGEdit_D120D:Make;EffectPNGEdit_D120R:Make;EffectPNGImage_D120D:Make;EffectPNGImage_D120R:Make;EffectPNGImageList_D120D:Make;EffectPNGImageList_D120R:Make;EffectPNGToolbar_D120D:Make;EffectPNGToolbar_D120R:Make;EffectPNG_D120R:Make;GroupListView_D120D:Make;GroupListView_D120R:Make;PNGImageList_D120D:Make;PNGImageList_D120R:Make;PNGImageListDesigner_D120D:Make;BaseImageList_D120R:Make;ImageListProvider_D120D:Make;ImageListProvider_D120R:Make;NPipe_D120:Make;PNGUtils_D120R:Make;SearchEdit_D120D:Make;SearchEdit_D120R:Make;Settings_D120D:Make;Settings_D120R:Make;Settings_VirtualTrees_D120D:Make;Settings_VirtualTrees_D120R:Make;VirtualActionTree_D120D:Make;VirtualActionTree_D120R:Make;VSTSearchEdit_D120D:Make;VSTSearchEdit_D120R:Make;Wiimote_D120D:Make;Wiimote_D120R:Make;YearCalendar_D120:Make;VNCWrapper_D120:Make;TaskbarList:Make"/>
 		</Target>
 		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 	</Project>
