@@ -143,7 +143,6 @@ end;
 function TThumbBarButtons.Add: TThumbBarButton;
 begin
   CheckCanAdd;
-  showmessage('add');
 
   Result:=TThumbBarButton(inherited Add);
 end;
