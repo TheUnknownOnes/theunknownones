@@ -10,7 +10,8 @@ interface
 
 uses
   SysUtils, JwaWinType, Graphics, ImgList, Controls, jwaShlObj, jwaDWMApi,
-  Messages, Classes, ActnList, AppEvnts, uTaskBarList, JwaWinUser, Windows;
+  Messages, Classes, ActnList, AppEvnts, uTaskBarList, JwaWinUser, Windows,
+  Math;
 
 type
   TTaskBarListThumbButtons = class;
@@ -166,9 +167,9 @@ function TThumbBarButtons.GetAllAsArray: TThumbBarButtonArray;
 var
   idx: Integer;
 begin
-  SetLength(Result, Self.Count);
+  SetLength(Result, Min(7, Self.Count));
 
-  for idx := 0 to Self.Count - 1 do
+  for idx := Low(Result) to High(Result) do
     Result[idx]:=GetAsRecord(Self[idx]);
 end;
 
