@@ -29,8 +29,7 @@ requires
   rtl,
   vcl,
   JediApi_SingleUnits,
-  dbrtl,
-  CommonTools_D100R;
+  dbrtl;
 
 contains
   uTaskBarListThumbButtons in '..\..\uTaskBarListThumbButtons.pas',

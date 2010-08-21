@@ -4,7 +4,7 @@ interface
 
 uses
   uTaskBarList, JwaWinUser, Classes, Controls, Windows, jwaDWMAPI, Messages,
-  JwaWinGDI, SysUtils, Graphics, Forms, uSysTools, Math, AppEvnts, JwaShlObj;
+  JwaWinGDI, SysUtils, Graphics, Forms, Math, AppEvnts, JwaShlObj;
 
 type
   TPreviewMode = (pmTaskBar, pmLive);
