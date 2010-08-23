@@ -17,8 +17,9 @@ Currently TUO's TaskbarList components support the following features:
 
 === I would like to see it first ===
 
-   * http://www.vimeo.com/14291783 TTaskbarListThumbButtons und TTaskbarListOverlayIcon
+   * http://www.vimeo.com/14291783 TTaskbarListThumbButtons and TTaskbarListOverlayIcon
    * http://www.vimeo.com/14354328 TTaskbarListProgress
+   * http://www.vimeo.com/14356627 TTaskbarlistFormTab and TTaskbarlistControlTab 
 
 
 
