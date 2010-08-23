@@ -32,7 +32,7 @@ This Component is part of the [TaskbarListComponents] package
       * tpUseAppThumbnailWhenActive
          When the application tab is active and a live representation of its window is available, use the main application frame window thumbnail. At other times, use the tab window thumbnail.
       * tpUseAppPeekAlways
-         Always use the peek image provided by the main applicatio frame window rather than a peek image provided by the individual tab window
+         Always use the peek image provided by the main application frame window rather than a peek image provided by the individual tab window
       * tpUseAppPeekWhenActive
          When the application tab is active and a live representation of its window is available, show the main application frame in the peek feature. At other times, use the tab window.
 
