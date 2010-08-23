@@ -47,9 +47,6 @@
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="JediApi_SingleUnits.dcp"/>
-			<DCCReference Include="dbrtl.dcp"/>
-			<DCCReference Include="CommonTools_D120R.dcp"/>
-			<DCCReference Include="RegExp_D120R.dcp"/>
 			<DCCReference Include="..\..\uTaskBarListThumbButtons.pas"/>
 			<DCCReference Include="..\..\uTaskBarList_Reg.pas"/>
 			<DCCReference Include="..\..\uTaskBarList.pas"/>
