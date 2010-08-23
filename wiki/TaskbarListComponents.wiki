@@ -15,6 +15,13 @@ Currently TUO's TaskbarList components support the following features:
   * *[TTaskbarListFormTab]* - display any of your forms as separate tabs in the taskbar
   * *[TTaskbarListControlTab]* - display any control as separate tab in the taskbar
 
+=== I would like to see it first ===
+
+   * http://www.vimeo.com/14291783 TTaskbarListThumbButtons und TTaskbarListOverlayIcon
+   * http://www.vimeo.com/14353454 TTaskbarListProgress
+
+
+
 === How to install? ===
 
 Checkout or download the source at:
