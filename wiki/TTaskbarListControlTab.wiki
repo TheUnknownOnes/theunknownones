@@ -5,7 +5,7 @@ This Component is part of the [TaskbarListComponents] package
 === Class members ===
 
   * *procedure UpdateTaskWindow*
-    Call this to invalidate the preview image of the application
+    Call this to invalidate the preview image of the control
 
   * *property Active: Boolean*
     rather self explaining
