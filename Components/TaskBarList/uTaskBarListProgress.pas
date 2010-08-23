@@ -16,10 +16,13 @@ uses
 {$i JEDI.inc}
 
 type
-  TTaskbarListProgressState = (psNoProgress,
-                               psNormal,
-                               psPaused,
-                               psError);
+  {$IFDEF DELPHI12_UP}
+  TTaskbarListProgressState = TProgressBarState;
+  {$ELSE}
+  TTaskbarListProgressState = (pbsNormal,
+                               pbsError,
+                               pbsPaused);
+  {$ENDIF}
 
   TTaskbarListProgress = class(TTaskBarListComponent)
   private
@@ -48,7 +51,7 @@ type
     property Min : ULONGLONG read FMin write SetMin default 0;
     property Max : ULONGLONG read FMax write SetMax default 100;
     property Position : ULONGLONG read FPosition write SetPosition default 0;
-    property State : TTaskbarListProgressState read FState write SetState default psNormal;
+    property State : TTaskbarListProgressState read FState write SetState default pbsNormal;
     property ProgressBar : TProgressBar read FProgressBar write SetProgressbar;
     property Marquee : Boolean read FMarquee write SetMarquee default false;
   end;
@@ -92,7 +95,7 @@ constructor TTaskbarListProgress.Create(AOwner: TComponent);
 begin
   inherited;
 
-  FState := psNormal;
+  FState := pbsNormal;
   FMin := 0;
   FMax := 100;
   FPosition := 0;
@@ -125,11 +128,7 @@ begin
     FPosition := FProgressbar.Position;
 
     {$IFDEF DELPHI12_UP}
-    case FProgressbar.State of
-      pbsNormal: FState := psNormal;
-      pbsError: FState := psError;
-      pbsPaused: FState := psPaused;
-    end;
+    FState := FProgressbar.State;
     FMarquee := FProgressbar.Style = pbstMarquee;
     {$ENDIF}
   end;
@@ -139,20 +138,21 @@ begin
     if not FMarquee then
       FTaskbarList3.SetProgressValue(TaskBarEntryHandle, FPosition - FMin, FMax - FMin);
 
-    NewState := TBPF_NOPROGRESS;
-
-    if FPosition <> FMin then
+    if (FPosition = FMin) and (not FMarquee) then
+    begin
+      NewState := TBPF_NOPROGRESS;
+    end
+    else
     begin
       case FState of
-        psNoProgress: NewState := TBPF_NOPROGRESS;
-        psNormal: NewState := TBPF_NORMAL;
-        psPaused: NewState := TBPF_PAUSED;
-        psError: NewState := TBPF_ERROR;
+        pbsNormal: NewState := TBPF_NORMAL;
+        pbsPaused: NewState := TBPF_PAUSED;
+        pbsError: NewState := TBPF_ERROR;
       end;
     end;
 
-
     FTaskbarList3.SetProgressState(TaskBarEntryHandle, NewState);
+
     if FMarquee then
       FTaskbarList3.SetProgressState(TaskBarEntryHandle, TBPF_INDETERMINATE);
   end;

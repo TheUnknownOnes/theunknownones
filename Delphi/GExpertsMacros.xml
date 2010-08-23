@@ -13,8 +13,6 @@
 </Template>
 <Template Name="uh" Desc="Unit Header" InsertPos="1">
 <![CDATA[{----------------------------------------------------------------------------- 
- Project: %PROJECTNAME%
- Purpose: %INPUTVAR,PRUPOSE,Purpose of this unit%| 
  Created: %DATETIME%
 
  (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
