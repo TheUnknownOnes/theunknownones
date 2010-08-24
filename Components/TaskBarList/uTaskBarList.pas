@@ -38,9 +38,8 @@ type
 
     procedure DoInitialize; virtual;
     procedure DoUpdate; virtual;
-
-    procedure PostUpdateMessage;
   public
+    procedure PostUpdateMessage;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
