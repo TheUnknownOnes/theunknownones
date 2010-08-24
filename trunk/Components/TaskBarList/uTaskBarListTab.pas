@@ -27,7 +27,6 @@ type
     FProxyHandle: HWND;
 
     FIsActive: Boolean;
-    FIsActiveWindow: Boolean;
 
     FIcon : TIcon;
     FOnGetPreviewRect : TOnGetPreviewRect;
@@ -51,6 +50,7 @@ type
     function DoDrawPreview(PreviewMode: TPreviewMode; Canvas: TCanvas; Rect: TRect): Boolean;
     procedure SetAppProps(const Value: TTabProperties);
     procedure SetInsertBefore(const Value: TTaskbarListTab);
+
   protected
     procedure DoRegisterTab;
     function GetIcon: TIcon; virtual;
@@ -64,6 +64,7 @@ type
 
     procedure DoInitialize; override;
     procedure DoUpdate; override;
+    function IsWindowActive: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -72,8 +73,6 @@ type
     procedure DeactivateTaskWindow;
     procedure UpdateTaskWindow;
     property Active: Boolean read FIsActive write SetActive;
-
-    procedure SetTabActive;
   published
     property OnCloseTab: TCloseTabEvent read FOnCloseTab write FOnCloseTab;
     property OnActivateTab: TNotifyEvent read FOnActivateTab write FOnActivateTab;
@@ -91,6 +90,7 @@ type
     function GetIcon: TIcon; override;
     function DoCloseWindow: Boolean; override;
     function GetWindowCaption: String; override;
+    function IsWindowActive: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -156,6 +156,11 @@ begin
   Result:=TCustomForm(Control).Caption;
 end;
 
+function TTaskbarListFormTab.IsWindowActive: Boolean;
+begin
+  Result:=TCustomForm(Control).Active;
+end;
+
 { TTaskbarListTab }
 
 procedure TTaskbarListTab.ProxyWndProc(var Message: TMessage);
@@ -196,10 +201,10 @@ begin
 
     DoRegisterTab;
 
-    if FIsActiveWindow then
-    begin
-      FTaskbarList3.SetTabActive(FProxyHandle, TaskBarEntryHandle, 0);
-    end;
+//    if FIsActiveWindow then
+//    begin
+//      FTaskbarList3.SetTabActive(FProxyHandle, TaskBarEntryHandle, 0);
+//    end;
   end;
 end;
 
@@ -248,9 +253,10 @@ procedure TTaskbarListTab.DoActivateWindow;
 begin
   if Assigned(FTaskbarList3) and CheckWin32Version(6,1) then
   begin
-    FTaskbarList3.SetTabActive(FProxyHandle, TaskBarEntryHandle, 0);
     if Assigned(FOnActivateTab) then
       FOnActivateTab(Self);
+
+    PostUpdateMessage;
   end;
 end;
 
@@ -446,6 +452,12 @@ begin
       FTaskbarList4.SetTabProperties(FProxyHandle, Flags);
     end;
 
+    if Assigned(FTaskbarList3) then
+    begin
+      if IsWindowActive then
+        FTaskbarList3.SetTabActive(FProxyHandle, TaskBarEntryHandle, 0);
+    end;
+
     DefWindowProc(FProxyHandle, WM_SETTEXT, 0 , LPARAM(PChar(GetWindowCaption)));
 
     Icon:=GetIcon;
@@ -458,6 +470,8 @@ end;
 
 procedure TTaskbarListTab.DoWMActivate;
 begin
+  Application.Restore;
+  //todo: find a better solution what to do here.
   if Application.MainForm.WindowState = wsMinimized then
     ShowWindow(Application.MainForm.Handle, SW_RESTORE);
   Application.MainForm.SetFocus;
@@ -490,6 +504,11 @@ end;
 function TTaskbarListTab.GetWindowCaption: String;
 begin
   Result:='';
+end;
+
+function TTaskbarListTab.IsWindowActive: Boolean;
+begin
+  Result:=False;
 end;
 
 procedure TTaskbarListTab.Notification(AComponent: TComponent;
@@ -556,12 +575,6 @@ begin
 
   if OldActive then
     ActivateTaskWindow;
-end;
-
-procedure TTaskbarListTab.SetTabActive;
-begin
-  if CheckWin32Version(6,1) and Assigned(FTaskbarList3) then
-    FTaskbarList3.SetTabActive(FProxyHandle, TaskBarEntryHandle, 0);
 end;
 
 procedure TTaskbarListTab.UpdateTaskWindow;
