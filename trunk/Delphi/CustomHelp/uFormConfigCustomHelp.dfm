@@ -3,12 +3,12 @@ object form_Config: Tform_Config
   Top = 0
   BorderStyle = bsSizeToolWin
   Caption = 'Configure Custom Help'
-  ClientHeight = 773
-  ClientWidth = 970
+  ClientHeight = 591
+  ClientWidth = 742
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -14
+  Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
@@ -16,93 +16,72 @@ object form_Config: Tform_Config
   ShowHint = True
   OnCreate = FormCreate
   OnShow = FormShow
-  PixelsPerInch = 120
-  TextHeight = 17
+  PixelsPerInch = 96
+  TextHeight = 13
   object Tabs: TPageControl
     Left = 0
     Top = 0
-    Width = 868
-    Height = 773
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
+    Width = 664
+    Height = 591
     ActivePage = TabSheet7
     Align = alClient
     TabOrder = 0
     object TabSheet1: TTabSheet
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'General'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label1: TLabel
         AlignWithMargins = True
-        Left = 4
-        Top = 701
-        Width = 852
-        Height = 36
+        Left = 3
+        Top = 534
+        Width = 626
+        Height = 26
         Cursor = crHandPoint
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Align = alBottom
         Caption = 
           'go to the discussion thread at www.delphipraxis.net to receive h' +
           'elp or post provider URLs (German and English spoken)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlue
-        Font.Height = -15
+        Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = [fsBold, fsUnderline]
         ParentFont = False
         WordWrap = True
         OnClick = Label1Click
-        ExplicitWidth = 833
       end
       object rgDisplayLocation: TRadioGroup
         AlignWithMargins = True
-        Left = 4
-        Top = 4
-        Width = 852
-        Height = 238
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 3
+        Top = 3
+        Width = 650
+        Height = 182
         Align = alTop
         Caption = 'Where to display help?'
         TabOrder = 0
       end
       object GroupBox2: TGroupBox
         AlignWithMargins = True
-        Left = 4
-        Top = 250
-        Width = 852
-        Height = 443
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 3
+        Top = 191
+        Width = 650
+        Height = 337
         Align = alClient
         Caption = 'Result order'
         TabOrder = 1
         object lbOrder: TListBox
           AlignWithMargins = True
-          Left = 6
-          Top = 23
-          Width = 840
-          Height = 414
+          Left = 5
+          Top = 18
+          Width = 640
+          Height = 314
           Hint = 'Use drag and drop to rearrange items'
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
           Align = alClient
           DragMode = dmAutomatic
           ExtendedSelect = False
-          ItemHeight = 17
+          ItemHeight = 13
           TabOrder = 0
           OnDragDrop = lbOrderDragDrop
           OnDragOver = lbOrderDragOver
@@ -110,90 +89,65 @@ object form_Config: Tform_Config
       end
     end
     object TabSheet2: TTabSheet
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'Microsoft Help 2.x'
       ImageIndex = 1
       object lvNamespaces: TListView
         AlignWithMargins = True
-        Left = 4
-        Top = 41
-        Width = 852
-        Height = 640
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 3
+        Top = 31
+        Width = 650
+        Height = 486
         Align = alClient
         Checkboxes = True
         Columns = <
           item
             Caption = 'Help namespace'
-            Width = 262
+            Width = 200
           end
           item
             AutoSize = True
             Caption = 'Description'
           end
           item
-            Width = 65
           end>
         TabOrder = 0
         ViewStyle = vsReport
       end
       object Panel4: TPanel
         Left = 0
-        Top = 685
-        Width = 860
-        Height = 56
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Top = 520
+        Width = 656
+        Height = 43
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
         object Label4: TLabel
-          Left = 8
-          Top = 29
-          Width = 224
-          Height = 17
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
+          Left = 6
+          Top = 22
+          Width = 176
+          Height = 13
           Caption = 'Trim namespaces until result is found'
         end
         object cbFullTextSearch: TCheckBox
-          Left = 8
-          Top = 4
-          Width = 757
-          Height = 22
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
+          Left = 6
+          Top = 3
+          Width = 579
+          Height = 17
           Caption = 
             'Perform fulltext search ... this may be slow (if unchecked only ' +
             'index searches are performed)'
           TabOrder = 0
         end
         object cbTrimNamespacesHX: TComboBox
-          Left = 251
-          Top = 25
-          Width = 190
-          Height = 25
+          Left = 192
+          Top = 19
+          Width = 145
+          Height = 21
           Hint = 
             'Example:'#13#10'Full Keyword is  Classes.TStringList.Create'#13#10'Trim Firs' +
             't searches for TStringList.Create'#13#10'Trim Full searches for Create'
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
           Style = csDropDownList
-          ItemHeight = 17
+          ItemHeight = 0
           ParentShowHint = False
           ShowHint = True
           TabOrder = 1
@@ -201,496 +155,156 @@ object form_Config: Tform_Config
       end
       inline fccMSHelp: TFrameConfigColor
         AlignWithMargins = True
-        Left = 4
-        Top = 4
-        Width = 852
-        Height = 29
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 3
+        Top = 3
+        Width = 650
+        Height = 22
         Align = alTop
         AutoSize = True
         TabOrder = 2
         TabStop = True
-        ExplicitLeft = 4
-        ExplicitTop = 4
-        ExplicitWidth = 852
-        ExplicitHeight = 29
-        inherited catbtnTopics: TCategoryButtons
-          Width = 332
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitWidth = 332
-          ExplicitHeight = 29
-        end
-        inherited ColorBox1: TColorBox
-          Left = 340
-          Width = 190
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitLeft = 340
-          ExplicitWidth = 190
-        end
+        ExplicitLeft = 3
+        ExplicitTop = 3
+        ExplicitWidth = 650
       end
     end
     object TabSheet3: TTabSheet
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'Static Web based providers'
       ImageIndex = 2
       inline FrameConfigWebBasedProviders: TFrameConfigProviders
         Left = 0
-        Top = 37
-        Width = 860
-        Height = 704
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Top = 28
+        Width = 656
+        Height = 535
         Align = alClient
         TabOrder = 0
         TabStop = True
-        ExplicitTop = 37
-        ExplicitWidth = 860
-        ExplicitHeight = 704
+        ExplicitTop = 28
+        ExplicitWidth = 656
+        ExplicitHeight = 535
         inherited pnlOHSItem: TPanel
-          Top = 581
-          Width = 860
-          Height = 123
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitTop = 581
-          ExplicitWidth = 860
-          ExplicitHeight = 123
+          Top = 441
+          Width = 656
+          ExplicitTop = 441
+          ExplicitWidth = 656
           DesignSize = (
-            860
-            123)
-          inherited Label1: TLabel
-            Left = 8
-            Top = 8
-            Width = 35
-            Height = 17
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 8
-            ExplicitTop = 8
-            ExplicitWidth = 35
-            ExplicitHeight = 17
-          end
-          inherited Label2: TLabel
-            Left = 8
-            Top = 38
-            Width = 68
-            Height = 17
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 8
-            ExplicitTop = 38
-            ExplicitWidth = 68
-            ExplicitHeight = 17
-          end
-          inherited LabelURLPath: TLabel
-            Left = 8
-            Top = 68
-            Width = 20
-            Height = 17
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 8
-            ExplicitTop = 68
-            ExplicitWidth = 20
-            ExplicitHeight = 17
-          end
-          inherited Label8: TLabel
-            Left = 8
-            Top = 95
-            Width = 106
-            Height = 17
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 8
-            ExplicitTop = 95
-            ExplicitWidth = 106
-            ExplicitHeight = 17
-          end
+            656
+            94)
           inherited BtnBrowseForFile: TSpeedButton
-            Left = 819
-            Top = 63
-            Width = 30
-            Height = 29
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 819
-            ExplicitTop = 63
-            ExplicitWidth = 30
-            ExplicitHeight = 29
+            Left = 626
+            ExplicitLeft = 626
           end
           inherited edName: TEdit
-            Left = 123
-            Top = 4
-            Width = 730
-            Height = 25
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 123
-            ExplicitTop = 4
-            ExplicitWidth = 730
-            ExplicitHeight = 25
+            Width = 558
+            Height = 21
+            ExplicitWidth = 558
+            ExplicitHeight = 21
           end
           inherited edDesc: TEdit
-            Left = 123
-            Top = 34
-            Width = 730
-            Height = 25
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 123
-            ExplicitTop = 34
-            ExplicitWidth = 730
-            ExplicitHeight = 25
+            Width = 558
+            Height = 21
+            ExplicitWidth = 558
+            ExplicitHeight = 21
           end
           inherited edURL: TEdit
-            Left = 123
-            Top = 63
-            Width = 694
-            Height = 25
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 123
-            ExplicitTop = 63
-            ExplicitWidth = 694
-            ExplicitHeight = 25
+            Width = 531
+            Height = 21
+            ExplicitWidth = 531
+            ExplicitHeight = 21
           end
           inherited cbTrimNamespacesOHS: TComboBox
-            Left = 123
-            Top = 92
-            Width = 190
-            Height = 25
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ItemHeight = 17
-            ExplicitLeft = 123
-            ExplicitTop = 92
-            ExplicitWidth = 190
-            ExplicitHeight = 25
+            ItemHeight = 0
           end
         end
         inherited ListView1: TListView
-          Left = 4
-          Top = 4
-          Width = 852
-          Height = 573
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          Columns = <
-            item
-              Caption = 'Name'
-              Width = 131
-            end
-            item
-              Caption = 'Description'
-              Width = 131
-            end
-            item
-              AutoSize = True
-              Caption = '%s ... $(HelpString) will be replaced by Keyword'
-            end
-            item
-              Caption = 'Trim Namespaces'
-              Width = 105
-            end>
-          ExplicitLeft = 4
-          ExplicitTop = 4
-          ExplicitWidth = 852
-          ExplicitHeight = 573
+          Width = 650
+          Height = 435
+          ExplicitWidth = 650
+          ExplicitHeight = 435
         end
       end
       inline fccWebProvider: TFrameConfigColor
         AlignWithMargins = True
-        Left = 4
-        Top = 4
-        Width = 852
-        Height = 29
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 3
+        Top = 3
+        Width = 650
+        Height = 22
         Align = alTop
         AutoSize = True
         TabOrder = 1
         TabStop = True
-        ExplicitLeft = 4
-        ExplicitTop = 4
-        ExplicitWidth = 852
-        ExplicitHeight = 29
-        inherited catbtnTopics: TCategoryButtons
-          Width = 332
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitWidth = 332
-          ExplicitHeight = 29
-        end
-        inherited ColorBox1: TColorBox
-          Left = 340
-          Width = 190
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitLeft = 340
-          ExplicitWidth = 190
-        end
+        ExplicitLeft = 3
+        ExplicitTop = 3
+        ExplicitWidth = 650
       end
     end
     object TabSheet4: TTabSheet
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'File based providers'
       ImageIndex = 3
       inline FrameConfigFileBasedProviders: TFrameConfigProviders
         Left = 0
-        Top = 105
-        Width = 860
-        Height = 636
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Top = 80
+        Width = 656
+        Height = 483
         Align = alClient
         TabOrder = 0
         TabStop = True
-        ExplicitTop = 105
-        ExplicitWidth = 860
-        ExplicitHeight = 636
+        ExplicitTop = 80
+        ExplicitWidth = 656
+        ExplicitHeight = 483
         inherited pnlOHSItem: TPanel
-          Top = 513
-          Width = 860
-          Height = 123
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitTop = 513
-          ExplicitWidth = 860
-          ExplicitHeight = 123
-          inherited Label1: TLabel
-            Left = 8
-            Top = 8
-            Width = 35
-            Height = 17
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 8
-            ExplicitTop = 8
-            ExplicitWidth = 35
-            ExplicitHeight = 17
-          end
-          inherited Label2: TLabel
-            Left = 8
-            Top = 38
-            Width = 68
-            Height = 17
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 8
-            ExplicitTop = 38
-            ExplicitWidth = 68
-            ExplicitHeight = 17
-          end
-          inherited LabelURLPath: TLabel
-            Left = 8
-            Top = 68
-            Width = 20
-            Height = 17
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 8
-            ExplicitTop = 68
-            ExplicitWidth = 20
-            ExplicitHeight = 17
-          end
-          inherited Label8: TLabel
-            Left = 8
-            Top = 95
-            Width = 106
-            Height = 17
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 8
-            ExplicitTop = 95
-            ExplicitWidth = 106
-            ExplicitHeight = 17
-          end
+          Top = 389
+          Width = 656
+          ExplicitTop = 389
+          ExplicitWidth = 656
           inherited BtnBrowseForFile: TSpeedButton
-            Left = 819
-            Top = 63
-            Width = 30
-            Height = 29
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 819
-            ExplicitTop = 63
-            ExplicitWidth = 30
-            ExplicitHeight = 29
+            Left = 626
+            ExplicitLeft = 626
           end
           inherited edName: TEdit
-            Left = 123
-            Top = 4
-            Width = 730
-            Height = 25
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 123
-            ExplicitTop = 4
-            ExplicitWidth = 730
-            ExplicitHeight = 25
+            Width = 558
+            Height = 21
+            ExplicitWidth = 558
+            ExplicitHeight = 21
           end
           inherited edDesc: TEdit
-            Left = 123
-            Top = 34
-            Width = 730
-            Height = 25
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 123
-            ExplicitTop = 34
-            ExplicitWidth = 730
-            ExplicitHeight = 25
+            Width = 558
+            Height = 21
+            ExplicitWidth = 558
+            ExplicitHeight = 21
           end
           inherited edURL: TEdit
-            Left = 123
-            Top = 63
-            Width = 694
-            Height = 25
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 123
-            ExplicitTop = 63
-            ExplicitWidth = 694
-            ExplicitHeight = 25
+            Width = 531
+            Height = 21
+            ExplicitWidth = 531
+            ExplicitHeight = 21
           end
           inherited cbTrimNamespacesOHS: TComboBox
-            Left = 123
-            Top = 92
-            Width = 190
-            Height = 25
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ItemHeight = 17
-            ExplicitLeft = 123
-            ExplicitTop = 92
-            ExplicitWidth = 190
-            ExplicitHeight = 25
+            ItemHeight = 0
           end
         end
         inherited ListView1: TListView
-          Left = 4
-          Top = 4
-          Width = 852
-          Height = 505
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          Columns = <
-            item
-              Caption = 'Name'
-              Width = 131
-            end
-            item
-              Caption = 'Description'
-              Width = 131
-            end
-            item
-              AutoSize = True
-              Caption = '%s ... $(HelpString) will be replaced by Keyword'
-            end
-            item
-              Caption = 'Trim Namespaces'
-              Width = 105
-            end>
-          ExplicitLeft = 4
-          ExplicitTop = 4
-          ExplicitWidth = 852
-          ExplicitHeight = 505
+          Width = 650
+          Height = 383
+          ExplicitWidth = 650
+          ExplicitHeight = 383
         end
       end
       object GroupBox1: TGroupBox
         AlignWithMargins = True
-        Left = 4
-        Top = 41
-        Width = 852
-        Height = 60
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 3
+        Top = 31
+        Width = 650
+        Height = 46
         Align = alTop
         Caption = 'Filetype specific options'
         TabOrder = 1
         object cbCheckGID: TCheckBox
           AlignWithMargins = True
-          Left = 6
-          Top = 23
-          Width = 840
-          Height = 22
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
+          Left = 5
+          Top = 18
+          Width = 640
+          Height = 16
           Align = alTop
           Caption = 
             'check winhelp sources (*.hlp files) if keyword is valid (help re' +
@@ -700,235 +314,69 @@ object form_Config: Tform_Config
       end
       inline fccFileProvider: TFrameConfigColor
         AlignWithMargins = True
-        Left = 4
-        Top = 4
-        Width = 852
-        Height = 29
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 3
+        Top = 3
+        Width = 650
+        Height = 22
         Align = alTop
         AutoSize = True
         TabOrder = 2
         TabStop = True
-        ExplicitLeft = 4
-        ExplicitTop = 4
-        ExplicitWidth = 852
-        ExplicitHeight = 29
-        inherited catbtnTopics: TCategoryButtons
-          Width = 332
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitWidth = 332
-          ExplicitHeight = 29
-        end
-        inherited ColorBox1: TColorBox
-          Left = 340
-          Width = 190
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitLeft = 340
-          ExplicitWidth = 190
-        end
+        ExplicitLeft = 3
+        ExplicitTop = 3
+        ExplicitWidth = 650
       end
     end
     object TabSheet5: TTabSheet
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'Dynamic Web based providers (RSS)'
       ImageIndex = 4
       inline FrameConfigRSSProviders: TFrameConfigProviders
         Left = 0
-        Top = 37
-        Width = 860
-        Height = 704
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Top = 28
+        Width = 656
+        Height = 535
         Align = alClient
         TabOrder = 0
         TabStop = True
-        ExplicitTop = 37
-        ExplicitWidth = 860
-        ExplicitHeight = 704
+        ExplicitTop = 28
+        ExplicitWidth = 656
+        ExplicitHeight = 535
         inherited pnlOHSItem: TPanel
-          Top = 581
-          Width = 860
-          Height = 123
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitTop = 581
-          ExplicitWidth = 860
-          ExplicitHeight = 123
-          inherited Label1: TLabel
-            Left = 8
-            Top = 8
-            Width = 35
-            Height = 17
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 8
-            ExplicitTop = 8
-            ExplicitWidth = 35
-            ExplicitHeight = 17
-          end
-          inherited Label2: TLabel
-            Left = 8
-            Top = 38
-            Width = 68
-            Height = 17
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 8
-            ExplicitTop = 38
-            ExplicitWidth = 68
-            ExplicitHeight = 17
-          end
-          inherited LabelURLPath: TLabel
-            Left = 8
-            Top = 68
-            Width = 20
-            Height = 17
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 8
-            ExplicitTop = 68
-            ExplicitWidth = 20
-            ExplicitHeight = 17
-          end
-          inherited Label8: TLabel
-            Left = 8
-            Top = 95
-            Width = 106
-            Height = 17
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 8
-            ExplicitTop = 95
-            ExplicitWidth = 106
-            ExplicitHeight = 17
-          end
+          Top = 441
+          Width = 656
+          ExplicitTop = 441
+          ExplicitWidth = 656
           inherited BtnBrowseForFile: TSpeedButton
-            Left = 821
-            Top = 63
-            Width = 30
-            Height = 29
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 821
-            ExplicitTop = 63
-            ExplicitWidth = 30
-            ExplicitHeight = 29
+            Left = 628
+            ExplicitLeft = 628
           end
           inherited edName: TEdit
-            Left = 123
-            Top = 4
-            Width = 732
-            Height = 25
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 123
-            ExplicitTop = 4
-            ExplicitWidth = 732
-            ExplicitHeight = 25
+            Width = 560
+            Height = 21
+            ExplicitWidth = 560
+            ExplicitHeight = 21
           end
           inherited edDesc: TEdit
-            Left = 123
-            Top = 34
-            Width = 732
-            Height = 25
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 123
-            ExplicitTop = 34
-            ExplicitWidth = 732
-            ExplicitHeight = 25
+            Width = 560
+            Height = 21
+            ExplicitWidth = 560
+            ExplicitHeight = 21
           end
           inherited edURL: TEdit
-            Left = 123
-            Top = 63
-            Width = 697
-            Height = 25
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ExplicitLeft = 123
-            ExplicitTop = 63
-            ExplicitWidth = 697
-            ExplicitHeight = 25
+            Width = 533
+            Height = 21
+            ExplicitWidth = 533
+            ExplicitHeight = 21
           end
           inherited cbTrimNamespacesOHS: TComboBox
-            Left = 123
-            Top = 92
-            Width = 190
-            Height = 25
-            Margins.Left = 4
-            Margins.Top = 4
-            Margins.Right = 4
-            Margins.Bottom = 4
-            ItemHeight = 17
-            ExplicitLeft = 123
-            ExplicitTop = 92
-            ExplicitWidth = 190
-            ExplicitHeight = 25
+            ItemHeight = 0
           end
         end
         inherited ListView1: TListView
-          Left = 4
-          Top = 4
-          Width = 852
-          Height = 573
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          Columns = <
-            item
-              Caption = 'Name'
-              Width = 131
-            end
-            item
-              Caption = 'Description'
-              Width = 131
-            end
-            item
-              AutoSize = True
-              Caption = '%s ... $(HelpString) will be replaced by Keyword'
-            end
-            item
-              Caption = 'Trim Namespaces'
-              Width = 105
-            end>
-          ExplicitLeft = 4
-          ExplicitTop = 4
-          ExplicitWidth = 852
-          ExplicitHeight = 573
+          Width = 650
+          Height = 435
+          ExplicitWidth = 650
+          ExplicitHeight = 435
         end
         inherited OpenDialog1: TOpenDialog
           Left = 600
@@ -937,72 +385,39 @@ object form_Config: Tform_Config
       end
       inline fccRSSProvider: TFrameConfigColor
         AlignWithMargins = True
-        Left = 4
-        Top = 4
-        Width = 852
-        Height = 29
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 3
+        Top = 3
+        Width = 650
+        Height = 22
         Align = alTop
         AutoSize = True
         TabOrder = 1
         TabStop = True
-        ExplicitLeft = 4
-        ExplicitTop = 4
-        ExplicitWidth = 852
-        ExplicitHeight = 29
-        inherited catbtnTopics: TCategoryButtons
-          Width = 332
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitWidth = 332
-          ExplicitHeight = 29
-        end
-        inherited ColorBox1: TColorBox
-          Left = 340
-          Width = 190
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitLeft = 340
-          ExplicitWidth = 190
-        end
+        ExplicitLeft = 3
+        ExplicitTop = 3
+        ExplicitWidth = 650
       end
     end
     object TabSheet6: TTabSheet
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = '3rd party providers'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ScrollBox1: TScrollBox
         Left = 0
         Top = 0
-        Width = 860
-        Height = 741
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Width = 656
+        Height = 563
         Align = alClient
         BorderStyle = bsNone
         TabOrder = 0
         object FlowPanel1: TFlowPanel
           Left = 0
           Top = 0
-          Width = 860
-          Height = 54
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
+          Width = 656
+          Height = 41
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
@@ -1011,31 +426,25 @@ object form_Config: Tform_Config
       end
     end
     object TabSheet7: TTabSheet
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       Caption = 'Windows Search'
       ImageIndex = 6
       object ScrollBox2: TScrollBox
         Left = 0
-        Top = 57
-        Width = 860
-        Height = 684
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Top = 79
+        Width = 656
+        Height = 484
         Align = alClient
         BorderStyle = bsNone
         TabOrder = 0
-        ExplicitTop = 29
-        ExplicitHeight = 712
         object FlowPanel2: TFlowPanel
           Left = 0
           Top = 0
-          Width = 860
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
+          Width = 656
+          Height = 22
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
@@ -1044,11 +453,11 @@ object form_Config: Tform_Config
       end
       object ToolBar1: TToolBar
         Left = 0
-        Top = 0
-        Width = 860
-        Height = 57
-        ButtonHeight = 51
-        ButtonWidth = 35
+        Top = 28
+        Width = 656
+        Height = 51
+        ButtonHeight = 44
+        ButtonWidth = 31
         Caption = 'ToolBar1'
         Images = ImageList1
         ShowCaptions = True
@@ -1061,31 +470,37 @@ object form_Config: Tform_Config
           OnClick = ToolButton1Click
         end
       end
+      inline fccWinSearch: TFrameConfigColor
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 650
+        Height = 22
+        Align = alTop
+        AutoSize = True
+        TabOrder = 2
+        TabStop = True
+        ExplicitLeft = 3
+        ExplicitTop = 3
+        ExplicitWidth = 650
+      end
     end
   end
   object Panel1: TPanel
     AlignWithMargins = True
-    Left = 872
-    Top = 4
-    Width = 94
-    Height = 765
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
+    Left = 667
+    Top = 3
+    Width = 72
+    Height = 585
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 1
     object Button1: TButton
       AlignWithMargins = True
-      Left = 4
-      Top = 4
-      Width = 86
-      Height = 34
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
+      Left = 3
+      Top = 3
+      Width = 66
+      Height = 26
       Align = alTop
       Caption = '&OK'
       TabOrder = 0
@@ -1093,14 +508,10 @@ object form_Config: Tform_Config
     end
     object Button2: TButton
       AlignWithMargins = True
-      Left = 4
-      Top = 46
-      Width = 86
-      Height = 34
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
+      Left = 3
+      Top = 35
+      Width = 66
+      Height = 26
       Align = alTop
       Cancel = True
       Caption = '&Cancel'
@@ -1114,7 +525,7 @@ object form_Config: Tform_Config
     Left = 480
     Top = 392
     Bitmap = {
-      494C010101003000440018001800FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101010030004C0018001800FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
       000000000000000000000000000000000000000000000000000000000000AD7B
       7B00B5848400B5848400B5848400B5848400B5848400B5848400B5848400B584

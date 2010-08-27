@@ -10,19 +10,16 @@ uses
 type
   TFrameConfigWinSearch = class(TFrame)
     Panel1: TPanel;
-    fccColor: TFrameConfigColor;
     EditName: TEdit;
     Label1: TLabel;
-    Memo1: TMemo;
     Label2: TLabel;
     Label4: TLabel;
     seMaxResults: TSpinEdit;
     SpeedButton1: TSpeedButton;
+    mem_Query: TMemo;
     procedure SpeedButton1Click(Sender: TObject);
   private
-    function GetColor: TColor;
     function GetProviderName: string;
-    procedure SetColor(const Value: TColor);
     procedure SetProviderName(const Value: string);
     function GetMaxResults: Integer;
     function GetTimeout: Integer;
@@ -35,7 +32,6 @@ type
     { Private-Deklarationen }
   public
     property ProviderName: string read GetProviderName write SetProviderName;
-    property SelectedColor: TColor read GetColor write SetColor;
     property Timeout: Integer read GetTimeout write SetTimeout;
     property MaxResults: Integer read GetMaxResults write SetMaxResults;
     property SQL: String read GetSQL write SetSQL;
@@ -51,11 +47,6 @@ uses uCustomHelpMain;
 {$R *.dfm}
 
 { TFrameConfigWinSearch }
-
-function TFrameConfigWinSearch.GetColor: TColor;
-begin
-  Result:=fccColor.Color;
-end;
 
 function TFrameConfigWinSearch.GetDescription: String;
 begin
@@ -74,7 +65,7 @@ end;
 
 function TFrameConfigWinSearch.GetSQL: String;
 begin
-  Result:=Memo1.Text;
+  Result:= mem_Query.Text;
 end;
 
 function TFrameConfigWinSearch.GetTimeout: Integer;
@@ -84,7 +75,6 @@ end;
 
 procedure TFrameConfigWinSearch.Save(AIndex: Integer);
 begin
-  GlobalCustomHelp.Color[ProviderName] := SelectedColor;
   GlobalCustomHelp.WriteProviderToRegistry(IntToStr(AIndex),
           Self.ProviderName,
           '',
@@ -94,11 +84,6 @@ begin
           True,
           Timeout,
           MaxResults);
-end;
-
-procedure TFrameConfigWinSearch.SetColor(const Value: TColor);
-begin
-  fccColor.Color:=Value;
 end;
 
 procedure TFrameConfigWinSearch.SetDescription(const Value: String);
@@ -118,7 +103,7 @@ end;
 
 procedure TFrameConfigWinSearch.SetSQL(const Value: String);
 begin
-  Memo1.Text:=Value;
+  mem_Query.Text:=Value;
 end;
 
 procedure TFrameConfigWinSearch.SetTimeout(const Value: Integer);

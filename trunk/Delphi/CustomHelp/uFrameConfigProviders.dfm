@@ -20,29 +20,29 @@ object FrameConfigProviders: TFrameConfigProviders
     object Label1: TLabel
       Left = 6
       Top = 6
-      Width = 33
-      Height = 16
+      Width = 27
+      Height = 13
       Caption = 'Name'
     end
     object Label2: TLabel
       Left = 6
       Top = 29
-      Width = 63
-      Height = 16
+      Width = 53
+      Height = 13
       Caption = 'Description'
     end
     object LabelURLPath: TLabel
       Left = 6
       Top = 52
-      Width = 18
-      Height = 16
+      Width = 16
+      Height = 13
       Caption = '%s'
     end
     object Label8: TLabel
       Left = 6
       Top = 73
-      Width = 102
-      Height = 16
+      Width = 82
+      Height = 13
       Caption = 'Trim namespaces'
     end
     object BtnBrowseForFile: TSpeedButton
@@ -137,12 +137,12 @@ object FrameConfigProviders: TFrameConfigProviders
       Left = 94
       Top = 70
       Width = 145
-      Height = 24
+      Height = 21
       Hint = 
         'Example:'#13#10'Full Keyword is  Classes.TStringList.Create'#13#10'Trim Firs' +
         't searches for TStringList.Create'#13#10'Trim Full searches for Create'
       Style = csDropDownList
-      ItemHeight = 16
+      ItemHeight = 13
       ParentShowHint = False
       ShowHint = True
       TabOrder = 3

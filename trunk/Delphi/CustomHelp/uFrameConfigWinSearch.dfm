@@ -32,14 +32,14 @@ object FrameConfigWinSearch: TFrameConfigWinSearch
     end
     object Label2: TLabel
       Left = 8
-      Top = 63
+      Top = 38
       Width = 97
       Height = 16
       Caption = 'Query Statement'
     end
     object Label4: TLabel
       Left = 8
-      Top = 163
+      Top = 133
       Width = 160
       Height = 16
       Caption = 'Maximum number of results'
@@ -99,43 +99,32 @@ object FrameConfigWinSearch: TFrameConfigWinSearch
       ShowHint = True
       OnClick = SpeedButton1Click
     end
-    inline fccColor: TFrameConfigColor
-      Left = 8
-      Top = 35
-      Width = 405
-      Height = 22
-      AutoSize = True
-      TabOrder = 0
-      TabStop = True
-      ExplicitLeft = 8
-      ExplicitTop = 35
-    end
     object EditName: TEdit
       Left = 174
       Top = 5
       Width = 289
       Height = 24
-      TabOrder = 1
+      TabOrder = 0
       Text = 'EditName'
     end
     object seMaxResults: TSpinEdit
       Left = 174
-      Top = 160
+      Top = 130
       Width = 121
       Height = 26
       MaxValue = 0
       MinValue = 0
-      TabOrder = 2
+      TabOrder = 1
       Value = 0
     end
   end
-  object Memo1: TMemo
+  object mem_Query: TMemo
     Left = 177
-    Top = 66
+    Top = 38
     Width = 488
     Height = 89
     Lines.Strings = (
-      'Memo1')
+      '$(HelpString)')
     TabOrder = 1
   end
 end
