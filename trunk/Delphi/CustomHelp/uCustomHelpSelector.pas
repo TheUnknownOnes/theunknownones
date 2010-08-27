@@ -276,6 +276,8 @@ var
   TrimOption:    TNamespaceTrimOption;
   ANode:         THelpViewerNodeAccess;
   ProvEnabled:   Boolean;
+  Timeout,
+  MaxResult:     Integer;
   AProvider:     ICustomHelpProvider;
 
   function GetCategoryFromLabel(ALabel: string;
@@ -291,7 +293,6 @@ var
         Result := catbtnTopics.Categories[i];
         break;
       end;
-
     if not Assigned(Result) and ACreate then
     begin
       Result         := catbtnTopics.Categories.Add;
@@ -304,8 +305,12 @@ var
         Result.Color := GlobalCustomHelp.Color[GROUP_LABEL_STANDARD]
       else if StartsText(GROUP_PREFIX_RSS, ALabel) then
         Result.Color := GlobalCustomHelp.Color[GROUP_PREFIX_RSS]
-      else if GlobalCustomHelp._3rdPartyViewers.IndexOf(ALabel) >= 0 then
-        Result.Color := GlobalCustomHelp.Color[ALabel]
+      else if StartsText(GROUP_PREFIX_RSS, ALabel) then
+        Result.Color := GlobalCustomHelp.Color[GROUP_PREFIX_RSS]
+      else if (GlobalCustomHelp._3rdPartyViewers.IndexOf(ALabel) >= 0) then
+      begin
+        Result.Color := GlobalCustomHelp.Color[ALabel];
+      end
       else
         Result.Color := GlobalCustomHelp.Color[GROUP_LABEL_DUMMY_MSHELP2];
 
@@ -357,7 +362,7 @@ begin
       if AnsiStartsText(PROTPREFIX_CUSTOMHELP, Keyword) then
       begin
         if not TCustomHelp.DecodeURL(Keyword, Caption, Description,
-          URL, Group, TrimOption, ProvEnabled) then
+          URL, Group, TrimOption, ProvEnabled, Timeout, MaxResult) then
           Continue;
       end
       else if CustomURLExists(Keyword) then
@@ -368,7 +373,7 @@ begin
       else if AnsiStartsText(PROTPREFIX_MSHELP, Keyword) then
       begin
         if not TCustomHelp.DecodeURL(Keyword, Caption, Description,
-          URL, Group, TrimOption, ProvEnabled) then
+          URL, Group, TrimOption, ProvEnabled, Timeout, MaxResult) then
           Continue;
         if not ProvEnabled then
           Continue;
@@ -386,7 +391,7 @@ begin
           Continue;
         TrimOption := nstoNoTrim;
         Keyword    := GlobalCustomHelp.EncodeURL(Caption, Description,
-          URL, Group, TrimOption, True);
+          URL, Group, TrimOption, True, Timeout, MaxResult);
       end
       else
       begin

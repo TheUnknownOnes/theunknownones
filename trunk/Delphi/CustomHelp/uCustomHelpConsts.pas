@@ -29,15 +29,19 @@ const
   PROTPREFIX_HTMLHELP = 'htmlhlp://';
   PROTPREFIX_WINHELP  = 'winhlp://';
   PROTPREFIX_UNKNOWNHELP = 'unknown://';
+  PROTPREFIX_SHELLOPEN = 'shellopen://';
 
   VALUE_NAME          = 'Name';
   VALUE_DESCR         = 'Description';
   VALUE_URL           = 'URL';
   VALUE_TRIMNAMESPACE = 'TrimNamespaces';
   VALUE_ENABLED       = 'Enabled';
+  VALUE_TIMEOUT       = 'Timeout';
+  VALUE_MAXRESULTS    = 'MaxResults';
 
   PROVIDER_SUB_KEY    = '\Provider';
   RSS_PROVIDER_SUB_KEY = '\RSSProvider';
+  WINSEARCH_PROVIDER_SUB_KEY = '\WinSearchProvider';
   SETTINGS_SUB_KEY    = '\Settings';
   NAMESPACES_SUB_KEY  = SETTINGS_SUB_KEY + '\NAMESPACES';
   EXPANDEDITEMS_SUB_KEY = SETTINGS_SUB_KEY + '\EXPANDED';

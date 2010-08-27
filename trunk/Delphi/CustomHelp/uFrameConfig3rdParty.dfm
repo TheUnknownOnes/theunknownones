@@ -14,7 +14,7 @@ object FrameConfig3rdParty: TFrameConfig3rdParty
     TabOrder = 0
     inline FrameConfigColor1: TFrameConfigColor
       Left = 2
-      Top = 15
+      Top = 18
       Width = 597
       Height = 22
       Align = alTop
@@ -22,7 +22,7 @@ object FrameConfig3rdParty: TFrameConfig3rdParty
       TabOrder = 0
       TabStop = True
       ExplicitLeft = 2
-      ExplicitTop = 15
+      ExplicitTop = 18
       ExplicitWidth = 597
     end
   end

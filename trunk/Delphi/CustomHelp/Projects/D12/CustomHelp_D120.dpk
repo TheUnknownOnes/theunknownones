@@ -35,7 +35,8 @@ requires
   xmlrtl,
   vclactnband,
   vclx,
-  tuocommon;
+  tuocommon,
+  VclSmp;
 
 contains
   uCustomHelpMain in '..\..\uCustomHelpMain.pas',
@@ -50,6 +51,8 @@ contains
   uFrameConfigProviders in '..\..\uFrameConfigProviders.pas' {FrameConfigProviders: TFrame},
   uCustomHelpConsts in '..\..\uCustomHelpConsts.pas',
   uFrameConfigColor in '..\..\uFrameConfigColor.pas' {FrameConfigColor: TFrame},
-  uFrameConfig3rdParty in '..\..\uFrameConfig3rdParty.pas' {FrameConfig3rdParty: TFrame};
+  uFrameConfig3rdParty in '..\..\uFrameConfig3rdParty.pas' {FrameConfig3rdParty: TFrame},
+  uCustomHelpTlbSearchAPILib in '..\..\uCustomHelpTlbSearchAPILib.pas',
+  uFrameConfigWinSearch in '..\..\uFrameConfigWinSearch.pas' {FrameConfigWinSearch: TFrame};
 
 end.

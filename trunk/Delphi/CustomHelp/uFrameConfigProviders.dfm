@@ -20,29 +20,29 @@ object FrameConfigProviders: TFrameConfigProviders
     object Label1: TLabel
       Left = 6
       Top = 6
-      Width = 27
-      Height = 13
+      Width = 33
+      Height = 16
       Caption = 'Name'
     end
     object Label2: TLabel
       Left = 6
       Top = 29
-      Width = 53
-      Height = 13
+      Width = 63
+      Height = 16
       Caption = 'Description'
     end
     object LabelURLPath: TLabel
       Left = 6
       Top = 52
-      Width = 16
-      Height = 13
+      Width = 18
+      Height = 16
       Caption = '%s'
     end
     object Label8: TLabel
       Left = 6
       Top = 73
-      Width = 82
-      Height = 13
+      Width = 102
+      Height = 16
       Caption = 'Trim namespaces'
     end
     object BtnBrowseForFile: TSpeedButton
@@ -101,7 +101,7 @@ object FrameConfigProviders: TFrameConfigProviders
       Left = 94
       Top = 3
       Width = 355
-      Height = 21
+      Height = 24
       Anchors = [akLeft, akTop, akRight]
       Enabled = False
       TabOrder = 0
@@ -111,7 +111,7 @@ object FrameConfigProviders: TFrameConfigProviders
       Left = 94
       Top = 26
       Width = 355
-      Height = 21
+      Height = 24
       Anchors = [akLeft, akTop, akRight]
       Enabled = False
       TabOrder = 1
@@ -121,7 +121,7 @@ object FrameConfigProviders: TFrameConfigProviders
       Left = 94
       Top = 48
       Width = 328
-      Height = 21
+      Height = 24
       Hint = 
         '- URL to a webbased search provider (e.g. koders.com)'#13#10'- Path to' +
         ' a windows *.hlp file (be aware to have winhlp32.exe installed)'#13 +
@@ -137,12 +137,12 @@ object FrameConfigProviders: TFrameConfigProviders
       Left = 94
       Top = 70
       Width = 145
-      Height = 21
+      Height = 24
       Hint = 
         'Example:'#13#10'Full Keyword is  Classes.TStringList.Create'#13#10'Trim Firs' +
         't searches for TStringList.Create'#13#10'Trim Full searches for Create'
       Style = csDropDownList
-      ItemHeight = 13
+      ItemHeight = 16
       ParentShowHint = False
       ShowHint = True
       TabOrder = 3

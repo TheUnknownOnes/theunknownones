@@ -28,7 +28,7 @@ uses
   uCustomHelpMain,
   uCustomHelpConsts,
   uFrameConfigProviders,
-  uFrameConfigColor;
+  uFrameConfigColor, ToolWin, uFrameConfigWinSearch, ImgList;
 
 type
   Tform_Config = class(TForm)
@@ -62,6 +62,12 @@ type
     TabSheet6:      TTabSheet;
     FlowPanel1:     TFlowPanel;
     ScrollBox1:     TScrollBox;
+    TabSheet7: TTabSheet;
+    ScrollBox2: TScrollBox;
+    FlowPanel2: TFlowPanel;
+    ToolBar1: TToolBar;
+    ToolButton1: TToolButton;
+    ImageList1: TImageList;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -71,12 +77,15 @@ type
       State: TDragState; var Accept: Boolean);
     procedure lbOrderDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure Label1Click(Sender: TObject);
+    procedure ToolButton1Click(Sender: TObject);
   private
     FLastDropRect: TRect;
     procedure Save;
     procedure BuildNamespaceList;
     procedure BuildResultOrderList;
     procedure Init3rdParty;
+    procedure InitWinSearch;
+    function CreateWinSearchItem(ACaption: string): TFrameConfigWinSearch;
   public
     class function Execute: Boolean;
   end;
@@ -219,6 +228,7 @@ begin
     FrameConfigRSSProviders.InitContent(cpfWebBased, ptRSS);
 
     Init3rdParty;
+    InitWinSearch;
   finally
     sl.Free;
     Reg.Free;
@@ -248,6 +258,49 @@ begin
   for idx := 0 to GlobalCustomHelp._3rdPartyViewers.Count - 1 do
   begin
     CreateItem(GlobalCustomHelp._3rdPartyViewers[idx]);
+  end;
+end;
+
+function Tform_Config.CreateWinSearchItem(ACaption: string): TFrameConfigWinSearch;
+begin
+  Result        := TFrameConfigWinSearch.Create(self);
+  Result.Width  := FlowPanel2.ClientWidth;
+  Result.Parent := FlowPanel2;
+  Result.SelectedColor := GlobalCustomHelp.Color[ACaption];
+  Result.ProviderName := ACaption;
+  Result.Name   := '';
+end;
+
+
+procedure Tform_Config.InitWinSearch;
+var
+  idx: Integer;
+  frm : TFrameConfigWinSearch;
+  Caption, Description, Url, Group:  string;
+  provEnabled: Boolean;
+  TrimOption:  TNamespaceTrimOption;
+  Timeout,
+  MaxResults: Integer;
+begin
+  for idx := 0 to GlobalCustomHelp.WinSearchProviderList.Count - 1 do
+  begin
+
+    if GlobalCustomHelp.DecodeURL(GlobalCustomHelp.WinSearchProviderList[idx],
+      Caption,
+      Description,
+      Url,
+      Group,
+      TrimOption,
+      provEnabled,
+      Timeout,
+      MaxResults) then
+      begin
+        frm:=CreateWinSearchItem('');
+        frm.ProviderName:=Caption;
+        frm.SQL:=Url;
+        frm.MaxResults:=MaxResults;
+        frm.Timeout:=Timeout;
+      end;
   end;
 end;
 
@@ -331,9 +384,19 @@ begin
     for idx := 0 to Items.Count - 1 do
       GlobalCustomHelp.WriteNamespacesToRegistry(Items[idx].Caption, Items[idx].Checked);
 
-
+  Reg.DeleteKey(WINSEARCH_PROVIDER_SUB_KEY);
+  for idx := 0 to FlowPanel2.ControlCount - 1 do
+  begin
+    if FlowPanel2.Controls[idx] is TFrameConfigWinSearch then
+      TFrameConfigWinSearch(FlowPanel2.Controls[idx]).Save(idx);
+  end;
 
   GlobalCustomHelp.WriteResultOrderToRegistry(lbOrder.Items);
+end;
+
+procedure Tform_Config.ToolButton1Click(Sender: TObject);
+begin
+  CreateWinSearchItem('<New Windows Search Provider>');
 end;
 
 end.
