@@ -227,6 +227,7 @@ begin
   case AType of
     ptStandard: Sub_Key := PROVIDER_SUB_KEY;
     ptRSS: Sub_Key      := RSS_PROVIDER_SUB_KEY;
+    ptWinSearch: Sub_Key:= WINSEARCH_PROVIDER_SUB_KEY;
   end;
 
   FInsertItem := ListView1.Items.Add;
@@ -261,8 +262,6 @@ begin
       edURL.Hint  := '- URL to a webbased search provider (e.g. koders.com)';
     end;
   end;
-
-
 
 
   Reg := TRegistry.Create;

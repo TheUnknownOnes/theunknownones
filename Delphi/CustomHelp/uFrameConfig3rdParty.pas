@@ -21,10 +21,10 @@ type
     GroupBox1:         TGroupBox;
   private
     function GetColor: TColor;
-    function GetProviderName: string;
     procedure SetColor(const Value: TColor);
+  protected
+    function GetProviderName: string;
     procedure SetProviderName(const Value: string);
-    { Private-Deklarationen }
   public
     property ProviderName: string read GetProviderName write SetProviderName;
     property SelectedColor: TColor read GetColor write SetColor;
