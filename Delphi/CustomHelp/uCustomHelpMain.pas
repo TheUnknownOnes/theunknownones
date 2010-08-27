@@ -417,6 +417,7 @@ begin
           fQuery:=Url;
           queryHelper.GenerateSQLFromUserQuery(PWideChar(fQuery),temp);
           wQuery := temp;
+          showmessage(wQuery);
 
           queryHelper.Get_ConnectionString(temp);
           sTemp := temp;
@@ -439,7 +440,7 @@ begin
               AList.Add(GlobalCustomHelp.EncodeURL(dataset.fields[1].Value,
                           dataset.fields[2].Value,
                           PROTPREFIX_SHELLOPEN+'"'+path+'"',
-                          Caption,
+                          GROUP_LABEL_WINSEARCH,
                           nstoTrimAll,
                           True,
                           0,

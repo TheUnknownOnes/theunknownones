@@ -68,6 +68,7 @@ type
     ToolBar1: TToolBar;
     ToolButton1: TToolButton;
     ImageList1: TImageList;
+    fccWinSearch: TFrameConfigColor;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -182,6 +183,7 @@ begin
     newItems.Add(GROUP_LABEL_DUMMY_MSHELP2);
     newItems.Add(GROUP_PREFIX_RSS);
     newItems.AddStrings(GlobalCustomHelp._3rdPartyViewers);
+    newItems.Add(GROUP_LABEL_WINSEARCH);
 
     for idx := 0 to newItems.Count - 1 do
     begin
@@ -220,6 +222,7 @@ begin
     fccMSHelp.SelectedColor       := GlobalCustomHelp.Color[GROUP_LABEL_DUMMY_MSHELP2];
     fccWebProvider.SelectedColor  := GlobalCustomHelp.Color[GROUP_LABEL_WEB_BASED];
     fccFileProvider.SelectedColor := GlobalCustomHelp.Color[GROUP_LABEL_FILE_BASED];
+    fccWinSearch.SelectedColor    := GlobalCustomHelp.Color[GROUP_LABEL_WINSEARCH];
 
     fccRSSProvider.SelectedColor  := GlobalCustomHelp.Color[GROUP_PREFIX_RSS];
 
@@ -266,7 +269,6 @@ begin
   Result        := TFrameConfigWinSearch.Create(self);
   Result.Width  := FlowPanel2.ClientWidth;
   Result.Parent := FlowPanel2;
-  Result.SelectedColor := GlobalCustomHelp.Color[ACaption];
   Result.ProviderName := ACaption;
   Result.Name   := '';
 end;
@@ -307,7 +309,7 @@ end;
 procedure Tform_Config.Label1Click(Sender: TObject);
 begin
   ShellExecute(Self.Handle, 'open',
-    'http://www.delphipraxis.net/topic165769_ideexperte+customhelp.html&highlight=',
+    'http://www.delphipraxis.net/topic165769_ideexperte+customhelp.html',
     '', '', SW_show);
 end;
 
@@ -370,6 +372,7 @@ begin
   GlobalCustomHelp.Color[GROUP_LABEL_WEB_BASED] := fccWebProvider.SelectedColor;
   GlobalCustomHelp.Color[GROUP_PREFIX_RSS] := fccRSSProvider.SelectedColor;
   GlobalCustomHelp.Color[GROUP_LABEL_FILE_BASED] := fccFileProvider.SelectedColor;
+  GlobalCustomHelp.Color[GROUP_LABEL_WINSEARCH] := fccWinSearch.SelectedColor;
 
   GlobalCustomHelp.WriteSettingToRegistry(SETTINGS_3RD_PARTY_VIEWERS,
             GlobalCustomHelp._3rdPartyViewers.CommaText);

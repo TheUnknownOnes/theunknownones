@@ -303,6 +303,8 @@ var
         Result.Color := GlobalCustomHelp.Color[GROUP_LABEL_FILE_BASED]
       else if ALabel = GROUP_LABEL_FILE_BASED then
         Result.Color := GlobalCustomHelp.Color[GROUP_LABEL_STANDARD]
+      else if ALabel = GROUP_LABEL_WINSEARCH then
+        Result.Color := GlobalCustomHelp.Color[GROUP_LABEL_WINSEARCH]
       else if StartsText(GROUP_PREFIX_RSS, ALabel) then
         Result.Color := GlobalCustomHelp.Color[GROUP_PREFIX_RSS]
       else if StartsText(GROUP_PREFIX_RSS, ALabel) then

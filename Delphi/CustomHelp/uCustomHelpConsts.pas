@@ -62,6 +62,7 @@ const
   GROUP_LABEL_FILE_BASED = 'File based providers';
   GROUP_LABEL_STANDARD = 'Other Help Providers';
   GROUP_LABEL_DUMMY_MSHELP2 = 'Microsoft Help 2.x';
+  GROUP_LABEL_WINSEARCH = 'Windows-Search';
   GROUP_PREFIX_RSS    = 'RSS Result for ';
 
 
