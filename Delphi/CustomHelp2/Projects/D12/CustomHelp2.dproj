@@ -1,10 +1,10 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{C876841F-4B2F-455B-AE17-1027AB891FA7}</ProjectGuid>
-			<MainSource>CustomHelp_D120.dpk</MainSource>
+			<ProjectGuid>{357E8398-D06B-4ADC-A03D-D217F5C30418}</ProjectGuid>
+			<MainSource>CustomHelp2.dpk</MainSource>
+			<ProjectVersion>12.0</ProjectVersion>
 			<Config Condition="'$(Config)'==''">Debug</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-			<ProjectVersion>12.0</ProjectVersion>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Basis' or '$(Base)'!=''">
 			<Base>true</Base>
@@ -20,20 +20,14 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
-			<ImageDebugInfo>true</ImageDebugInfo>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp_D120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp2_D120.bpl</DCC_DependencyCheckOutputName>
 			<DesignOnlyPackage>true</DesignOnlyPackage>
-			<DCC_Optimize>false</DCC_Optimize>
-			<DCC_Description>CustomHelp Expert ... by TUO</DCC_Description>
-			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
-			<GenDll>true</GenDll>
-			<GenPackage>true</GenPackage>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
-			<DCC_RemoteDebug>true</DCC_RemoteDebug>
-			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
-			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+			<DCC_Description>CustomHelp2</DCC_Description>
+			<GenPackage>true</GenPackage>
+			<GenDll>true</GenDll>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DllSuffix>_D120</DllSuffix>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_Platform>x86</DCC_Platform>
 		</PropertyGroup>
@@ -44,51 +38,17 @@
 			<DCC_DebugInformation>false</DCC_DebugInformation>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
-			<DCC_MapFile>3</DCC_MapFile>
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="CustomHelp_D120.dpk">
+			<DelphiCompile Include="CustomHelp2.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="designide.dcp"/>
-			<DCCReference Include="vclie.dcp"/>
-			<DCCReference Include="vcl.dcp"/>
-			<DCCReference Include="xmlrtl.dcp"/>
-			<DCCReference Include="vclactnband.dcp"/>
-			<DCCReference Include="vclx.dcp"/>
-			<DCCReference Include="tuocommon.dcp"/>
-			<DCCReference Include="VclSmp.dcp"/>
-			<DCCReference Include="..\..\uCustomHelpMain.pas"/>
-			<DCCReference Include="..\..\uCustomHelpSelector.pas">
-				<Form>FormHelpSelector</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\uFormConfigCustomHelp.pas">
-				<Form>form_Config</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\uCustomHelpIDEIntegration.pas"/>
-			<DCCReference Include="..\..\uHtmlHelp.pas"/>
-			<DCCReference Include="..\..\uUtils.pas"/>
-			<DCCReference Include="..\..\uCustomHelpIntfs.pas"/>
-			<DCCReference Include="..\..\uCustomHelpKeywordRecorder.pas"/>
-			<DCCReference Include="..\..\uMSHelpServices.pas"/>
-			<DCCReference Include="..\..\uFrameConfigProviders.pas">
-				<Form>FrameConfigProviders</Form>
-				<DesignClass>TFrame</DesignClass>
-			</DCCReference>
-			<DCCReference Include="..\..\uCustomHelpConsts.pas"/>
-			<DCCReference Include="..\..\uFrameConfigColor.pas">
-				<Form>FrameConfigColor</Form>
-				<DesignClass>TFrame</DesignClass>
-			</DCCReference>
-			<DCCReference Include="..\..\uFrameConfig3rdParty.pas">
-				<Form>FrameConfig3rdParty</Form>
-				<DesignClass>TFrame</DesignClass>
-			</DCCReference>
-			<DCCReference Include="..\..\uCustomHelpTlbSearchAPILib.pas"/>
-			<DCCReference Include="..\..\uFrameConfigWinSearch.pas">
-				<Form>FrameConfigWinSearch</Form>
-				<DesignClass>TFrame</DesignClass>
+			<DCCReference Include="..\..\uch2Main.pas"/>
+			<DCCReference Include="..\..\uch2HelpSelector.pas">
+				<Form>ch2formHelpSelector</Form>
 			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
@@ -109,15 +69,12 @@
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">CustomHelp_D120.dpk</Source>
+						<Source Name="MainSource">CustomHelp2.dpk</Source>
 					</Source>
 					<Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
 						<Parameters Name="LoadAllSymbols">True</Parameters>
 						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
-						<Parameters Name="Debug Symbols Search Path">$(BDSCOMMONDIR)\Bpl\</Parameters>
-						<Parameters Name="RunParams">-pDelphi -rDebug_CustomHelp</Parameters>
-						<Parameters Name="HostApplication">$(BDS)\bin\bds.exe</Parameters>
 					</Parameters>
 					<VersionInfo>
 						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
@@ -146,7 +103,6 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
-					<Excluded_Packages/>
 				</Delphi.Personality>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
