@@ -413,7 +413,6 @@ begin
           EnvVarToken(ENVVAR_NAME_KEYWORD));
           ExpandEnvVars(Url, HelpString);
 
-
           fQuery:=Url;
           queryHelper.GenerateSQLFromUserQuery(PWideChar(fQuery),temp);
           wQuery := temp;
