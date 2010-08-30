@@ -35,8 +35,8 @@ or
 {{{
 ext:pas path:"C:\Users\YourUserName\Documents\Projects\Jedi\jwapi" $(HelpString)  
 }}}
-Note that you have to use the clear text filter for Pascal files.
-A full reference of the available search query parameters can be found [http://www.microsoft.com/windows/products/winfamily/desktopsearch/technicalresources/advquery.mspx here]
+    Note that you have to use the clear text filter for Pascal files.
+    A full reference of the available search query parameters can be found [http://www.microsoft.com/windows/products/winfamily/desktopsearch/technicalresources/advquery.mspx here]
 
 A full description can be found here-> http://www.delphipraxis.net/topic165769_ideexperte+customhelp.html&highlight=
 it's German ... sorry ;-)
