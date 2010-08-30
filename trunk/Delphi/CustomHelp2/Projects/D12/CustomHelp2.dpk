@@ -29,10 +29,13 @@ package CustomHelp2;
 
 requires
   rtl,
-  designide;
+  designide,
+  TUOCommon;
 
 contains
   uch2Main in '..\..\uch2Main.pas',
-  uch2HelpSelector in '..\..\uch2HelpSelector.pas' {ch2formHelpSelector};
+  uch2HelpSelector in '..\..\uch2HelpSelector.pas' {ch2formHelpSelector},
+  uch2Config in '..\..\uch2Config.pas' {ch2FormConfig},
+  uch2ProvStaticWeb in '..\..\uch2ProvStaticWeb.pas' {ch2FrameProvStaticWeb: TFrame};
 
 end.

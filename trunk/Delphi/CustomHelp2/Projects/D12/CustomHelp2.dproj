@@ -46,9 +46,17 @@
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="designide.dcp"/>
+			<DCCReference Include="TUOCommon.dcp"/>
 			<DCCReference Include="..\..\uch2Main.pas"/>
 			<DCCReference Include="..\..\uch2HelpSelector.pas">
 				<Form>ch2formHelpSelector</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\uch2Config.pas">
+				<Form>ch2FormConfig</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\uch2ProvStaticWeb.pas">
+				<Form>ch2FrameProvStaticWeb</Form>
+				<DesignClass>TFrame</DesignClass>
 			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
@@ -103,6 +111,13 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
+					<Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\frxZintBarcode120.bpl">(Unbenannt)</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\bcboffice2k120.bpl">CodeGear C++Builder Office 2000-Server-Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\bcbofficexp120.bpl">CodeGear C++Builder Office XP-Server-Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dcloffice2k120.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dclofficexp120.bpl">Microsoft Office XP Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
+					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
