@@ -30,6 +30,14 @@ or
   * Other Help Sources
     You may add URLs of your favourite online help provider (e.g. google codesearch) be aware that the keyword is appended to the URL. You may as well add a path to a `*`.hlp or `*`.chm file. Those help sources will be searched using the index. If the help file does not support index queries the help will not work. You may also choose to execute a command of your choice (e.g. {{{"C:\Program Files (x86)\Adobe\Reader 9.0\Reader\AcroRd32.exe" /A "zoom=50&navpanes=1=OpenActions&search=$(HelpString)" "C:\Users\JohnDoe\Documents\Help\BDS4 Reference.pdf"}}}. This will open a PDF reader and search for the HelpString. You may use any environment variable enclosed in "$()". {{{$(HelpString)}}} will always be replaced by the keyword to search for.
 
+  * Windows Search
+    You can add different queries that are passed to the Windows Search to search in the system index. You can for example use this query to search whether your keyword was implemented in the jwapi:
+{{{
+ext:pas path:"C:\Users\YourUserName\Documents\Projects\Jedi\jwapi" $(HelpString)  
+}}}
+Note that you have to use the clear text filter for Pascal files.
+A full reference of the available search query parameters can be found [http://www.microsoft.com/windows/products/winfamily/desktopsearch/technicalresources/advquery.mspx here]
+
 A full description can be found here-> http://www.delphipraxis.net/topic165769_ideexperte+customhelp.html&highlight=
 it's German ... sorry ;-)
 A short demo video is available here -> http://theunknownones.googlecode.com/svn/Videos/
