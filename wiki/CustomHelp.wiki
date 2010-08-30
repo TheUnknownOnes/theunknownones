@@ -6,6 +6,7 @@
   * Search for help in the old (`*`.hlp) Windows help files (e.g. Delphi 7 help)
   * Search in Html-Help (`*`.chm) Files
   * Search using Index of fulltext
+  * *New in Version 1.3* Search using the _Windows Search_
 
 = How to get it and installation =
   * Download the latest stable release at: http://theunknownones.googlecode.com/svn/tags/Release/CustomHelp/
