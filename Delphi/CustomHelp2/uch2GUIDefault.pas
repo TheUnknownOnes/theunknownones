@@ -7,7 +7,10 @@ uses
   Dialogs, uch2Main, StdCtrls, ComCtrls, ExtCtrls;
 
 type
-  PNodeData = ^Tch2HelpItem;
+  TNodeData = record
+    HelpItem : Ich2HelpItem;
+  end;
+  PNodeData = ^TNodeData;
 
   Tch2GUIDefault = class;
 
@@ -34,7 +37,7 @@ type
 
     procedure DoSearch(AKeyword : String);
   public
-    function AddHelpItem(AParent : Integer; AHelpItem : Tch2HelpItem) : Integer;
+    function AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer = nil) : Pointer;
   end;
 
   Tch2GUIDefault = class(TInterfacedObject, Ich2GUI)
@@ -48,7 +51,7 @@ type
 
     procedure Show(const AHelpString : String; const Ach2Keywords : TStringList);
 
-    function AddHelpItem(AHelpItem : Tch2HelpItem; AParent : Integer = 0) : Integer;
+    function AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer = nil) : Pointer;
     {$ENDREGION}
   public
 
@@ -60,9 +63,9 @@ implementation
 
 { Tch2GUIDefault }
 
-function Tch2GUIDefault.AddHelpItem(AHelpItem : Tch2HelpItem; AParent : Integer = 0) : Integer;
+function Tch2GUIDefault.AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer = nil) : Pointer;
 begin
-  Result := FForm.AddHelpItem(AParent, AHelpItem);
+  Result := FForm.AddHelpItem(AHelpItem, AParent);
 end;
 
 function Tch2GUIDefault.GetDescription: String;
@@ -98,16 +101,17 @@ end;
 
 { Tch2FormGUIDefault }
 
-function Tch2FormGUIDefault.AddHelpItem(AParent : Integer; AHelpItem : Tch2HelpItem) : Integer;
+function Tch2FormGUIDefault.AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer = nil) : Pointer;
 var
   Node : TTreeNode;
   NodeData : PNodeData;
 begin
+  Node := tv.Items.AddChild(TTreeNode(AParent), AHelpItem.GetCaption);
+
   New(NodeData);
-  NodeData^ := AHelpItem;
-  Node := tv.Items.AddChild(TTreeNode(AParent), AHelpItem.Caption);
+  NodeData^.HelpItem := AHelpItem;
   Node.Data := NodeData;
-  Result := Integer(Node);
+  Result := Node;
 end;
 
 procedure Tch2FormGUIDefault.com_KeywordsChange(Sender: TObject);
@@ -175,11 +179,11 @@ begin
   PaintImages := true;
   DefaultDraw := true;
 
-  if PNodeData(Node.Data)^.ForeColor <> clNone then
-    Sender.Canvas.Font.Color := PNodeData(Node.Data)^.ForeColor;
+  if ifHasForeColor in PNodeData(Node.Data)^.HelpItem.GetFlags then
+    Sender.Canvas.Font.Color := PNodeData(Node.Data)^.HelpItem.GetForeColor;
 
-  if PNodeData(Node.Data)^.BackColor <> clNone then
-    Sender.Canvas.Brush.Color := PNodeData(Node.Data)^.BackColor;
+  if ifHasBackColor in PNodeData(Node.Data)^.HelpItem.GetFlags then
+    Sender.Canvas.Brush.Color := PNodeData(Node.Data)^.HelpItem.GetBackColor;
 end;
 
 procedure Tch2FormGUIDefault.TVDeletion(Sender: TObject; Node: TTreeNode);

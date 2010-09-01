@@ -114,22 +114,10 @@ end;
 procedure Tch2ProviderStaticWebsearch.ProvideHelp(AKeyword: String;
   AGUI: Ich2GUI);
 var
-  parent : Integer;
+  parent : pointer;
   idx : Integer;
-  item : Tch2HelpItem;
 begin
-  parent := 0;
-  for idx := 0 to 4 do
-  begin
-    item.GUID := CH2NonInterestingHelpItemGUID;
-    item.Caption := 'Hallo';
-    item.Provider := Self as Ich2Provider;
-    item.ForeColor := RGB(Random(255), Random(255), Random(255));
-    item.BackColor := clNone;
-    item.Provider := Self as Ich2Provider;
 
-    parent := AGUI.AddHelpItem(item, parent);
-  end;
 end;
 
 procedure Tch2ProviderStaticWebsearch.ShowHelp(AID: Integer);

@@ -19,34 +19,34 @@ uses
   Graphics;
 
 type
-  Ich2Provider = interface;
+  Tch2HelpItemFlag = (ifSaveStats,
+                      ifHasForeColor,
+                      ifHasBackColor);
+  Tch2HelpItemFlags = set of Tch2HelpItemFlag;
 
-  Tch2HelpItem = record
-    GUID : TGUID;  //set this to "NonInterestingHelpItemGUID" in order to prevent saving stats about this helpitem
-    Caption,
-    Description : String;
-    ForeColor,          //may be clNone
-    BackColor : TColor; //may be clNone
-    Icon : TIcon;       //may be nil
-    Provider : Ich2Provider;
-    Data : Pointer;
+  Ich2HelpItem = interface
+    ['{D64EBC33-3A57-48F0-BA6E-E9770507A770}']
+    function GetGUID : TGUID; //used to store stats (expanded, position, ...)
+    function GetCaption : String;
+    function GetDescription : String;
+    function GetForeColor : TColor;
+    function GetBackColor : TColor;
+    function GetFlags : Tch2HelpItemFlags;
   end;
 
   Ich2GUI = interface
     ['{99A8E48B-A998-42D7-A7C0-DC444BEC2467}']
-
     function GetName : String;
     function GetDescription : String;
     function GetGUID : TGUID;
 
     procedure Show(const AHelpString : String; const Ach2Keywords : TStringList);
 
-    function AddHelpItem(AHelpItem : Tch2HelpItem; AParent : Integer = 0) : Integer;
+    function AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer = nil) : Pointer;
   end;
 
   Ich2Provider = interface
     ['{AA0B05F4-53E5-4CCD-8566-055B6AF0D24D}']
-
     function GetGUID : TGUID;
     function GetDescription : String;
     function GetName : String;
@@ -151,7 +151,6 @@ type
 function ch2Main : Tch2Main;
 
 const
-  CH2NonInterestingHelpItemGUID : TGUID = '{0EAD5703-6960-463C-8FCB-203E07D4681C}';
   CH2HelpViewerName = 'CustomHelp2Viewer';
 
 implementation
