@@ -24,8 +24,6 @@ type
     procedure Configure;
 
     function GetPriority : Integer;
-
-    function UnderstandsNonCH2Keywords : Boolean;
     {$ENDREGION}
 
   end;
@@ -126,6 +124,9 @@ begin
     item.GUID := CH2NonInterestingHelpItemGUID;
     item.Caption := 'Hallo';
     item.Provider := Self as Ich2Provider;
+    item.ForeColor := RGB(Random(255), Random(255), Random(255));
+    item.BackColor := clNone;
+    item.Provider := Self as Ich2Provider;
 
     parent := AGUI.AddHelpItem(item, parent);
   end;
@@ -134,11 +135,6 @@ end;
 procedure Tch2ProviderStaticWebsearch.ShowHelp(AID: Integer);
 begin
 
-end;
-
-function Tch2ProviderStaticWebsearch.UnderstandsNonCH2Keywords: Boolean;
-begin
-  Result := false;
 end;
 
 initialization

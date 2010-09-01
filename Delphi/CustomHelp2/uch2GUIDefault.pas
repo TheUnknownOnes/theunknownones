@@ -24,6 +24,9 @@ type
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure tm_RunFirstSearchTimer(Sender: TObject);
     procedure TVDeletion(Sender: TObject; Node: TTreeNode);
+    procedure TVAdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode;
+      State: TCustomDrawState; Stage: TCustomDrawStage; var PaintImages,
+      DefaultDraw: Boolean);
   private
     FHelpString : String;
     FKeywords : TStringList;
@@ -116,11 +119,11 @@ procedure Tch2FormGUIDefault.DoSearch(AKeyword: String);
 var
   i : IInterface;
   p : Ich2Provider absolute i;
-  s : String;
 begin
   tv.Items.Clear;
 
   Screen.Cursor := crHourGlass;
+  tv.Items.BeginUpdate;
   try
 
     for i in ch2Main.Providers do
@@ -130,6 +133,7 @@ begin
 
   finally
     Screen.Cursor := crDefault;
+    tv.Items.EndUpdate;
   end;
 end;
 
@@ -162,6 +166,20 @@ procedure Tch2FormGUIDefault.tm_RunFirstSearchTimer(Sender: TObject);
 begin
   tm_RunFirstSearch.Enabled := false;
   com_KeywordsChange(Sender);
+end;
+
+procedure Tch2FormGUIDefault.TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
+  Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;
+  var PaintImages, DefaultDraw: Boolean);
+begin
+  PaintImages := true;
+  DefaultDraw := true;
+
+  if PNodeData(Node.Data)^.ForeColor <> clNone then
+    Sender.Canvas.Font.Color := PNodeData(Node.Data)^.ForeColor;
+
+  if PNodeData(Node.Data)^.BackColor <> clNone then
+    Sender.Canvas.Brush.Color := PNodeData(Node.Data)^.BackColor;
 end;
 
 procedure Tch2FormGUIDefault.TVDeletion(Sender: TObject; Node: TTreeNode);

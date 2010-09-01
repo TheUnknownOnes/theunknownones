@@ -85,8 +85,12 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
       ParentFont = False
       ReadOnly = True
       RightClickSelect = True
+      RowSelect = True
       TabOrder = 0
+      OnAdvancedCustomDrawItem = TVAdvancedCustomDrawItem
       OnDeletion = TVDeletion
+      ExplicitLeft = 7
+      ExplicitTop = 20
     end
   end
   object tm_RunFirstSearch: TTimer
