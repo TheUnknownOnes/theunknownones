@@ -34,8 +34,8 @@ requires
 
 contains
   uch2Main in '..\..\uch2Main.pas',
-  uch2HelpSelector in '..\..\uch2HelpSelector.pas' {ch2formHelpSelector},
-  uch2Config in '..\..\uch2Config.pas' {ch2FormConfig},
-  uch2ProvStaticWeb in '..\..\uch2ProvStaticWeb.pas' {ch2FrameProvStaticWeb: TFrame};
+  uch2GUIDefault in '..\..\uch2GUIDefault.pas' {ch2FormHelpGUIDefault},
+  uch2Configure in '..\..\uch2Configure.pas' {ch2FormConfigure},
+  uch2ProviderStaticWebsearch in '..\..\uch2ProviderStaticWebsearch.pas' {Form1};
 
 end.

@@ -20,13 +20,13 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
 			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp2_D120.bpl</DCC_DependencyCheckOutputName>
 			<DesignOnlyPackage>true</DesignOnlyPackage>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DCC_Description>CustomHelp2</DCC_Description>
 			<GenPackage>true</GenPackage>
 			<GenDll>true</GenDll>
-			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
 			<DllSuffix>_D120</DllSuffix>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_Platform>x86</DCC_Platform>
@@ -48,15 +48,14 @@
 			<DCCReference Include="designide.dcp"/>
 			<DCCReference Include="TUOCommon.dcp"/>
 			<DCCReference Include="..\..\uch2Main.pas"/>
-			<DCCReference Include="..\..\uch2HelpSelector.pas">
-				<Form>ch2formHelpSelector</Form>
+			<DCCReference Include="..\..\uch2GUIDefault.pas">
+				<Form>ch2FormHelpGUIDefault</Form>
 			</DCCReference>
-			<DCCReference Include="..\..\uch2Config.pas">
-				<Form>ch2FormConfig</Form>
+			<DCCReference Include="..\..\uch2Configure.pas">
+				<Form>ch2FormConfigure</Form>
 			</DCCReference>
-			<DCCReference Include="..\..\uch2ProvStaticWeb.pas">
-				<Form>ch2FrameProvStaticWeb</Form>
-				<DesignClass>TFrame</DesignClass>
+			<DCCReference Include="..\..\uch2ProviderStaticWebsearch.pas">
+				<Form>Form1</Form>
 			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
