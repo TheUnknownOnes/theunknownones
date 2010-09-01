@@ -47,7 +47,7 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
       Font.Height = -11
       Font.Name = 'Tahoma'
       Font.Style = []
-      ItemHeight = 13
+      ItemHeight = 0
       ParentFont = False
       Sorted = True
       TabOrder = 0
@@ -89,8 +89,6 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
       TabOrder = 0
       OnAdvancedCustomDrawItem = TVAdvancedCustomDrawItem
       OnDeletion = TVDeletion
-      ExplicitLeft = 7
-      ExplicitTop = 20
     end
   end
   object tm_RunFirstSearch: TTimer
