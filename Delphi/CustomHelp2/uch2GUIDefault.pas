@@ -23,6 +23,7 @@ type
     procedure com_KeywordsChange(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure tm_RunFirstSearchTimer(Sender: TObject);
+    procedure TVDeletion(Sender: TObject; Node: TTreeNode);
   private
     FHelpString : String;
     FKeywords : TStringList;
@@ -44,7 +45,7 @@ type
 
     procedure Show(const AHelpString : String; const Ach2Keywords : TStringList);
 
-    function AddHelpItem(AParent : Integer; AHelpItem : Tch2HelpItem) : Integer;
+    function AddHelpItem(AHelpItem : Tch2HelpItem; AParent : Integer = 0) : Integer;
     {$ENDREGION}
   public
 
@@ -56,7 +57,7 @@ implementation
 
 { Tch2GUIDefault }
 
-function Tch2GUIDefault.AddHelpItem(AParent : Integer; AHelpItem : Tch2HelpItem) : Integer;
+function Tch2GUIDefault.AddHelpItem(AHelpItem : Tch2HelpItem; AParent : Integer = 0) : Integer;
 begin
   Result := FForm.AddHelpItem(AParent, AHelpItem);
 end;
@@ -102,6 +103,7 @@ begin
   New(NodeData);
   NodeData^ := AHelpItem;
   Node := tv.Items.AddChild(TTreeNode(AParent), AHelpItem.Caption);
+  Node.Data := NodeData;
   Result := Integer(Node);
 end;
 
@@ -160,6 +162,11 @@ procedure Tch2FormGUIDefault.tm_RunFirstSearchTimer(Sender: TObject);
 begin
   tm_RunFirstSearch.Enabled := false;
   com_KeywordsChange(Sender);
+end;
+
+procedure Tch2FormGUIDefault.TVDeletion(Sender: TObject; Node: TTreeNode);
+begin
+  Dispose(PNodeData(Node.Data));
 end;
 
 initialization

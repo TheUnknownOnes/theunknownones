@@ -86,6 +86,7 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
       ReadOnly = True
       RightClickSelect = True
       TabOrder = 0
+      OnDeletion = TVDeletion
     end
   end
   object tm_RunFirstSearch: TTimer

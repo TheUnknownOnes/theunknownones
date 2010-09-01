@@ -41,7 +41,7 @@ type
 
     procedure Show(const AHelpString : String; const Ach2Keywords : TStringList);
 
-    function AddHelpItem(AParent : Integer; AHelpItem : Tch2HelpItem) : Integer;
+    function AddHelpItem(AHelpItem : Tch2HelpItem; AParent : Integer = 0) : Integer;
   end;
 
   Ich2Provider = interface
@@ -151,7 +151,7 @@ type
 function ch2Main : Tch2Main;
 
 const
-  NonInterestingHelpItemGUID : TGUID = '{0EAD5703-6960-463C-8FCB-203E07D4681C}';
+  CH2NonInterestingHelpItemGUID : TGUID = '{0EAD5703-6960-463C-8FCB-203E07D4681C}';
   CH2HelpViewerName = 'CustomHelp2Viewer';
 
 implementation
