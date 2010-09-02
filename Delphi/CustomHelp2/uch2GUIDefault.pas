@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, uch2Main, StdCtrls, ComCtrls, ExtCtrls;
+  Dialogs, uch2Main, StdCtrls, ComCtrls, ExtCtrls, Registry;
 
 type
   TNodeData = record
@@ -30,12 +30,17 @@ type
     procedure TVAdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode;
       State: TCustomDrawState; Stage: TCustomDrawStage; var PaintImages,
       DefaultDraw: Boolean);
+    procedure TVDblClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FHelpString : String;
     FKeywords : TStringList;
     FGUI : Ich2GUI;
 
     procedure DoSearch(AKeyword : String);
+
+    procedure SaveItemStats;
+    procedure LoadItemStats;
   public
     function AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer = nil) : Pointer;
   end;
@@ -60,6 +65,10 @@ type
 implementation
 
 {$R *.dfm}
+
+const
+  Settings_Key_Stats = '\Stats\';
+  Settings_Value_Expanded = 'Expanded';
 
 { Tch2GUIDefault }
 
@@ -125,6 +134,7 @@ var
   p : Ich2Provider absolute i;
 begin
   tv.Items.Clear;
+  SaveItemStats;
 
   Screen.Cursor := crHourGlass;
   tv.Items.BeginUpdate;
@@ -139,6 +149,15 @@ begin
     Screen.Cursor := crDefault;
     tv.Items.EndUpdate;
   end;
+
+  LoadItemStats;
+end;
+
+procedure Tch2FormGUIDefault.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  Action := caFree;
+  SaveItemStats;
 end;
 
 procedure Tch2FormGUIDefault.FormCreate(Sender: TObject);
@@ -166,6 +185,64 @@ begin
   tm_RunFirstSearch.Enabled := true;
 end;
 
+procedure Tch2FormGUIDefault.LoadItemStats;
+var
+  Reg : TRegistry;
+  t : TTreeNode;
+  hi : Ich2HelpItem;
+begin
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    Reg.RootKey := HKEY_CURRENT_USER;
+
+    for t in tv.Items do
+    begin
+      hi := PNodeData(t.Data)^.HelpItem;
+
+      if ifSaveStats in hi.GetFlags then
+      begin
+        if Reg.OpenKey(ch2Main.RegRootKeyGUI[FGUI.GetGUID] + Settings_Key_Stats + GUIDToString(hi.GetGUID), false) then
+        begin
+          t.Expanded := reg.ReadBool(Settings_Value_Expanded);
+          reg.CloseKey;
+        end;
+      end;
+    end;
+
+  finally
+    Reg.Free;
+  end;
+end;
+
+procedure Tch2FormGUIDefault.SaveItemStats;
+var
+  Reg : TRegistry;
+  t : TTreeNode;
+  hi : Ich2HelpItem;
+begin
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    Reg.RootKey := HKEY_CURRENT_USER;
+
+    for t in tv.Items do
+    begin
+      hi := PNodeData(t.Data)^.HelpItem;
+
+      if ifSaveStats in hi.GetFlags then
+      begin
+        if Reg.OpenKey(ch2Main.RegRootKeyGUI[FGUI.GetGUID] + Settings_Key_Stats + GUIDToString(hi.GetGUID), true) then
+        begin
+          reg.WriteBool(Settings_Value_Expanded, t.Expanded);
+          reg.CloseKey;
+        end;
+      end;
+    end;
+
+  finally
+    Reg.Free;
+  end;
+end;
+
 procedure Tch2FormGUIDefault.tm_RunFirstSearchTimer(Sender: TObject);
 begin
   tm_RunFirstSearch.Enabled := false;
@@ -184,6 +261,22 @@ begin
 
   if ifHasBackColor in PNodeData(Node.Data)^.HelpItem.GetFlags then
     Sender.Canvas.Brush.Color := PNodeData(Node.Data)^.HelpItem.GetBackColor;
+end;
+
+procedure Tch2FormGUIDefault.TVDblClick(Sender: TObject);
+var
+  hi : Ich2HelpItem;
+begin
+  if Assigned(tv.Selected) then
+  begin
+    hi := PNodeData(tv.Selected.Data)^.HelpItem;
+
+    if ifProvidesHelp in hi.GetFlags then
+    begin
+      hi.ShowHelp;
+      ModalResult := mrOk;
+    end;
+  end;
 end;
 
 procedure Tch2FormGUIDefault.TVDeletion(Sender: TObject; Node: TTreeNode);

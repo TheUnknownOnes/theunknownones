@@ -84,6 +84,10 @@ type
     property ID : Integer read FID;
   end;
 
+  Tch2URLOpenLocation = (olWelcomePage,
+                         olMSDocExplorer,
+                         olDefaultBrowser);
+
   Tch2Main = class
   private
     FHelpViewer : Tch2HelpViewer;
@@ -130,6 +134,7 @@ type
     procedure ShowInWelcomePage(AURL : String);
     procedure ShellOpen(APath : String);
     procedure ShowInMSDocExplorer(AURL : String);
+    procedure ShowURL(AURL : String; ALocation : Tch2URLOpenLocation);
 
     procedure ShowHelp;
 
@@ -163,6 +168,11 @@ function ch2Main : Tch2Main;
 
 const
   CH2HelpViewerName = 'CustomHelp2Viewer';
+
+  ch2URLOpenLocationTexts : array[Tch2URLOpenLocation] of String =
+                            ('Delphi''s WelcomPage',
+                             'MS Document Explorer',
+                             'Systems Default Browser');
 
 implementation
 
@@ -676,6 +686,15 @@ procedure Tch2Main.ShowInWelcomePage(AURL: String);
 begin
   FWPURL := AURL;
   FWPTimer.Enabled := true;
+end;
+
+procedure Tch2Main.ShowURL(AURL: String; ALocation: Tch2URLOpenLocation);
+begin
+  case ALocation of
+    olWelcomePage: ShowInWelcomePage(AURL);
+    olMSDocExplorer: ShowInMSDocExplorer(AURL);
+    olDefaultBrowser: ShellOpen(AURL);
+  end;
 end;
 
 { Tch2HelpSelector }

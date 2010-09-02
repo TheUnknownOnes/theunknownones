@@ -13,6 +13,7 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
   KeyPreview = True
   OldCreateOrder = False
   Position = poMainFormCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyUp = FormKeyUp
@@ -47,7 +48,7 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
       Font.Height = -11
       Font.Name = 'Tahoma'
       Font.Style = []
-      ItemHeight = 0
+      ItemHeight = 13
       ParentFont = False
       Sorted = True
       TabOrder = 0
@@ -88,6 +89,7 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
       RowSelect = True
       TabOrder = 0
       OnAdvancedCustomDrawItem = TVAdvancedCustomDrawItem
+      OnDblClick = TVDblClick
       OnDeletion = TVDeletion
     end
   end
