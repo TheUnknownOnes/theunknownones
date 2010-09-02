@@ -493,7 +493,7 @@ end;
 
 procedure Tch2Main.SortProviderList();
 begin
-  //QuickSortProviderList(FProviders, 0, FProviders.Count - 1);
+  QuickSortProviderList(FProviders, 0, FProviders.Count - 1);
 end;
 
 procedure Tch2Main.LoadSettings;
@@ -598,10 +598,10 @@ begin
 
     p := AList[(ALeft + ARight) shr 1] as Ich2Provider;
     repeat
-      while (AList[i] as Ich2Provider).GetPriority < p.GetPriority do
+      while (AList[i] as Ich2Provider).GetPriority > p.GetPriority do
         Inc(i);
 
-      while (AList[j] as Ich2Provider).GetPriority > p.GetPriority do
+      while (AList[j] as Ich2Provider).GetPriority < p.GetPriority do
         Dec(j);
 
       if i <= j then
