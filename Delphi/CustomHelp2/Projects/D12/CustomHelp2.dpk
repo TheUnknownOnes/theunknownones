@@ -30,13 +30,15 @@ package CustomHelp2;
 requires
   rtl,
   designide,
-  TUOCommon;
+  TUOCommon,
+  vclie,
+  VclSmp;
 
 contains
   uch2Main in '..\..\uch2Main.pas',
   uch2GUIDefault in '..\..\uch2GUIDefault.pas' {ch2FormHelpGUIDefault},
   uch2Configure in '..\..\uch2Configure.pas' {ch2FormConfigure},
-  uch2ProviderStaticWebsearch in '..\..\uch2ProviderStaticWebsearch.pas' {Form1},
+  uch2ProviderStaticWebsearch in '..\..\uch2ProviderStaticWebsearch.pas' {ch2FormConfigStaticWebsearch},
   uch2Provider3rdPartyHelp in '..\..\uch2Provider3rdPartyHelp.pas' {ch2FormProvider3rdPartyHelp};
 
 end.
