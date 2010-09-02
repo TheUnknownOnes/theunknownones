@@ -14,6 +14,7 @@ type
     ForeColor,
     BackColor : TColor;
     OpenLocation : Tch2URLOpenLocation;
+    GUID : TGUID;
 
     constructor Create();
 
@@ -107,6 +108,7 @@ const
   Settings_Value_URL = 'URL';
   Settings_Key_URLs = '\URLs';
   Settings_Value_OpenLocation = 'OpenIn';
+  Settings_Value_GUID = 'GUID';
 
 type
   Tch2HIURL = class(TInterfacedObject, Ich2HelpItem)
@@ -412,6 +414,7 @@ begin
   BackColor := clNone;
   ForeColor := clNone;
   OpenLocation := olDefaultBrowser;
+  CreateGUID(GUID);
 end;
 
 procedure Tch2RSSURL.Load(ARegistry: TRegistry);
@@ -440,6 +443,9 @@ begin
     OpenLocation := Tch2URLOpenLocation(ARegistry.ReadInteger(Settings_Value_OpenLocation))
   else
     OpenLocation := olDefaultBrowser;
+
+  if ARegistry.ValueExists(Settings_Value_GUID) then
+    GUID := StringToGUID(ARegistry.ReadString(Settings_Value_GUID));
 end;
 
 procedure Tch2RSSURL.Save(ARegistry: TRegistry);
@@ -451,6 +457,8 @@ begin
   ARegistry.WriteString(Settings_Value_URL, URL);
 
   ARegistry.WriteInteger(Settings_Value_OpenLocation, Integer(OpenLocation));
+
+  ARegistry.WriteString(Settings_Value_GUID, GUIDToString(GUID));
 end;
 
 { Tch2FormConfigRSSSearch }
@@ -639,10 +647,8 @@ begin
 end;
 
 function Tch2HIURL.GetGUID: TGUID;
-const
-  g : TGUID = '{14789FB2-C549-4804-A7F8-E795BBFEAB68}';
 begin
-  Result := g;
+  Result := FURL.GUID;
 end;
 
 procedure Tch2HIURL.ShowHelp;
