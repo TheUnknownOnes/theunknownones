@@ -135,8 +135,9 @@ type
     FCaption : String;
     FDescription : String;
     FOpenLocation : Tch2URLOpenLocation;
+    FRSSUrl : Tch2RSSURL;
   public
-    constructor Create(AURL, ACaption, ADescription : String; AOpenLocation : Tch2URLOpenLocation);
+    constructor Create(ARSSUrl : Tch2RSSURL; AURL, ACaption, ADescription : String; AOpenLocation : Tch2URLOpenLocation);
 
     {$REGION 'Ich2HelpItem'}
     function GetGUID : TGUID;
@@ -231,7 +232,7 @@ begin
           if Assigned(node) then
             Url := node.Text;
 
-          AGUI.AddHelpItem(Tch2HIRSSEntry.Create(Url, Caption, Description, AURL.OpenLocation) as Ich2HelpItem, AParent);
+          AGUI.AddHelpItem(Tch2HIRSSEntry.Create(AURL, Url, Caption, Description, AURL.OpenLocation) as Ich2HelpItem, AParent);
         end;
 
         if nodes.length > 0 then
@@ -242,7 +243,7 @@ begin
 
           node := channels[channelidx].selectSingleNode('link');
           if Assigned(node) then
-            AGUI.AddHelpItem(Tch2HIRSSEntry.Create(node.text, 'All Results for "' + Caption + '"', '', AURL.OpenLocation) as Ich2HelpItem, AParent);
+            AGUI.AddHelpItem(Tch2HIRSSEntry.Create(AURL, node.text, 'All Results for "' + Caption + '"', '', AURL.OpenLocation) as Ich2HelpItem, AParent);
         end;
       end;
     end
@@ -657,17 +658,18 @@ end;
 
 { Tch2HIRSSEntry }
 
-constructor Tch2HIRSSEntry.Create(AURL, ACaption, ADescription: String; AOpenLocation : Tch2URLOpenLocation);
+constructor Tch2HIRSSEntry.Create(ARSSUrl : Tch2RSSURL; AURL, ACaption, ADescription: String; AOpenLocation : Tch2URLOpenLocation);
 begin
   FURL := AURL;
   FCaption := ACaption;
   FDescription := ADescription;
   FOpenLocation := AOpenLocation;
+  FRSSUrl := ARSSUrl;
 end;
 
 function Tch2HIRSSEntry.GetBackColor: TColor;
 begin
-  Result := clNone;
+  Result := FRSSUrl.BackColor;
 end;
 
 function Tch2HIRSSEntry.GetCaption: String;
@@ -683,6 +685,9 @@ end;
 function Tch2HIRSSEntry.GetFlags: Tch2HelpItemFlags;
 begin
   Result := [ifProvidesHelp];
+
+  if FRSSUrl.ForeColor <> clNone then Include(Result, ifHasForeColor);
+  if FRSSUrl.BackColor <> clNone then Include(Result, ifHasBackColor);
 end;
 
 function Tch2HIRSSEntry.GetFontStyles: TFontStyles;
@@ -692,7 +697,7 @@ end;
 
 function Tch2HIRSSEntry.GetForeColor: TColor;
 begin
-  Result := clNone;
+  Result := FRSSUrl.ForeColor;
 end;
 
 function Tch2HIRSSEntry.GetGUID: TGUID;
