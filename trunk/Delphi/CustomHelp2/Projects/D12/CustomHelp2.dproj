@@ -62,6 +62,9 @@
 			<DCCReference Include="..\..\uch2Provider3rdPartyHelp.pas">
 				<Form>ch2FormProvider3rdPartyHelp</Form>
 			</DCCReference>
+			<DCCReference Include="..\..\uch2ProviderRSSSearch.pas">
+				<Form>ch2FormConfigRSSSearch</Form>
+			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

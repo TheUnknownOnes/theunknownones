@@ -252,15 +252,22 @@ end;
 procedure Tch2FormGUIDefault.TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
   Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;
   var PaintImages, DefaultDraw: Boolean);
+var
+  flags : Tch2HelpItemFlags;
 begin
   PaintImages := true;
   DefaultDraw := true;
 
-  if ifHasForeColor in PNodeData(Node.Data)^.HelpItem.GetFlags then
+  flags := PNodeData(Node.Data)^.HelpItem.GetFlags;
+
+  if ifHasForeColor in flags then
     Sender.Canvas.Font.Color := PNodeData(Node.Data)^.HelpItem.GetForeColor;
 
-  if ifHasBackColor in PNodeData(Node.Data)^.HelpItem.GetFlags then
+  if ifHasBackColor in flags then
     Sender.Canvas.Brush.Color := PNodeData(Node.Data)^.HelpItem.GetBackColor;
+
+  if ifHasFontStyles in flags then
+    Sender.Canvas.Font.Style := PNodeData(Node.Data)^.HelpItem.GetFontStyles;
 end;
 
 procedure Tch2FormGUIDefault.TVDblClick(Sender: TObject);
