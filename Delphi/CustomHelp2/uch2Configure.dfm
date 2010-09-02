@@ -3,8 +3,8 @@ object ch2FormConfigure: Tch2FormConfigure
   Top = 0
   BorderStyle = bsSizeToolWin
   Caption = 'Configure CustomHelp'
-  ClientHeight = 478
-  ClientWidth = 609
+  ClientHeight = 479
+  ClientWidth = 724
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,8 +21,8 @@ object ch2FormConfigure: Tch2FormConfigure
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 603
-    Height = 262
+    Width = 718
+    Height = 263
     Align = alClient
     Caption = 'Helpprovider (doubleclick to configure)'
     Font.Charset = DEFAULT_CHARSET
@@ -32,12 +32,14 @@ object ch2FormConfigure: Tch2FormConfigure
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
+    ExplicitWidth = 603
+    ExplicitHeight = 262
     object lv_Provider: TListView
       AlignWithMargins = True
       Left = 5
       Top = 18
-      Width = 593
-      Height = 239
+      Width = 708
+      Height = 240
       Align = alClient
       Columns = <
         item
@@ -60,13 +62,15 @@ object ch2FormConfigure: Tch2FormConfigure
       TabOrder = 0
       ViewStyle = vsReport
       OnDblClick = lv_ProviderDblClick
+      ExplicitWidth = 593
+      ExplicitHeight = 239
     end
   end
   object GroupBox2: TGroupBox
     AlignWithMargins = True
     Left = 3
-    Top = 271
-    Width = 603
+    Top = 272
+    Width = 718
     Height = 172
     Align = alBottom
     Caption = 'GUI'
@@ -77,11 +81,13 @@ object ch2FormConfigure: Tch2FormConfigure
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
+    ExplicitTop = 271
+    ExplicitWidth = 603
     object lv_GUI: TListView
       AlignWithMargins = True
       Left = 5
       Top = 18
-      Width = 593
+      Width = 708
       Height = 149
       Align = alClient
       Checkboxes = True
@@ -105,19 +111,22 @@ object ch2FormConfigure: Tch2FormConfigure
       TabOrder = 0
       ViewStyle = vsReport
       OnItemChecked = lv_GUIItemChecked
+      ExplicitWidth = 593
     end
   end
   object Panel1: TPanel
     Left = 0
-    Top = 446
-    Width = 609
+    Top = 447
+    Width = 724
     Height = 32
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitTop = 446
+    ExplicitWidth = 609
     object btn_Cancel: TButton
       AlignWithMargins = True
-      Left = 531
+      Left = 646
       Top = 3
       Width = 75
       Height = 26
@@ -126,10 +135,11 @@ object ch2FormConfigure: Tch2FormConfigure
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 1
+      ExplicitLeft = 531
     end
     object btn_OK: TButton
       AlignWithMargins = True
-      Left = 450
+      Left = 565
       Top = 3
       Width = 75
       Height = 26
@@ -139,6 +149,7 @@ object ch2FormConfigure: Tch2FormConfigure
       ModalResult = 1
       TabOrder = 0
       OnClick = btn_OKClick
+      ExplicitLeft = 450
     end
   end
 end

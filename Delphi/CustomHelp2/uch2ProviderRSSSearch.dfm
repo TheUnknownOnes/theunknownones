@@ -1,10 +1,10 @@
-object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
+object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
   Left = 0
   Top = 0
   BorderStyle = bsToolWindow
-  Caption = 'Configure Static Websearch'
-  ClientHeight = 439
-  ClientWidth = 421
+  Caption = 'Configure RSS Search'
+  ClientHeight = 510
+  ClientWidth = 424
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,21 +12,21 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poMainFormCenter
+  Position = poScreenCenter
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
-    Top = 408
-    Width = 421
+    Top = 479
+    Width = 424
     Height = 31
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     object btn_OK: TButton
       AlignWithMargins = True
-      Left = 343
+      Left = 346
       Top = 3
       Width = 75
       Height = 25
@@ -41,7 +41,7 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 415
+    Width = 418
     Height = 54
     Align = alTop
     Caption = 'Priority'
@@ -62,8 +62,8 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
     AlignWithMargins = True
     Left = 3
     Top = 63
-    Width = 415
-    Height = 342
+    Width = 418
+    Height = 413
     Align = alClient
     Caption = 'URL'#39's'
     TabOrder = 2
@@ -71,8 +71,8 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
       AlignWithMargins = True
       Left = 5
       Top = 46
-      Width = 405
-      Height = 198
+      Width = 408
+      Height = 269
       Align = alClient
       Columns = <
         item
@@ -92,8 +92,8 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
     end
     object Panel2: TPanel
       Left = 2
-      Top = 247
-      Width = 411
+      Top = 318
+      Width = 414
       Height = 93
       Align = alBottom
       BevelOuter = bvNone
@@ -196,7 +196,7 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
       AlignWithMargins = True
       Left = 5
       Top = 18
-      Width = 405
+      Width = 408
       Height = 22
       Caption = 'ToolBar1'
       Images = iml_TB
@@ -221,7 +221,7 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
     Left = 288
     Top = 96
     Bitmap = {
-      494C010102000800840010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101020008008C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000DADBDB630BB019FF0BB019FF0BB019FF0BB019FF000000000000
