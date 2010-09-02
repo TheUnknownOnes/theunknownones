@@ -4,9 +4,13 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, uch2Main, Registry;
+  Dialogs, uch2Main, Registry, StdCtrls, ExtCtrls, Spin;
 
 type
+  Tch2StatWebItem = class
+
+  end;
+
   Tch2ProviderStaticWebsearch = class(TInterfacedObject, Ich2Provider)
   private
     FPriority : Integer;
@@ -27,7 +31,17 @@ type
 
   end;
 
-  TForm1 = class(TForm)
+  Tch2FormConfigStaticWebsearch = class(TForm)
+    Panel1: TPanel;
+    btn_Cancel: TButton;
+    btn_OK: TButton;
+    GroupBox1: TGroupBox;
+    ed_Prio: TSpinEdit;
+    Label1: TLabel;
+    ColorBox1: TColorBox;
+    ColorBox2: TColorBox;
+    CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
   private
     { Private-Deklarationen }
   public

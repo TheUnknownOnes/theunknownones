@@ -16,12 +16,14 @@ uses
   ComCtrls,
   ShellAPI,
   Controls,
-  Graphics;
+  Graphics,
+  ExtCtrls;
 
 type
   Tch2HelpItemFlag = (ifSaveStats,
                       ifHasForeColor,
                       ifHasBackColor,
+                      ifHasFontStyles,
                       ifProvidesHelp);
   Tch2HelpItemFlags = set of Tch2HelpItemFlag;
 
@@ -32,6 +34,7 @@ type
     function GetDescription : String;
     function GetForeColor : TColor;
     function GetBackColor : TColor;
+    function GetFontStyles : TFontStyles;
     function GetFlags : Tch2HelpItemFlags;
     procedure ShowHelp;
   end;
@@ -95,6 +98,11 @@ type
     FCurrentGUI : Ich2GUI;
     FGUIs: TInterfaceList;
 
+    FWPTimer : TTimer;
+    FWPURL : String;
+
+    procedure OnWPTimer(Sender : TObject);
+
     procedure AttachToIDE;
     procedure DetachFromIDE;
 
@@ -120,6 +128,8 @@ type
     destructor Destroy; override;
 
     procedure ShowInWelcomePage(AURL : String);
+    procedure ShellOpen(APath : String);
+    procedure ShowInMSDocExplorer(AURL : String);
 
     procedure ShowHelp;
 
@@ -156,7 +166,10 @@ const
 
 implementation
 
-uses uch2GUIDefault, uch2Configure;
+uses uch2GUIDefault,
+     uch2Configure,
+     WebBrowserEx,
+     ActnList;
 
 const
   HelpKeywordGUID = '{9451A4D8-A0C8-451D-ADE1-4B79CD82CAA6}';
@@ -173,6 +186,38 @@ begin
 
   Result := Fch2Main;
 end;
+
+type
+  IURLModule = interface
+    ['{9D215B02-6073-45DC-B007-1A2DBCE2D693}']
+    procedure Close;
+    function GetURL: string;                             // tested
+    procedure SetURL(const AURL: string);                // tested
+    procedure SourceActivated;
+    function GetWindowClosingEvent: TWindowClosingEvent; // WARNING!!! do NOT CALL!!!
+    procedure Proc1;
+    procedure Proc2;
+    procedure Proc3;
+    procedure Proc4;
+    procedure Proc5;
+    property URL: string read GetURL write SetURL;
+  end;
+
+  IDocModule = interface
+    ['{60AE6F18-62AD-4E39-A999-29504CF2632A}']
+    procedure AddToProject;
+    function GetFileName: string;
+    procedure GetIsModified;
+    function GetModuleName: string;
+    procedure Save;
+    procedure Show;  // doesn't seem to work properly...
+    procedure ShowEditor(Visible: Boolean; const Filename: string);
+    procedure GetProjectCount;
+    procedure GetProject;
+    procedure GetActiveProject;
+    property Filename: string read GetFilename;
+    property ModuleName: string read GetModuleName;
+  end;
 
 { Tch2HelpViewer }
 
@@ -369,6 +414,11 @@ begin
   FGUIs := TInterfaceList.Create;
 
   LoadSettings;
+
+  FWPTimer := TTimer.Create(nil);
+  FWPTimer.Enabled := false;
+  FWPTimer.Interval := 100;
+  FWPTimer.OnTimer := OnWPTimer;
 end;
 
 destructor Tch2Main.Destroy;
@@ -466,6 +516,66 @@ begin
   SortProviderList;
 end;
 
+procedure Tch2Main.OnWPTimer(Sender: TObject);
+
+  function HasWP : Boolean;
+  begin
+    Result := (GetModuleHandle('startpageide100.bpl') > 0) or
+              (GetModuleHandle('startpageide120.bpl') > 0) or
+              (GetModuleHandle('startpageide140.bpl') > 0);
+  end;
+
+  procedure ShowWP;
+  var
+    IDEService: INTAServices;
+    actList:    TCustomActionList;
+    idx:        Integer;
+    act:        TContainedAction;
+  begin
+    IDEService := (BorlandIDEServices as INTAServices);
+    actList    := IDEService.ActionList;
+
+    for idx := 0 to actList.ActionCount - 1 do
+    begin
+      act := actList.Actions[idx];
+
+      if act.Name = 'ViewWelcomePageCommand' then
+        act.Execute;
+    end;
+  end;
+
+var
+  ModuleServices: IOTAModuleServices;
+  Module:    IOTAModule;
+  I:         Integer;
+  mIdx:      Integer;
+  URLModule: IURLModule;
+  DocModule: IDocModule;
+begin
+  FWPTimer.Enabled := False;
+  ShowWP;
+
+  mIdx           := -1;
+  ModuleServices := BorlandIDEServices as IOTAModuleServices;
+  for I := 0 to ModuleServices.ModuleCount - 1 do
+  begin
+    Module := ModuleServices.Modules[I];
+    if Supports(Module, IURLModule, URLModule) then
+    begin
+      if Supports(Module, IDocModule, DocModule) then
+      begin
+        URLModule.URL := FWPURL;
+        mIdx          := i;
+        Break;
+      end;
+    end;
+  end;
+
+  if (mIdx > -1) and (mIdx < ModuleServices.ModuleCount) then
+    ModuleServices.Modules[mIdx].Show;
+end;
+
+
 procedure Tch2Main.QuickSortProviderList(AList: TInterfaceList; ALeft,
   ARight: Integer);
 var
@@ -538,6 +648,11 @@ begin
   FCurrentGUI := Value;
 end;
 
+procedure Tch2Main.ShellOpen(APath: String);
+begin
+  ShellExecute(0, 'open', PChar(APath), nil, nil, SW_SHOW);
+end;
+
 procedure Tch2Main.ShowHelp;
 var
   idx : Integer;
@@ -549,9 +664,18 @@ begin
   CurrentGUI.Show(FHelpString, FKeywords);
 end;
 
+procedure Tch2Main.ShowInMSDocExplorer(AURL: String);
+var
+  hs : IHelpSystem;
+begin
+  if GetHelpSystem(hs) then
+    hs.ShowTopicHelp(AURL, '');
+end;
+
 procedure Tch2Main.ShowInWelcomePage(AURL: String);
 begin
-  ShellExecute(0, 'open', PChar(AURL), nil, nil, SW_SHOW);
+  FWPURL := AURL;
+  FWPTimer.Enabled := true;
 end;
 
 { Tch2HelpSelector }
