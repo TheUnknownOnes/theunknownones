@@ -21,7 +21,8 @@ uses
 type
   Tch2HelpItemFlag = (ifSaveStats,
                       ifHasForeColor,
-                      ifHasBackColor);
+                      ifHasBackColor,
+                      ifProvidesHelp);
   Tch2HelpItemFlags = set of Tch2HelpItemFlag;
 
   Ich2HelpItem = interface
@@ -32,6 +33,7 @@ type
     function GetForeColor : TColor;
     function GetBackColor : TColor;
     function GetFlags : Tch2HelpItemFlags;
+    procedure ShowHelp;
   end;
 
   Ich2GUI = interface
@@ -52,7 +54,6 @@ type
     function GetName : String;
 
     procedure ProvideHelp(AKeyword : String; AGUI : Ich2GUI);
-    procedure ShowHelp(AID : Integer);
     procedure Configure;
 
     function GetPriority : Integer;

@@ -20,7 +20,6 @@ type
     function GetName : String;
 
     procedure ProvideHelp(AKeyword : String; AGUI : Ich2GUI);
-    procedure ShowHelp(AID : Integer);
     procedure Configure;
 
     function GetPriority : Integer;
@@ -116,11 +115,6 @@ procedure Tch2ProviderStaticWebsearch.ProvideHelp(AKeyword: String;
 var
   parent : pointer;
   idx : Integer;
-begin
-
-end;
-
-procedure Tch2ProviderStaticWebsearch.ShowHelp(AID: Integer);
 begin
 
 end;
