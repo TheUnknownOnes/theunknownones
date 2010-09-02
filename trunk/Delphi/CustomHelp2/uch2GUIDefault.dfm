@@ -12,7 +12,6 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
-  Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy

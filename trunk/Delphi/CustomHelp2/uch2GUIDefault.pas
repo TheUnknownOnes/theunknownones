@@ -41,6 +41,9 @@ type
 
     procedure SaveItemStats;
     procedure LoadItemStats;
+
+    procedure LoadSettings;
+    procedure SaveSettings;
   public
     function AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer = nil) : Pointer;
   end;
@@ -69,6 +72,7 @@ implementation
 const
   Settings_Key_Stats = '\Stats\';
   Settings_Value_Expanded = 'Expanded';
+  Settings_Value_Size = 'Size';
 
 { Tch2GUIDefault }
 
@@ -158,6 +162,7 @@ procedure Tch2FormGUIDefault.FormClose(Sender: TObject;
 begin
   Action := caFree;
   SaveItemStats;
+  SaveSettings;
 end;
 
 procedure Tch2FormGUIDefault.FormCreate(Sender: TObject);
@@ -179,6 +184,8 @@ end;
 
 procedure Tch2FormGUIDefault.FormShow(Sender: TObject);
 begin
+  LoadSettings;
+
   Caption := 'Find help for "' + FHelpString + '"';
   com_Keywords.Items.Assign(FKeywords);
   com_Keywords.ItemIndex := com_Keywords.Items.IndexOf(FHelpString);
@@ -207,6 +214,35 @@ begin
           reg.CloseKey;
         end;
       end;
+    end;
+
+  finally
+    Reg.Free;
+  end;
+end;
+
+procedure Tch2FormGUIDefault.LoadSettings;
+var
+  Reg : TRegistry;
+  r : TRect;
+begin
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    REG.RootKey := HKEY_CURRENT_USER;
+
+    if Reg.OpenKey(ch2Main.RegRootKeyGUI[FGUI.GetGUID], true) then
+    begin
+      if Reg.ValueExists(Settings_Value_Size) then
+      begin
+        Reg.ReadBinaryData(Settings_Value_Size, r, SizeOf(r));
+
+        Left := r.Left;
+        Top := r.Top;
+        Width := r.Right - r.Left;
+        Height := r.Bottom - r.Top;
+      end;
+
+      Reg.CloseKey;
     end;
 
   finally
@@ -243,11 +279,35 @@ begin
   end;
 end;
 
+procedure Tch2FormGUIDefault.SaveSettings;
+var
+  Reg : TRegistry;
+  r : TRect;
+begin
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    REG.RootKey := HKEY_CURRENT_USER;
+
+    r := Rect(Left, Top, Left + Width, Top + Height);
+
+    if Reg.OpenKey(ch2Main.RegRootKeyGUI[FGUI.GetGUID], true) then
+    begin
+      Reg.WriteBinaryData(Settings_Value_Size, r, SizeOf(r));
+
+      Reg.CloseKey;
+    end;
+
+  finally
+    Reg.Free;
+  end;
+end;
+
 procedure Tch2FormGUIDefault.tm_RunFirstSearchTimer(Sender: TObject);
 begin
   tm_RunFirstSearch.Enabled := false;
   com_KeywordsChange(Sender);
 end;
+
 
 procedure Tch2FormGUIDefault.TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
   Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;

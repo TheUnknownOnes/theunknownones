@@ -167,7 +167,7 @@ type
 function ch2Main : Tch2Main;
 
 const
-  CH2HelpViewerName = 'CustomHelp2Viewer';
+  CH2HelpViewerName = 'CustomHelp2Viewer (TUO)';
 
   ch2URLOpenLocationTexts : array[Tch2URLOpenLocation] of String =
                             ('Delphi''s WelcomPage',
@@ -398,7 +398,7 @@ end;
 procedure Tch2Main.AttachToIDE;
 begin
   FMenuItemConfig := TMenuItem.Create(nil);
-  FMenuItemConfig.Caption := 'Configure CustomHelp';
+  FMenuItemConfig.Caption := 'Configure CustomHelp2';
   FMenuItemConfig.OnClick := OnConfigure;
 
   with GetTUOCommon do
