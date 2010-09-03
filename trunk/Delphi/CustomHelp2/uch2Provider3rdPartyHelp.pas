@@ -7,7 +7,6 @@ uses
   uch2Main, Registry, HelpIntfs, StdCtrls, ExtCtrls, CheckLst, Mask, Spin;
 
 type
-  THelpViewerColorType = (hvctForeColor, hvctBackColor);
   THelpViewerNodeType = (hvntCategory, hvntItem);
 
   Tch2Provider3rdPartyHelp = class(TInterfacedObject, Ich2Provider)
@@ -138,10 +137,8 @@ type
     function GetGUID : TGUID; //used to store stats (expanded, position, ...)
     function GetCaption : String;
     function GetDescription : String;
-    function GetForeColor : TColor;
-    function GetBackColor : TColor;
+    function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
-    function GetFontStyles : TFontStyles;
     procedure ShowHelp;
     {$ENDREGION}
 
@@ -159,10 +156,8 @@ type
     function GetGUID : TGUID; //used to store stats (expanded, position, ...)
     function GetCaption : String;
     function GetDescription : String;
-    function GetForeColor : TColor;
-    function GetBackColor : TColor;
+    function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
-    function GetFontStyles : TFontStyles;
     procedure ShowHelp;
     {$ENDREGION}
 
@@ -182,12 +177,6 @@ const
   REG_VALUE_PRIORITY = 'Priority';
   REG_KEY_VIEWERS = 'Viewers';
   REG_VALUE_GUID = 'GUID';
-  REG_VALUE_COLOR_CAT_F = 'Category Foreground Color';
-  REG_VALUE_COLOR_CAT_B = 'Category Background Color';
-  REG_VALUE_COLOR_ITM_F = 'Item Foreground Color';
-  REG_VALUE_COLOR_ITM_B = 'Item Background Color';
-  REG_VALUE_FONTSTYLE_CAT = 'Category Font Style';
-  REG_VALUE_FONTSTYLE_ITM = 'Item Font Style';
   REG_VALUE_VISIBLE = 'Visible';
 
 procedure Tch2Provider3rdPartyHelp.AfterConstruction;
@@ -700,14 +689,14 @@ begin
   FProvider:=AProvider;
 end;
 
-function Tch2Provider3rdPartyHelpItemCategory.GetBackColor: TColor;
-begin
-  Result:=FProvider.GetColorForHelpViewer(FHelpViewer.GetViewerName, hvntCategory, hvctBackColor);
-end;
-
 function Tch2Provider3rdPartyHelpItemCategory.GetCaption: String;
 begin
   Result:=FHelpViewer.GetViewerName;
+end;
+
+function Tch2Provider3rdPartyHelpItemCategory.GetDecoration: Tch2HelpItemDecoration;
+begin
+
 end;
 
 function Tch2Provider3rdPartyHelpItemCategory.GetDescription: String;
@@ -717,17 +706,7 @@ end;
 
 function Tch2Provider3rdPartyHelpItemCategory.GetFlags: Tch2HelpItemFlags;
 begin
-  Result:=[ifSaveStats, ifHasForeColor, ifHasBackColor, ifHasFontStyles]
-end;
-
-function Tch2Provider3rdPartyHelpItemCategory.GetFontStyles: TFontStyles;
-begin
-
-end;
-
-function Tch2Provider3rdPartyHelpItemCategory.GetForeColor: TColor;
-begin
-  Result:=FProvider.GetColorForHelpViewer(FHelpViewer.GetViewerName, hvntCategory, hvctForeColor);
+  Result:=[ifSaveStats]
 end;
 
 function Tch2Provider3rdPartyHelpItemCategory.GetGUID: TGUID;
@@ -751,16 +730,15 @@ begin
   FHelpString:=AHelpString;
 end;
 
-function Tch2Provider3rdPartyHelpItemItem.GetBackColor: TColor;
-begin
-  Result:=FProvider.GetColorForHelpViewer(FHelpViewer.GetViewerName,
-                                          hvntItem,
-                                          hvctBackColor);
-end;
 
 function Tch2Provider3rdPartyHelpItemItem.GetCaption: String;
 begin
   Result:=FHelpString;
+end;
+
+function Tch2Provider3rdPartyHelpItemItem.GetDecoration: Tch2HelpItemDecoration;
+begin
+
 end;
 
 function Tch2Provider3rdPartyHelpItemItem.GetDescription: String;
@@ -770,19 +748,7 @@ end;
 
 function Tch2Provider3rdPartyHelpItemItem.GetFlags: Tch2HelpItemFlags;
 begin
-  Result:=[ifHasForeColor, ifHasBackColor, ifHasFontStyles, ifProvidesHelp];
-end;
-
-function Tch2Provider3rdPartyHelpItemItem.GetFontStyles: TFontStyles;
-begin
-  Result:=FProvider.GetFontStyleForHelpViewer(FHelpViewer.GetViewerName, hvntItem);
-end;
-
-function Tch2Provider3rdPartyHelpItemItem.GetForeColor: TColor;
-begin
-  Result:=FProvider.GetColorForHelpViewer(FHelpViewer.GetViewerName,
-                                          hvntItem,
-                                          hvctForeColor);
+  Result:=[ifProvidesHelp];
 end;
 
 function Tch2Provider3rdPartyHelpItemItem.GetGUID: TGUID;

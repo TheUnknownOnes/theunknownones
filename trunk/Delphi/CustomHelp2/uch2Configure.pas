@@ -20,6 +20,8 @@ type
     procedure lv_GUIItemChecked(Sender: TObject; Item: TListItem);
     procedure btn_OKClick(Sender: TObject);
     procedure lv_ProviderDblClick(Sender: TObject);
+    procedure lv_ProviderCompare(Sender: TObject; Item1, Item2: TListItem;
+      Data: Integer; var Compare: Integer);
   private
     { Private-Deklarationen }
   public
@@ -144,6 +146,19 @@ begin
   end;
 end;
 
+procedure Tch2FormConfigure.lv_ProviderCompare(Sender: TObject; Item1,
+  Item2: TListItem; Data: Integer; var Compare: Integer);
+var
+  pd1,
+  pd2 : PProviderData;
+begin
+  pd1 := Item1.Data;
+  pd2 := Item2.Data;
+
+  //thats not a bug ... its descending ordering
+  Compare := CompareValue(pd2^.Provider.GetPriority, pd1^.Provider.GetPriority);
+end;
+
 procedure Tch2FormConfigure.lv_ProviderDblClick(Sender: TObject);
 var
   pd : PProviderData;
@@ -151,7 +166,8 @@ begin
   if Assigned(lv_Provider.Selected) then
   begin
     pd := lv_Provider.Selected.Data;
-    pd.Provider.Configure;
+    pd^.Provider.Configure;
+    lv_Provider.CustomSort(nil, 0);
   end;
 end;
 

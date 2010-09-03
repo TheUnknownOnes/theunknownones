@@ -5,15 +5,14 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, uch2Main, Registry, StdCtrls, ExtCtrls, Spin, ImgList, ComCtrls,
-  ToolWin, Contnrs, StrUtils;
+  ToolWin, Contnrs, StrUtils, uch2FrameHelpItemDecoration;
 
 type
   Tch2StatWebURL = class
   public
     Name : String;
     URL : String;
-    ForeColor,
-    BackColor : TColor;
+    Deco : Tch2HelpItemDecoration;
     OpenLocation : Tch2URLOpenLocation;
 
     constructor Create();
@@ -24,8 +23,6 @@ type
 
   Tch2ProviderStaticWebsearch = class(TInterfacedObject, Ich2Provider)
   private
-    FForeColor,
-    FBackColor : TColor;
     FPriority : Integer;
     FURLs: TObjectList;
     function GetURL(AIndex: Integer): Tch2StatWebURL;
@@ -55,8 +52,6 @@ type
   Tch2FormConfigStaticWebsearch = class(TForm)
     Panel1: TPanel;
     btn_OK: TButton;
-    GroupBox1: TGroupBox;
-    ed_Prio: TSpinEdit;
     GroupBox2: TGroupBox;
     LV: TListView;
     Panel2: TPanel;
@@ -68,28 +63,24 @@ type
     Label3: TLabel;
     ed_Name: TEdit;
     ed_URL: TEdit;
-    cob_URLForeColor: TColorBox;
-    cob_URLBackColor: TColorBox;
-    Label6: TLabel;
-    Label7: TLabel;
-    Label8: TLabel;
     com_Location: TComboBox;
     Label9: TLabel;
+    frame_Deco: Tch2FrameHelpItemDecoration;
+    Panel3: TPanel;
+    Label1: TLabel;
+    ed_Prio: TSpinEdit;
     procedure ed_NameChange(Sender: TObject);
     procedure ed_URLChange(Sender: TObject);
-    procedure cob_URLForeColorChange(Sender: TObject);
-    procedure cob_URLBackColorChange(Sender: TObject);
     procedure LVSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
     procedure btn_AddClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btn_DelClick(Sender: TObject);
     procedure ed_PrioChange(Sender: TObject);
     procedure com_LocationChange(Sender: TObject);
-    procedure LVAdvancedCustomDrawItem(Sender: TCustomListView; Item: TListItem;
-      State: TCustomDrawState; Stage: TCustomDrawStage;
-      var DefaultDraw: Boolean);
   private
     FProvider : Tch2ProviderStaticWebsearch;
+
+    procedure OnDecoChange(Sender : TObject);
   public
     class function Execute(AProvider : Tch2ProviderStaticWebsearch) : Boolean;
   end;
@@ -100,8 +91,6 @@ implementation
 
 const
   Settings_Value_Priority = 'Priority';
-  Settings_Value_ForeColor = 'ForeColor';
-  Settings_Value_BackColor = 'BackColor';
   Settings_Value_Name = 'Name';
   Settings_Value_URL = 'URL';
   Settings_Key_URLs = '\URLs';
@@ -119,9 +108,7 @@ type
     function GetGUID : TGUID;
     function GetCaption : String;
     function GetDescription : String;
-    function GetForeColor : TColor;
-    function GetBackColor : TColor;
-    function GetFontStyles : TFontStyles;
+    function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
     procedure ShowHelp;
     {$ENDREGION}
@@ -197,16 +184,6 @@ begin
       else
         FPriority := 0;
 
-      if Reg.ValueExists(Settings_Value_ForeColor) then
-        FForeColor := reg.ReadInteger(Settings_Value_ForeColor)
-      else
-        FForeColor := clNone;
-
-      if Reg.ValueExists(Settings_Value_BackColor) then
-        FBackColor := reg.ReadInteger(Settings_Value_BackColor)
-      else
-        FBackColor := clNone;
-
       Reg.CloseKey;
     end;
 
@@ -259,8 +236,6 @@ begin
     if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID], true) then
     begin
       Reg.WriteInteger(Settings_Value_Priority, FPriority);
-      Reg.WriteInteger(Settings_Value_ForeColor, FForeColor);
-      Reg.WriteInteger(Settings_Value_BackColor, FBackColor);
 
       Reg.CloseKey;
     end;
@@ -297,22 +272,12 @@ end;
 
 constructor Tch2StatWebURL.Create;
 begin
-  ForeColor := clNone;
-  BackColor := clNone;
   OpenLocation := olDefaultBrowser;
 end;
 
 procedure Tch2StatWebURL.Load(ARegistry: TRegistry);
 begin
-  if ARegistry.ValueExists(Settings_Value_ForeColor) then
-    ForeColor := ARegistry.ReadInteger(Settings_Value_ForeColor)
-  else
-    ForeColor := clNone;
-
-  if ARegistry.ValueExists(Settings_Value_BackColor) then
-    BackColor := ARegistry.ReadInteger(Settings_Value_BackColor)
-  else
-    BackColor := clNone;
+  Deco.LoadFromRegistry(ARegistry);
 
   if ARegistry.ValueExists(Settings_Value_Name) then
     Name := ARegistry.ReadString(Settings_Value_Name)
@@ -332,8 +297,7 @@ end;
 
 procedure Tch2StatWebURL.Save(ARegistry: TRegistry);
 begin
-  ARegistry.WriteInteger(Settings_Value_ForeColor, ForeColor);
-  ARegistry.WriteInteger(Settings_Value_BackColor, BackColor);
+  Deco.SaveToRegistry(ARegistry);
 
   ARegistry.WriteString(Settings_Value_Name, Name);
   ARegistry.WriteString(Settings_Value_URL, URL);
@@ -348,8 +312,7 @@ begin
   url := Tch2StatWebURL.Create;
   url.Name := IfThen(ed_Name.Text = '', 'NewURL', ed_Name.Text);
   url.URL := IfThen(ed_URL.Text = '', 'http://', ed_URL.Text);
-  url.ForeColor := cob_URLForeColor.Selected;
-  url.BackColor := cob_URLBackColor.Selected;
+  url.Deco := frame_Deco.Decoration;
   FProvider.URLs.Add(url);
   with lv.Items.Add do
   begin
@@ -369,19 +332,6 @@ begin
   end;
 end;
 
-
-procedure Tch2FormConfigStaticWebsearch.cob_URLBackColorChange(Sender: TObject);
-begin
-   if Assigned(lv.Selected) then
-    Tch2StatWebURL(lv.Selected.Data).BackColor := cob_URLBackColor.Selected;
-end;
-
-procedure Tch2FormConfigStaticWebsearch.cob_URLForeColorChange(Sender: TObject);
-begin
-  if Assigned(lv.Selected) then
-    Tch2StatWebURL(lv.Selected.Data).ForeColor := cob_URLForeColor.Selected;
-end;
-
 procedure Tch2FormConfigStaticWebsearch.com_LocationChange(Sender: TObject);
 begin
   if Assigned(lv.Selected) then
@@ -394,6 +344,7 @@ begin
   begin
     Tch2StatWebURL(lv.Selected.Data).Name := ed_Name.Text;
     lv.Selected.Caption := ed_Name.Text;
+    frame_Deco.Caption := ed_Name.Text;
   end;
 end;
 
@@ -448,19 +399,6 @@ begin
   ed_Prio.Value := FProvider.FPriority;
 end;
 
-procedure Tch2FormConfigStaticWebsearch.LVAdvancedCustomDrawItem(
-  Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
-  Stage: TCustomDrawStage; var DefaultDraw: Boolean);
-begin
-  DefaultDraw := true;
-
-  if Tch2StatWebURL(Item.Data).ForeColor <> clNone then
-    lv.Canvas.Font.Color := Tch2StatWebURL(Item.Data).ForeColor;
-
-  if Tch2StatWebURL(Item.Data).BackColor <> clNone then
-    lv.Canvas.Brush.Color := Tch2StatWebURL(Item.Data).BackColor;
-end;
-
 procedure Tch2FormConfigStaticWebsearch.LVSelectItem(Sender: TObject;
   Item: TListItem; Selected: Boolean);
 begin
@@ -470,8 +408,8 @@ begin
     begin
       ed_Name.Text := Name;
       ed_URL.Text := URL;
-      cob_URLForeColor.Selected := ForeColor;
-      cob_URLBackColor.Selected := BackColor;
+      frame_Deco.Decoration := Deco;
+      frame_Deco.Caption := Name;
       com_Location.ItemIndex := com_Location.Items.IndexOfObject(TObject(OpenLocation));
     end;
   end
@@ -479,10 +417,15 @@ begin
   begin
     ed_Name.Text := EmptyStr;
     ed_URL.Text := EmptyStr;
-    cob_URLForeColor.Selected := clNone;
-    cob_URLBackColor.Selected := clNone;
+    frame_Deco.ResetToDefault;
     com_Location.ItemIndex := com_Location.Items.IndexOfObject(TObject(olDefaultBrowser));
   end;
+end;
+
+procedure Tch2FormConfigStaticWebsearch.OnDecoChange(Sender: TObject);
+begin
+  if Assigned(lv.Selected) then
+    Tch2StatWebURL(lv.Selected.Data).Deco := frame_Deco.Decoration;
 end;
 
 { Tch2HIURL }
@@ -493,14 +436,14 @@ begin
   FKeyword := AKeyword;
 end;
 
-function Tch2HIURL.GetBackColor: TColor;
-begin
-  Result := FURL.BackColor;
-end;
-
 function Tch2HIURL.GetCaption: String;
 begin
   Result := FURL.Name;
+end;
+
+function Tch2HIURL.GetDecoration: Tch2HelpItemDecoration;
+begin
+  Result := FURL.Deco;
 end;
 
 function Tch2HIURL.GetDescription: String;
@@ -511,18 +454,6 @@ end;
 function Tch2HIURL.GetFlags: Tch2HelpItemFlags;
 begin
   Result := [ifProvidesHelp];
-  if FURL.ForeColor <> clNone then Include(Result, ifHasForeColor);
-  if FURL.BackColor <> clNone then Include(Result, ifHasBackColor);
-end;
-
-function Tch2HIURL.GetFontStyles: TFontStyles;
-begin
-  Result := [];
-end;
-
-function Tch2HIURL.GetForeColor: TColor;
-begin
-  Result := FURL.ForeColor;
 end;
 
 function Tch2HIURL.GetGUID: TGUID;

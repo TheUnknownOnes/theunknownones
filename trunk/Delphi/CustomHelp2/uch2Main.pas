@@ -21,20 +21,24 @@ uses
 
 type
   Tch2HelpItemFlag = (ifSaveStats,
-                      ifHasForeColor,
-                      ifHasBackColor,
-                      ifHasFontStyles,
                       ifProvidesHelp);
   Tch2HelpItemFlags = set of Tch2HelpItemFlag;
+
+  Tch2HelpItemDecoration = record
+    TextColor,
+    BackColor : TColor;
+    FontStyles : TFontStyles;
+
+    procedure SaveToRegistry(ARegistry : TRegistry; AKey : String = '');
+    procedure LoadFromRegistry(ARegistry : TRegistry; AKey : String = '');
+  end;
 
   Ich2HelpItem = interface
     ['{D64EBC33-3A57-48F0-BA6E-E9770507A770}']
     function GetGUID : TGUID; //used to store stats (expanded, position, ...)
     function GetCaption : String;
     function GetDescription : String;
-    function GetForeColor : TColor;
-    function GetBackColor : TColor;
-    function GetFontStyles : TFontStyles;
+    function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
     procedure ShowHelp;
   end;
@@ -125,14 +129,15 @@ type
     function GetRegRootKeyGUI(AGUID : TGUID): String;
     procedure SetCurrentGUI(const Value: Ich2GUI);
 
-    procedure QuickSortProviderList(AList : TInterfaceList; ALeft, ARight : Integer);
+    procedure QuickSortProviderList(ALeft, ARight : Integer);
     procedure SortProviderList;
   public
     constructor Create();
     destructor Destroy; override;
 
     procedure ShowInWelcomePage(AURL : String);
-    procedure ShellOpen(APath : String);
+    procedure ShellOpen(APath : String); overload;
+    procedure ShellOpen(APath : String; AParams : String); overload;
     procedure ShowInMSDocExplorer(AURL : String);
     procedure ShowURL(AURL : String; ALocation : Tch2URLOpenLocation);
 
@@ -185,6 +190,8 @@ const
   HelpKeywordGUID = '{9451A4D8-A0C8-451D-ADE1-4B79CD82CAA6}';
 
   Settings_Value_CurrentGUI = 'CurrentGUI';
+
+  Settings_Value_HelpItemDecoration = 'Decoration';
 
 var
   Fch2Main : Tch2Main;
@@ -493,7 +500,7 @@ end;
 
 procedure Tch2Main.SortProviderList();
 begin
-  QuickSortProviderList(FProviders, 0, FProviders.Count - 1);
+  QuickSortProviderList(0, FProviders.Count - 1);
 end;
 
 procedure Tch2Main.LoadSettings;
@@ -586,37 +593,33 @@ begin
 end;
 
 
-procedure Tch2Main.QuickSortProviderList(AList: TInterfaceList; ALeft,
-  ARight: Integer);
+procedure Tch2Main.QuickSortProviderList(ALeft, ARight: Integer);
 var
-  i, j : Integer;
-  p : Ich2Provider;
-begin
-  repeat
-    i := ALeft;
-    j := ARight;
+   Lo, Hi : Integer;
+   Pivot : Ich2Provider;
+ begin
+   Lo := ALeft;
+   Hi := ARight;
 
-    p := AList[(ALeft + ARight) shr 1] as Ich2Provider;
-    repeat
-      while (AList[i] as Ich2Provider).GetPriority > p.GetPriority do
-        Inc(i);
+   Pivot := Provider[(Lo + Hi) div 2];
+   repeat
+     while Provider[Lo].GetPriority > Pivot.GetPriority do
+      Inc(Lo);
+     while Provider[Hi].GetPriority < Pivot.GetPriority do
+      Dec(Hi);
 
-      while (AList[j] as Ich2Provider).GetPriority < p.GetPriority do
-        Dec(j);
+     if Lo <= Hi then
+     begin
+       FProviders.Exchange(Lo, Hi);
+       Inc(Lo) ;
+       Dec(Hi) ;
+     end;
+   until Lo > Hi;
 
-      if i <= j then
-      begin
-        AList.Exchange(i, j);
-        Inc(i);
-        Dec(j);
-      end;
-    until i > j;
+   if Hi > ALeft then QuickSortProviderList(ALeft, Hi) ;
+   if Lo < ARight then QuickSortProviderList(Lo, ARight) ;
+ end;
 
-    if ALeft < j then
-      QuickSortProviderList(AList, ALeft, j);
-
-  until i >= ARight;
-end;
 
 procedure Tch2Main.RegisterGUI(AGUI: Ich2GUI);
 begin
@@ -660,7 +663,12 @@ end;
 
 procedure Tch2Main.ShellOpen(APath: String);
 begin
-  ShellExecute(0, 'open', PChar(APath), nil, nil, SW_SHOW);
+  ShellOpen(APath, '');
+end;
+
+procedure Tch2Main.ShellOpen(APath, AParams: String);
+begin
+  ShellExecute(0, 'open', Pchar(APath), PChar(AParams), nil, SW_SHOW);
 end;
 
 procedure Tch2Main.ShowHelp;
@@ -707,6 +715,51 @@ end;
 function Tch2HelpSelector.TableOfContents(Contents: TStrings): Integer;
 begin
   Result := 0;
+end;
+
+{ Tch2HelpItemDecoration }
+
+procedure Tch2HelpItemDecoration.LoadFromRegistry(ARegistry: TRegistry;
+  AKey: String);
+var
+  OpenCloseKey : Boolean;
+begin
+  OpenCloseKey := AKey <> '';
+  try
+    if OpenCloseKey then
+      ARegistry.OpenKey(AKey, true);
+
+    if ARegistry.ValueExists(Settings_Value_HelpItemDecoration) then
+      ARegistry.ReadBinaryData(Settings_Value_HelpItemDecoration, Self, SizeOf(Self))
+    else
+    begin
+      FontStyles := [];
+      TextColor := clDefault;
+      BackColor := clDefault;
+    end;
+
+  finally
+    if OpenCloseKey then
+      ARegistry.CloseKey;
+  end;
+end;
+
+procedure Tch2HelpItemDecoration.SaveToRegistry(ARegistry: TRegistry;
+  AKey: String);
+var
+  OpenCloseKey : Boolean;
+begin
+  OpenCloseKey := AKey <> '';
+  try
+    if OpenCloseKey then
+      ARegistry.OpenKey(AKey, true);
+
+    ARegistry.WriteBinaryData(Settings_Value_HelpItemDecoration, Self, SizeOf(Self));
+
+  finally
+    if OpenCloseKey then
+      ARegistry.CloseKey;
+  end;
 end;
 
 initialization

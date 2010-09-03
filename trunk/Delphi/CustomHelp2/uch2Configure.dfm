@@ -32,8 +32,6 @@ object ch2FormConfigure: Tch2FormConfigure
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 603
-    ExplicitHeight = 262
     object lv_Provider: TListView
       AlignWithMargins = True
       Left = 5
@@ -58,12 +56,11 @@ object ch2FormConfigure: Tch2FormConfigure
       ReadOnly = True
       RowSelect = True
       ParentFont = False
-      SortType = stText
+      SortType = stData
       TabOrder = 0
       ViewStyle = vsReport
+      OnCompare = lv_ProviderCompare
       OnDblClick = lv_ProviderDblClick
-      ExplicitWidth = 593
-      ExplicitHeight = 239
     end
   end
   object GroupBox2: TGroupBox
@@ -81,8 +78,6 @@ object ch2FormConfigure: Tch2FormConfigure
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
-    ExplicitTop = 271
-    ExplicitWidth = 603
     object lv_GUI: TListView
       AlignWithMargins = True
       Left = 5
@@ -111,7 +106,6 @@ object ch2FormConfigure: Tch2FormConfigure
       TabOrder = 0
       ViewStyle = vsReport
       OnItemChecked = lv_GUIItemChecked
-      ExplicitWidth = 593
     end
   end
   object Panel1: TPanel
@@ -122,8 +116,6 @@ object ch2FormConfigure: Tch2FormConfigure
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitTop = 446
-    ExplicitWidth = 609
     object btn_Cancel: TButton
       AlignWithMargins = True
       Left = 646
@@ -135,7 +127,6 @@ object ch2FormConfigure: Tch2FormConfigure
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 1
-      ExplicitLeft = 531
     end
     object btn_OK: TButton
       AlignWithMargins = True
@@ -149,7 +140,6 @@ object ch2FormConfigure: Tch2FormConfigure
       ModalResult = 1
       TabOrder = 0
       OnClick = btn_OKClick
-      ExplicitLeft = 450
     end
   end
 end

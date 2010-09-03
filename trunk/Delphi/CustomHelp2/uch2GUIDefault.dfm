@@ -47,7 +47,7 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
       Font.Height = -11
       Font.Name = 'Tahoma'
       Font.Style = []
-      ItemHeight = 13
+      ItemHeight = 0
       ParentFont = False
       Sorted = True
       TabOrder = 0
