@@ -4,21 +4,19 @@ interface
 
 uses
   Windows, Messages, Variants, Classes, Graphics, Controls, Forms, Dialogs,
-  uch2Main, Registry, HelpIntfs, StdCtrls, ExtCtrls, CheckLst, Mask, Spin;
+  uch2Main, Registry, HelpIntfs, StdCtrls, ExtCtrls, CheckLst, Mask, Spin,
+  uch2FrameHelpItemDecoration;
 
 type
-  THelpViewerNodeType = (hvntCategory, hvntItem);
-
   Tch2Provider3rdPartyHelp = class(TInterfacedObject, Ich2Provider)
   private
     FPriority : Integer;
     procedure SetPriority(APriority: Integer);
   protected
     function GetGUIDForHelpViewer(AName: String): TGUID;
-    function GetColorForHelpViewer(AName: String; ANodeType: THelpViewerNodeType; AColorType: THelpViewerColorType): TColor;
-    function GetFontStyleForHelpViewer(AName: String; ANodeType: THelpViewerNodeType): TFontStyles;
-    procedure SetColorForHelpViewer(AName: String; ANodeType: THelpViewerNodeType; AColorType: THelpViewerColorType; AColor: TColor);
-    procedure SetFontStyleForHelpViewer(AName: String; ANodeType: THelpViewerNodeType; AStyle: TFontStyles);
+
+    function GetDecoration(AName: String): Tch2HelpItemDecoration;
+    procedure SetDecoration(AName: String; ADeco: Tch2HelpItemDecoration);
     function GetVisibilityForHelpViewer(AName: String): Boolean;
     procedure SetVisibilityForHelpViewer(AName: String; AVisible: Boolean);
   public
@@ -40,37 +38,22 @@ type
 
   Tch2FormProvider3rdPartyHelp = class(TForm)
     clbProviders: TCheckListBox;
-    gbOptions: TGroupBox;
     GroupBox2: TGroupBox;
-    cbHeadFC: TColorBox;
-    LabelHeader: TLabel;
-    cbHeadBC: TColorBox;
-    cbHeadFb: TCheckBox;
-    cbHeadFi: TCheckBox;
-    cbHeadFs: TCheckBox;
-    cbHeadFu: TCheckBox;
-    LabelItem: TLabel;
-    cbItemFC: TColorBox;
-    cbItemBC: TColorBox;
-    cbItemFb: TCheckBox;
-    cbItemFi: TCheckBox;
-    cbItemFu: TCheckBox;
-    cbItemFs: TCheckBox;
-    Label3: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
     Panel1: TPanel;
     Label1: TLabel;
     EditPrio: TSpinEdit;
+    GroupBox1: TGroupBox;
+    FrameHelpItemDeco: Tch2FrameHelpItemDecoration;
+    Panel2: TPanel;
+    btn_OK: TButton;
     procedure clbProvidersClick(Sender: TObject);
-    procedure Headerchanged(Sender: TObject);
-    procedure ItemChanged(Sender: TObject);
     procedure clbProvidersClickCheck(Sender: TObject);
     procedure EditPrioChange(Sender: TObject);
   private
     FProvider : Tch2Provider3rdPartyHelp;
 
     procedure Init;
+    procedure OnDecoChange(ASender: TObject);
   public
     class procedure Execute(AProvider: Tch2Provider3rdPartyHelp);
   end;
@@ -231,97 +214,10 @@ begin
   Tch2FormProvider3rdPartyHelp.Execute(Self);
 end;
 
-function Tch2Provider3rdPartyHelp.GetColorForHelpViewer(AName: String;
-  ANodeType: THelpViewerNodeType;
-  AColorType: THelpViewerColorType): TColor;
-var
-  Reg : TRegistry;
-  Reg_Value_Color : String;
-begin
-  inherited;
-
-  case ANodeType of
-    hvntCategory: case AColorType of
-                    hvctForeColor: begin
-                                     Reg_Value_Color:=REG_VALUE_COLOR_CAT_F;
-                                     Result:=clWindowText;
-                                   end;
-                    hvctBackColor: begin
-                                     Reg_Value_Color:=REG_VALUE_COLOR_CAT_B;
-                                     Result:=clWindow;
-                                   end
-                  end;
-    hvntItem:     case AColorType of
-                    hvctForeColor: begin
-                                     Reg_Value_Color:=REG_VALUE_COLOR_ITM_F;
-                                     Result:=clWindowText;
-                                   end;
-                    hvctBackColor: begin
-                                     Reg_Value_Color:=REG_VALUE_COLOR_ITM_B;
-                                     Result:=clWindow;
-                                   end
-                  end;
-  end;
-  
-
-  Reg := TRegistry.Create(KEY_ALL_ACCESS);
-  try
-    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_VIEWERS+'\'+AName, true) then
-    begin
-      if not Reg.ValueExists(Reg_Value_Color) then
-      begin
-        Reg.WriteString(Reg_Value_Color, ColorToString(Result));
-      end
-      else
-        Result := StringToColor(reg.ReadString(Reg_Value_Color));
-
-      Reg.CloseKey;
-    end;
-  finally
-    Reg.Free;
-  end;
-end;
 
 function Tch2Provider3rdPartyHelp.GetDescription: String;
 begin
   Result := 'Query other Help providers installed';
-end;
-
-function Tch2Provider3rdPartyHelp.GetFontStyleForHelpViewer(AName: String;
-  ANodeType: THelpViewerNodeType): TFontStyles;
-var
-  Reg : TRegistry;
-  Reg_Value_FontStyle : String;
-begin
-  inherited;
-
-  case ANodeType of
-    hvntCategory: begin
-                    Result:=[fsBold];
-                    Reg_Value_FontStyle:=REG_VALUE_FONTSTYLE_CAT;
-                  end;
-    hvntItem:     begin
-                    Result:=[];
-                    Reg_Value_FontStyle:=REG_VALUE_FONTSTYLE_ITM;
-                  end;
-  end;
-
-  Reg := TRegistry.Create(KEY_ALL_ACCESS);
-  try
-    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_VIEWERS+'\'+AName, true) then
-    begin
-      if not Reg.ValueExists(Reg_Value_FontStyle) then
-      begin
-        Reg.WriteBinaryData(Reg_Value_FontStyle, Result, SizeOf(Result));
-      end
-      else
-        reg.ReadBinaryData(Reg_Value_FontStyle, Result, SizeOf(Result));
-
-      Reg.CloseKey;
-    end;
-  finally
-    Reg.Free;
-  end;
 end;
 
 function Tch2Provider3rdPartyHelp.GetGUID: TGUID;
@@ -364,6 +260,44 @@ end;
 function Tch2Provider3rdPartyHelp.GetPriority: Integer;
 begin
   Result:=FPriority;
+end;
+
+function Tch2Provider3rdPartyHelp.GetDecoration(AName: String): Tch2HelpItemDecoration;
+var
+  Reg : TRegistry;
+begin
+  inherited;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_VIEWERS+'\'+AName, true) then
+    begin
+      Result.LoadFromRegistry(Reg);
+
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
+end;
+
+procedure Tch2Provider3rdPartyHelp.SetDecoration(AName: String; ADeco: Tch2HelpItemDecoration);
+var
+  Reg : TRegistry;
+begin
+  inherited;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_VIEWERS+'\'+AName, true) then
+    begin
+      ADeco.SaveToRegistry(Reg);
+
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
 end;
 
 function Tch2Provider3rdPartyHelp.GetVisibilityForHelpViewer(
@@ -430,79 +364,6 @@ begin
 
 end;
 
-procedure Tch2Provider3rdPartyHelp.SetColorForHelpViewer(AName: String;
-  ANodeType: THelpViewerNodeType; AColorType: THelpViewerColorType;
-  AColor: TColor);
-var
-  Reg : TRegistry;
-  Reg_Value_Color : String;
-begin
-  inherited;
-
-  case ANodeType of
-    hvntCategory: case AColorType of
-                    hvctForeColor: begin
-                                     Reg_Value_Color:=REG_VALUE_COLOR_CAT_F;
-                                   end;
-                    hvctBackColor: begin
-                                     Reg_Value_Color:=REG_VALUE_COLOR_CAT_B;
-                                   end
-                  end;
-    hvntItem:     case AColorType of
-                    hvctForeColor: begin
-                                     Reg_Value_Color:=REG_VALUE_COLOR_ITM_F;
-                                   end;
-                    hvctBackColor: begin
-                                     Reg_Value_Color:=REG_VALUE_COLOR_ITM_B;
-                                   end
-                  end;
-  end;
-
-
-  Reg := TRegistry.Create(KEY_ALL_ACCESS);
-  try
-    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_VIEWERS+'\'+AName, true) then
-    begin
-      Reg.WriteString(Reg_Value_Color, ColorToString(AColor));
-
-      Reg.CloseKey;
-    end;
-  finally
-    Reg.Free;
-  end;
-end;
-
-procedure Tch2Provider3rdPartyHelp.SetFontStyleForHelpViewer(AName: String;
-  ANodeType: THelpViewerNodeType; AStyle: TFontStyles);
-var
-  Reg : TRegistry;
-  Reg_Value_FontStyle : String;
-begin
-  inherited;
-
-  case ANodeType of
-    hvntCategory: begin
-                    Reg_Value_FontStyle:=REG_VALUE_FONTSTYLE_CAT;
-                  end;
-    hvntItem:     begin
-                    Reg_Value_FontStyle:=REG_VALUE_FONTSTYLE_ITM;
-                  end;
-  end;
-
-  Reg := TRegistry.Create(KEY_ALL_ACCESS);
-  try
-    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_VIEWERS+'\'+AName, true) then
-    begin
-      Reg.WriteBinaryData(Reg_Value_FontStyle, AStyle , SizeOf(AStyle));
-
-
-      Reg.CloseKey;
-    end;
-  finally
-    Reg.Free;
-  end;
-end;
-
 procedure Tch2Provider3rdPartyHelp.SetVisibilityForHelpViewer(AName: String;
   AVisible: Boolean);
 var
@@ -554,33 +415,6 @@ begin
   end;
 end;
 
-procedure Tch2FormProvider3rdPartyHelp.Headerchanged(Sender: TObject);
-var
-  fs : TFontStyles;
-  ViewerName : String;
-begin
-  LabelHeader.Font.Color:=cbHeadFC.Selected;
-  LabelHeader.Color:=cbHeadBC.Selected; 
-  fs:=[];
-  if cbHeadFb.Checked then
-    Include(fs, fsBold);  
-  if cbHeadFi.Checked then
-    Include(fs, fsItalic);
-  if cbHeadFu.Checked then
-    Include(fs, fsUnderline);
-  if cbHeadFs.Checked then
-    Include(fs, fsStrikeOut);
-  LabelHeader.Font.Style:=fs;
-
-  if clbProviders.ItemIndex>=0 then
-  begin
-    ViewerName:=THelpViewerNodeHack(clbProviders.Items.Objects[clbProviders.ItemIndex]).FViewer.GetViewerName;
-    FProvider.SetColorForHelpViewer(ViewerName,hvntCategory, hvctForeColor, cbHeadFC.Selected);
-    FProvider.SetColorForHelpViewer(ViewerName,hvntCategory, hvctBackColor, cbHeadBC.Selected);
-    FProvider.SetFontStyleForHelpViewer(ViewerName, hvntCategory, fs);
-  end;
-end;
-
 procedure Tch2FormProvider3rdPartyHelp.Init;
 var
   ViewerList : TList;
@@ -590,6 +424,7 @@ var
   Parent : Pointer;
   idx: Integer;
 begin
+  FrameHelpItemDeco.OnChange:=onDecoChange;
   ViewerList:=GetHelpManagerHackObject.FViewerList;
   EditPrio.Value:=FProvider.GetPriority;
   clbProviders.Items.BeginUpdate;
@@ -616,30 +451,15 @@ begin
 end;
 
 
-procedure Tch2FormProvider3rdPartyHelp.ItemChanged(Sender: TObject);
+procedure Tch2FormProvider3rdPartyHelp.OnDecoChange(ASender: TObject);
 var
-  fs : TFontStyles;
   ViewerName : String;
 begin
-  LabelItem.Font.Color:=cbItemFC.Selected;
-  LabelItem.Color:=cbItemBC.Selected; 
-  fs:=[];
-  if cbItemFb.Checked then
-    Include(fs, fsBold);  
-  if cbItemFi.Checked then
-    Include(fs, fsItalic);
-  if cbItemFu.Checked then
-    Include(fs, fsUnderline);
-  if cbItemFs.Checked then
-    Include(fs, fsStrikeOut);
-  LabelItem.Font.Style:=fs;
-
   if clbProviders.ItemIndex>=0 then
   begin
     ViewerName:=THelpViewerNodeHack(clbProviders.Items.Objects[clbProviders.ItemIndex]).FViewer.GetViewerName;
-    FProvider.SetColorForHelpViewer(ViewerName,hvntItem, hvctForeColor, cbItemFC.Selected);
-    FProvider.SetColorForHelpViewer(ViewerName,hvntItem, hvctBackColor, cbItemBC.Selected);
-    FProvider.SetFontStyleForHelpViewer(ViewerName, hvntItem, fs);
+
+    FProvider.SetDecoration(ViewerName, FrameHelpItemDeco.Decoration);
   end;
 end;
 
@@ -649,32 +469,14 @@ var
   ViewerName : String;
   fs : TFontStyles;
 begin
-  for idx := 0 to gbOptions.ControlCount - 1 do
-    gbOptions.Controls[idx].Enabled:=clbProviders.ItemIndex>=0;
+  for idx := 0 to FrameHelpItemDeco.ControlCount - 1 do
+    FrameHelpItemDeco.Controls[idx].Enabled:=clbProviders.ItemIndex>=0;
 
   if clbProviders.ItemIndex>=0 then
   begin
     ViewerName:=THelpViewerNodeHack(clbProviders.Items.Objects[clbProviders.ItemIndex]).FViewer.GetViewerName;
 
-    cbHeadFC.Selected:=FProvider.GetColorForHelpViewer(ViewerName, hvntCategory, hvctForeColor);
-    cbHeadBC.Selected:=FProvider.GetColorForHelpViewer(ViewerName, hvntCategory, hvctBackColor);
-    cbItemFC.Selected:=FProvider.GetColorForHelpViewer(ViewerName, hvntItem, hvctForeColor);
-    cbItemBC.Selected:=FProvider.GetColorForHelpViewer(ViewerName, hvntItem, hvctBackColor);
-
-    fs:=FProvider.GetFontStyleForHelpViewer(ViewerName, hvntCategory);
-    cbHeadFb.Checked:= fsBold in fs;
-    cbHeadFu.Checked:= fsUnderline in fs;
-    cbHeadFi.Checked:= fsItalic in fs;
-    cbHeadFs.Checked:= fsStrikeOut in fs;
-
-    fs:=FProvider.GetFontStyleForHelpViewer(ViewerName, hvntItem);
-    cbItemFb.Checked:= fsBold in fs;
-    cbItemFu.Checked:= fsUnderline in fs;
-    cbItemFi.Checked:= fsItalic in fs;
-    cbItemFs.Checked:= fsStrikeOut in fs;
-
-    Headerchanged(nil);
-    ItemChanged(nil);
+    FrameHelpItemDeco.Decoration:=FProvider.GetDecoration(ViewerName);
   end;
 end;
 
@@ -696,7 +498,7 @@ end;
 
 function Tch2Provider3rdPartyHelpItemCategory.GetDecoration: Tch2HelpItemDecoration;
 begin
-
+  Result:=FProvider.GetDecoration(FHelpViewer.GetViewerName);
 end;
 
 function Tch2Provider3rdPartyHelpItemCategory.GetDescription: String;
@@ -738,7 +540,7 @@ end;
 
 function Tch2Provider3rdPartyHelpItemItem.GetDecoration: Tch2HelpItemDecoration;
 begin
-
+  Result:=FProvider.GetDecoration(FHelpViewer.GetViewerName);
 end;
 
 function Tch2Provider3rdPartyHelpItemItem.GetDescription: String;
