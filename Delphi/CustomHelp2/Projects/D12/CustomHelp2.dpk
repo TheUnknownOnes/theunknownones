@@ -40,6 +40,8 @@ contains
   uch2Configure in '..\..\uch2Configure.pas' {ch2FormConfigure},
   uch2ProviderStaticWebsearch in '..\..\uch2ProviderStaticWebsearch.pas' {ch2FormConfigStaticWebsearch},
   uch2Provider3rdPartyHelp in '..\..\uch2Provider3rdPartyHelp.pas' {ch2FormProvider3rdPartyHelp},
-  uch2ProviderRSSSearch in '..\..\uch2ProviderRSSSearch.pas' {ch2FormConfigRSSSearch};
+  uch2ProviderRSSSearch in '..\..\uch2ProviderRSSSearch.pas' {ch2FormConfigRSSSearch},
+  uch2ProviderShellCommand in '..\..\uch2ProviderShellCommand.pas' {ch2FormConfigShellCommand},
+  uch2FrameHelpItemDecoration in '..\..\uch2FrameHelpItemDecoration.pas' {ch2FrameHelpItemDecoration: TFrame};
 
 end.

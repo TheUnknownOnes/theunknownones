@@ -1,10 +1,10 @@
-object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
+object ch2FormConfigShellCommand: Tch2FormConfigShellCommand
   Left = 0
   Top = 0
-  BorderStyle = bsToolWindow
-  Caption = 'Configure Static Websearch'
-  ClientHeight = 442
-  ClientWidth = 602
+  BorderStyle = bsSizeToolWin
+  Caption = 'Configure ShellCommand Help'
+  ClientHeight = 373
+  ClientWidth = 570
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,15 +18,46 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
-    Top = 411
-    Width = 602
+    Top = 0
+    Width = 570
+    Height = 25
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 0
+    object Label1: TLabel
+      AlignWithMargins = True
+      Left = 3
+      Top = 3
+      Width = 38
+      Height = 19
+      Align = alLeft
+      Caption = 'Priority:'
+      Layout = tlCenter
+      ExplicitHeight = 13
+    end
+    object ed_Prio: TSpinEdit
+      Left = 54
+      Top = 3
+      Width = 59
+      Height = 22
+      MaxValue = 0
+      MinValue = 0
+      TabOrder = 0
+      Value = 0
+      OnChange = ed_PrioChange
+    end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Top = 342
+    Width = 570
     Height = 31
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 0
-    object btn_OK: TButton
+    TabOrder = 1
+    object btn_Ok: TButton
       AlignWithMargins = True
-      Left = 524
+      Left = 492
       Top = 3
       Width = 75
       Height = 25
@@ -37,150 +68,145 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
       TabOrder = 0
     end
   end
-  object GroupBox2: TGroupBox
+  object GroupBox1: TGroupBox
     AlignWithMargins = True
     Left = 3
     Top = 28
-    Width = 596
-    Height = 380
+    Width = 564
+    Height = 311
     Align = alClient
-    Caption = 'URL'#39's'
-    TabOrder = 1
-    object LV: TListView
-      AlignWithMargins = True
-      Left = 5
-      Top = 46
-      Width = 586
-      Height = 274
+    Caption = 'Commands'
+    TabOrder = 2
+    object lv: TListView
+      Left = 2
+      Top = 43
+      Width = 560
+      Height = 204
       Align = alClient
       Columns = <
         item
           Caption = 'Name'
-          Width = 100
+          Width = 150
         end
         item
           AutoSize = True
-          Caption = 'URL'
+          Caption = 'Command'
+        end
+        item
+          Caption = 'Params'
+          Width = 200
         end>
       ReadOnly = True
       RowSelect = True
       TabOrder = 0
       ViewStyle = vsReport
-      OnSelectItem = LVSelectItem
+      OnSelectItem = lvSelectItem
     end
-    object Panel2: TPanel
+    object Panel3: TPanel
       Left = 2
-      Top = 323
-      Width = 592
-      Height = 55
+      Top = 247
+      Width = 560
+      Height = 62
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
-      object Label2: TLabel
-        Left = 9
-        Top = 3
-        Width = 31
-        Height = 13
-        Caption = 'Name:'
-      end
-      object Label3: TLabel
-        Left = 208
-        Top = 3
-        Width = 23
-        Height = 13
-        Caption = 'URL:'
-      end
-      object Label9: TLabel
-        Left = 396
-        Top = 4
-        Width = 41
-        Height = 13
-        Caption = 'Open in:'
-      end
-      object ed_Name: TEdit
-        Left = 46
-        Top = 0
-        Width = 154
-        Height = 21
-        TabOrder = 0
-        OnChange = ed_NameChange
-      end
-      object ed_URL: TEdit
-        Left = 245
-        Top = 0
-        Width = 142
-        Height = 21
-        Hint = '"$(HelpString)" will be replaced with the helpstring'
-        ParentShowHint = False
-        ShowHint = True
-        TabOrder = 1
-        OnChange = ed_URLChange
-      end
-      object com_Location: TComboBox
-        Left = 443
-        Top = 0
-        Width = 142
-        Height = 21
-        Style = csDropDownList
-        ItemHeight = 13
-        TabOrder = 2
-        OnChange = com_LocationChange
-      end
       inline frame_Deco: Tch2FrameHelpItemDecoration
         Left = 0
-        Top = 27
-        Width = 592
+        Top = 34
+        Width = 560
         Height = 28
         Align = alBottom
-        TabOrder = 3
-        ExplicitTop = 27
-        ExplicitWidth = 592
+        TabOrder = 0
+        ExplicitTop = 34
+        ExplicitWidth = 560
         inherited Label1: TLabel
-          Left = 315
-          ExplicitLeft = 315
+          Left = 283
+          ExplicitLeft = 283
         end
         inherited Label2: TLabel
-          Left = 179
-          ExplicitLeft = 179
+          Left = 147
+          ExplicitLeft = 147
         end
         inherited lbl_Caption: TLabel
-          Width = 170
+          Width = 138
           Caption = 'Sample entry'
           ExplicitWidth = 63
         end
         inherited cb_Bold: TCheckBox
-          Left = 451
-          ExplicitLeft = 451
+          Left = 419
+          ExplicitLeft = 419
         end
         inherited cb_Italic: TCheckBox
-          Left = 487
-          ExplicitLeft = 487
+          Left = 455
+          ExplicitLeft = 455
         end
         inherited cb_Underline: TCheckBox
-          Left = 523
-          ExplicitLeft = 523
+          Left = 491
+          ExplicitLeft = 491
         end
         inherited cb_Strike: TCheckBox
-          Left = 559
-          ExplicitLeft = 559
+          Left = 527
+          ExplicitLeft = 527
         end
         inherited cob_Text: TColorBox
-          Left = 211
-          ExplicitLeft = 211
+          Left = 179
+          ExplicitLeft = 179
         end
         inherited cob_Back: TColorBox
-          Left = 347
-          ExplicitLeft = 347
+          Left = 315
+          ExplicitLeft = 315
         end
       end
+      object ed_Name: TLabeledEdit
+        Left = 41
+        Top = 6
+        Width = 121
+        Height = 21
+        EditLabel.Width = 31
+        EditLabel.Height = 13
+        EditLabel.Caption = 'Name:'
+        LabelPosition = lpLeft
+        TabOrder = 1
+        OnChange = ed_NameChange
+      end
+      object ed_Command: TLabeledEdit
+        Left = 225
+        Top = 6
+        Width = 136
+        Height = 21
+        Hint = '"$(HelpString)" will be replaced with the helpstring'
+        EditLabel.Width = 51
+        EditLabel.Height = 13
+        EditLabel.Caption = 'Command:'
+        LabelPosition = lpLeft
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 2
+        OnChange = ed_CommandChange
+      end
+      object ed_Params: TLabeledEdit
+        Left = 408
+        Top = 6
+        Width = 146
+        Height = 21
+        Hint = '"$(HelpString)" will be replaced with the helpstring'
+        EditLabel.Width = 39
+        EditLabel.Height = 13
+        EditLabel.Caption = 'Params:'
+        LabelPosition = lpLeft
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 3
+        OnChange = ed_ParamsChange
+      end
     end
-    object ToolBar1: TToolBar
+    object TB: TToolBar
       AlignWithMargins = True
       Left = 5
       Top = 18
-      Width = 586
+      Width = 554
       Height = 22
-      Caption = 'ToolBar1'
+      Caption = 'TB'
       Images = iml_TB
       TabOrder = 2
       object btn_Add: TToolButton
@@ -199,42 +225,11 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
       end
     end
   end
-  object Panel3: TPanel
-    Left = 0
-    Top = 0
-    Width = 602
-    Height = 25
-    Align = alTop
-    BevelOuter = bvNone
-    TabOrder = 2
-    object Label1: TLabel
-      AlignWithMargins = True
-      Left = 3
-      Top = 3
-      Width = 38
-      Height = 19
-      Align = alLeft
-      Caption = 'Priority:'
-      Layout = tlCenter
-      ExplicitHeight = 13
-    end
-    object ed_Prio: TSpinEdit
-      Left = 47
-      Top = 0
-      Width = 59
-      Height = 22
-      MaxValue = 0
-      MinValue = 0
-      TabOrder = 0
-      Value = 0
-      OnChange = ed_PrioChange
-    end
-  end
   object iml_TB: TImageList
-    Left = 288
-    Top = 96
+    Left = 344
+    Top = 48
     Bitmap = {
-      494C010102000800D40010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000800E00010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000DADBDB630BB019FF0BB019FF0BB019FF0BB019FF000000000000

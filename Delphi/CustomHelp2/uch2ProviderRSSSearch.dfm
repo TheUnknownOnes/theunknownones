@@ -3,8 +3,8 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Configure RSS Search'
-  ClientHeight = 510
-  ClientWidth = 424
+  ClientHeight = 472
+  ClientWidth = 620
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,15 +18,15 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
-    Top = 479
-    Width = 424
+    Top = 441
+    Width = 620
     Height = 31
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     object btn_OK: TButton
       AlignWithMargins = True
-      Left = 346
+      Left = 542
       Top = 3
       Width = 75
       Height = 25
@@ -37,42 +37,21 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
       TabOrder = 0
     end
   end
-  object GroupBox1: TGroupBox
-    AlignWithMargins = True
-    Left = 3
-    Top = 3
-    Width = 418
-    Height = 54
-    Align = alTop
-    Caption = 'Priority'
-    TabOrder = 1
-    object ed_Prio: TSpinEdit
-      Left = 11
-      Top = 21
-      Width = 70
-      Height = 22
-      MaxValue = 0
-      MinValue = 0
-      TabOrder = 0
-      Value = 0
-      OnChange = ed_PrioChange
-    end
-  end
   object GroupBox2: TGroupBox
     AlignWithMargins = True
     Left = 3
-    Top = 63
-    Width = 418
-    Height = 413
+    Top = 28
+    Width = 614
+    Height = 410
     Align = alClient
     Caption = 'URL'#39's'
-    TabOrder = 2
+    TabOrder = 1
     object LV: TListView
       AlignWithMargins = True
       Left = 5
       Top = 46
-      Width = 408
-      Height = 269
+      Width = 604
+      Height = 302
       Align = alClient
       Columns = <
         item
@@ -87,14 +66,13 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
       RowSelect = True
       TabOrder = 0
       ViewStyle = vsReport
-      OnAdvancedCustomDrawItem = LVAdvancedCustomDrawItem
       OnSelectItem = LVSelectItem
     end
     object Panel2: TPanel
       Left = 2
-      Top = 318
-      Width = 414
-      Height = 93
+      Top = 351
+      Width = 610
+      Height = 57
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
@@ -106,37 +84,22 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         Caption = 'Name:'
       end
       object Label3: TLabel
-        Left = 9
-        Top = 33
+        Left = 217
+        Top = 6
         Width = 23
         Height = 13
         Caption = 'URL:'
       end
-      object Label6: TLabel
-        Left = 206
-        Top = 6
-        Width = 51
-        Height = 13
-        Caption = 'ForeColor:'
-      end
-      object Label7: TLabel
-        Left = 206
-        Top = 33
-        Width = 51
-        Height = 13
-        Caption = 'BackColor:'
-      end
       object Label8: TLabel
         Left = 46
         Top = 57
-        Width = 150
-        Height = 26
-        Caption = '"$(HelpString)" will be replaced with the helpstring'
+        Width = 3
+        Height = 13
         WordWrap = True
       end
       object Label9: TLabel
-        Left = 216
-        Top = 61
+        Left = 416
+        Top = 6
         Width = 41
         Height = 13
         Caption = 'Open in:'
@@ -150,53 +113,79 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         OnChange = ed_NameChange
       end
       object ed_URL: TEdit
-        Left = 46
-        Top = 30
+        Left = 246
+        Top = 3
         Width = 154
         Height = 21
+        Hint = '"$(HelpString)" will be replaced with the helpstring'
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 1
         OnChange = ed_URLChange
       end
-      object cob_URLForeColor: TColorBox
-        Left = 263
-        Top = 3
-        Width = 142
-        Height = 22
-        NoneColorColor = clNone
-        Selected = clNone
-        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbCustomColor]
-        ItemHeight = 16
-        TabOrder = 2
-        OnChange = cob_URLForeColorChange
-      end
-      object cob_URLBackColor: TColorBox
-        Left = 263
-        Top = 30
-        Width = 142
-        Height = 22
-        NoneColorColor = clNone
-        Selected = clNone
-        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbCustomColor]
-        ItemHeight = 16
-        TabOrder = 3
-        OnChange = cob_URLBackColorChange
-      end
       object com_Location: TComboBox
-        Left = 263
-        Top = 58
+        Left = 463
+        Top = 3
         Width = 142
         Height = 21
         Style = csDropDownList
         ItemHeight = 13
-        TabOrder = 4
+        TabOrder = 2
         OnChange = com_LocationChange
+      end
+      inline frame_Deco: Tch2FrameHelpItemDecoration
+        Left = 0
+        Top = 29
+        Width = 610
+        Height = 28
+        Align = alBottom
+        TabOrder = 3
+        ExplicitTop = 29
+        ExplicitWidth = 610
+        inherited Label1: TLabel
+          Left = 333
+          ExplicitLeft = 333
+        end
+        inherited Label2: TLabel
+          Left = 197
+          ExplicitLeft = 197
+        end
+        inherited lbl_Caption: TLabel
+          Width = 188
+          Caption = 'Sample entry'
+          ExplicitWidth = 63
+        end
+        inherited cb_Bold: TCheckBox
+          Left = 469
+          ExplicitLeft = 469
+        end
+        inherited cb_Italic: TCheckBox
+          Left = 505
+          ExplicitLeft = 505
+        end
+        inherited cb_Underline: TCheckBox
+          Left = 541
+          ExplicitLeft = 541
+        end
+        inherited cb_Strike: TCheckBox
+          Left = 577
+          ExplicitLeft = 577
+        end
+        inherited cob_Text: TColorBox
+          Left = 229
+          ExplicitLeft = 229
+        end
+        inherited cob_Back: TColorBox
+          Left = 365
+          ExplicitLeft = 365
+        end
       end
     end
     object ToolBar1: TToolBar
       AlignWithMargins = True
       Left = 5
       Top = 18
-      Width = 408
+      Width = 604
       Height = 22
       Caption = 'ToolBar1'
       Images = iml_TB
@@ -217,11 +206,41 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
       end
     end
   end
+  object Panel3: TPanel
+    Left = 0
+    Top = 0
+    Width = 620
+    Height = 25
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 2
+    object Label1: TLabel
+      AlignWithMargins = True
+      Left = 3
+      Top = 3
+      Width = 38
+      Height = 19
+      Align = alLeft
+      Caption = 'Priority:'
+      Layout = tlCenter
+      ExplicitHeight = 13
+    end
+    object ed_Prio: TSpinEdit
+      Left = 54
+      Top = 3
+      Width = 59
+      Height = 22
+      MaxValue = 0
+      MinValue = 0
+      TabOrder = 0
+      Value = 0
+    end
+  end
   object iml_TB: TImageList
     Left = 288
     Top = 96
     Bitmap = {
-      494C010102000800940010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000800C00010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000DADBDB630BB019FF0BB019FF0BB019FF0BB019FF000000000000
