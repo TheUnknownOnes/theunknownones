@@ -32,7 +32,9 @@ requires
   designide,
   TUOCommon,
   vclie,
-  VclSmp;
+  VclSmp,
+  vcl,
+  vclx;
 
 contains
   uch2Main in '..\..\uch2Main.pas',
@@ -42,6 +44,8 @@ contains
   uch2Provider3rdPartyHelp in '..\..\uch2Provider3rdPartyHelp.pas' {ch2FormProvider3rdPartyHelp},
   uch2ProviderRSSSearch in '..\..\uch2ProviderRSSSearch.pas' {ch2FormConfigRSSSearch},
   uch2ProviderShellCommand in '..\..\uch2ProviderShellCommand.pas' {ch2FormConfigShellCommand},
-  uch2FrameHelpItemDecoration in '..\..\uch2FrameHelpItemDecoration.pas' {ch2FrameHelpItemDecoration: TFrame};
+  uch2FrameHelpItemDecoration in '..\..\uch2FrameHelpItemDecoration.pas' {ch2FrameHelpItemDecoration: TFrame},
+  uch2ProviderMsHelp in '..\..\uch2ProviderMsHelp.pas' {ch2FormProviderMsHelp},
+  uch2MSHelpServices in '..\..\uch2MSHelpServices.pas';
 
 end.
