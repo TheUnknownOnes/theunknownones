@@ -3,77 +3,95 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
   Top = 0
   BorderStyle = bsSizeToolWin
   Caption = 'Configure 3rd Party Help Viewers for use in CustomHelp2'
-  ClientHeight = 576
-  ClientWidth = 903
+  ClientHeight = 440
+  ClientWidth = 691
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -14
+  Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  PixelsPerInch = 120
-  TextHeight = 17
+  PixelsPerInch = 96
+  TextHeight = 13
   object GroupBox2: TGroupBox
     AlignWithMargins = True
-    Left = 3
-    Top = 41
-    Width = 897
-    Height = 428
+    Left = 2
+    Top = 31
+    Width = 687
+    Height = 328
+    Margins.Left = 2
+    Margins.Top = 2
+    Margins.Right = 2
+    Margins.Bottom = 2
     Align = alClient
     Caption = 'Currently installed Help Viewers'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -15
+    Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
     TabOrder = 0
-    ExplicitHeight = 393
     object clbProviders: TCheckListBox
       AlignWithMargins = True
-      Left = 5
-      Top = 23
-      Width = 887
-      Height = 400
+      Left = 4
+      Top = 17
+      Width = 679
+      Height = 307
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       OnClickCheck = clbProvidersClickCheck
       Align = alClient
-      ItemHeight = 18
+      ItemHeight = 13
       TabOrder = 0
       OnClick = clbProvidersClick
-      ExplicitHeight = 365
     end
   end
   object Panel1: TPanel
     AlignWithMargins = True
-    Left = 3
-    Top = 3
-    Width = 897
-    Height = 32
+    Left = 2
+    Top = 2
+    Width = 687
+    Height = 25
+    Margins.Left = 2
+    Margins.Top = 2
+    Margins.Right = 2
+    Margins.Bottom = 2
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 1
     object Label1: TLabel
-      Left = 8
-      Top = 11
-      Width = 43
-      Height = 18
+      Left = 6
+      Top = 8
+      Width = 34
+      Height = 13
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       Caption = 'Priority'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -15
+      Font.Height = -11
       Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
     end
     object EditPrio: TSpinEdit
-      Left = 64
-      Top = 4
-      Width = 81
-      Height = 28
+      Left = 49
+      Top = 3
+      Width = 62
+      Height = 22
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -15
+      Font.Height = -11
       Font.Name = 'Tahoma'
       Font.Style = []
       MaxValue = 0
@@ -86,101 +104,162 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
   end
   object GroupBox1: TGroupBox
     AlignWithMargins = True
-    Left = 3
-    Top = 475
-    Width = 897
-    Height = 58
+    Left = 2
+    Top = 363
+    Width = 687
+    Height = 45
+    Margins.Left = 2
+    Margins.Top = 2
+    Margins.Right = 2
+    Margins.Bottom = 2
     Align = alBottom
     Caption = 'Options'
     TabOrder = 2
-    ExplicitTop = 440
     inline FrameHelpItemDeco: Tch2FrameHelpItemDecoration
       AlignWithMargins = True
-      Left = 5
-      Top = 22
-      Width = 887
-      Height = 28
+      Left = 4
+      Top = 17
+      Width = 679
+      Height = 21
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       Align = alTop
       TabOrder = 0
-      ExplicitLeft = 5
-      ExplicitTop = 22
-      ExplicitWidth = 887
+      ExplicitLeft = 4
+      ExplicitTop = 17
+      ExplicitWidth = 679
+      ExplicitHeight = 21
       inherited Label1: TLabel
-        Left = 602
-        Width = 34
-        ExplicitLeft = 602
-        ExplicitWidth = 34
-        ExplicitHeight = 17
+        Left = 436
+        Top = 2
+        Height = 17
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
+        ExplicitLeft = 465
+        ExplicitTop = 2
       end
       inherited Label2: TLabel
-        Left = 459
-        Width = 33
-        ExplicitLeft = 459
-        ExplicitWidth = 33
-        ExplicitHeight = 17
+        Left = 327
+        Top = 2
+        Height = 17
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
+        ExplicitLeft = 356
+        ExplicitTop = 2
       end
       inherited lbl_Caption: TLabel
-        Width = 450
+        Left = 2
+        Top = 2
+        Width = 321
+        Height = 17
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         Caption = 'Sample Header'
-        ExplicitWidth = 91
-        ExplicitHeight = 17
+        ExplicitLeft = 2
+        ExplicitTop = 2
+        ExplicitWidth = 72
       end
       inherited cb_Bold: TCheckBox
-        Left = 746
-        ExplicitLeft = 746
+        Left = 545
+        Top = 2
+        Height = 17
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
+        ExplicitLeft = 574
+        ExplicitTop = 2
+        ExplicitHeight = 17
       end
       inherited cb_Italic: TCheckBox
-        Left = 782
-        ExplicitLeft = 782
+        Left = 579
+        Top = 2
+        Height = 17
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
+        ExplicitLeft = 601
+        ExplicitTop = 2
+        ExplicitHeight = 17
       end
       inherited cb_Underline: TCheckBox
-        Left = 818
-        ExplicitLeft = 818
+        Left = 613
+        Top = 2
+        Height = 17
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
+        ExplicitLeft = 628
+        ExplicitTop = 2
+        ExplicitHeight = 17
       end
       inherited cb_Strike: TCheckBox
-        Left = 854
-        ExplicitLeft = 854
+        Left = 647
+        Top = 2
+        Height = 17
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
+        ExplicitLeft = 654
+        ExplicitTop = 2
+        ExplicitHeight = 17
       end
       inherited cob_Text: TColorBox
-        Left = 498
-        ExplicitLeft = 498
+        Left = 357
+        Top = 2
+        Width = 75
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
+        ExplicitLeft = 386
+        ExplicitTop = 2
+        ExplicitWidth = 75
       end
       inherited cob_Back: TColorBox
-        Left = 642
-        ExplicitLeft = 642
+        Left = 466
+        Top = 2
+        Width = 75
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
+        ExplicitLeft = 495
+        ExplicitTop = 2
+        ExplicitWidth = 75
       end
     end
   end
   object Panel2: TPanel
     Left = 0
-    Top = 536
-    Width = 903
-    Height = 40
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
+    Top = 410
+    Width = 691
+    Height = 30
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 3
-    ExplicitTop = 461
-    ExplicitWidth = 811
     object btn_OK: TButton
       AlignWithMargins = True
-      Left = 801
-      Top = 4
-      Width = 98
-      Height = 32
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
+      Left = 614
+      Top = 3
+      Width = 74
+      Height = 24
       Align = alRight
       Caption = 'OK'
       Default = True
       ModalResult = 1
       TabOrder = 0
-      ExplicitLeft = 709
     end
   end
 end
