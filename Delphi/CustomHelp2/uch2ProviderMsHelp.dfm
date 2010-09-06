@@ -20,7 +20,7 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
     Left = 4
     Top = 83
     Width = 799
-    Height = 462
+    Height = 422
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
@@ -34,12 +34,13 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
     Font.Style = []
     ParentFont = False
     TabOrder = 0
+    ExplicitHeight = 462
     object lvNamespaces: TListView
       AlignWithMargins = True
       Left = 6
       Top = 23
       Width = 787
-      Height = 368
+      Height = 328
       Margins.Left = 4
       Margins.Top = 4
       Margins.Right = 4
@@ -60,20 +61,18 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
       TabOrder = 0
       ViewStyle = vsReport
       OnChange = lvNamespacesChange
-      ExplicitHeight = 293
+      ExplicitHeight = 368
     end
     object GroupBox3: TGroupBox
       AlignWithMargins = True
       Left = 5
-      Top = 398
+      Top = 358
       Width = 789
       Height = 59
       Align = alBottom
       Caption = 'Options'
       TabOrder = 1
-      ExplicitLeft = 3
-      ExplicitTop = 487
-      ExplicitWidth = 801
+      ExplicitTop = 398
       inline FrameHelpItemDeco: Tch2FrameHelpItemDecoration
         AlignWithMargins = True
         Left = 5
@@ -84,7 +83,7 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
         TabOrder = 0
         ExplicitLeft = 5
         ExplicitTop = 22
-        ExplicitWidth = 791
+        ExplicitWidth = 779
         inherited Label1: TLabel
           Left = 458
           Width = 34
@@ -109,37 +108,37 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
           Left = 602
           Width = 39
           Font.Height = -15
-          ExplicitLeft = 614
+          ExplicitLeft = 602
           ExplicitWidth = 39
         end
         inherited cb_Italic: TCheckBox
           Left = 647
           Width = 39
           Font.Height = -15
-          ExplicitLeft = 659
+          ExplicitLeft = 647
           ExplicitWidth = 39
         end
         inherited cb_Underline: TCheckBox
           Left = 692
           Width = 39
           Font.Height = -15
-          ExplicitLeft = 704
+          ExplicitLeft = 692
           ExplicitWidth = 39
         end
         inherited cb_Strike: TCheckBox
           Left = 737
           Width = 39
           Font.Height = -15
-          ExplicitLeft = 749
+          ExplicitLeft = 737
           ExplicitWidth = 39
         end
         inherited cob_Text: TColorBox
           Left = 354
-          ExplicitLeft = 366
+          ExplicitLeft = 354
         end
         inherited cob_Back: TColorBox
           Left = 498
-          ExplicitLeft = 510
+          ExplicitLeft = 498
         end
       end
     end
@@ -176,6 +175,39 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
       MinValue = 0
       TabOrder = 0
       Value = 0
+    end
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 509
+    Width = 807
+    Height = 40
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 2
+    ExplicitLeft = -51
+    ExplicitTop = 450
+    ExplicitWidth = 858
+    object btn_OK: TButton
+      AlignWithMargins = True
+      Left = 705
+      Top = 4
+      Width = 98
+      Height = 32
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
+      Align = alRight
+      Caption = 'OK'
+      Default = True
+      ModalResult = 1
+      TabOrder = 0
+      ExplicitLeft = 756
     end
   end
 end

@@ -1,10 +1,10 @@
-object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
+object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
   Left = 0
   Top = 0
-  BorderStyle = bsToolWindow
-  Caption = 'Configure RSS Search'
-  ClientHeight = 617
-  ClientWidth = 811
+  BorderStyle = bsDialog
+  Caption = 'Config Windows Search'
+  ClientHeight = 490
+  ClientWidth = 858
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,59 +12,27 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poScreenCenter
-  OnShow = FormShow
   PixelsPerInch = 120
   TextHeight = 17
-  object Panel1: TPanel
-    Left = 0
-    Top = 577
-    Width = 811
-    Height = 40
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
-    Align = alBottom
-    BevelOuter = bvNone
-    TabOrder = 0
-    object btn_OK: TButton
-      AlignWithMargins = True
-      Left = 709
-      Top = 4
-      Width = 98
-      Height = 32
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
-      Align = alRight
-      Caption = 'OK'
-      Default = True
-      ModalResult = 1
-      TabOrder = 0
-    end
-  end
   object GroupBox2: TGroupBox
     AlignWithMargins = True
     Left = 4
     Top = 37
-    Width = 803
-    Height = 536
+    Width = 850
+    Height = 409
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
     Margins.Bottom = 4
     Align = alClient
-    Caption = 'URL'#39's'
-    TabOrder = 1
-    ExplicitLeft = -1
+    Caption = 'Searches'
+    TabOrder = 0
     object LV: TListView
       AlignWithMargins = True
       Left = 6
       Top = 51
-      Width = 791
-      Height = 404
+      Width = 838
+      Height = 277
       Margins.Left = 4
       Margins.Top = 4
       Margins.Right = 4
@@ -77,18 +45,18 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         end
         item
           AutoSize = True
-          Caption = 'URL'
+          Caption = 'Query'
         end>
       ReadOnly = True
       RowSelect = True
       TabOrder = 0
       ViewStyle = vsReport
-      OnSelectItem = LVSelectItem
+      OnChange = LVChange
     end
     object Panel2: TPanel
       Left = 2
-      Top = 459
-      Width = 799
+      Top = 332
+      Width = 846
       Height = 75
       Margins.Left = 4
       Margins.Top = 4
@@ -109,15 +77,15 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         Caption = 'Name:'
       end
       object Label3: TLabel
-        Left = 284
-        Top = 8
-        Width = 30
+        Left = 271
+        Top = 7
+        Width = 43
         Height = 17
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
         Margins.Bottom = 4
-        Caption = 'URL:'
+        Caption = 'Query:'
       end
       object Label8: TLabel
         Left = 60
@@ -129,17 +97,6 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         Margins.Right = 4
         Margins.Bottom = 4
         WordWrap = True
-      end
-      object Label9: TLabel
-        Left = 544
-        Top = 8
-        Width = 52
-        Height = 17
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
-        Caption = 'Open in:'
       end
       object ed_Name: TEdit
         Left = 60
@@ -153,10 +110,10 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         TabOrder = 0
         OnChange = ed_NameChange
       end
-      object ed_URL: TEdit
+      object ed_Query: TEdit
         Left = 322
         Top = 4
-        Width = 201
+        Width = 519
         Height = 25
         Hint = '"$(HelpString)" will be replaced with the helpstring'
         Margins.Left = 4
@@ -166,38 +123,24 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         ParentShowHint = False
         ShowHint = True
         TabOrder = 1
-        OnChange = ed_URLChange
-      end
-      object com_Location: TComboBox
-        Left = 605
-        Top = 4
-        Width = 186
-        Height = 25
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
-        Style = csDropDownList
-        ItemHeight = 17
-        TabOrder = 2
-        OnChange = com_LocationChange
+        OnChange = ed_QueryChange
       end
       inline frame_Deco: Tch2FrameHelpItemDecoration
         Left = 0
         Top = 38
-        Width = 799
+        Width = 846
         Height = 37
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
         Margins.Bottom = 4
         Align = alBottom
-        TabOrder = 3
+        TabOrder = 2
         ExplicitTop = 38
-        ExplicitWidth = 799
+        ExplicitWidth = 846
         ExplicitHeight = 37
         inherited Label1: TLabel
-          Left = 434
+          Left = 481
           Top = 4
           Width = 34
           Height = 29
@@ -205,13 +148,13 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
           Margins.Top = 4
           Margins.Right = 4
           Margins.Bottom = 4
-          ExplicitLeft = 423
+          ExplicitLeft = 481
           ExplicitTop = 4
           ExplicitWidth = 34
           ExplicitHeight = 17
         end
         inherited Label2: TLabel
-          Left = 256
+          Left = 303
           Top = 4
           Width = 33
           Height = 29
@@ -219,7 +162,7 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
           Margins.Top = 4
           Margins.Right = 4
           Margins.Bottom = 4
-          ExplicitLeft = 245
+          ExplicitLeft = 303
           ExplicitTop = 4
           ExplicitWidth = 33
           ExplicitHeight = 17
@@ -227,7 +170,7 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         inherited lbl_Caption: TLabel
           Left = 4
           Top = 4
-          Width = 244
+          Width = 291
           Height = 29
           Margins.Left = 4
           Margins.Top = 4
@@ -240,7 +183,7 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
           ExplicitHeight = 17
         end
         inherited cb_Bold: TCheckBox
-          Left = 612
+          Left = 659
           Top = 4
           Width = 40
           Height = 29
@@ -249,30 +192,15 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
           Margins.Right = 4
           Margins.Bottom = 4
           Font.Height = -15
-          ExplicitLeft = 612
+          ExplicitLeft = 659
           ExplicitTop = 4
           ExplicitWidth = 40
           ExplicitHeight = 29
         end
         inherited cb_Italic: TCheckBox
-          Left = 660
-          Top = 4
-          Width = 39
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          Font.Height = -15
-          ExplicitLeft = 660
-          ExplicitTop = 4
-          ExplicitWidth = 39
-          ExplicitHeight = 29
-        end
-        inherited cb_Underline: TCheckBox
           Left = 707
           Top = 4
-          Width = 41
+          Width = 39
           Height = 29
           Margins.Left = 4
           Margins.Top = 4
@@ -281,11 +209,26 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
           Font.Height = -15
           ExplicitLeft = 707
           ExplicitTop = 4
+          ExplicitWidth = 39
+          ExplicitHeight = 29
+        end
+        inherited cb_Underline: TCheckBox
+          Left = 754
+          Top = 4
+          Width = 41
+          Height = 29
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
+          Font.Height = -15
+          ExplicitLeft = 754
+          ExplicitTop = 4
           ExplicitWidth = 41
           ExplicitHeight = 29
         end
         inherited cb_Strike: TCheckBox
-          Left = 756
+          Left = 803
           Top = 4
           Width = 39
           Height = 29
@@ -294,32 +237,32 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
           Margins.Right = 4
           Margins.Bottom = 4
           Font.Height = -15
-          ExplicitLeft = 756
+          ExplicitLeft = 803
           ExplicitTop = 4
           ExplicitWidth = 39
           ExplicitHeight = 29
         end
         inherited cob_Text: TColorBox
-          Left = 297
+          Left = 344
           Top = 4
           Width = 129
           Margins.Left = 4
           Margins.Top = 4
           Margins.Right = 4
           Margins.Bottom = 4
-          ExplicitLeft = 297
+          ExplicitLeft = 344
           ExplicitTop = 4
           ExplicitWidth = 129
         end
         inherited cob_Back: TColorBox
-          Left = 476
+          Left = 523
           Top = 4
           Width = 128
           Margins.Left = 4
           Margins.Top = 4
           Margins.Right = 4
           Margins.Bottom = 4
-          ExplicitLeft = 476
+          ExplicitLeft = 523
           ExplicitTop = 4
           ExplicitWidth = 128
         end
@@ -329,8 +272,9 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
       AlignWithMargins = True
       Left = 5
       Top = 22
-      Width = 793
+      Width = 840
       Height = 22
+      ButtonHeight = 26
       Caption = 'ToolBar1'
       Images = iml_TB
       TabOrder = 2
@@ -350,10 +294,39 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
       end
     end
   end
+  object Panel1: TPanel
+    Left = 0
+    Top = 450
+    Width = 858
+    Height = 40
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 1
+    object btn_OK: TButton
+      AlignWithMargins = True
+      Left = 756
+      Top = 4
+      Width = 98
+      Height = 32
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
+      Align = alRight
+      Caption = 'OK'
+      Default = True
+      ModalResult = 1
+      TabOrder = 0
+    end
+  end
   object Panel3: TPanel
     Left = 0
     Top = 0
-    Width = 811
+    Width = 858
     Height = 33
     Margins.Left = 4
     Margins.Top = 4
@@ -396,7 +369,7 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
     Left = 288
     Top = 96
     Bitmap = {
-      494C010102000800F40010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000800000110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000DADBDB630BB019FF0BB019FF0BB019FF0BB019FF000000000000
