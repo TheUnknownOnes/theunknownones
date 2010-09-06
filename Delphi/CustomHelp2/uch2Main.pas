@@ -32,6 +32,7 @@ type
     procedure SaveToRegistry(ARegistry : TRegistry; AKey : String = '');
     procedure LoadFromRegistry(ARegistry : TRegistry; AKey : String = '');
   end;
+  Pch2HelpItemDecoration = ^Tch2HelpItemDecoration;
 
   Ich2HelpItem = interface
     ['{D64EBC33-3A57-48F0-BA6E-E9770507A770}']

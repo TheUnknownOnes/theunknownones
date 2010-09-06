@@ -22,7 +22,7 @@
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 			<ImageDebugInfo>true</ImageDebugInfo>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp_D120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp_D120.bpl</DCC_DependencyCheckOutputName>
 			<DesignOnlyPackage>true</DesignOnlyPackage>
 			<DCC_Optimize>false</DCC_Optimize>
 			<DCC_Description>CustomHelp Expert ... by TUO</DCC_Description>
@@ -85,7 +85,7 @@
 				<Form>FrameConfig3rdParty</Form>
 				<DesignClass>TFrame</DesignClass>
 			</DCCReference>
-			<DCCReference Include="..\..\uCustomHelpTlbSearchAPILib.pas"/>
+			<DCCReference Include="..\..\..\CustomHelp2\uch2TlbSearchAPILib.pas"/>
 			<DCCReference Include="..\..\uFrameConfigWinSearch.pas">
 				<Form>FrameConfigWinSearch</Form>
 				<DesignClass>TFrame</DesignClass>
