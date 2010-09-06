@@ -425,7 +425,9 @@ end;
 procedure Tch2FormConfigHTMLHelp.OnDecoChange(Sender: TObject);
 begin
   if Assigned(lv.Selected) then
+  begin
     Tch2HHItem(lv.Selected.Data).Deco := frame_Deco.Decoration;
+  end;
 end;
 
 { Tch2HIHHItem }
