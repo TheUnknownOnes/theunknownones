@@ -87,6 +87,8 @@ type
 
 implementation
 
+uses uch2Tools;
+
 {$R *.dfm}
 
 const
@@ -100,7 +102,7 @@ type
   Tch2HIURL = class(TInterfacedObject, Ich2HelpItem)
   private
     FURL : Tch2StatWebURL;
-    FKeyword : AnsiString;
+    FKeyword : String;
   public
     constructor Create(AURL : Tch2StatWebURL; AKeyword : String);
 
@@ -397,6 +399,8 @@ begin
   com_Location.ItemIndex := com_Location.Items.IndexOfObject(TObject(olDefaultBrowser));
 
   ed_Prio.Value := FProvider.FPriority;
+
+  frame_Deco.OnChange := OnDecoChange;
 end;
 
 procedure Tch2FormConfigStaticWebsearch.LVSelectItem(Sender: TObject;
@@ -466,14 +470,8 @@ end;
 procedure Tch2HIURL.ShowHelp;
 var
   EncodedKeyWord : String;
-  c : AnsiChar;
 begin
-  EncodedKeyWord := '';
-
-  for c in FKeyword do
-  begin
-    EncodedKeyWord := EncodedKeyWord + '%' + IntToHex(Ord(c), 2);
-  end;
+  EncodedKeyWord := ch2StrEncodeURL(FKeyword);
 
   ch2Main.ShowURL(StringReplace(FURL.URL, '$(HelpString)', EncodedKeyWord, [rfIgnoreCase, rfReplaceAll]), FURL.OpenLocation);
 end;
