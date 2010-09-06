@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Spin, ComCtrls, ToolWin, StdCtrls, ExtCtrls, uch2MSHelpServices,
-  uch2Main, SyncObjs;
+  uch2Main, SyncObjs, uch2FrameHelpItemDecoration;
 
 type
   Tch2ProviderMSHelp = class(TInterfacedObject, Ich2Provider)
@@ -53,13 +53,17 @@ type
   Tch2FormProviderMsHelp = class(TForm)
     GroupBox2: TGroupBox;
     lvNamespaces: TListView;
-    Panel2: TPanel;
     GroupBox1: TGroupBox;
     ed_Prio: TSpinEdit;
+    GroupBox3: TGroupBox;
+    FrameHelpItemDeco: Tch2FrameHelpItemDecoration;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure lvNamespacesChange(Sender: TObject; Item: TListItem;
+      Change: TItemChange);
   private
-    FProvider:Tch2ProviderMSHelp;
+    FProvider: Tch2ProviderMSHelp;
     procedure Init;
+    procedure OnDecoChange(ASender: TObject);
   public
     class procedure Execute(AProvider: Tch2ProviderMSHelp);
   end;
@@ -454,6 +458,15 @@ end;
 
 { Tch2FormProviderMsHelp }
 
+
+procedure Tch2FormProviderMsHelp.OnDecoChange(ASender: TObject);
+begin
+  if lvNamespaces.Selected<>nil then
+  begin
+    FProvider.SetDecoration(lvNamespaces.Selected.Caption, FrameHelpItemDeco.Decoration);
+  end;
+end;
+
 class procedure Tch2FormProviderMsHelp.Execute(AProvider: Tch2ProviderMSHelp);
 var
   Form : Tch2FormProviderMsHelp;
@@ -490,6 +503,7 @@ var
 
   li : TListItem;
 begin
+  FrameHelpItemDeco.OnChange:=onDecoChange;
   Namespaces:=FProvider.GetNamespaces;
   EnumNamespaces:=Namespaces._NewEnum as IEnumVARIANT;
   lvNamespaces.Items.BeginUpdate;
@@ -504,6 +518,15 @@ begin
   lvNamespaces.Items.EndUpdate;
 end;
 
+
+procedure Tch2FormProviderMsHelp.lvNamespacesChange(Sender: TObject;
+  Item: TListItem; Change: TItemChange);
+begin
+  if Item=lvNamespaces.Selected then
+  begin
+    FrameHelpItemDeco.Decoration:=FProvider.GetDecoration(Item.Caption)
+  end;
+end;
 
 { Tch2ProviderMsHelpItemCategory }
 
