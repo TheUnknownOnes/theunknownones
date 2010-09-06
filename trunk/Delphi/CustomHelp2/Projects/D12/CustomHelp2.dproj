@@ -82,6 +82,9 @@
 				<Form>ch2FormConfigGoogleCodeSearch</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\uch2Tools.pas"/>
+			<DCCReference Include="..\..\uch2ProviderWindowsSearch.pas">
+				<Form>uch2FormProviderWindowsSearch</Form>
+			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

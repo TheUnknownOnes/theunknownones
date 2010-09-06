@@ -57,6 +57,8 @@ type
     ed_Prio: TSpinEdit;
     GroupBox3: TGroupBox;
     FrameHelpItemDeco: Tch2FrameHelpItemDecoration;
+    Panel1: TPanel;
+    btn_OK: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lvNamespacesChange(Sender: TObject; Item: TListItem;
       Change: TItemChange);
