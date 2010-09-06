@@ -39,7 +39,7 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
       Left = 6
       Top = 23
       Width = 787
-      Height = 293
+      Height = 368
       Margins.Left = 4
       Margins.Top = 4
       Margins.Right = 4
@@ -59,19 +59,89 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
       RowSelect = True
       TabOrder = 0
       ViewStyle = vsReport
+      OnChange = lvNamespacesChange
+      ExplicitHeight = 293
     end
-    object Panel2: TPanel
-      Left = 2
-      Top = 320
-      Width = 795
-      Height = 140
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
+    object GroupBox3: TGroupBox
+      AlignWithMargins = True
+      Left = 5
+      Top = 398
+      Width = 789
+      Height = 59
       Align = alBottom
-      BevelOuter = bvNone
+      Caption = 'Options'
       TabOrder = 1
+      ExplicitLeft = 3
+      ExplicitTop = 487
+      ExplicitWidth = 801
+      inline FrameHelpItemDeco: Tch2FrameHelpItemDecoration
+        AlignWithMargins = True
+        Left = 5
+        Top = 22
+        Width = 779
+        Height = 28
+        Align = alTop
+        TabOrder = 0
+        ExplicitLeft = 5
+        ExplicitTop = 22
+        ExplicitWidth = 791
+        inherited Label1: TLabel
+          Left = 458
+          Width = 34
+          ExplicitLeft = 473
+          ExplicitWidth = 34
+          ExplicitHeight = 17
+        end
+        inherited Label2: TLabel
+          Left = 315
+          Width = 33
+          ExplicitLeft = 333
+          ExplicitWidth = 33
+          ExplicitHeight = 17
+        end
+        inherited lbl_Caption: TLabel
+          Width = 306
+          Caption = 'Sample Header'
+          ExplicitWidth = 91
+          ExplicitHeight = 17
+        end
+        inherited cb_Bold: TCheckBox
+          Left = 602
+          Width = 39
+          Font.Height = -15
+          ExplicitLeft = 614
+          ExplicitWidth = 39
+        end
+        inherited cb_Italic: TCheckBox
+          Left = 647
+          Width = 39
+          Font.Height = -15
+          ExplicitLeft = 659
+          ExplicitWidth = 39
+        end
+        inherited cb_Underline: TCheckBox
+          Left = 692
+          Width = 39
+          Font.Height = -15
+          ExplicitLeft = 704
+          ExplicitWidth = 39
+        end
+        inherited cb_Strike: TCheckBox
+          Left = 737
+          Width = 39
+          Font.Height = -15
+          ExplicitLeft = 749
+          ExplicitWidth = 39
+        end
+        inherited cob_Text: TColorBox
+          Left = 354
+          ExplicitLeft = 366
+        end
+        inherited cob_Back: TColorBox
+          Left = 498
+          ExplicitLeft = 510
+        end
+      end
     end
   end
   object GroupBox1: TGroupBox
