@@ -34,7 +34,6 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
     Font.Style = []
     ParentFont = False
     TabOrder = 0
-    ExplicitHeight = 462
     object lvNamespaces: TListView
       AlignWithMargins = True
       Left = 6
@@ -61,7 +60,6 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
       TabOrder = 0
       ViewStyle = vsReport
       OnChange = lvNamespacesChange
-      ExplicitHeight = 368
     end
     object GroupBox3: TGroupBox
       AlignWithMargins = True
@@ -72,7 +70,6 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
       Align = alBottom
       Caption = 'Options'
       TabOrder = 1
-      ExplicitTop = 398
       inline FrameHelpItemDeco: Tch2FrameHelpItemDecoration
         AlignWithMargins = True
         Left = 5
@@ -189,9 +186,6 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitLeft = -51
-    ExplicitTop = 450
-    ExplicitWidth = 858
     object btn_OK: TButton
       AlignWithMargins = True
       Left = 705
@@ -207,7 +201,6 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
       Default = True
       ModalResult = 1
       TabOrder = 0
-      ExplicitLeft = 756
     end
   end
 end

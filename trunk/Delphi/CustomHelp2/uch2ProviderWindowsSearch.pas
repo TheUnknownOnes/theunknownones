@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, uch2Main, Spin, StdCtrls, ComCtrls, ToolWin,
+  Dialogs, uch2Main, Spin, StdCtrls, ComCtrls, ToolWin, ADOInt,
   uch2FrameHelpItemDecoration, ExtCtrls, ImgList;
 
 type
@@ -12,9 +12,12 @@ type
   private
     FPriority : Integer;
     procedure SetPriority(APriority: Integer);
+    procedure Search(AQuery: String; AGUI: Ich2GUI);
   protected
     function GetDecoration(AName: String): Tch2HelpItemDecoration;
+    function GetQuery(AName: String): String;
     procedure SetDecoration(AName: String; ADeco: Tch2HelpItemDecoration);
+    procedure GetProviderList(const AList: TStrings);
   public
     procedure AfterConstruction(); override;
     procedure BeforeDestruction(); override;
@@ -56,9 +59,12 @@ type
     procedure LVChange(Sender: TObject; Item: TListItem; Change: TItemChange);
     procedure ed_NameChange(Sender: TObject);
     procedure ed_QueryChange(Sender: TObject);
+    procedure btn_OKClick(Sender: TObject);
   private
     FProvider : Tch2ProviderWindowsSearch;
     procedure Init;
+    function AddItemToList(ACaption: String = '<New Windows Search>'): TListItem;
+    procedure OnDecoChange(ASender: TObject);
   public
     class procedure Execute(AProvider: Tch2ProviderWindowsSearch);
   end;
@@ -69,14 +75,15 @@ var
 implementation
 
 uses
-  Registry;
+  Registry, StrUtils, uch2TlbSearchAPILib, ComObj;
 
 {$R *.dfm}
 
 { Tch2ProviderWindowsSearch }
 const
   REG_VALUE_PRIORITY = 'Priority';
-  REG_KEY_SEARCHES = 'Searches';
+  REG_KEY_SEARCHES = 'Searches';  
+  REG_VALUE_QUERY = 'Query';
 
 procedure Tch2ProviderWindowsSearch.AfterConstruction;
 var
@@ -151,10 +158,144 @@ begin
   Result:=FPriority;
 end;
 
+procedure Tch2ProviderWindowsSearch.GetProviderList(const AList: TStrings);
+var
+  Reg : TRegistry;
+begin             
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_SEARCHES, true) then
+    begin
+      Reg.GetKeyNames(AList);
+
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
+end;
+
+function Tch2ProviderWindowsSearch.GetQuery(AName: String): String;
+var
+  Reg : TRegistry;
+begin
+  inherited;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_SEARCHES+'\'+AName, true) then
+    begin
+      if not Reg.ValueExists(REG_VALUE_QUERY) then
+        Result:='$(HelpString)'
+      else
+        Result:=Reg.ReadString(REG_VALUE_QUERY);
+
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
+end;
+
 procedure Tch2ProviderWindowsSearch.ProvideHelp(AKeyword: String;
   AGUI: Ich2GUI);
+var
+  sl : TStringList;
+  s: string;
+  query : String;
 begin
+  sl:=TStringList.Create;
+  try
+    GetProviderList(sl);
+    for s in sl do
+    begin
+      query:=ReplaceText(GetQuery(s),'$(HelpString)',AKeyword);
+      Search(query, AGUI);
+    end;
 
+  finally
+    sl.Free;
+  end;      
+end;
+
+
+procedure Tch2ProviderWindowsSearch.Search(AQuery: String; AGUI: Ich2GUI);
+var
+  manager : ISearchManager;
+  catalogManager : ISearchCatalogManager;
+  queryHelper : ISearchQueryHelper;
+  wQuery : string;
+  temp : PWideChar;
+  sTemp : string;
+  ra: OleVariant;
+  idx: Integer;
+
+  fQuery: WideString;
+
+  Caption, Description, Url, Group:  string;
+  provEnabled: Boolean;
+  HelpString:  string;
+  Timeout,
+  MaxResults: Integer;
+
+  path  : string;
+
+  dataset: ADOInt.Recordset;
+  bdatabasefailed: boolean;
+begin
+  dataset:=nil;
+
+  try
+    try
+      manager := CoCSearchManager.Create;
+      if Succeeded(manager.GetCatalog('SystemIndex',catalogManager)) then
+      begin
+        if Succeeded(catalogManager.GetQueryHelper(queryHelper)) then
+        begin
+          if MaxResults<=0 then
+          begin
+            MaxResults:=20;
+          end;
+
+          queryHelper.Set_QueryMaxResults(MaxResults);
+          queryHelper.Set_QuerySelectColumns('"System.ItemUrl" , "System.ItemNameDisplay", "System.ItemTypeText"');
+
+          fQuery:=AQuery;
+          queryHelper.GenerateSQLFromUserQuery(PWideChar(fQuery),temp);
+          wQuery := temp;
+
+          queryHelper.Get_ConnectionString(temp);
+          sTemp := temp;
+          dataset := CreateComObject(CLASS_Recordset) as _Recordset;
+          dataset.CursorLocation := adUseServer;
+          dataset.Open(wQuery, stemp, adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+          if not dataset.EOF then
+          begin
+            dataset.MoveFirst;
+
+            idx:=1;
+            while (not dataset.EOF) and (idx<=MaxResults) do
+            begin
+              inc(idx);
+
+            //  showmessage(dataset.Fields[0].Value);
+              
+              dataset.MoveNext;
+            end;
+          end;
+        end
+      end
+    except
+      on E:Exception do
+      begin
+
+        raise;
+      end;
+    end;
+  finally
+    dataset:=nil;
+  end;
 end;
 
 procedure Tch2ProviderWindowsSearch.SetDecoration(AName: String;
@@ -195,19 +336,75 @@ begin
   end;
 end;
 
-procedure Tuch2FormProviderWindowsSearch.btn_AddClick(Sender: TObject);
+function Tuch2FormProviderWindowsSearch.AddItemToList(ACaption: String): TListItem;
 var
-  item : TListItem;
+  SavedDecoPtr : Pch2HelpItemDecoration;
 begin
-  item:=LV.Items.Add;
-  item.Caption:='<new Windows Search>';
-  item.SubItems.Add('$(Helpstring)');
-  LV.Selected:=item;
+  New(SavedDecoPtr);
+  SavedDecoPtr^:=FProvider.GetDecoration(ACaption);
+  Result:=LV.Items.Add;
+  Result.Caption:=ACaption;
+  Result.SubItems.Add(FProvider.GetQuery(ACaption));
+  Result.Data:=SavedDecoPtr;  
+end;
+
+procedure Tuch2FormProviderWindowsSearch.btn_AddClick(Sender: TObject);
+begin
+  LV.Selected:=AddItemToList;
 end;
 
 procedure Tuch2FormProviderWindowsSearch.btn_DelClick(Sender: TObject);
+var
+  item : TListItem;
 begin
-  LV.DeleteSelected;
+  item:=LV.Selected;
+  if Assigned(Item) then
+  begin
+    Dispose(item.Data);
+    Item.Free;
+  end;
+end;     
+
+procedure Tuch2FormProviderWindowsSearch.btn_OKClick(Sender: TObject);
+var
+  Reg : TRegistry;
+  idx: Integer;
+begin
+  inherited;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    Reg.DeleteKey(ch2Main.RegRootKeyProvider[FProvider.GetGUID]+'\'+REG_KEY_SEARCHES);
+
+    for idx := 0 to LV.Items.Count - 1 do
+    begin
+      if Reg.OpenKey(ch2Main.RegRootKeyProvider[FProvider.GetGUID]+'\'+REG_KEY_SEARCHES+'\'+lv.Items[idx].Caption, true) then
+      begin
+        Pch2HelpItemDecoration(lv.Items[idx].Data)^.SaveToRegistry(Reg);
+        Reg.WriteString('Query',lv.Items[idx].SubItems[0]);
+
+        Reg.CloseKey;
+      end;
+    end;
+  finally
+    Reg.Free;
+  end;
+
+  while lv.Items.Count > 0 do
+  begin
+    dispose(lv.Items[0].Data);
+    lv.Items.Delete(0);   
+  end;                 
+
+  ModalResult:=mrOk;
+end;
+
+procedure Tuch2FormProviderWindowsSearch.OnDecoChange(ASender: TObject);
+begin
+  if Lv.Selected<>nil then
+  begin
+    Pch2HelpItemDecoration(lv.Selected.Data)^:=frame_Deco.Decoration;
+  end;
 end;
 
 procedure Tuch2FormProviderWindowsSearch.ed_NameChange(Sender: TObject);
@@ -222,7 +419,7 @@ procedure Tuch2FormProviderWindowsSearch.ed_QueryChange(Sender: TObject);
 begin
   if lv.Selected<>nil then
   begin
-    LV.Selected.SubItems[0]:=ed_Query.Text;  
+    LV.Selected.SubItems[0]:=ed_Query.Text;
   end; 
 end;
 
@@ -242,9 +439,20 @@ begin
   end;
 end;
 
-procedure Tuch2FormProviderWindowsSearch.Init;
+procedure Tuch2FormProviderWindowsSearch.Init;   
+var
+  sl : TStringList;
+  idx: Integer;        
 begin
-
+  frame_Deco.OnChange:=OnDecoChange;  
+  sl:=TStringList.Create;
+  try
+    FProvider.GetProviderList(sl);
+    for idx := 0 to sl.Count - 1 do
+      AddItemToList(sl[idx]);
+  finally
+    sl.Free;
+  end;
 end;
 
 procedure Tuch2FormProviderWindowsSearch.LVChange(Sender: TObject;
@@ -254,7 +462,7 @@ begin
   begin
     ed_Name.Text:=Item.Caption;
     ed_Query.Text:=Item.SubItems[0];
-    frame_Deco.Decoration:=FProvider.GetDecoration(Item.Caption);
+    frame_Deco.Decoration:=Pch2HelpItemDecoration(Item.Data)^;
   end;
 end;
 

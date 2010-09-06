@@ -52,7 +52,7 @@ contains
   uCustomHelpConsts in '..\..\uCustomHelpConsts.pas',
   uFrameConfigColor in '..\..\uFrameConfigColor.pas' {FrameConfigColor: TFrame},
   uFrameConfig3rdParty in '..\..\uFrameConfig3rdParty.pas' {FrameConfig3rdParty: TFrame},
-  uCustomHelpTlbSearchAPILib in '..\..\uCustomHelpTlbSearchAPILib.pas',
+  uch2TlbSearchAPILib in '..\..\..\CustomHelp2\uch2TlbSearchAPILib.pas',
   uFrameConfigWinSearch in '..\..\uFrameConfigWinSearch.pas' {FrameConfigWinSearch: TFrame};
 
 end.

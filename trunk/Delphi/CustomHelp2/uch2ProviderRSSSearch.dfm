@@ -58,7 +58,6 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
     Align = alClient
     Caption = 'URL'#39's'
     TabOrder = 1
-    ExplicitLeft = -1
     object LV: TListView
       AlignWithMargins = True
       Left = 6
@@ -205,7 +204,7 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
           Margins.Top = 4
           Margins.Right = 4
           Margins.Bottom = 4
-          ExplicitLeft = 423
+          ExplicitLeft = 434
           ExplicitTop = 4
           ExplicitWidth = 34
           ExplicitHeight = 17
@@ -219,7 +218,7 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
           Margins.Top = 4
           Margins.Right = 4
           Margins.Bottom = 4
-          ExplicitLeft = 245
+          ExplicitLeft = 256
           ExplicitTop = 4
           ExplicitWidth = 33
           ExplicitHeight = 17
@@ -396,7 +395,7 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
     Left = 288
     Top = 96
     Bitmap = {
-      494C010102000800F40010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000800F80010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000DADBDB630BB019FF0BB019FF0BB019FF0BB019FF000000000000
