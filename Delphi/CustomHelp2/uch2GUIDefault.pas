@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, uch2Main, StdCtrls, ComCtrls, ExtCtrls, Registry;
+  Dialogs, uch2Main, StdCtrls, ComCtrls, ExtCtrls, Registry, ImgList;
 
 type
   TNodeData = record
@@ -20,6 +20,7 @@ type
     GroupBox2: TGroupBox;
     TV: TTreeView;
     tm_RunFirstSearch: TTimer;
+    iml_TV: TImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -119,12 +120,19 @@ var
   Node : TTreeNode;
   NodeData : PNodeData;
 begin
-  Node := tv.Items.AddChild(TTreeNode(AParent), AHelpItem.GetCaption);
+  Node := tv.Items.AddChild(TTreeNode(AParent), AHelpItem.GetCaption + ' (' + AHelpItem.GetDescription + ')');
 
   New(NodeData);
   NodeData^.HelpItem := AHelpItem;
   Node.Data := NodeData;
   Result := Node;
+
+  if ifProvidesHelp in AHelpItem.GetFlags then
+    Node.ImageIndex := 0
+  else
+    Node.ImageIndex := 1;
+
+  Node.SelectedIndex := Node.ImageIndex;
 end;
 
 procedure Tch2FormGUIDefault.com_KeywordsChange(Sender: TObject);

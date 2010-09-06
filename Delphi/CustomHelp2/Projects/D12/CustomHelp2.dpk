@@ -46,6 +46,8 @@ contains
   uch2ProviderShellCommand in '..\..\uch2ProviderShellCommand.pas' {ch2FormConfigShellCommand},
   uch2FrameHelpItemDecoration in '..\..\uch2FrameHelpItemDecoration.pas' {ch2FrameHelpItemDecoration: TFrame},
   uch2ProviderMsHelp in '..\..\uch2ProviderMsHelp.pas' {ch2FormProviderMsHelp},
-  uch2MSHelpServices in '..\..\uch2MSHelpServices.pas';
+  uch2MSHelpServices in '..\..\uch2MSHelpServices.pas',
+  uch2ProviderGooleCodeSearch in '..\..\uch2ProviderGooleCodeSearch.pas' {ch2FormConfigGoogleCodeSearch},
+  uch2Tools in '..\..\uch2Tools.pas';
 
 end.

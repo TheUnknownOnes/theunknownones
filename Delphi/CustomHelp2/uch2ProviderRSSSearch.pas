@@ -90,6 +90,8 @@ type
 
 implementation
 
+uses uch2Tools;
+
 {$R *.dfm}
 
 const
@@ -105,7 +107,7 @@ type
   private
     FURL : Tch2RSSURL;
   public
-    constructor Create(AURL : Tch2RSSURL; AKeyword : AnsiString);
+    constructor Create(AURL : Tch2RSSURL);
 
     {$REGION 'Ich2HelpItem'}
     function GetGUID : TGUID;
@@ -316,22 +318,16 @@ end;
 
 procedure Tch2ProviderRSSSearch.ProvideHelp(AKeyword: String; AGUI: Ich2GUI);
 var
-  kw : AnsiString;
-  c : AnsiChar;
   EncodedKeyword : String;
   o : Pointer;
   u : Tch2RSSURL absolute o;
   parent : Pointer;
 begin
-  kw := AKeyword;
-
-  EncodedKeyword := '';
-  for c in kw do
-    EncodedKeyword := EncodedKeyword + '%' + IntToHex(Ord(c), 2);
+  EncodedKeyword := ch2StrEncodeURL(AKeyword);
 
   for o in URLs do
   begin
-    parent := AGUI.AddHelpItem(Tch2HIURL.Create(u, AKeyword) as Ich2HelpItem);
+    parent := AGUI.AddHelpItem(Tch2HIURL.Create(u) as Ich2HelpItem);
 
     DoRSSSearch(u, AGUI, EncodedKeyword, parent);
   end;
@@ -555,7 +551,7 @@ end;
 
 { Tch2HIURL }
 
-constructor Tch2HIURL.Create(AURL: Tch2RSSURL; AKeyword: AnsiString);
+constructor Tch2HIURL.Create(AURL: Tch2RSSURL);
 begin
   FURL := AURL;
 end;
