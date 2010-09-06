@@ -49,6 +49,8 @@ contains
   uch2MSHelpServices in '..\..\uch2MSHelpServices.pas',
   uch2ProviderGooleCodeSearch in '..\..\uch2ProviderGooleCodeSearch.pas' {ch2FormConfigGoogleCodeSearch},
   uch2Tools in '..\..\uch2Tools.pas',
-  uch2ProviderWindowsSearch in '..\..\uch2ProviderWindowsSearch.pas' {uch2FormProviderWindowsSearch};
+  uch2ProviderHTMLHelp in '..\..\uch2ProviderHTMLHelp.pas' {ch2FormConfigHTMLHelp},
+  uch2ProviderWindowsSearch in '..\..\uch2ProviderWindowsSearch.pas' {uch2FormProviderWindowsSearch},
+  uch2HtmlHelp in '..\..\uch2HtmlHelp.pas';
 
 end.
