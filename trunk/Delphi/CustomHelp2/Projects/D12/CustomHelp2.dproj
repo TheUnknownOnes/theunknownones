@@ -21,7 +21,7 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp2_D120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp2_D120.bpl</DCC_DependencyCheckOutputName>
 			<DesignOnlyPackage>true</DesignOnlyPackage>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DCC_Description>CustomHelp2</DCC_Description>
@@ -51,40 +51,6 @@
 			<DCCReference Include="VclSmp.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="vclx.dcp"/>
-			<DCCReference Include="..\..\uch2Main.pas"/>
-			<DCCReference Include="..\..\uch2GUIDefault.pas">
-				<Form>ch2FormHelpGUIDefault</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\uch2Configure.pas">
-				<Form>ch2FormConfigure</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\uch2ProviderStaticWebsearch.pas">
-				<Form>ch2FormConfigStaticWebsearch</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\uch2Provider3rdPartyHelp.pas">
-				<Form>ch2FormProvider3rdPartyHelp</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\uch2ProviderRSSSearch.pas">
-				<Form>ch2FormConfigRSSSearch</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\uch2ProviderShellCommand.pas">
-				<Form>ch2FormConfigShellCommand</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\uch2FrameHelpItemDecoration.pas">
-				<Form>ch2FrameHelpItemDecoration</Form>
-				<DesignClass>TFrame</DesignClass>
-			</DCCReference>
-			<DCCReference Include="..\..\uch2ProviderMsHelp.pas">
-				<Form>ch2FormProviderMsHelp</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\uch2MSHelpServices.pas"/>
-			<DCCReference Include="..\..\uch2ProviderGooleCodeSearch.pas">
-				<Form>ch2FormConfigGoogleCodeSearch</Form>
-			</DCCReference>
-			<DCCReference Include="..\..\uch2Tools.pas"/>
-			<DCCReference Include="..\..\uch2ProviderWindowsSearch.pas">
-				<Form>uch2FormProviderWindowsSearch</Form>
-			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

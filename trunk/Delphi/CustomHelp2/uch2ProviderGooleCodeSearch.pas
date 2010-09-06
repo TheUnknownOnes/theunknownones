@@ -25,6 +25,8 @@ type
   private
     FPriority : Integer;
     FQueries: TObjectList;
+    FFeedURL,
+    FWebURL : String;
 
     procedure LoadSettings;
     procedure SaveSettings;
@@ -52,9 +54,6 @@ type
   end;
 
   Tch2FormConfigGoogleCodeSearch = class(TForm)
-    Panel3: TPanel;
-    Label1: TLabel;
-    ed_Prio: TSpinEdit;
     GroupBox2: TGroupBox;
     LV: TListView;
     Panel2: TPanel;
@@ -73,6 +72,13 @@ type
     btn_OK: TButton;
     com_Location: TComboBox;
     Label9: TLabel;
+    GroupBox1: TGroupBox;
+    ed_Prio: TSpinEdit;
+    Label1: TLabel;
+    Label5: TLabel;
+    ed_FeedURL: TEdit;
+    ed_WebURL: TEdit;
+    Label6: TLabel;
     procedure Label4Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure LVSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
@@ -82,6 +88,8 @@ type
     procedure ed_QueryChange(Sender: TObject);
     procedure ed_PrioChange(Sender: TObject);
     procedure com_LocationChange(Sender: TObject);
+    procedure ed_FeedURLChange(Sender: TObject);
+    procedure ed_WebURLChange(Sender: TObject);
   private
     FProvider : Tch2ProviderGoogleCodeSearch;
 
@@ -104,6 +112,8 @@ const
   Settings_Value_GUID = 'GUID';
   Settings_Key_Queries = '\Queries';
   Settings_Value_OpenLocation = 'OpenIn';
+  Settings_Value_FeedURL = 'FeedURL';
+  Settings_Value_WebURL = 'WebURL';
 
 type
   THIQuery = class(TInterfacedObject, Ich2HelpItem)
@@ -228,6 +238,11 @@ begin
     Tch2GCSQuery(lv.Selected.Data).OpenLocation := Tch2URLOpenLocation(com_Location.Items.Objects[com_Location.ItemIndex]);
 end;
 
+procedure Tch2FormConfigGoogleCodeSearch.ed_FeedURLChange(Sender: TObject);
+begin
+  FProvider.FFeedURL := ed_FeedURL.Text;
+end;
+
 procedure Tch2FormConfigGoogleCodeSearch.ed_NameChange(Sender: TObject);
 begin
   if Assigned(lv.Selected) then
@@ -250,6 +265,11 @@ begin
     Tch2GCSQuery(lv.Selected.Data).Query := ed_Query.Text;
     lv.Selected.SubItems[0] := ed_Query.Text;
   end;
+end;
+
+procedure Tch2FormConfigGoogleCodeSearch.ed_WebURLChange(Sender: TObject);
+begin
+  FProvider.FWebURL := ed_WebURL.Text;
 end;
 
 class function Tch2FormConfigGoogleCodeSearch.Execute(
@@ -287,6 +307,8 @@ begin
   com_Location.ItemIndex := com_Location.Items.IndexOfObject(TObject(olDefaultBrowser));
 
   ed_Prio.Value := FProvider.FPriority;
+  ed_FeedURL.Text := FProvider.FFeedURL;
+  ed_WebURL.Text := FProvider.FWebURL;
 
   frame_Deco.OnChange := OnDecoChange;
 end;
@@ -375,6 +397,9 @@ begin
   inherited;
 
   FQueries := TObjectList.Create(true);
+
+  FFeedURL := 'http://www.google.com/codesearch/feeds/search?max-results=20&q=';
+  FWebURL := 'http://www.google.com/codesearch?q=';
 
   LoadSettings;
 end;
@@ -569,6 +594,12 @@ begin
       else
         FPriority := 0;
 
+      if Reg.ValueExists(Settings_Value_FeedURL) then
+        FFeedURL := reg.ReadString(Settings_Value_FeedURL);
+
+      if Reg.ValueExists(Settings_Value_WebURL) then
+        FWebURL := reg.ReadString(Settings_Value_WebURL);
+
       Reg.CloseKey;
     end;
 
@@ -627,6 +658,9 @@ begin
     if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID], true) then
     begin
       Reg.WriteInteger(Settings_Value_Priority, FPriority);
+
+      Reg.WriteString(Settings_Value_FeedURL, FFeedURL);
+      Reg.WriteString(Settings_Value_WebURL, FWebURL);
 
       Reg.CloseKey;
     end;
