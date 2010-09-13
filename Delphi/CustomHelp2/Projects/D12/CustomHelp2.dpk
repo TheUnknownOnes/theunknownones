@@ -51,6 +51,7 @@ contains
   uch2Tools in '..\..\uch2Tools.pas',
   uch2ProviderHTMLHelp in '..\..\uch2ProviderHTMLHelp.pas' {ch2FormConfigHTMLHelp},
   uch2ProviderWindowsSearch in '..\..\uch2ProviderWindowsSearch.pas' {uch2FormProviderWindowsSearch},
-  uch2HtmlHelp in '..\..\uch2HtmlHelp.pas';
+  uch2HtmlHelp in '..\..\uch2HtmlHelp.pas',
+  uch2TlbSearchAPILib in '..\..\uch2TlbSearchAPILib.pas';
 
 end.
