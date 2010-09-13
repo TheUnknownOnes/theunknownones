@@ -12,10 +12,12 @@ type
   private
     FPriority : Integer;
     procedure SetPriority(APriority: Integer);
-    procedure Search(AQuery: String; AGUI: Ich2GUI);
+    procedure Search(ASearch, AQuery: String; AGUI: Ich2GUI);
   protected
     function GetDecoration(AName: String): Tch2HelpItemDecoration;
+    function GetGUIDForName(AName: String): TGUID;
     function GetQuery(AName: String): String;
+    function GetMaxCount(AName: String): Integer;
     procedure SetDecoration(AName: String; ADeco: Tch2HelpItemDecoration);
     procedure GetProviderList(const AList: TStrings);
   public
@@ -54,12 +56,15 @@ type
     Label1: TLabel;
     ed_Prio: TSpinEdit;
     iml_TB: TImageList;
+    Label4: TLabel;
+    ed_maxResults: TSpinEdit;
     procedure btn_AddClick(Sender: TObject);
     procedure btn_DelClick(Sender: TObject);
     procedure LVChange(Sender: TObject; Item: TListItem; Change: TItemChange);
     procedure ed_NameChange(Sender: TObject);
     procedure ed_QueryChange(Sender: TObject);
     procedure btn_OKClick(Sender: TObject);
+    procedure ed_maxResultsChange(Sender: TObject);
   private
     FProvider : Tch2ProviderWindowsSearch;
     procedure Init;
@@ -77,13 +82,58 @@ implementation
 uses
   Registry, StrUtils, uch2TlbSearchAPILib, ComObj;
 
+type
+  Tch2ProviderWindowsSearchCategory = class(TInterfacedObject, Ich2HelpItem)
+  private
+    FProvider : Tch2ProviderWindowsSearch;
+    FCaption  : String;
+  public
+    {$REGION 'Ich2HelpItem'}
+    function GetGUID : TGUID; //used to store stats (expanded, position, ...)
+    function GetCaption : String;
+    function GetDescription : String;
+    function GetDecoration : Tch2HelpItemDecoration;
+    function GetFlags : Tch2HelpItemFlags;
+    procedure ShowHelp;
+    {$ENDREGION}
+
+    constructor Create(AProvider: Tch2ProviderWindowsSearch;
+                       ACaption: String);
+  end;
+
+  Tch2ProviderWindowsSearchItem = class(TInterfacedObject, Ich2HelpItem)
+  private
+    FProvider : Tch2ProviderWindowsSearch;
+    FCaption     : String;
+    FURL         : String;
+    FDescription : String;
+    FSearchName  : String;
+  public
+    {$REGION 'Ich2HelpItem'}
+    function GetGUID : TGUID; //used to store stats (expanded, position, ...)
+    function GetCaption : String;
+    function GetDescription : String;
+    function GetDecoration : Tch2HelpItemDecoration;
+    function GetFlags : Tch2HelpItemFlags;
+    procedure ShowHelp;
+    {$ENDREGION}
+
+    constructor Create(AProvider: Tch2ProviderWindowsSearch;
+                       ACaption,
+                       AURL,
+                       ADescription,
+                       ASearchName : String);
+  end;
+
 {$R *.dfm}
 
 { Tch2ProviderWindowsSearch }
 const
   REG_VALUE_PRIORITY = 'Priority';
-  REG_KEY_SEARCHES = 'Searches';  
+  REG_KEY_SEARCHES = 'Searches';
   REG_VALUE_QUERY = 'Query';
+  REG_VALUE_GUID = 'GUID';
+  REG_VALUE_MAXCOUNT = 'MaxCount';
 
 procedure Tch2ProviderWindowsSearch.AfterConstruction;
 var
@@ -148,6 +198,53 @@ begin
   Result:=StringToGUID('{FA18E9E3-AF0F-413D-BC23-53E23C31B49C}');
 end;
 
+function Tch2ProviderWindowsSearch.GetGUIDForName(AName: String): TGUID;
+var
+  Reg : TRegistry;
+begin
+  inherited;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_SEARCHES+'\'+AName, true) then
+    begin
+      if not Reg.ValueExists(REG_VALUE_GUID) then
+      begin
+        CreateGUID(Result);
+        Reg.WriteString(REG_VALUE_GUID, GUIDToString(Result));
+      end
+      else
+        Result:=StringToGUID(Reg.ReadString(REG_VALUE_GUID));
+
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
+end;
+
+function Tch2ProviderWindowsSearch.GetMaxCount(AName: String): Integer;
+var
+  Reg : TRegistry;
+begin
+  inherited;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_SEARCHES+'\'+AName, true) then
+    begin
+      if not Reg.ValueExists(REG_VALUE_MAXCOUNT) then
+        Result:=20
+      else
+        Result:=Reg.ReadInteger(REG_VALUE_MAXCOUNT);
+
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
+end;
+
 function Tch2ProviderWindowsSearch.GetName: String;
 begin
   Result:='Windows Search';
@@ -210,7 +307,7 @@ begin
     for s in sl do
     begin
       query:=ReplaceText(GetQuery(s),'$(HelpString)',AKeyword);
-      Search(query, AGUI);
+      Search(s, query, AGUI);
     end;
 
   finally
@@ -219,7 +316,7 @@ begin
 end;
 
 
-procedure Tch2ProviderWindowsSearch.Search(AQuery: String; AGUI: Ich2GUI);
+procedure Tch2ProviderWindowsSearch.Search(ASearch, AQuery: String; AGUI: Ich2GUI);
 var
   manager : ISearchManager;
   catalogManager : ISearchCatalogManager;
@@ -235,10 +332,10 @@ var
   Caption, Description, Url, Group:  string;
   provEnabled: Boolean;
   HelpString:  string;
-  Timeout,
   MaxResults: Integer;
 
   path  : string;
+  Parent : Pointer;
 
   dataset: ADOInt.Recordset;
   bdatabasefailed: boolean;
@@ -252,13 +349,9 @@ begin
       begin
         if Succeeded(catalogManager.GetQueryHelper(queryHelper)) then
         begin
-          if MaxResults<=0 then
-          begin
-            MaxResults:=20;
-          end;
-
+          MaxResults:=GetMaxCount(ASearch);
           queryHelper.Set_QueryMaxResults(MaxResults);
-          queryHelper.Set_QuerySelectColumns('"System.ItemUrl" , "System.ItemNameDisplay", "System.ItemTypeText"');
+          queryHelper.Set_QuerySelectColumns('"System.ItemUrl" , "System.ItemNameDisplay", "System.ItemTypeText", "System.ItemPathDisplayNarrow"');
 
           fQuery:=AQuery;
           queryHelper.GenerateSQLFromUserQuery(PWideChar(fQuery),temp);
@@ -274,13 +367,22 @@ begin
           begin
             dataset.MoveFirst;
 
+            Parent:=AGUI.AddHelpItem(Tch2ProviderWindowsSearchCategory.Create(
+                                      Self, ASearch));
+
             idx:=1;
             while (not dataset.EOF) and (idx<=MaxResults) do
             begin
               inc(idx);
 
-            //  showmessage(dataset.Fields[0].Value);
-              
+              AGUI.AddHelpItem(Tch2ProviderWindowsSearchItem.Create(
+                                      Self,
+                                      dataset.Fields[3].Value,
+                                      dataset.Fields[0].Value,
+                                      dataset.Fields[2].Value,
+                                      ASearch),
+                                Parent);
+
               dataset.MoveNext;
             end;
           end;
@@ -345,6 +447,7 @@ begin
   Result:=LV.Items.Add;
   Result.Caption:=ACaption;
   Result.SubItems.Add(FProvider.GetQuery(ACaption));
+  Result.SubItems.Add(IntToStr(FProvider.GetMaxCount(ACaption)));
   Result.Data:=SavedDecoPtr;  
 end;
 
@@ -381,8 +484,8 @@ begin
       if Reg.OpenKey(ch2Main.RegRootKeyProvider[FProvider.GetGUID]+'\'+REG_KEY_SEARCHES+'\'+lv.Items[idx].Caption, true) then
       begin
         Pch2HelpItemDecoration(lv.Items[idx].Data)^.SaveToRegistry(Reg);
-        Reg.WriteString('Query',lv.Items[idx].SubItems[0]);
-
+        Reg.WriteString(REG_VALUE_QUERY,lv.Items[idx].SubItems[0]);
+        Reg.WriteInteger(REG_VALUE_MAXCOUNT,StrToIntDef(lv.Items[idx].SubItems[1],20));
         Reg.CloseKey;
       end;
     end;
@@ -407,12 +510,20 @@ begin
   end;
 end;
 
+procedure Tuch2FormProviderWindowsSearch.ed_maxResultsChange(Sender: TObject);
+begin
+  if lv.Selected<>nil then
+  begin
+    LV.Selected.SubItems[1]:=IntToStr(ed_maxResults.Value);
+  end;
+end;
+
 procedure Tuch2FormProviderWindowsSearch.ed_NameChange(Sender: TObject);
 begin
   if lv.Selected<>nil then
   begin
-    LV.Selected.Caption:=ed_Name.Text;  
-  end; 
+    LV.Selected.Caption:=ed_Name.Text;
+  end;
 end;
 
 procedure Tuch2FormProviderWindowsSearch.ed_QueryChange(Sender: TObject);
@@ -462,8 +573,91 @@ begin
   begin
     ed_Name.Text:=Item.Caption;
     ed_Query.Text:=Item.SubItems[0];
+    ed_maxResults.Value:=StrToIntDef(Item.SubItems[1],20);
     frame_Deco.Decoration:=Pch2HelpItemDecoration(Item.Data)^;
   end;
+end;
+
+{ Tch2ProviderWindowsSearchCategory }
+
+constructor Tch2ProviderWindowsSearchCategory.Create(
+  AProvider: Tch2ProviderWindowsSearch; ACaption: String);
+begin
+  inherited Create;
+  FProvider:=AProvider;
+  FCaption:=ACaption;
+end;
+
+function Tch2ProviderWindowsSearchCategory.GetCaption: String;
+begin
+  Result:=FCaption;
+end;
+
+function Tch2ProviderWindowsSearchCategory.GetDecoration: Tch2HelpItemDecoration;
+begin
+  Result:=FProvider.GetDecoration(FCaption);
+end;
+
+function Tch2ProviderWindowsSearchCategory.GetDescription: String;
+begin
+  Result:=''
+end;
+
+function Tch2ProviderWindowsSearchCategory.GetFlags: Tch2HelpItemFlags;
+begin
+  Result:=[ifSaveStats];
+end;
+
+function Tch2ProviderWindowsSearchCategory.GetGUID: TGUID;
+begin
+  Result:=FProvider.GetGUIDForName(FCaption);
+end;
+
+procedure Tch2ProviderWindowsSearchCategory.ShowHelp;
+begin
+end;
+
+{ Tch2ProviderWindowsSearchItem }
+
+constructor Tch2ProviderWindowsSearchItem.Create(
+  AProvider: Tch2ProviderWindowsSearch; ACaption, AURL, ADescription,
+  ASearchName: String);
+begin
+  inherited Create;
+  FProvider:=AProvider;
+  FCaption:=ACaption;
+  FURL:=AURL;
+  FDescription:=ADescription;
+  FSearchName:=ASearchName;
+end;
+
+function Tch2ProviderWindowsSearchItem.GetCaption: String;
+begin
+  Result:=FCaption;
+end;
+
+function Tch2ProviderWindowsSearchItem.GetDecoration: Tch2HelpItemDecoration;
+begin
+  Result:=FProvider.GetDecoration(FSearchName);
+end;
+
+function Tch2ProviderWindowsSearchItem.GetDescription: String;
+begin
+  Result:=FDescription;
+end;
+
+function Tch2ProviderWindowsSearchItem.GetFlags: Tch2HelpItemFlags;
+begin
+  Result:=[ifProvidesHelp];
+end;
+
+function Tch2ProviderWindowsSearchItem.GetGUID: TGUID;
+begin
+end;
+
+procedure Tch2ProviderWindowsSearchItem.ShowHelp;
+begin
+  ch2Main.ShellOpen(FURL);
 end;
 
 initialization

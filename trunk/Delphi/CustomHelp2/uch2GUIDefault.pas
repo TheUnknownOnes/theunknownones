@@ -119,8 +119,12 @@ function Tch2FormGUIDefault.AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Poin
 var
   Node : TTreeNode;
   NodeData : PNodeData;
+  Desc : String;
 begin
-  Node := tv.Items.AddChild(TTreeNode(AParent), AHelpItem.GetCaption + ' (' + AHelpItem.GetDescription + ')');
+  Desc:='';
+  if trim(AHelpItem.GetDescription)<>'' then
+    Desc:=' (' + AHelpItem.GetDescription + ')';
+  Node := tv.Items.AddChild(TTreeNode(AParent), AHelpItem.GetCaption + Desc);
 
   New(NodeData);
   NodeData^.HelpItem := AHelpItem;
