@@ -2,12 +2,12 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
   Left = 0
   Top = 0
   BorderStyle = bsSizeToolWin
-  ClientHeight = 398
-  ClientWidth = 531
+  ClientHeight = 520
+  ClientWidth = 694
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -14
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
@@ -17,37 +17,45 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
   OnDestroy = FormDestroy
   OnKeyUp = FormKeyUp
   OnShow = FormShow
-  PixelsPerInch = 96
-  TextHeight = 13
+  PixelsPerInch = 120
+  TextHeight = 17
   object GroupBox1: TGroupBox
     AlignWithMargins = True
-    Left = 3
-    Top = 3
-    Width = 525
-    Height = 46
+    Left = 4
+    Top = 4
+    Width = 686
+    Height = 60
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Align = alTop
     Caption = 'Available keywords'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -15
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
     object com_Keywords: TComboBox
       AlignWithMargins = True
-      Left = 5
-      Top = 18
-      Width = 515
-      Height = 21
+      Left = 6
+      Top = 24
+      Width = 674
+      Height = 26
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Align = alClient
       Style = csDropDownList
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -15
       Font.Name = 'Tahoma'
       Font.Style = []
-      ItemHeight = 13
+      ItemHeight = 18
       ParentFont = False
       Sorted = True
       TabOrder = 0
@@ -56,29 +64,37 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
   end
   object GroupBox2: TGroupBox
     AlignWithMargins = True
-    Left = 3
-    Top = 55
-    Width = 525
-    Height = 340
+    Left = 4
+    Top = 72
+    Width = 686
+    Height = 444
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Align = alClient
     Caption = 'Help'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -15
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
     object TV: TTreeView
       AlignWithMargins = True
-      Left = 5
-      Top = 18
-      Width = 515
-      Height = 317
+      Left = 6
+      Top = 24
+      Width = 674
+      Height = 414
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Align = alClient
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -15
       Font.Name = 'Tahoma'
       Font.Style = []
       Images = iml_TV
@@ -104,7 +120,7 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
     Left = 344
     Top = 144
     Bitmap = {
-      494C010102000800340010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000800380010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       00000000000000000000000000000000000000000000F9F9F906B1B1B157FBFB
       FB04000000000000000000000000000000000000000000000000000000000000

@@ -46,6 +46,11 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
         item
           AutoSize = True
           Caption = 'Query'
+        end
+        item
+          Alignment = taRightJustify
+          Caption = 'max Results'
+          Width = 100
         end>
       ReadOnly = True
       RowSelect = True
@@ -98,6 +103,17 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
         Margins.Bottom = 4
         WordWrap = True
       end
+      object Label4: TLabel
+        Left = 673
+        Top = 7
+        Width = 79
+        Height = 17
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
+        Caption = 'max Results:'
+      end
       object ed_Name: TEdit
         Left = 60
         Top = 4
@@ -113,7 +129,7 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
       object ed_Query: TEdit
         Left = 322
         Top = 4
-        Width = 519
+        Width = 343
         Height = 25
         Hint = '"$(HelpString)" will be replaced with the helpstring'
         Margins.Left = 4
@@ -267,6 +283,17 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
           ExplicitWidth = 128
         end
       end
+      object ed_maxResults: TSpinEdit
+        Left = 759
+        Top = 3
+        Width = 82
+        Height = 27
+        MaxValue = 0
+        MinValue = 0
+        TabOrder = 3
+        Value = 0
+        OnChange = ed_maxResultsChange
+      end
     end
     object ToolBar1: TToolBar
       AlignWithMargins = True
@@ -369,7 +396,7 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
     Left = 288
     Top = 96
     Bitmap = {
-      494C010102000800200110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101020008002C0110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000DADBDB630BB019FF0BB019FF0BB019FF0BB019FF000000000000
