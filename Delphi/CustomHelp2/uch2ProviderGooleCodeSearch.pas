@@ -32,7 +32,7 @@ type
     procedure SaveSettings;
     function GetQuery(AIndex: Integer): Tch2GCSQuery;
 
-    function DoQuery(AQuery : Tch2GCSQuery; AEncodedQuery : String; AGUI : Ich2GUI; AParent : Pointer) : Boolean;
+    function DoQuery(AQuery : Tch2GCSQuery; AEncodedQuery : String; AGUI : Ich2GUI) : Boolean;
   public
 
     procedure AfterConstruction(); override;
@@ -419,7 +419,7 @@ begin
   SaveSettings;
 end;
 
-function Tch2ProviderGoogleCodeSearch.DoQuery(AQuery: Tch2GCSQuery; AEncodedQuery : String; AGUI : Ich2GUI; AParent : Pointer) : Boolean;
+function Tch2ProviderGoogleCodeSearch.DoQuery(AQuery: Tch2GCSQuery; AEncodedQuery : String; AGUI : Ich2GUI) : Boolean;
 var
   FileName : String;
   xml : IXMLDOMDocument;
@@ -437,7 +437,19 @@ var
   hientry : Pointer;
 
   sl : TStringList;
+
+  Parent : Pointer;
+
+  FoundOne : Boolean;
+
+  procedure NeedParent();
+  begin
+    if not Assigned(Parent) then
+      Parent := AGUI.AddHelpItem(THIQuery.Create(AQuery) as Ich2HelpItem)
+  end;
 begin
+  Parent := nil;
+
   sl := TStringList.Create;
   result := false;
   try
@@ -515,7 +527,8 @@ begin
             descr := entry_filename;
           end;
 
-          hientry := AGUI.AddHelpItem(THIEntry.Create(AQuery, cap, descr, url), AParent);
+          NeedParent;
+          hientry := AGUI.AddHelpItem(THIEntry.Create(AQuery, cap, descr, url), Parent);
           if not Result then
             Result := true;
 
@@ -534,7 +547,11 @@ begin
           end;
         end;
 
-        AGUI.AddHelpItem(THIEntry.Create(AQuery, '-= Show in browser =-', '', 'http://www.google.com/codesearch?q=' + AEncodedQuery) as Ich2HelpItem, AParent);
+        if Result then
+        begin
+          NeedParent;
+          AGUI.AddHelpItem(THIEntry.Create(AQuery, '-= Show in browser =-', '', 'http://www.google.com/codesearch?q=' + AEncodedQuery) as Ich2HelpItem, Parent);
+        end;
       end
       else
         raise Exception.Create('Could not download feed data for ' + AQuery.Name);
@@ -633,15 +650,12 @@ var
   EncodedQuery : String;
   o : Pointer;
   q : Tch2GCSQuery absolute o;
-  parent : Pointer;
 begin
   for o in Queries do
   begin
-    parent := AGUI.AddHelpItem(THIQuery.Create(q) as Ich2HelpItem);
-
     EncodedQuery := ch2StrEncodeURL(StringReplace(q.Query, '$(HelpString)', AKeyword, [rfReplaceAll, rfIgnoreCase]));
 
-    DoQuery(q, EncodedQuery, AGUI, parent);
+    DoQuery(q, EncodedQuery, AGUI);
   end;
 end;
 
