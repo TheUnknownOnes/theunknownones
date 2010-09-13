@@ -30,7 +30,7 @@ type
     procedure LoadSettings;
     procedure SaveSettings;
 
-    procedure DoRSSSearch(AURL : Tch2RSSURL; AGUI : Ich2GUI; AKeyword : String; AParent : Pointer);
+    procedure DoRSSSearch(AURL : Tch2RSSURL; AGUI : Ich2GUI; AKeyword : String);
   public
 
     procedure AfterConstruction(); override;
@@ -166,11 +166,10 @@ begin
 end;
 
 procedure Tch2ProviderRSSSearch.DoRSSSearch(AURL: Tch2RSSURL; AGUI: Ich2GUI;
-  AKeyword: String; AParent: Pointer);
+  AKeyword: String);
 var
   idx, channelidx: Integer;
   Caption, Description, Url, Group:  string;
-  provEnabled: Boolean;
   oldc:        string;
   xmldocument: IXMLDomDocument;
   node:        IXMLDOMNode;
@@ -178,8 +177,16 @@ var
   FileName:    string;
   Timeout,
   MaxResults: Integer;
+  Parent : Pointer;
+
+  procedure NeedParent();
+  begin
+    if not Assigned(Parent) then
+      Parent := AGUI.AddHelpItem(Tch2HIURL.Create(AURL) as Ich2HelpItem)
+  end;
 begin
   url := ReplaceText(AURL.URL, '$(HelpString)', AKeyword);
+  Parent := nil;
 
   SetLength(FileName, MAX_PATH + 1);
 
@@ -220,7 +227,8 @@ begin
           if Assigned(node) then
             Url := node.Text;
 
-          AGUI.AddHelpItem(Tch2HIRSSEntry.Create(AURL, Url, Caption, Description, AURL.OpenLocation) as Ich2HelpItem, AParent);
+          NeedParent;
+          AGUI.AddHelpItem(Tch2HIRSSEntry.Create(AURL, Url, Caption, Description, AURL.OpenLocation) as Ich2HelpItem, Parent);
         end;
 
         if nodes.length > 0 then
@@ -231,7 +239,10 @@ begin
 
           node := channels[channelidx].selectSingleNode('link');
           if Assigned(node) then
-            AGUI.AddHelpItem(Tch2HIRSSEntry.Create(AURL, node.text, 'All Results for "' + Caption + '"', '', AURL.OpenLocation) as Ich2HelpItem, AParent);
+          begin
+            NeedParent;
+            AGUI.AddHelpItem(Tch2HIRSSEntry.Create(AURL, node.text, 'All Results for "' + Caption + '"', '', AURL.OpenLocation) as Ich2HelpItem, Parent);
+          end;
         end;
       end;
     end
@@ -321,15 +332,12 @@ var
   EncodedKeyword : String;
   o : Pointer;
   u : Tch2RSSURL absolute o;
-  parent : Pointer;
 begin
   EncodedKeyword := ch2StrEncodeURL(AKeyword);
 
   for o in URLs do
   begin
-    parent := AGUI.AddHelpItem(Tch2HIURL.Create(u) as Ich2HelpItem);
-
-    DoRSSSearch(u, AGUI, EncodedKeyword, parent);
+    DoRSSSearch(u, AGUI, EncodedKeyword);
   end;
 end;
 

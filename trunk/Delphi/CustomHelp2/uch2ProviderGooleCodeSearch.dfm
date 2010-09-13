@@ -25,8 +25,6 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
     Align = alClient
     Caption = 'Queries'
     TabOrder = 0
-    ExplicitTop = 28
-    ExplicitHeight = 308
     object LV: TListView
       AlignWithMargins = True
       Left = 5
@@ -48,7 +46,6 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
       TabOrder = 0
       ViewStyle = vsReport
       OnSelectItem = LVSelectItem
-      ExplicitHeight = 180
     end
     object Panel2: TPanel
       Left = 2
@@ -58,7 +55,6 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitTop = 229
       object Label2: TLabel
         Left = 9
         Top = 6
@@ -221,7 +217,6 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitTop = 339
     object btn_OK: TButton
       AlignWithMargins = True
       Left = 547
@@ -244,9 +239,6 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
     Align = alTop
     Caption = 'General'
     TabOrder = 2
-    ExplicitLeft = 232
-    ExplicitTop = 152
-    ExplicitWidth = 185
     DesignSize = (
       619
       105)
@@ -313,7 +305,7 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
     Left = 336
     Top = 128
     Bitmap = {
-      494C010102000800140110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000800180110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000DADBDB630BB019FF0BB019FF0BB019FF0BB019FF000000000000
