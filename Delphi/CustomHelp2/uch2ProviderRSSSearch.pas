@@ -329,7 +329,7 @@ var
   o : Pointer;
   u : Tch2RSSURL absolute o;
 begin
-  EncodedKeyword := ch2StrEncodeURL(AKeyword);
+  EncodedKeyword := ch2StrEncodeURL(UTF8String(AKeyword));
 
   for o in URLs do
   begin

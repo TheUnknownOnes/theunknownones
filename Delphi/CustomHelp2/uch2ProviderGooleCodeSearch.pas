@@ -650,7 +650,7 @@ var
 begin
   for o in Queries do
   begin
-    EncodedQuery := ch2StrEncodeURL(StringReplace(q.Query, '$(HelpString)', AKeyword, [rfReplaceAll, rfIgnoreCase]));
+    EncodedQuery := ch2StrEncodeURL(UTF8String(StringReplace(q.Query, '$(HelpString)', AKeyword, [rfReplaceAll, rfIgnoreCase])));
 
     DoQuery(q, EncodedQuery, AGUI);
   end;
