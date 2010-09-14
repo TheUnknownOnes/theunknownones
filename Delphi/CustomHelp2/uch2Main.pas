@@ -205,6 +205,23 @@ begin
   Result := Fch2Main;
 end;
 
+{$R Images.res}
+
+var
+  bmp: TBitmap;
+
+procedure AddSplashBitmap;
+begin
+  bmp := TBitmap.Create;
+  bmp.LoadFromResourceName(hinstance, 'Splash');
+  SplashScreenServices.AddPluginBitmap(
+    'Custom Help 2',
+    bmp.Handle,
+    False,
+    'Free and OpenSource',
+    'by TheUnknownOnes');
+end;
+
 type
   IURLModule = interface
     ['{9D215B02-6073-45DC-B007-1A2DBCE2D693}']
@@ -764,8 +781,11 @@ begin
 end;
 
 initialization
+  AddSplashBitmap;
 
 finalization
   ch2Main.Free;
+  if Assigned(bmp) then
+    bmp.Free;
 
 end.
