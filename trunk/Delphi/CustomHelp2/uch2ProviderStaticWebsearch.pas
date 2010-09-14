@@ -470,7 +470,7 @@ procedure Tch2HIURL.ShowHelp;
 var
   EncodedKeyWord : String;
 begin
-  EncodedKeyWord := ch2StrEncodeURL(FKeyword);
+  EncodedKeyWord := ch2StrEncodeURL(UTF8String(FKeyword));
 
   ch2Main.ShowURL(StringReplace(FURL.URL, '$(HelpString)', EncodedKeyWord, [rfIgnoreCase, rfReplaceAll]), FURL.OpenLocation);
 end;

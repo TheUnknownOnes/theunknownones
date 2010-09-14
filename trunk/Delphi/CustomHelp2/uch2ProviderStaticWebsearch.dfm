@@ -3,33 +3,41 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Configure Static Websearch'
-  ClientHeight = 442
-  ClientWidth = 602
+  ClientHeight = 578
+  ClientWidth = 787
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -14
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
   OnShow = FormShow
-  PixelsPerInch = 96
-  TextHeight = 13
+  PixelsPerInch = 120
+  TextHeight = 17
   object Panel1: TPanel
     Left = 0
-    Top = 411
-    Width = 602
-    Height = 31
+    Top = 537
+    Width = 787
+    Height = 41
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     object btn_OK: TButton
       AlignWithMargins = True
-      Left = 524
-      Top = 3
-      Width = 75
-      Height = 25
+      Left = 685
+      Top = 4
+      Width = 98
+      Height = 33
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Align = alRight
       Caption = 'OK'
       Default = True
@@ -39,24 +47,33 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
   end
   object GroupBox2: TGroupBox
     AlignWithMargins = True
-    Left = 3
-    Top = 28
-    Width = 596
-    Height = 380
+    Left = 4
+    Top = 37
+    Width = 779
+    Height = 496
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Align = alClient
     Caption = 'URL'#39's'
     TabOrder = 1
+    ExplicitHeight = 497
     object LV: TListView
       AlignWithMargins = True
-      Left = 5
-      Top = 54
-      Width = 586
-      Height = 266
+      Left = 6
+      Top = 59
+      Width = 767
+      Height = 359
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Align = alClient
       Columns = <
         item
           Caption = 'Name'
-          Width = 100
+          Width = 131
         end
         item
           AutoSize = True
@@ -67,125 +84,258 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
       TabOrder = 0
       ViewStyle = vsReport
       OnSelectItem = LVSelectItem
+      ExplicitLeft = 7
+      ExplicitTop = 71
+      ExplicitWidth = 766
+      ExplicitHeight = 347
     end
     object Panel2: TPanel
       Left = 2
-      Top = 323
-      Width = 592
-      Height = 55
+      Top = 422
+      Width = 775
+      Height = 72
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitLeft = 3
+      ExplicitWidth = 774
       object Label2: TLabel
-        Left = 9
-        Top = 3
-        Width = 31
-        Height = 13
+        Left = 12
+        Top = 4
+        Width = 40
+        Height = 17
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = 'Name:'
       end
       object Label3: TLabel
-        Left = 208
-        Top = 3
-        Width = 23
-        Height = 13
+        Left = 272
+        Top = 4
+        Width = 30
+        Height = 17
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = 'URL:'
       end
       object Label9: TLabel
-        Left = 396
-        Top = 4
-        Width = 41
-        Height = 13
+        Left = 518
+        Top = 5
+        Width = 52
+        Height = 17
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = 'Open in:'
       end
       object ed_Name: TEdit
-        Left = 46
+        Left = 60
         Top = 0
-        Width = 154
+        Width = 202
         Height = 21
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         TabOrder = 0
         OnChange = ed_NameChange
       end
       object ed_URL: TEdit
-        Left = 245
+        Left = 320
         Top = 0
-        Width = 142
+        Width = 186
         Height = 21
         Hint = '"$(HelpString)" will be replaced with the helpstring'
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         ParentShowHint = False
         ShowHint = True
         TabOrder = 1
         OnChange = ed_URLChange
       end
       object com_Location: TComboBox
-        Left = 443
+        Left = 579
         Top = 0
-        Width = 142
+        Width = 186
         Height = 21
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 2
         OnChange = com_LocationChange
       end
       inline frame_Deco: Tch2FrameHelpItemDecoration
         Left = 0
-        Top = 27
-        Width = 592
-        Height = 28
+        Top = 35
+        Width = 775
+        Height = 37
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Align = alBottom
         TabOrder = 3
         TabStop = True
-        ExplicitTop = 27
-        ExplicitWidth = 592
+        ExplicitTop = 35
+        ExplicitWidth = 774
+        ExplicitHeight = 37
         inherited Label1: TLabel
-          Left = 315
-          ExplicitLeft = 315
+          Left = 413
+          Top = 4
+          Width = 34
+          Height = 29
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
+          ExplicitLeft = 402
+          ExplicitTop = 4
+          ExplicitWidth = 34
+          ExplicitHeight = 17
         end
         inherited Label2: TLabel
-          Left = 179
-          ExplicitLeft = 179
+          Left = 235
+          Top = 4
+          Width = 33
+          Height = 29
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
+          ExplicitLeft = 224
+          ExplicitTop = 4
+          ExplicitWidth = 33
+          ExplicitHeight = 17
         end
         inherited lbl_Caption: TLabel
-          Width = 170
+          Left = 4
+          Top = 4
+          Width = 223
+          Height = 29
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Caption = 'Sample entry'
-          ExplicitWidth = 63
+          ExplicitLeft = 4
+          ExplicitTop = 4
+          ExplicitWidth = 81
+          ExplicitHeight = 17
         end
         inherited cb_Bold: TCheckBox
-          Left = 451
-          ExplicitLeft = 451
+          Left = 591
+          Top = 4
+          Width = 39
+          Height = 29
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
+          Font.Height = -15
+          ExplicitLeft = 590
+          ExplicitTop = 4
+          ExplicitWidth = 39
+          ExplicitHeight = 29
         end
         inherited cb_Italic: TCheckBox
-          Left = 487
-          ExplicitLeft = 487
+          Left = 638
+          Top = 4
+          Width = 39
+          Height = 29
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
+          Font.Height = -15
+          ExplicitLeft = 637
+          ExplicitTop = 4
+          ExplicitWidth = 39
+          ExplicitHeight = 29
         end
         inherited cb_Underline: TCheckBox
-          Left = 523
-          ExplicitLeft = 523
+          Left = 685
+          Top = 4
+          Width = 39
+          Height = 29
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
+          Font.Height = -15
+          ExplicitLeft = 684
+          ExplicitTop = 4
+          ExplicitWidth = 39
+          ExplicitHeight = 29
         end
         inherited cb_Strike: TCheckBox
-          Left = 559
-          ExplicitLeft = 559
+          Left = 732
+          Top = 4
+          Width = 39
+          Height = 29
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
+          Font.Height = -15
+          ExplicitLeft = 731
+          ExplicitTop = 4
+          ExplicitWidth = 39
+          ExplicitHeight = 29
         end
         inherited cob_Text: TColorBox
-          Left = 211
-          ExplicitLeft = 211
+          Left = 276
+          Top = 4
+          Width = 129
+          Height = 29
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
+          ExplicitLeft = 265
+          ExplicitTop = 4
+          ExplicitWidth = 129
         end
         inherited cob_Back: TColorBox
-          Left = 347
-          ExplicitLeft = 347
+          Left = 455
+          Top = 4
+          Width = 128
+          Height = 29
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
+          ExplicitLeft = 454
+          ExplicitTop = 4
+          ExplicitWidth = 128
         end
       end
     end
     object ToolBar1: TToolBar
       AlignWithMargins = True
       Left = 5
-      Top = 18
-      Width = 586
+      Top = 22
+      Width = 769
       Height = 30
       ButtonHeight = 30
       ButtonWidth = 31
       Caption = 'ToolBar1'
       Images = ch2Data.ch2Images24
       TabOrder = 2
+      ExplicitTop = 18
+      ExplicitWidth = 586
       object btn_Add: TToolButton
         Left = 0
         Top = 0
@@ -205,27 +355,38 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
   object Panel3: TPanel
     Left = 0
     Top = 0
-    Width = 602
-    Height = 25
+    Width = 787
+    Height = 33
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 2
     object Label1: TLabel
       AlignWithMargins = True
-      Left = 3
-      Top = 3
-      Width = 38
-      Height = 19
+      Left = 4
+      Top = 4
+      Width = 48
+      Height = 17
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Align = alLeft
       Caption = 'Priority:'
       Layout = tlCenter
-      ExplicitHeight = 13
     end
     object ed_Prio: TSpinEdit
-      Left = 47
+      Left = 61
       Top = 0
-      Width = 59
+      Width = 78
       Height = 22
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       MaxValue = 0
       MinValue = 0
       TabOrder = 0
