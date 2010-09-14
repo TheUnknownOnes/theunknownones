@@ -67,7 +67,6 @@ type
     TB: TToolBar;
     btn_Add: TToolButton;
     btn_Del: TToolButton;
-    iml_TB: TImageList;
     procedure btn_AddClick(Sender: TObject);
     procedure btn_DelClick(Sender: TObject);
     procedure lvSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
@@ -86,6 +85,8 @@ type
 
 
 implementation
+
+uses uch2Data;
 
 {$R *.dfm}
 

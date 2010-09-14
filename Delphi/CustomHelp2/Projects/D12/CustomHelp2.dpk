@@ -35,11 +35,11 @@ requires
   VclSmp,
   vcl,
   vclx,
-  xmlrtl,
-  vclactnband;
+  xmlrtl;
 
 contains
   uch2Configure in '..\..\uch2Configure.pas' {ch2FormConfigure},
+  uch2Data in '..\..\uch2Data.pas' {ch2Data: TDataModule},
   uch2FrameHelpItemDecoration in '..\..\uch2FrameHelpItemDecoration.pas' {ch2FrameHelpItemDecoration: TFrame},
   uch2GUIDefault in '..\..\uch2GUIDefault.pas' {ch2FormGUIDefault},
   uch2GUIDockableTree in '..\..\uch2GUIDockableTree.pas' {ch2FormGUIDockableTree},

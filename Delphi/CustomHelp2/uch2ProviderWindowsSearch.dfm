@@ -3,45 +3,37 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Config Windows Search'
-  ClientHeight = 490
-  ClientWidth = 858
+  ClientHeight = 375
+  ClientWidth = 656
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -14
+  Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  PixelsPerInch = 120
-  TextHeight = 17
+  PixelsPerInch = 96
+  TextHeight = 13
   object GroupBox2: TGroupBox
     AlignWithMargins = True
-    Left = 4
-    Top = 37
-    Width = 850
-    Height = 409
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
+    Left = 3
+    Top = 28
+    Width = 650
+    Height = 313
     Align = alClient
     Caption = 'Searches'
     TabOrder = 0
     object LV: TListView
       AlignWithMargins = True
-      Left = 6
-      Top = 51
-      Width = 838
-      Height = 277
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
+      Left = 5
+      Top = 54
+      Width = 640
+      Height = 197
       Align = alClient
       Columns = <
         item
           Caption = 'Name'
-          Width = 131
+          Width = 100
         end
         item
           AutoSize = True
@@ -50,92 +42,66 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
         item
           Alignment = taRightJustify
           Caption = 'max Results'
-          Width = 100
+          Width = 76
         end>
       ReadOnly = True
       RowSelect = True
       TabOrder = 0
       ViewStyle = vsReport
       OnChange = LVChange
+      ExplicitTop = 46
+      ExplicitHeight = 205
     end
     object Panel2: TPanel
       Left = 2
-      Top = 332
-      Width = 846
-      Height = 75
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
+      Top = 254
+      Width = 646
+      Height = 57
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
       object Label2: TLabel
-        Left = 12
-        Top = 8
-        Width = 40
-        Height = 17
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 9
+        Top = 6
+        Width = 31
+        Height = 13
         Caption = 'Name:'
       end
       object Label3: TLabel
-        Left = 271
-        Top = 7
-        Width = 43
-        Height = 17
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 207
+        Top = 5
+        Width = 34
+        Height = 13
         Caption = 'Query:'
       end
       object Label8: TLabel
-        Left = 60
-        Top = 75
-        Width = 4
-        Height = 17
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 46
+        Top = 57
+        Width = 3
+        Height = 13
         WordWrap = True
       end
       object Label4: TLabel
-        Left = 673
-        Top = 7
-        Width = 79
-        Height = 17
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 515
+        Top = 5
+        Width = 62
+        Height = 13
         Caption = 'max Results:'
       end
       object ed_Name: TEdit
-        Left = 60
-        Top = 4
-        Width = 202
-        Height = 25
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Left = 46
+        Top = 3
+        Width = 154
+        Height = 21
         TabOrder = 0
         OnChange = ed_NameChange
       end
       object ed_Query: TEdit
-        Left = 322
-        Top = 4
-        Width = 343
-        Height = 25
+        Left = 246
+        Top = 3
+        Width = 263
+        Height = 21
         Hint = '"$(HelpString)" will be replaced with the helpstring'
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         ParentShowHint = False
         ShowHint = True
         TabOrder = 1
@@ -143,151 +109,68 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
       end
       inline frame_Deco: Tch2FrameHelpItemDecoration
         Left = 0
-        Top = 38
-        Width = 846
-        Height = 37
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
+        Top = 29
+        Width = 646
+        Height = 28
         Align = alBottom
         TabOrder = 2
-        ExplicitTop = 38
-        ExplicitWidth = 846
-        ExplicitHeight = 37
+        ExplicitTop = 29
+        ExplicitWidth = 646
         inherited Label1: TLabel
-          Left = 481
-          Top = 4
-          Width = 34
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitLeft = 481
-          ExplicitTop = 4
-          ExplicitWidth = 34
-          ExplicitHeight = 17
+          Left = 368
+          ExplicitLeft = 374
         end
         inherited Label2: TLabel
-          Left = 303
-          Top = 4
-          Width = 33
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitLeft = 303
-          ExplicitTop = 4
-          ExplicitWidth = 33
-          ExplicitHeight = 17
+          Left = 231
+          ExplicitLeft = 237
         end
         inherited lbl_Caption: TLabel
-          Left = 4
-          Top = 4
-          Width = 291
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
+          Width = 222
           Caption = 'Sample entry'
-          ExplicitLeft = 4
-          ExplicitTop = 4
-          ExplicitWidth = 81
-          ExplicitHeight = 17
+          ExplicitWidth = 63
         end
         inherited cb_Bold: TCheckBox
-          Left = 659
-          Top = 4
-          Width = 40
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          Font.Height = -15
-          ExplicitLeft = 659
-          ExplicitTop = 4
-          ExplicitWidth = 40
-          ExplicitHeight = 29
+          Left = 504
+          Width = 31
+          ExplicitLeft = 504
+          ExplicitWidth = 31
         end
         inherited cb_Italic: TCheckBox
-          Left = 707
-          Top = 4
-          Width = 39
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          Font.Height = -15
-          ExplicitLeft = 707
-          ExplicitTop = 4
-          ExplicitWidth = 39
-          ExplicitHeight = 29
+          Left = 541
+          Width = 29
+          ExplicitLeft = 541
+          ExplicitWidth = 29
         end
         inherited cb_Underline: TCheckBox
-          Left = 754
-          Top = 4
-          Width = 41
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          Font.Height = -15
-          ExplicitLeft = 754
-          ExplicitTop = 4
-          ExplicitWidth = 41
-          ExplicitHeight = 29
+          Left = 576
+          Width = 31
+          ExplicitLeft = 576
+          ExplicitWidth = 31
         end
         inherited cb_Strike: TCheckBox
-          Left = 803
-          Top = 4
-          Width = 39
-          Height = 29
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          Font.Height = -15
-          ExplicitLeft = 803
-          ExplicitTop = 4
-          ExplicitWidth = 39
-          ExplicitHeight = 29
+          Left = 613
+          ExplicitLeft = 613
         end
         inherited cob_Text: TColorBox
-          Left = 344
-          Top = 4
-          Width = 129
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitLeft = 344
-          ExplicitTop = 4
-          ExplicitWidth = 129
+          Left = 263
+          Width = 99
+          ExplicitLeft = 263
+          ExplicitWidth = 99
         end
         inherited cob_Back: TColorBox
-          Left = 523
-          Top = 4
-          Width = 128
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
-          ExplicitLeft = 523
-          ExplicitTop = 4
-          ExplicitWidth = 128
+          Left = 400
+          ExplicitLeft = 400
         end
       end
       object ed_maxResults: TSpinEdit
-        Left = 759
-        Top = 3
-        Width = 82
-        Height = 27
+        Left = 580
+        Top = 2
+        Width = 63
+        Height = 22
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         MaxValue = 0
         MinValue = 0
         TabOrder = 3
@@ -298,51 +181,44 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
     object ToolBar1: TToolBar
       AlignWithMargins = True
       Left = 5
-      Top = 22
-      Width = 840
-      Height = 22
-      ButtonHeight = 26
+      Top = 18
+      Width = 640
+      Height = 30
+      ButtonHeight = 30
+      ButtonWidth = 31
       Caption = 'ToolBar1'
-      Images = iml_TB
+      Images = ch2Data.ch2Images24
       TabOrder = 2
       object btn_Add: TToolButton
         Left = 0
         Top = 0
         Caption = 'btn_Add'
-        ImageIndex = 0
+        ImageIndex = 1
         OnClick = btn_AddClick
       end
       object btn_Del: TToolButton
-        Left = 23
+        Left = 31
         Top = 0
         Caption = 'btn_Del'
-        ImageIndex = 1
+        ImageIndex = 2
         OnClick = btn_DelClick
       end
     end
   end
   object Panel1: TPanel
     Left = 0
-    Top = 450
-    Width = 858
-    Height = 40
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
+    Top = 344
+    Width = 656
+    Height = 31
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     object btn_OK: TButton
       AlignWithMargins = True
-      Left = 756
-      Top = 4
-      Width = 98
-      Height = 32
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
+      Left = 578
+      Top = 3
+      Width = 75
+      Height = 25
       Align = alRight
       Caption = 'OK'
       Default = True
@@ -353,186 +229,31 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
   object Panel3: TPanel
     Left = 0
     Top = 0
-    Width = 858
-    Height = 33
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
+    Width = 656
+    Height = 25
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 2
     object Label1: TLabel
       AlignWithMargins = True
-      Left = 4
-      Top = 4
-      Width = 48
-      Height = 25
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
+      Left = 3
+      Top = 3
+      Width = 38
+      Height = 19
       Align = alLeft
       Caption = 'Priority:'
       Layout = tlCenter
-      ExplicitHeight = 17
+      ExplicitHeight = 13
     end
     object ed_Prio: TSpinEdit
-      Left = 71
-      Top = 4
-      Width = 77
-      Height = 27
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
+      Left = 54
+      Top = 3
+      Width = 59
+      Height = 22
       MaxValue = 0
       MinValue = 0
       TabOrder = 0
       Value = 0
     end
-  end
-  object iml_TB: TImageList
-    Left = 288
-    Top = 96
-    Bitmap = {
-      494C0101020008002C0110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
-      0000000000003600000028000000400000001000000001002000000000000010
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000DADBDB630BB019FF0BB019FF0BB019FF0BB019FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000BB019FF05BF14FF00B20CFF00A806FF56C357FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000BB019FF0DC920FF06BF15FF00B50CFF56CB5BFF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000BB019FF1BD334FF10CA20FF07C017FF57D561FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000BB019FF2BDA53FF1BD436FF11CC22FF5CDD68FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000BB019FF39E16AFF2BDA54FF1ED53AFF63E471FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000004AE963FF64ED80FF70F392FF75F4
-      97FF75F697FF7AEB9FFF45E47BFF3AE16AFF2DDC56FF6AE37EFF63E671FF5DE1
-      69FF59DB62FF56D35DFF56CC59FF0BB019FF4AE963FF64ED80FF70F392FF75F4
-      97FF75F697FF7AEB9FFF77EB9FFF6FE992FF66E584FF5BE071FF54E463FF5DE1
-      69FF59DB62FF56D35DFF56CC59FF0BB019FF0000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000041D64DFF1BD336FF28DA4FFF38E0
-      68FF46E47BFF4CE581FF47E47CFF46E47CFF3CE26FFF2FDD59FF21D740FF15CF
-      28FF0BC61BFF04BB11FF00B10AFF0BB019FF41D64DFF1BD336FF28DA4FFF38E0
-      68FF46E47BFF4CE581FF47E47CFF46E47CFF3CE26FFF2FDD59FF21D740FF15CF
-      28FF0BC61BFF04BB11FF00B10AFF0BB019FF0000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000003DD249FF11CB22FF1AD331FF27DA
-      4EFF36E064FF45E479FF52E789FF52E889FF4BE580FF3DE170FF30DD5BFF22D7
-      43FF16D029FF0BC71CFF04BC14FF0BB019FF3DD249FF11CB22FF1AD331FF27DA
-      4EFF36E064FF45E479FF52E789FF52E889FF4BE580FF3DE170FF30DD5BFF22D7
-      43FF16D029FF0BC71CFF04BC14FF0BB019FF0000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000039CD45FF0AC51BFF10CB21FF18D1
-      2FFF25D848FF34DF61FF43E376FF51E787FF54E98BFF55E98CFF4CE681FF3CE2
-      6EFF2BDB53FF1BD336FF0FC921FF0BB019FF39CD45FF0AC51BFF10CB21FF18D1
-      2FFF25D848FF34DF61FF43E376FF51E787FF54E98BFF55E98CFF4CE681FF3CE2
-      6EFF2BDB53FF1BD336FF0FC921FF0BB019FF0000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000039207FF039207FF039207FF0392
-      07FF039207FF039207FF32DF5EFF42E376FF4FE685FF77EEA4FF08A412FF08A4
-      12FF08A412FF08A412FF08A412FFDADBDB63039207FF039207FF039207FF0392
-      07FF039207FF039207FF039207FF039207FF039207FF05980BFF079B0CFF07A0
-      0FFF08A411FF08A412FF08A412FFDADBDB630000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000039207FF21D641FF30DD5DFF3FE272FF7AF7A9FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000039207FF14CF27FF20D741FF2DDD57FF6DF299FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000039207FF0EC91FFF14CE27FF1FD63EFF5DEE83FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000039207FF09C318FF0DC81EFF13CC24FF4FE86AFF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000039207FF36C942FF39CE46FF3DD24AFF43E053FF000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000424D3E000000000000003E000000
-      2800000040000000100000000100010000000000800000000000000000000000
-      000000000000000000000000FFFFFF00F83FFFFF00000000F83FFFFF00000000
-      F83FFFFF00000000F83FFFFF00000000F83FFFFF00000000F83FFFFF00000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000F83FFFFF00000000F83FFFFF00000000F83FFFFF00000000
-      F83FFFFF00000000F83FFFFF0000000000000000000000000000000000000000
-      000000000000}
   end
 end

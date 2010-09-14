@@ -21,7 +21,7 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp2_D120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\CustomHelp2_D120.bpl</DCC_DependencyCheckOutputName>
 			<DesignOnlyPackage>true</DesignOnlyPackage>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DCC_Description>CustomHelp2</DCC_Description>
@@ -52,9 +52,12 @@
 			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="vclx.dcp"/>
 			<DCCReference Include="xmlrtl.dcp"/>
-			<DCCReference Include="vclactnband.dcp"/>
 			<DCCReference Include="..\..\uch2Configure.pas">
 				<Form>ch2FormConfigure</Form>
+			</DCCReference>
+			<DCCReference Include="..\..\uch2Data.pas">
+				<Form>ch2Data</Form>
+				<DesignClass>TDataModule</DesignClass>
 			</DCCReference>
 			<DCCReference Include="..\..\uch2FrameHelpItemDecoration.pas">
 				<Form>ch2FrameHelpItemDecoration</Form>
