@@ -43,7 +43,6 @@ contains
   uch2FrameHelpItemDecoration in '..\..\uch2FrameHelpItemDecoration.pas' {ch2FrameHelpItemDecoration: TFrame},
   uch2GUIDefault in '..\..\uch2GUIDefault.pas' {ch2FormGUIDefault},
   uch2GUIDockableTree in '..\..\uch2GUIDockableTree.pas' {ch2FormGUIDockableTree},
-  uch2HtmlHelp in '..\..\uch2HtmlHelp.pas',
   uch2Main in '..\..\uch2Main.pas',
   uch2MSHelpServices in '..\..\uch2MSHelpServices.pas',
   uch2Provider3rdPartyHelp in '..\..\uch2Provider3rdPartyHelp.pas' {ch2FormProvider3rdPartyHelp},
