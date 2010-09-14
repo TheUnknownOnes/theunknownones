@@ -88,7 +88,7 @@ type
 
 implementation
 
-uses uch2HtmlHelp, uch2Data;
+uses uch2Data;
 
 {$R *.dfm}
 

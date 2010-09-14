@@ -98,8 +98,6 @@ object ch2FormConfigHTMLHelp: Tch2FormConfigHTMLHelp
       TabOrder = 0
       ViewStyle = vsReport
       OnSelectItem = LVSelectItem
-      ExplicitTop = 46
-      ExplicitHeight = 223
     end
     object Panel2: TPanel
       Left = 2
