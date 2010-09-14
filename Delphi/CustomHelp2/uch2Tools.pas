@@ -5,13 +5,13 @@ interface
 uses
   SysUtils, StrUtils;
 
-function ch2StrEncodeURL(AStr : AnsiString) : String;
+function ch2StrEncodeURL(AStr : UTF8String) : String;
 
 function ch2StripTags(line: string; c1, c2: Char): string;
 
 implementation
 
-function ch2StrEncodeURL(AStr : AnsiString) : String;
+function ch2StrEncodeURL(AStr : UTF8String) : String;
 var
   c : AnsiChar;
 begin

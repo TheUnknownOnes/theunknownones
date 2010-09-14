@@ -1,4 +1,4 @@
-object Frame1: TFrame1
+object ch2FrameHelpTree: Tch2FrameHelpTree
   Left = 0
   Top = 0
   Width = 451
@@ -34,21 +34,21 @@ object Frame1: TFrame1
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 55
+      Width = 54
       Height = 24
       Align = alLeft
-      Caption = 'Keywords'
+      Caption = 'Search for:'
       Layout = tlCenter
-      ExplicitHeight = 16
+      ExplicitHeight = 13
     end
     object cbKeywords: TComboBox
       AlignWithMargins = True
-      Left = 64
+      Left = 63
       Top = 3
-      Width = 384
-      Height = 24
+      Width = 385
+      Height = 21
       Align = alClient
-      ItemHeight = 16
+      ItemHeight = 13
       TabOrder = 0
       OnCloseUp = cbKeywordsCloseUp
       OnKeyPress = cbKeywordsKeyPress
