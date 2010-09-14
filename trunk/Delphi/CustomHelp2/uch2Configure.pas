@@ -15,9 +15,10 @@ type
     Panel1: TPanel;
     btn_Cancel: TButton;
     btn_OK: TButton;
+    procedure lv_GUIChange(Sender: TObject; Item: TListItem;
+      Change: TItemChange);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure lv_GUIItemChecked(Sender: TObject; Item: TListItem);
     procedure btn_OKClick(Sender: TObject);
     procedure lv_ProviderDblClick(Sender: TObject);
     procedure lv_ProviderCompare(Sender: TObject; Item1, Item2: TListItem;
@@ -119,30 +120,34 @@ begin
     Dispose(PProviderData(i.Data));
 end;
 
-procedure Tch2FormConfigure.lv_GUIItemChecked(Sender: TObject; Item: TListItem);
+procedure Tch2FormConfigure.lv_GUIChange(Sender: TObject; Item: TListItem;
+  Change: TItemChange);
 var
   i : TListItem;
   cnt : Integer;
 begin
-  if Item.Checked then
+  if Change=ctState then
   begin
-    for i in lv_GUI.Items do
+    if Item.Checked then
     begin
-      if i <> Item then
-        i.Checked := false;
-    end;
-  end
-  else
-  begin
-    cnt := 0;
-    for i in lv_GUI.Items do
+      for i in lv_GUI.Items do
+      begin
+        if i <> Item then
+          i.Checked := false;
+      end;
+    end
+    else
     begin
-      if i.Checked then
-        inc(cnt)
-    end;
+      cnt := 0;
+      for i in lv_GUI.Items do
+      begin
+        if i.Checked then
+          inc(cnt)
+      end;
 
-    if cnt = 0 then
-      Item.Checked := true;
+      if cnt = 0 then
+        Item.Checked := true;
+    end;
   end;
 end;
 
