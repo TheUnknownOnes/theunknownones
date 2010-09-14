@@ -2,78 +2,48 @@ object ch2FormGUIDockableTree: Tch2FormGUIDockableTree
   Left = 0
   Top = 0
   Caption = 'Custom Help 2'
-  ClientHeight = 212
-  ClientWidth = 414
+  ClientHeight = 283
+  ClientWidth = 552
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -10
+  Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   OnCreate = FormCreate
-  PixelsPerInch = 96
-  TextHeight = 12
-  inline Frame11: Tch2FrameHelpTree
+  PixelsPerInch = 120
+  TextHeight = 16
+  inline Frame: Tch2FrameHelpTree
     Left = 0
     Top = 0
-    Width = 414
-    Height = 212
-    Margins.Left = 2
-    Margins.Top = 2
-    Margins.Right = 2
-    Margins.Bottom = 2
+    Width = 552
+    Height = 283
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 414
-    ExplicitHeight = 212
+    ExplicitWidth = 552
+    ExplicitHeight = 283
     inherited TreeView1: TTreeView
-      Left = 2
-      Top = 25
-      Width = 410
-      Height = 185
-      Margins.Left = 2
-      Margins.Top = 2
-      Margins.Right = 2
-      Margins.Bottom = 2
-      ExplicitLeft = 2
-      ExplicitTop = 25
-      ExplicitWidth = 410
-      ExplicitHeight = 185
+      Top = 34
+      Width = 546
+      Height = 246
+      ExplicitTop = 34
+      ExplicitWidth = 546
+      ExplicitHeight = 246
     end
     inherited Panel1: TPanel
-      Width = 414
-      Height = 23
-      Margins.Left = 2
-      Margins.Top = 2
-      Margins.Right = 2
-      Margins.Bottom = 2
-      ExplicitWidth = 414
-      ExplicitHeight = 23
+      Width = 552
+      Height = 31
+      ExplicitWidth = 552
+      ExplicitHeight = 31
       inherited Label1: TLabel
-        Left = 2
-        Top = 2
-        Height = 19
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Margins.Bottom = 2
+        Height = 25
         ParentFont = False
-        ExplicitLeft = 2
-        ExplicitTop = 2
       end
       inherited cbKeywords: TComboBox
-        Left = 60
-        Top = 2
-        Width = 352
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Margins.Bottom = 2
+        Width = 475
         ParentFont = False
-        ExplicitLeft = 60
-        ExplicitTop = 2
-        ExplicitWidth = 352
+        ExplicitWidth = 475
       end
     end
   end

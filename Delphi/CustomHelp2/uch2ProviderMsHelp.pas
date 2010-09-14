@@ -289,7 +289,7 @@ end;
 
 function Tch2ProviderMSHelp.GetDescription: String;
 begin
-  Result:='nothing to see here';
+  Result:='Get help from the Microsoft Help providers installed in your system';
 end;
 
 function Tch2ProviderMSHelp.GetGUID: TGUID;

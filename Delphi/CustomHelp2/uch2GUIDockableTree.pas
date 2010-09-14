@@ -11,7 +11,7 @@ type
   Tch2GUIDockableTree = class;
 
   Tch2FormGUIDockableTree = class(TDockableForm)
-    Frame11: Tch2FrameHelpTree;
+    Frame: Tch2FrameHelpTree;
 
     procedure FormCreate(Sender: TObject);
   end;
@@ -99,7 +99,7 @@ end;
 function Tch2GUIDockableTree.AddHelpItem(AHelpItem: Ich2HelpItem;
   AParent: Pointer): Pointer;
 begin
-  Result:=FForm.Frame11.AddHelpItem(AHelpItem, AParent);
+  Result:=FForm.Frame.AddHelpItem(AHelpItem, AParent);
 end;
 
 procedure Tch2GUIDockableTree.AfterConstruction;
@@ -132,7 +132,7 @@ end;
 procedure Tch2GUIDockableTree.Show(const AHelpString: String;
   const Ach2Keywords: TStringList);
 begin
-  FForm.Frame11.Init(AHelpString, Ach2Keywords);
+  FForm.Frame.Init(AHelpString, Ach2Keywords);
   ShowDockableForm(TDockableForm(Self.FForm));
 end;
 
