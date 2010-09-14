@@ -3,31 +3,31 @@ object ch2FormConfigure: Tch2FormConfigure
   Top = 0
   BorderStyle = bsSizeToolWin
   Caption = 'Configure CustomHelp'
-  ClientHeight = 479
-  ClientWidth = 724
+  ClientHeight = 626
+  ClientWidth = 947
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -14
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  PixelsPerInch = 96
-  TextHeight = 13
+  PixelsPerInch = 120
+  TextHeight = 17
   object GroupBox1: TGroupBox
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 718
-    Height = 263
+    Width = 941
+    Height = 348
     Align = alClient
     Caption = 'Helpprovider (doubleclick to configure)'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -15
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
@@ -35,14 +35,14 @@ object ch2FormConfigure: Tch2FormConfigure
     object lv_Provider: TListView
       AlignWithMargins = True
       Left = 5
-      Top = 18
-      Width = 708
-      Height = 240
+      Top = 23
+      Width = 931
+      Height = 320
       Align = alClient
       Columns = <
         item
           Caption = 'Name'
-          Width = 150
+          Width = 196
         end
         item
           AutoSize = True
@@ -50,7 +50,7 @@ object ch2FormConfigure: Tch2FormConfigure
         end>
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -15
       Font.Name = 'Tahoma'
       Font.Style = []
       ReadOnly = True
@@ -66,14 +66,14 @@ object ch2FormConfigure: Tch2FormConfigure
   object GroupBox2: TGroupBox
     AlignWithMargins = True
     Left = 3
-    Top = 272
-    Width = 718
-    Height = 172
+    Top = 357
+    Width = 941
+    Height = 225
     Align = alBottom
     Caption = 'GUI'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -15
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
@@ -81,15 +81,15 @@ object ch2FormConfigure: Tch2FormConfigure
     object lv_GUI: TListView
       AlignWithMargins = True
       Left = 5
-      Top = 18
-      Width = 708
-      Height = 149
+      Top = 23
+      Width = 931
+      Height = 197
       Align = alClient
       Checkboxes = True
       Columns = <
         item
           Caption = 'Name'
-          Width = 150
+          Width = 196
         end
         item
           AutoSize = True
@@ -97,7 +97,7 @@ object ch2FormConfigure: Tch2FormConfigure
         end>
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -15
       Font.Name = 'Tahoma'
       Font.Style = []
       ReadOnly = True
@@ -105,23 +105,23 @@ object ch2FormConfigure: Tch2FormConfigure
       ParentFont = False
       TabOrder = 0
       ViewStyle = vsReport
-      OnItemChecked = lv_GUIItemChecked
+      OnChange = lv_GUIChange
     end
   end
   object Panel1: TPanel
     Left = 0
-    Top = 447
-    Width = 724
-    Height = 32
+    Top = 585
+    Width = 947
+    Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
     object btn_Cancel: TButton
       AlignWithMargins = True
-      Left = 646
+      Left = 846
       Top = 3
-      Width = 75
-      Height = 26
+      Width = 98
+      Height = 35
       Align = alRight
       Cancel = True
       Caption = 'Cancel'
@@ -130,10 +130,10 @@ object ch2FormConfigure: Tch2FormConfigure
     end
     object btn_OK: TButton
       AlignWithMargins = True
-      Left = 565
+      Left = 742
       Top = 3
-      Width = 75
-      Height = 26
+      Width = 98
+      Height = 35
       Align = alRight
       Caption = 'OK'
       Default = True
