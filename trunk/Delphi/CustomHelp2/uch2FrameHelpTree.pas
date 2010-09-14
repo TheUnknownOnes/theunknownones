@@ -104,7 +104,6 @@ procedure Tch2FrameHelpTree.ShowHelp(FKeyword: String);
 var
   Intf : IInterface;
   IProv : Ich2Provider absolute Intf;
-  IGUI : Ich2GUI;
 begin
   Screen.Cursor := crHourGlass;
   TreeView1.Items.BeginUpdate;
@@ -237,7 +236,6 @@ end;
 function TNodeData.GetExpanded: Boolean;
 var
   Reg : TRegistry;
-  hi : Ich2HelpItem;
 begin
   Result:=False;
 
@@ -266,7 +264,6 @@ end;
 procedure TNodeData.SetExpanded(const Value: Boolean);
 var
   Reg : TRegistry;
-  hi : Ich2HelpItem;
 begin
   Reg := TRegistry.Create(KEY_ALL_ACCESS);
   try

@@ -168,14 +168,11 @@ procedure Tch2ProviderRSSSearch.DoRSSSearch(AURL: Tch2RSSURL; AGUI: Ich2GUI;
   AKeyword: String);
 var
   idx, channelidx: Integer;
-  Caption, Description, Url, Group:  string;
-  oldc:        string;
+  Caption, Description, Url:  string;
   xmldocument: IXMLDomDocument;
   node:        IXMLDOMNode;
   channels, nodes: IXMLDOMNodeList;
   FileName:    string;
-  Timeout,
-  MaxResults: Integer;
   Parent : Pointer;
 
   procedure NeedParent();

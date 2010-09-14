@@ -133,6 +133,7 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
         Height = 28
         Align = alBottom
         TabOrder = 3
+        TabStop = True
         ExplicitTop = 27
         ExplicitWidth = 592
         inherited Label1: TLabel

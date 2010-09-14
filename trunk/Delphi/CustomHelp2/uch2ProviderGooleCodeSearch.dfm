@@ -131,6 +131,7 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
         Height = 28
         Align = alBottom
         TabOrder = 2
+        TabStop = True
         ExplicitTop = 30
         ExplicitWidth = 615
         inherited Label1: TLabel
@@ -181,7 +182,7 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
         Width = 151
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 3
         OnChange = com_LocationChange
       end

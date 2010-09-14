@@ -151,6 +151,7 @@ object ch2FormConfigHTMLHelp: Tch2FormConfigHTMLHelp
         Height = 28
         Align = alBottom
         TabOrder = 2
+        TabStop = True
         ExplicitTop = 29
         ExplicitWidth = 549
         inherited Label1: TLabel

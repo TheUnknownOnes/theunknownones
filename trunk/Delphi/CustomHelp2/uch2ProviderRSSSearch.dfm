@@ -67,8 +67,6 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
       TabOrder = 0
       ViewStyle = vsReport
       OnSelectItem = LVSelectItem
-      ExplicitTop = 46
-      ExplicitHeight = 302
     end
     object Panel2: TPanel
       Left = 2
@@ -142,6 +140,7 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         Height = 28
         Align = alBottom
         TabOrder = 3
+        TabStop = True
         ExplicitTop = 29
         ExplicitWidth = 610
         inherited Label1: TLabel

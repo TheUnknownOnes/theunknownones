@@ -101,8 +101,6 @@ object ch2FormConfigShellCommand: Tch2FormConfigShellCommand
       TabOrder = 0
       ViewStyle = vsReport
       OnSelectItem = lvSelectItem
-      ExplicitTop = 43
-      ExplicitHeight = 204
     end
     object Panel3: TPanel
       Left = 2
@@ -119,6 +117,7 @@ object ch2FormConfigShellCommand: Tch2FormConfigShellCommand
         Height = 28
         Align = alBottom
         TabOrder = 0
+        TabStop = True
         ExplicitTop = 34
         ExplicitWidth = 560
         inherited Label1: TLabel

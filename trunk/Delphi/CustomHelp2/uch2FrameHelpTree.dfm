@@ -5,6 +5,7 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
   Height = 304
   Align = alClient
   TabOrder = 0
+  TabStop = True
   object TreeView1: TTreeView
     AlignWithMargins = True
     Left = 3
@@ -35,11 +36,10 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
       Left = 3
       Top = 3
       Width = 54
-      Height = 24
+      Height = 13
       Align = alLeft
       Caption = 'Search for:'
       Layout = tlCenter
-      ExplicitHeight = 13
     end
     object cbKeywords: TComboBox
       AlignWithMargins = True
@@ -48,7 +48,7 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
       Width = 385
       Height = 21
       Align = alClient
-      ItemHeight = 13
+      ItemHeight = 0
       TabOrder = 0
       OnCloseUp = cbKeywordsCloseUp
       OnKeyPress = cbKeywordsKeyPress

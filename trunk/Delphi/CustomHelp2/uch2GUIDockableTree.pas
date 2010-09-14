@@ -144,8 +144,6 @@ end;
 
 
 initialization
-  ch2Main.RegisterGUI(Tch2GUIDockableTree.Create as Ich2GUI);
-
-finalization
+  //ch2Main.RegisterGUI(Tch2GUIDockableTree.Create as Ich2GUI);
 
 end.

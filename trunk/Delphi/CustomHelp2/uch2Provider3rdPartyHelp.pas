@@ -102,7 +102,7 @@ end;
 type
   THelpManagerHack = class(TInterfacedObject)
   private
-    FHelpSelector: IHelpSelector;
+    FHelpSelector: IHelpSelector; //dont remove ... its part of the hack :)
     FViewerList: TList;
   end;
 
@@ -307,6 +307,8 @@ var
 begin
   inherited;
 
+  Result := true;
+
   Reg := TRegistry.Create(KEY_ALL_ACCESS);
   try
     if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_VIEWERS+'\'+AName, true) then
@@ -420,8 +422,6 @@ var
   ViewerList : TList;
   P : Pointer;
   Node : THelpViewerNodeHack absolute P;
-  HelpStrings: TStrings;
-  Parent : Pointer;
   idx: Integer;
 begin
   FrameHelpItemDeco.OnChange:=onDecoChange;
@@ -467,7 +467,6 @@ procedure Tch2FormProvider3rdPartyHelp.clbProvidersClick(Sender: TObject);
 var
   idx: Integer;
   ViewerName : String;
-  fs : TFontStyles;
 begin
   for idx := 0 to FrameHelpItemDeco.ControlCount - 1 do
     FrameHelpItemDeco.Controls[idx].Enabled:=clbProviders.ItemIndex>=0;

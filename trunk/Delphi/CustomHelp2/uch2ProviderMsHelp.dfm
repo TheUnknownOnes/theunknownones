@@ -2,25 +2,25 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
   Left = 0
   Top = 0
   Caption = 'MS Help 2.x'
-  ClientHeight = 549
-  ClientWidth = 807
+  ClientHeight = 412
+  ClientWidth = 605
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -13
+  Font.Height = -10
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
   OnClose = FormClose
-  PixelsPerInch = 120
-  TextHeight = 16
+  PixelsPerInch = 96
+  TextHeight = 12
   object GroupBox2: TGroupBox
     AlignWithMargins = True
     Left = 4
-    Top = 83
-    Width = 799
-    Height = 422
+    Top = 65
+    Width = 597
+    Height = 313
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
@@ -29,7 +29,7 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
     Caption = 'MS Help Namespaces'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -14
+    Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
@@ -37,9 +37,9 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
     object lvNamespaces: TListView
       AlignWithMargins = True
       Left = 6
-      Top = 23
-      Width = 787
-      Height = 328
+      Top = 19
+      Width = 585
+      Height = 238
       Margins.Left = 4
       Margins.Top = 4
       Margins.Right = 4
@@ -49,7 +49,7 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
       Columns = <
         item
           Caption = 'Name'
-          Width = 250
+          Width = 188
         end
         item
           AutoSize = True
@@ -64,81 +64,82 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
     object GroupBox3: TGroupBox
       AlignWithMargins = True
       Left = 5
-      Top = 358
-      Width = 789
-      Height = 59
+      Top = 264
+      Width = 587
+      Height = 44
       Align = alBottom
       Caption = 'Options'
       TabOrder = 1
       inline FrameHelpItemDeco: Tch2FrameHelpItemDecoration
         AlignWithMargins = True
         Left = 5
-        Top = 22
-        Width = 779
-        Height = 28
+        Top = 18
+        Width = 577
+        Height = 21
         Align = alTop
         TabOrder = 0
+        TabStop = True
         ExplicitLeft = 5
-        ExplicitTop = 22
-        ExplicitWidth = 779
+        ExplicitTop = 18
+        ExplicitWidth = 577
+        ExplicitHeight = 21
         inherited Label1: TLabel
-          Left = 458
-          Width = 34
-          Height = 17
-          ExplicitLeft = 473
-          ExplicitWidth = 34
-          ExplicitHeight = 17
+          Left = 328
+          Height = 15
+          ExplicitLeft = 328
         end
         inherited Label2: TLabel
-          Left = 315
-          Width = 33
-          Height = 17
-          ExplicitLeft = 333
-          ExplicitWidth = 33
-          ExplicitHeight = 17
+          Left = 217
+          Height = 15
+          ExplicitLeft = 217
         end
         inherited lbl_Caption: TLabel
-          Width = 91
-          Height = 17
+          Width = 208
+          Height = 15
           Caption = 'Sample Header'
-          ExplicitWidth = 91
-          ExplicitHeight = 17
+          ExplicitWidth = 72
         end
         inherited cb_Bold: TCheckBox
-          Left = 602
-          Width = 39
-          Font.Height = -15
-          ExplicitLeft = 602
-          ExplicitWidth = 39
+          Left = 439
+          Width = 29
+          Height = 15
+          ExplicitLeft = 439
+          ExplicitWidth = 29
+          ExplicitHeight = 15
         end
         inherited cb_Italic: TCheckBox
-          Left = 647
-          Width = 39
-          Font.Height = -15
-          ExplicitLeft = 647
-          ExplicitWidth = 39
+          Left = 474
+          Height = 15
+          ExplicitLeft = 474
+          ExplicitHeight = 15
         end
         inherited cb_Underline: TCheckBox
-          Left = 692
-          Width = 39
-          Font.Height = -15
-          ExplicitLeft = 692
-          ExplicitWidth = 39
+          Left = 510
+          Width = 29
+          Height = 15
+          ExplicitLeft = 510
+          ExplicitWidth = 29
+          ExplicitHeight = 15
         end
         inherited cb_Strike: TCheckBox
-          Left = 737
-          Width = 39
-          Font.Height = -15
-          ExplicitLeft = 737
-          ExplicitWidth = 39
+          Left = 545
+          Width = 29
+          Height = 15
+          ExplicitLeft = 545
+          ExplicitWidth = 29
+          ExplicitHeight = 15
         end
         inherited cob_Text: TColorBox
-          Left = 354
-          ExplicitLeft = 354
+          Left = 249
+          Width = 73
+          ExplicitLeft = 249
+          ExplicitWidth = 73
         end
         inherited cob_Back: TColorBox
-          Left = 498
-          ExplicitLeft = 498
+          Left = 360
+          Width = 73
+          ExplicitLeft = 360
+          ExplicitWidth = 73
         end
       end
     end
@@ -147,8 +148,8 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
     AlignWithMargins = True
     Left = 4
     Top = 4
-    Width = 799
-    Height = 71
+    Width = 597
+    Height = 53
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
@@ -157,16 +158,16 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
     Caption = 'Priority'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -14
+    Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
     TabOrder = 1
     object ed_Prio: TSpinEdit
-      Left = 14
-      Top = 27
-      Width = 92
-      Height = 27
+      Left = 11
+      Top = 20
+      Width = 69
+      Height = 22
       Margins.Left = 4
       Margins.Top = 4
       Margins.Right = 4
@@ -179,9 +180,9 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
   end
   object Panel1: TPanel
     Left = 0
-    Top = 509
-    Width = 807
-    Height = 40
+    Top = 382
+    Width = 605
+    Height = 30
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
@@ -191,10 +192,10 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
     TabOrder = 2
     object btn_OK: TButton
       AlignWithMargins = True
-      Left = 705
+      Left = 528
       Top = 4
-      Width = 98
-      Height = 32
+      Width = 73
+      Height = 22
       Margins.Left = 4
       Margins.Top = 4
       Margins.Right = 4
