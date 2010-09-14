@@ -68,7 +68,6 @@ type
     ToolBar1: TToolBar;
     btn_Add: TToolButton;
     btn_Del: TToolButton;
-    iml_TB: TImageList;
     btn_FindFile: TButton;
     dlg_SelectFile: TOpenDialog;
     procedure FormShow(Sender: TObject);
@@ -89,7 +88,7 @@ type
 
 implementation
 
-uses uch2HtmlHelp;
+uses uch2HtmlHelp, uch2Data;
 
 {$R *.dfm}
 

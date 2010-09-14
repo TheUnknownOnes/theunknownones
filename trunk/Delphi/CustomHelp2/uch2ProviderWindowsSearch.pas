@@ -55,7 +55,6 @@ type
     Panel3: TPanel;
     Label1: TLabel;
     ed_Prio: TSpinEdit;
-    iml_TB: TImageList;
     Label4: TLabel;
     ed_maxResults: TSpinEdit;
     procedure btn_AddClick(Sender: TObject);
@@ -80,7 +79,7 @@ var
 implementation
 
 uses
-  Registry, StrUtils, uch2TlbSearchAPILib, ComObj;
+  Registry, StrUtils, uch2TlbSearchAPILib, ComObj, uch2Data;
 
 type
   Tch2ProviderWindowsSearchCategory = class(TInterfacedObject, Ich2HelpItem)

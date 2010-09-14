@@ -66,7 +66,6 @@ type
     ToolBar1: TToolBar;
     btn_Add: TToolButton;
     btn_Del: TToolButton;
-    iml_TB: TImageList;
     Label4: TLabel;
     Panel1: TPanel;
     btn_OK: TButton;
@@ -101,7 +100,7 @@ type
 
 implementation
 
-uses uch2Tools;
+uses uch2Tools, uch2Data;
 
 {$R *.dfm}
 
