@@ -4,49 +4,24 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, uch2Main, StdCtrls, ComCtrls, ExtCtrls, Registry, ImgList;
+  Dialogs, uch2Main, StdCtrls, ComCtrls, ExtCtrls, Registry, ImgList,
+  uch2FrameHelpTree;
 
 type
-  TNodeData = record
-    HelpItem : Ich2HelpItem;
-  end;
-  PNodeData = ^TNodeData;
-
   Tch2GUIDefault = class;
 
   Tch2FormGUIDefault = class(TForm)
-    GroupBox1: TGroupBox;
-    com_Keywords: TComboBox;
-    GroupBox2: TGroupBox;
-    TV: TTreeView;
-    tm_RunFirstSearch: TTimer;
-    iml_TV: TImageList;
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
+    Tree: Tch2FrameHelpTree;
+    tmDoSearch: TTimer;
     procedure FormShow(Sender: TObject);
-    procedure com_KeywordsChange(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure tm_RunFirstSearchTimer(Sender: TObject);
-    procedure TVDeletion(Sender: TObject; Node: TTreeNode);
-    procedure TVAdvancedCustomDrawItem(Sender: TCustomTreeView; Node: TTreeNode;
-      State: TCustomDrawState; Stage: TCustomDrawStage; var PaintImages,
-      DefaultDraw: Boolean);
-    procedure TVDblClick(Sender: TObject);
+
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure tmDoSearchTimer(Sender: TObject);
   private
-    FHelpString : String;
-    FKeywords : TStringList;
-    FGUI : Ich2GUI;
-
-    procedure DoSearch(AKeyword : String);
-
-    procedure SaveItemStats;
-    procedure LoadItemStats;
-
     procedure LoadSettings;
     procedure SaveSettings;
   public
-    function AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer = nil) : Pointer;
   end;
 
   Tch2GUIDefault = class(TInterfacedObject, Ich2GUI)
@@ -79,7 +54,8 @@ const
 
 function Tch2GUIDefault.AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer = nil) : Pointer;
 begin
-  Result := FForm.AddHelpItem(AHelpItem, AParent);
+  if Assigned(FForm) then
+    Result := FForm.Tree.AddHelpItem(AHelpItem, AParent)
 end;
 
 function Tch2GUIDefault.GetDescription: String;
@@ -103,88 +79,23 @@ procedure Tch2GUIDefault.Show(const AHelpString : String; const Ach2Keywords: TS
 begin
   FForm := Tch2FormGUIDefault.Create(nil);
   try
-    FForm.FKeywords.Assign(Ach2Keywords);
-    FForm.FHelpString := AHelpString;
-    FForm.FGUI := Self as Ich2GUI;
-
+    Fform.Caption := 'Search Help for "' + AHelpString + '"';
+    FForm.Tree.Init(AHelpString, Ach2Keywords, false);
     FForm.ShowModal;
   finally
     FForm.Free;
+    FForm := nil;
   end;
 end;
 
 { Tch2FormGUIDefault }
 
-function Tch2FormGUIDefault.AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer = nil) : Pointer;
-var
-  Node : TTreeNode;
-  NodeData : PNodeData;
-  Desc : String;
-begin
-  Desc:='';
-  if trim(AHelpItem.GetDescription)<>'' then
-    Desc:=' (' + AHelpItem.GetDescription + ')';
-  Node := tv.Items.AddChild(TTreeNode(AParent), AHelpItem.GetCaption + Desc);
-
-  New(NodeData);
-  NodeData^.HelpItem := AHelpItem;
-  Node.Data := NodeData;
-  Result := Node;
-
-  if ifProvidesHelp in AHelpItem.GetFlags then
-    Node.ImageIndex := 0
-  else
-    Node.ImageIndex := 1;
-
-  Node.SelectedIndex := Node.ImageIndex;
-end;
-
-procedure Tch2FormGUIDefault.com_KeywordsChange(Sender: TObject);
-begin
-  DoSearch(com_Keywords.Text);
-end;
-
-procedure Tch2FormGUIDefault.DoSearch(AKeyword: String);
-var
-  i : IInterface;
-  p : Ich2Provider absolute i;
-begin
-  tv.Items.Clear;
-  SaveItemStats;
-
-  Screen.Cursor := crHourGlass;
-  tv.Items.BeginUpdate;
-  try
-
-    for i in ch2Main.Providers do
-    begin
-      p.ProvideHelp(AKeyword, FGUI);
-    end;
-
-  finally
-    Screen.Cursor := crDefault;
-    tv.Items.EndUpdate;
-  end;
-
-  LoadItemStats;
-end;
 
 procedure Tch2FormGUIDefault.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
   Action := caFree;
-  SaveItemStats;
   SaveSettings;
-end;
-
-procedure Tch2FormGUIDefault.FormCreate(Sender: TObject);
-begin
-  FKeywords := TStringList.Create;
-end;
-
-procedure Tch2FormGUIDefault.FormDestroy(Sender: TObject);
-begin
-  FKeywords.Free;
 end;
 
 procedure Tch2FormGUIDefault.FormKeyUp(Sender: TObject; var Key: Word;
@@ -197,40 +108,7 @@ end;
 procedure Tch2FormGUIDefault.FormShow(Sender: TObject);
 begin
   LoadSettings;
-
-  Caption := 'Find help for "' + FHelpString + '"';
-  com_Keywords.Items.Assign(FKeywords);
-  com_Keywords.ItemIndex := com_Keywords.Items.IndexOf(FHelpString);
-  tm_RunFirstSearch.Enabled := true;
-end;
-
-procedure Tch2FormGUIDefault.LoadItemStats;
-var
-  Reg : TRegistry;
-  t : TTreeNode;
-  hi : Ich2HelpItem;
-begin
-  Reg := TRegistry.Create(KEY_ALL_ACCESS);
-  try
-    Reg.RootKey := HKEY_CURRENT_USER;
-
-    for t in tv.Items do
-    begin
-      hi := PNodeData(t.Data)^.HelpItem;
-
-      if ifSaveStats in hi.GetFlags then
-      begin
-        if Reg.OpenKey(ch2Main.RegRootKeyGUI[FGUI.GetGUID] + Settings_Key_Stats + GUIDToString(hi.GetGUID), false) then
-        begin
-          t.Expanded := reg.ReadBool(Settings_Value_Expanded);
-          reg.CloseKey;
-        end;
-      end;
-    end;
-
-  finally
-    Reg.Free;
-  end;
+  tmDoSearch.Enabled := true;
 end;
 
 procedure Tch2FormGUIDefault.LoadSettings;
@@ -242,7 +120,7 @@ begin
   try
     REG.RootKey := HKEY_CURRENT_USER;
 
-    if Reg.OpenKey(ch2Main.RegRootKeyGUI[FGUI.GetGUID], true) then
+    if Reg.OpenKey(ch2Main.RegRootKeyGUI[ch2Main.CurrentGUI.GetGUID], true) then
     begin
       if Reg.ValueExists(Settings_Value_Size) then
       begin
@@ -262,35 +140,6 @@ begin
   end;
 end;
 
-procedure Tch2FormGUIDefault.SaveItemStats;
-var
-  Reg : TRegistry;
-  t : TTreeNode;
-  hi : Ich2HelpItem;
-begin
-  Reg := TRegistry.Create(KEY_ALL_ACCESS);
-  try
-    Reg.RootKey := HKEY_CURRENT_USER;
-
-    for t in tv.Items do
-    begin
-      hi := PNodeData(t.Data)^.HelpItem;
-
-      if ifSaveStats in hi.GetFlags then
-      begin
-        if Reg.OpenKey(ch2Main.RegRootKeyGUI[FGUI.GetGUID] + Settings_Key_Stats + GUIDToString(hi.GetGUID), true) then
-        begin
-          reg.WriteBool(Settings_Value_Expanded, t.Expanded);
-          reg.CloseKey;
-        end;
-      end;
-    end;
-
-  finally
-    Reg.Free;
-  end;
-end;
-
 procedure Tch2FormGUIDefault.SaveSettings;
 var
   Reg : TRegistry;
@@ -302,7 +151,7 @@ begin
 
     r := Rect(Left, Top, Left + Width, Top + Height);
 
-    if Reg.OpenKey(ch2Main.RegRootKeyGUI[FGUI.GetGUID], true) then
+    if Reg.OpenKey(ch2Main.RegRootKeyGUI[ch2Main.CurrentGUI.GetGUID], true) then
     begin
       Reg.WriteBinaryData(Settings_Value_Size, r, SizeOf(r));
 
@@ -314,53 +163,10 @@ begin
   end;
 end;
 
-procedure Tch2FormGUIDefault.tm_RunFirstSearchTimer(Sender: TObject);
+procedure Tch2FormGUIDefault.tmDoSearchTimer(Sender: TObject);
 begin
-  tm_RunFirstSearch.Enabled := false;
-  com_KeywordsChange(Sender);
-end;
-
-
-procedure Tch2FormGUIDefault.TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
-  Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;
-  var PaintImages, DefaultDraw: Boolean);
-var
-  flags : Tch2HelpItemFlags;
-  deco : Tch2HelpItemDecoration;
-begin
-  PaintImages := true;
-  DefaultDraw := true;
-
-  deco := PNodeData(Node.Data)^.HelpItem.GetDecoration;
-
-  if deco.TextColor <> clDefault then
-    Sender.Canvas.Font.Color := deco.TextColor;
-
-  if deco.BackColor <> clDefault then
-    Sender.Canvas.Brush.Color := deco.BackColor;
-
-  Sender.Canvas.Font.Style := deco.FontStyles;
-end;
-
-procedure Tch2FormGUIDefault.TVDblClick(Sender: TObject);
-var
-  hi : Ich2HelpItem;
-begin
-  if Assigned(tv.Selected) then
-  begin
-    hi := PNodeData(tv.Selected.Data)^.HelpItem;
-
-    if ifProvidesHelp in hi.GetFlags then
-    begin
-      hi.ShowHelp;
-      ModalResult := mrOk;
-    end;
-  end;
-end;
-
-procedure Tch2FormGUIDefault.TVDeletion(Sender: TObject; Node: TTreeNode);
-begin
-  Dispose(PNodeData(Node.Data));
+  tmDoSearch.Enabled := false;
+  Tree.ShowHelp(Tree.cbKeywords.Text);
 end;
 
 initialization

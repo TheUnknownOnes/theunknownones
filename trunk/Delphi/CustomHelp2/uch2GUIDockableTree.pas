@@ -11,7 +11,7 @@ type
   Tch2GUIDockableTree = class;
 
   Tch2FormGUIDockableTree = class(TDockableForm)
-    Frame11: TFrame1;
+    Frame11: Tch2FrameHelpTree;
 
     procedure FormCreate(Sender: TObject);
   end;

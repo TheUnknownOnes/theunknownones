@@ -7,7 +7,7 @@ uses
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, uch2Main, ImgList, uch2Data;
 
 type
-  TFrame1 = class(TFrame)
+  Tch2FrameHelpTree = class(TFrame)
     TreeView1: TTreeView;
     Panel1: TPanel;
     Label1: TLabel;
@@ -22,7 +22,7 @@ type
     procedure TreeView1Expanded(Sender: TObject; Node: TTreeNode);
   public
     function AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer = nil) : Pointer;
-    procedure Init(const AHelpString: String; const Ach2Keywords: TStringList);
+    procedure Init(const AHelpString: String; const Ach2Keywords: TStringList; ASeachImmediate : Boolean = true);
 
     procedure ShowHelp(FKeyword: String);
   end;
@@ -54,7 +54,7 @@ type
 
 { TFrame1 }
 
-function TFrame1.AddHelpItem(AHelpItem: Ich2HelpItem;
+function Tch2FrameHelpTree.AddHelpItem(AHelpItem: Ich2HelpItem;
   AParent: Pointer): Pointer;
 var
   Node : TTreeNode;
@@ -76,32 +76,34 @@ begin
   Result:=Node;
 end;
 
-procedure TFrame1.cbKeywordsCloseUp(Sender: TObject);
+procedure Tch2FrameHelpTree.cbKeywordsCloseUp(Sender: TObject);
 begin
   if cbKeywords.ItemIndex>=0 then
     ShowHelp(cbKeywords.Items[cbKeywords.ItemIndex]);
 end;
 
-procedure TFrame1.cbKeywordsKeyPress(Sender: TObject; var Key: Char);
+procedure Tch2FrameHelpTree.cbKeywordsKeyPress(Sender: TObject; var Key: Char);
 begin
   if Key=#13 then
     ShowHelp(cbKeywords.Text);
 end;
 
-procedure TFrame1.Init(const AHelpString: String;
-  const Ach2Keywords: TStringList);
+procedure Tch2FrameHelpTree.Init(const AHelpString: String;
+  const Ach2Keywords: TStringList; ASeachImmediate : Boolean = true);
 begin
   cbKeywords.Items.Text:=Ach2Keywords.Text;
   cbKeywords.Text:=AHelpString;
-  ShowHelp(AHelpString);
+  if ASeachImmediate then
+    ShowHelp(AHelpString);
 end;
 
-procedure TFrame1.ShowHelp(FKeyword: String);
+procedure Tch2FrameHelpTree.ShowHelp(FKeyword: String);
 var
   Intf : IInterface;
   IProv : Ich2Provider absolute Intf;
   IGUI : Ich2GUI;
 begin
+  Screen.Cursor := crHourGlass;
   TreeView1.Items.BeginUpdate;
   try
     while Treeview1.Items.Count>0 do
@@ -116,10 +118,11 @@ begin
     end;
   finally
     TreeView1.Items.EndUpdate;
+    Screen.Cursor := crDefault;
   end;
 end;
 
-procedure TFrame1.TreeView1AdvancedCustomDrawItem(Sender: TCustomTreeView;
+procedure Tch2FrameHelpTree.TreeView1AdvancedCustomDrawItem(Sender: TCustomTreeView;
   Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;
   var PaintImages, DefaultDraw: Boolean);
 var
@@ -188,18 +191,18 @@ begin
   end;
 end;
 
-procedure TFrame1.TreeView1DblClick(Sender: TObject);
+procedure Tch2FrameHelpTree.TreeView1DblClick(Sender: TObject);
 begin
   if Assigned(TreeView1.Selected) and Assigned(TreeView1.Selected.Data) then
     TNodeData(TreeView1.Selected.Data).Execute;
 end;
 
-procedure TFrame1.TreeView1Expanded(Sender: TObject; Node: TTreeNode);
+procedure Tch2FrameHelpTree.TreeView1Expanded(Sender: TObject; Node: TTreeNode);
 begin
   TNodeData(Node.Data).Expanded:=Node.Expanded;
 end;
 
-procedure TFrame1.TreeView1KeyPress(Sender: TObject; var Key: Char);
+procedure Tch2FrameHelpTree.TreeView1KeyPress(Sender: TObject; var Key: Char);
 begin
   if Key=#13 then
     TreeView1DblClick(Sender);

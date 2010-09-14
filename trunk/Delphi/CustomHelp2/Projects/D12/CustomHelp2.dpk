@@ -56,6 +56,6 @@ contains
   uch2ProviderWindowsSearch in '..\..\uch2ProviderWindowsSearch.pas' {uch2FormProviderWindowsSearch},
   uch2TlbSearchAPILib in '..\..\uch2TlbSearchAPILib.pas',
   uch2Tools in '..\..\uch2Tools.pas',
-  uch2FrameHelpTree in '..\..\uch2FrameHelpTree.pas' {Frame1: TFrame};
+  uch2FrameHelpTree in '..\..\uch2FrameHelpTree.pas' {ch2FrameHelpTree: TFrame};
 
 end.
