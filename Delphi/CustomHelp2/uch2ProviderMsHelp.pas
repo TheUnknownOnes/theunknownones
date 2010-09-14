@@ -168,6 +168,8 @@ var
 begin
   inherited;
 
+  Result := true;
+
   Reg := TRegistry.Create(KEY_ALL_ACCESS);
   try
     if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_NAMESPACES+'\'+ANamespace, true) then

@@ -49,8 +49,6 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
       TabOrder = 0
       ViewStyle = vsReport
       OnChange = LVChange
-      ExplicitTop = 46
-      ExplicitHeight = 205
     end
     object Panel2: TPanel
       Left = 2
@@ -114,15 +112,16 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
         Height = 28
         Align = alBottom
         TabOrder = 2
+        TabStop = True
         ExplicitTop = 29
         ExplicitWidth = 646
         inherited Label1: TLabel
           Left = 368
-          ExplicitLeft = 374
+          ExplicitLeft = 368
         end
         inherited Label2: TLabel
           Left = 231
-          ExplicitLeft = 237
+          ExplicitLeft = 231
         end
         inherited lbl_Caption: TLabel
           Width = 222

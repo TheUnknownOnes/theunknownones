@@ -28,7 +28,6 @@ var
    p, p1, p2, pr, pt: PChar;
    res: string;
    Buf: string;
-   i: Integer;
 begin
    p:= PChar(line);
    SetLength( Buf, Length( line));

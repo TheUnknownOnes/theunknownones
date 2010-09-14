@@ -56,6 +56,8 @@ function Tch2GUIDefault.AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer 
 begin
   if Assigned(FForm) then
     Result := FForm.Tree.AddHelpItem(AHelpItem, AParent)
+  else
+    Result := nil;
 end;
 
 function Tch2GUIDefault.GetDescription: String;
@@ -84,7 +86,6 @@ begin
     FForm.ShowModal;
   finally
     FForm.Free;
-    FForm := nil;
   end;
 end;
 

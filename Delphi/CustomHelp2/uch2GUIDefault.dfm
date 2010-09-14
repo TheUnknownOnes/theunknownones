@@ -24,6 +24,7 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
     Height = 398
     Align = alClient
     TabOrder = 0
+    TabStop = True
     ExplicitWidth = 531
     ExplicitHeight = 398
     inherited TreeView1: TTreeView

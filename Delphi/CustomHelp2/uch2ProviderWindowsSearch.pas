@@ -228,6 +228,8 @@ var
 begin
   inherited;
 
+  Result := 20;
+
   Reg := TRegistry.Create(KEY_ALL_ACCESS);
   try
     if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID]+'\'+REG_KEY_SEARCHES+'\'+AName, true) then
@@ -323,21 +325,13 @@ var
   wQuery : string;
   temp : PWideChar;
   sTemp : string;
-  ra: OleVariant;
   idx: Integer;
-
   fQuery: WideString;
-
-  Caption, Description, Url, Group:  string;
-  provEnabled: Boolean;
-  HelpString:  string;
   MaxResults: Integer;
 
-  path  : string;
   Parent : Pointer;
 
-  dataset: ADOInt.Recordset;
-  bdatabasefailed: boolean;
+  dataset: ADOInt.Recordset; 
 begin
   dataset:=nil;
 

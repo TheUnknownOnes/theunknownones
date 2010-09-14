@@ -52,8 +52,6 @@ implementation
 { Tch2FrameHelpItemDecoration }
 
 procedure Tch2FrameHelpItemDecoration.ApplyOnCaption;
-var
-  fs : TFontStyles;
 begin
   if cob_Back.Selected <> clDefault then
     lbl_Caption.Color := cob_Back.Selected

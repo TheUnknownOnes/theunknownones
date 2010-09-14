@@ -127,6 +127,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
       Margins.Bottom = 2
       Align = alTop
       TabOrder = 0
+      TabStop = True
       ExplicitLeft = 4
       ExplicitTop = 17
       ExplicitWidth = 679
@@ -139,7 +140,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        ExplicitLeft = 465
+        ExplicitLeft = 436
         ExplicitTop = 2
       end
       inherited Label2: TLabel
@@ -150,7 +151,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        ExplicitLeft = 356
+        ExplicitLeft = 327
         ExplicitTop = 2
       end
       inherited lbl_Caption: TLabel
@@ -223,7 +224,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        ExplicitLeft = 386
+        ExplicitLeft = 357
         ExplicitTop = 2
         ExplicitWidth = 75
       end
@@ -235,7 +236,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        ExplicitLeft = 495
+        ExplicitLeft = 466
         ExplicitTop = 2
         ExplicitWidth = 75
       end

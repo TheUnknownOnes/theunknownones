@@ -83,6 +83,7 @@ type
     procedure ShutDown;
     {$ENDREGION}
   public
+    destructor Destroy; override;
     procedure AfterConstruction(); override;
     procedure BeforeDestruction(); override;
 
@@ -92,6 +93,18 @@ type
   Tch2URLOpenLocation = (olWelcomePage,
                          olMSDocExplorer,
                          olDefaultBrowser);
+
+  Tch2HelpSelector = class(TInterfacedObject, IHelpSelector, IHelpSelector2)
+  public
+    {$REGION 'IHelpSelector'}
+    function SelectKeyword(Keywords: TStrings) : Integer;
+    function TableOfContents(Contents: TStrings): Integer;
+    {$ENDREGION}
+
+    {$REGION 'IHelpSelector2'}
+    function SelectContext(Viewers: TStrings): Integer;
+    {$ENDREGION}
+  end;
 
   Tch2Main = class
   private
@@ -160,14 +173,6 @@ type
     property GUI[AIndex : Integer] : Ich2GUI read GetGUI;
 
     property CurrentGUI : Ich2GUI read GetCurrentGUI write SetCurrentGUI;
-  end;
-
-  Tch2HelpSelector = class(TInterfacedObject, IHelpSelector)
-  private
-    {$REGION 'IHelpSelector'}
-    function SelectKeyword(Keywords: TStrings) : Integer;
-    function TableOfContents(Contents: TStrings): Integer;
-    {$ENDREGION}
   end;
 
 function ch2Main : Tch2Main;
@@ -264,7 +269,6 @@ end;
 
 procedure Tch2HelpViewer.BeforeDestruction;
 begin
-
   inherited;
 end;
 
@@ -273,6 +277,11 @@ begin
   Result := false;
 end;
 
+
+destructor Tch2HelpViewer.Destroy;
+begin
+  inherited;
+end;
 
 function Tch2HelpViewer.GetHelpStrings(const HelpString: string): TStringList;
 begin
@@ -320,7 +329,7 @@ begin
   Result := 1;
 
   ch2Main.FHelpString := HelpString;
-
+  
   ch2Main.FKeywords.Clear;
   ch2Main.AddKeyword(HelpString);
 
@@ -340,7 +349,10 @@ begin
   end;
 
   if GetHelpSystem(hs) then
-    hs.AssignHelpSelector(Tch2HelpSelector.Create as IHelpSelector);
+  begin
+    hs.AssignHelpSelector(nil);
+    hs.AssignHelpSelector(Tch2HelpSelector.Create as IHelpSelector2);
+  end;
 end;
 
 { Tch2Main }
@@ -434,6 +446,8 @@ end;
 
 constructor Tch2Main.Create;
 begin
+  Fch2Main := Self;
+
   FKeywords := TStringList.Create;
   FKeywords.Sorted := true;
   FKeywords.Duplicates := dupIgnore;
@@ -441,7 +455,7 @@ begin
 
   FHelpViewer := Tch2HelpViewer.Create;
 
-  RegisterViewer(FHelpViewer as ICustomHelpViewer, FHelpManager);
+  RegisterViewer(FHelpViewer, FHelpManager);
 
   AttachToIDE;
 
@@ -457,8 +471,11 @@ begin
 end;
 
 destructor Tch2Main.Destroy;
+var
+  hs : IHelpSystem;
 begin
   HelpManager.Release(FHelpViewer.ID);
+
   DetachFromIDE;
 
   SaveSettings;
@@ -467,7 +484,7 @@ begin
   FGUIs.Free;
 
   FKeywords.Free;
-
+  
   inherited;
 end;
 
@@ -518,7 +535,8 @@ end;
 
 procedure Tch2Main.SortProviderList();
 begin
-  QuickSortProviderList(0, FProviders.Count - 1);
+  if FProviders.Count > 1 then
+    QuickSortProviderList(0, FProviders.Count - 1);
 end;
 
 procedure Tch2Main.LoadSettings;
@@ -724,6 +742,11 @@ begin
 end;
 
 { Tch2HelpSelector }
+
+function Tch2HelpSelector.SelectContext(Viewers: TStrings): Integer;
+begin
+  Result := Viewers.IndexOf(CH2HelpViewerName);
+end;
 
 function Tch2HelpSelector.SelectKeyword(Keywords: TStrings): Integer;
 begin

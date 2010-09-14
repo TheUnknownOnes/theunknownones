@@ -4,6 +4,7 @@ object ch2FrameHelpItemDecoration: Tch2FrameHelpItemDecoration
   Width = 563
   Height = 28
   TabOrder = 0
+  TabStop = True
   object Label1: TLabel
     AlignWithMargins = True
     Left = 286

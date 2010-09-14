@@ -439,8 +439,6 @@ var
 
   Parent : Pointer;
 
-  FoundOne : Boolean;
-
   procedure NeedParent();
   begin
     if not Assigned(Parent) then
