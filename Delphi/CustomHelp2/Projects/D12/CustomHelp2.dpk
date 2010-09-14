@@ -55,6 +55,7 @@ contains
   uch2ProviderStaticWebsearch in '..\..\uch2ProviderStaticWebsearch.pas' {ch2FormConfigStaticWebsearch},
   uch2ProviderWindowsSearch in '..\..\uch2ProviderWindowsSearch.pas' {uch2FormProviderWindowsSearch},
   uch2TlbSearchAPILib in '..\..\uch2TlbSearchAPILib.pas',
-  uch2Tools in '..\..\uch2Tools.pas';
+  uch2Tools in '..\..\uch2Tools.pas',
+  uch2FrameHelpTree in '..\..\uch2FrameHelpTree.pas' {Frame1: TFrame};
 
 end.
