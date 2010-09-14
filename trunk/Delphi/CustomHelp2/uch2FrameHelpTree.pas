@@ -36,6 +36,9 @@ const
   REG_KEY_SETTINGS_STATS = '\Stats\';
   REG_VALUE_STATS_EXPANDED = 'Expanded';
 
+  IMG_INDENT_PLUSMINUS = 35;
+  IMG_INDENT_IMAGE = 18;
+
 {$R *.dfm}
 
 type
@@ -161,6 +164,7 @@ begin
       if trim(HelpItem.GetDescription)<>'' then
         s:=s+' ('+HelpItem.GetDescription+')';
 
+      Rect.Right:=Rect.Left+Sender.Canvas.TextExtent(s).cx;
       Sender.Canvas.TextRect(Rect, s);
 
       bmp:=TIcon.Create;
@@ -170,12 +174,15 @@ begin
       if Node.HasChildren then
         TreeView1.Images.GetIcon(iiPlus,bmp);
 
-      Sender.Canvas.Draw(Rect.Left-35, Rect.Top, bmp);
+      Sender.Canvas.Draw(Rect.Left-IMG_INDENT_PLUSMINUS, Rect.Top, bmp);
 
       if ifProvidesHelp in HelpItem.GetFlags then
       begin
         TreeView1.Images.GetIcon(iiHelp,bmp);
-        Sender.Canvas.Draw(Rect.Left - 18 , Rect.Top, bmp);
+        if (Node.Parent=Nil) and (not Node.HasChildren) then
+          Sender.Canvas.Draw(Rect.Left - IMG_INDENT_PLUSMINUS , Rect.Top, bmp)
+        else
+          Sender.Canvas.Draw(Rect.Left - IMG_INDENT_IMAGE , Rect.Top, bmp);
       end;
       bmp.Free;
 
