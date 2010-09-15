@@ -114,9 +114,12 @@ begin
       TreeView1.Items[TreeView1.Items.Count-1].Free;
     end;
 
-    for intf in ch2Main.Providers do
+    if trim(FKeyword)<>'' then
     begin
-      IProv.ProvideHelp(FKeyword, ch2Main.CurrentGUI);
+      for intf in ch2Main.Providers do
+      begin
+        IProv.ProvideHelp(FKeyword, ch2Main.CurrentGUI);
+      end;
     end;
   finally
     TreeView1.Items.EndUpdate;
