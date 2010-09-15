@@ -116,7 +116,7 @@
 			<Linker Name="MinStackSize">16384</Linker>
 			<Linker Name="MaxStackSize">1048576</Linker>
 			<Linker Name="ImageBase">4194304</Linker>
-			<Linker Name="ExeDescription"></Linker>
+			<Linker Name="ExeDescription">CustomHelp2</Linker>
 		</Linker>
 		<Directories>
 			<Directories Name="OutputDir"></Directories>
