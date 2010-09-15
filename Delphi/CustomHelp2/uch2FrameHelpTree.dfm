@@ -35,20 +35,21 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 54
-      Height = 13
+      Width = 65
+      Height = 24
       Align = alLeft
       Caption = 'Search for:'
       Layout = tlCenter
+      ExplicitHeight = 16
     end
     object cbKeywords: TComboBox
       AlignWithMargins = True
-      Left = 63
+      Left = 74
       Top = 3
-      Width = 385
-      Height = 21
+      Width = 374
+      Height = 24
       Align = alClient
-      ItemHeight = 0
+      ItemHeight = 16
       TabOrder = 0
       OnCloseUp = cbKeywordsCloseUp
       OnKeyPress = cbKeywordsKeyPress
