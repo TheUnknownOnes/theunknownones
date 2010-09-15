@@ -10,6 +10,7 @@ uses
 type
   Tch2ProviderMSHelp = class(TInterfacedObject, Ich2Provider)
   private
+    FPrority : Integer;
     FEnabledhxSessions: TInterfaceList;
     FSessionLock:     TCriticalSection;
 
@@ -21,6 +22,8 @@ type
     function SetNamespaceSearchType(ANamespace: String; ASearchType: String): String;
     function GetDecoration(ANamespace: String): Tch2HelpItemDecoration;
     procedure SetDecoration(ANamespace: String; ADeco: Tch2HelpItemDecoration);
+
+
 
     procedure InitSessions;
     function QueryInHxSession(hxSession: IHxSession;
@@ -62,6 +65,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lvNamespacesChange(Sender: TObject; Item: TListItem;
       Change: TItemChange);
+    procedure ed_PrioChange(Sender: TObject);
   private
     FProvider: Tch2ProviderMSHelp;
     procedure Init;
@@ -80,6 +84,7 @@ const
   REG_VALUE_ENABLED = 'Enabled';
   REG_VALUE_GUID = 'GUID';
   REG_VALUE_SEARCHTYPE = 'SearchType';
+  REG_VALUE_Priority = 'Priority';
 
   VALUE_SEARCHTYPE_IDX = 'Index';
   VALUE_SEARCHTYPE_FULLTEXT = 'FullText';
@@ -242,8 +247,26 @@ begin
 end;
 
 procedure Tch2ProviderMSHelp.AfterConstruction;
+var
+  Reg : TRegistry;
 begin
   inherited;
+
+  FPrority := 0;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    Reg.RootKey := HKEY_CURRENT_USER;
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID], true) then
+    begin
+      if Reg.ValueExists(REG_VALUE_Priority) then
+        FPrority := Reg.ReadInteger(REG_VALUE_Priority);
+    end;
+
+  finally
+    Reg.Free;
+  end;
+
   FEnabledhxSessions:=TInterfaceList.Create;
   FSessionLock:=TCriticalSection.Create;
   InitSessions;
@@ -331,7 +354,7 @@ end;
 
 function Tch2ProviderMSHelp.GetPriority: Integer;
 begin
-  Result:=0;
+  Result:=FPrority;
 end;
 
 procedure Tch2ProviderMSHelp.InitSessions;
@@ -471,6 +494,11 @@ begin
   end;
 end;
 
+procedure Tch2FormProviderMsHelp.ed_PrioChange(Sender: TObject);
+begin
+  FProvider.FPrority := ed_Prio.Value;
+end;
+
 class procedure Tch2FormProviderMsHelp.Execute(AProvider: Tch2ProviderMSHelp);
 var
   Form : Tch2FormProviderMsHelp;
@@ -489,11 +517,23 @@ procedure Tch2FormProviderMsHelp.FormClose(Sender: TObject;
   var Action: TCloseAction);
 var
   idx: Integer;
+  Reg : TRegistry;
 begin
   for idx := 0 to lvNamespaces.Items.Count - 1 do
   begin
     FProvider.SetNamespaceEnabled(lvNamespaces.Items[idx].Caption,
                                   lvNamespaces.Items[idx].Checked);
+  end;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[FProvider.GetGUID], true) then
+    begin
+      Reg.WriteInteger(REG_VALUE_Priority, FProvider.FPrority);
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
   end;
 end;
 
@@ -520,6 +560,8 @@ begin
     li.Checked:=FProvider.GetNamespaceEnabled(li.Caption);
   end;
   lvNamespaces.Items.EndUpdate;
+
+  ed_Prio.Value := FProvider.FPrority;
 end;
 
 
