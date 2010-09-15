@@ -176,6 +176,7 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
       MinValue = 0
       TabOrder = 0
       Value = 0
+      OnChange = ed_PrioChange
     end
   end
   object Panel1: TPanel
