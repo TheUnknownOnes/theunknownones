@@ -40,7 +40,7 @@ ext:pas path:"C:\Users\YourUserName\Documents\Projects\Jedi\jwapi" $(HelpString)
 
 A full description can be found here-> http://www.delphipraxis.net/topic165769_ideexperte+customhelp.html&highlight=
 it's German ... sorry ;-)
-A short demo video is available here -> http://theunknownones.googlecode.com/svn/Videos/
+A short demo video is available here -> http://www.vimeo.com/15021497
 
 Have fun with it
 by TUO
