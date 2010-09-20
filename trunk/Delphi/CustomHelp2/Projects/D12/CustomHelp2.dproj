@@ -101,6 +101,9 @@
 				<Form>ch2FrameHelpTree</Form>
 				<DesignClass>TFrame</DesignClass>
 			</DCCReference>
+			<DCCReference Include="..\..\uch2ProviderWinhelp.pas">
+				<Form>ch2FormConfigWinhelp</Form>
+			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
