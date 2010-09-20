@@ -54,27 +54,34 @@ object ch2FormGUIDockableTree: Tch2FormGUIDockableTree
       inherited Label1: TLabel
         Left = 2
         Top = 2
+        Width = 51
         Height = 19
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
+        Font.Height = -10
         ParentFont = False
         ExplicitLeft = 2
         ExplicitTop = 2
+        ExplicitWidth = 51
+        ExplicitHeight = 12
       end
       inherited cbKeywords: TComboBox
-        Left = 60
+        Left = 57
         Top = 2
-        Width = 352
+        Width = 355
+        Height = 20
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
+        Font.Height = -10
         ParentFont = False
-        ExplicitLeft = 60
+        ExplicitLeft = 57
         ExplicitTop = 2
-        ExplicitWidth = 352
+        ExplicitWidth = 355
+        ExplicitHeight = 20
       end
     end
   end

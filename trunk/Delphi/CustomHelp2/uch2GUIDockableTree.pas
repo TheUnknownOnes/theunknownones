@@ -65,7 +65,9 @@ end;
 procedure ShowDockableForm(Form: TDockableForm);
 begin
   if not Assigned(Form) then
+  begin
     Exit;
+  end;
   if not Form.Floating then
   begin
     Form.ForceShow;

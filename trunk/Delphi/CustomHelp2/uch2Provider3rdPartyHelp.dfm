@@ -176,7 +176,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        ExplicitLeft = 574
+        ExplicitLeft = 545
         ExplicitTop = 2
         ExplicitHeight = 17
       end
@@ -188,7 +188,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        ExplicitLeft = 601
+        ExplicitLeft = 579
         ExplicitTop = 2
         ExplicitHeight = 17
       end
@@ -200,7 +200,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        ExplicitLeft = 628
+        ExplicitLeft = 613
         ExplicitTop = 2
         ExplicitHeight = 17
       end
@@ -212,7 +212,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        ExplicitLeft = 654
+        ExplicitLeft = 647
         ExplicitTop = 2
         ExplicitHeight = 17
       end

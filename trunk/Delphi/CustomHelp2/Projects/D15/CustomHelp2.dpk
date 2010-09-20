@@ -1,0 +1,61 @@
+package CustomHelp2;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'CustomHelp2'}
+{$LIBSUFFIX '_D150'}
+{$DESIGNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  designide,
+  TUOCommon,
+  vclie,
+  VclSmp,
+  vcl,
+  vclx,
+  xmlrtl;
+
+contains
+  uch2Configure in '..\..\uch2Configure.pas' {ch2FormConfigure},
+  uch2Data in '..\..\uch2Data.pas' {ch2Data: TDataModule},
+  uch2FrameHelpItemDecoration in '..\..\uch2FrameHelpItemDecoration.pas' {ch2FrameHelpItemDecoration: TFrame},
+  uch2GUIDefault in '..\..\uch2GUIDefault.pas' {ch2FormGUIDefault},
+  uch2GUIDockableTree in '..\..\uch2GUIDockableTree.pas' {ch2FormGUIDockableTree},
+  uch2Main in '..\..\uch2Main.pas',
+  uch2MSHelpServices in '..\..\uch2MSHelpServices.pas',
+  uch2Provider3rdPartyHelp in '..\..\uch2Provider3rdPartyHelp.pas' {ch2FormProvider3rdPartyHelp},
+  uch2ProviderGooleCodeSearch in '..\..\uch2ProviderGooleCodeSearch.pas' {ch2FormConfigGoogleCodeSearch},
+  uch2ProviderHTMLHelp in '..\..\uch2ProviderHTMLHelp.pas' {ch2FormConfigHTMLHelp},
+  uch2ProviderMsHelp in '..\..\uch2ProviderMsHelp.pas' {ch2FormProviderMsHelp},
+  uch2ProviderRSSSearch in '..\..\uch2ProviderRSSSearch.pas' {ch2FormConfigRSSSearch},
+  uch2ProviderShellCommand in '..\..\uch2ProviderShellCommand.pas' {ch2FormConfigShellCommand},
+  uch2ProviderStaticWebsearch in '..\..\uch2ProviderStaticWebsearch.pas' {ch2FormConfigStaticWebsearch},
+  uch2ProviderWindowsSearch in '..\..\uch2ProviderWindowsSearch.pas' {uch2FormProviderWindowsSearch},
+  uch2TlbSearchAPILib in '..\..\uch2TlbSearchAPILib.pas',
+  uch2Tools in '..\..\uch2Tools.pas',
+  uch2FrameHelpTree in '..\..\uch2FrameHelpTree.pas' {ch2FrameHelpTree: TFrame},
+  uch2ProviderWinhelp in '..\..\uch2ProviderWinhelp.pas' {ch2FormConfigWinhelp};
+
+end.
