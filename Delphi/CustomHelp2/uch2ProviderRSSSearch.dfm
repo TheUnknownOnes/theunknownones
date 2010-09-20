@@ -129,7 +129,6 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         Width = 142
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
         TabOrder = 2
         OnChange = com_LocationChange
       end
@@ -145,11 +144,11 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         ExplicitWidth = 610
         inherited Label1: TLabel
           Left = 331
-          ExplicitLeft = 337
+          ExplicitLeft = 331
         end
         inherited Label2: TLabel
           Left = 193
-          ExplicitLeft = 199
+          ExplicitLeft = 193
         end
         inherited lbl_Caption: TLabel
           Width = 184

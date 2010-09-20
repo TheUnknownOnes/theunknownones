@@ -200,7 +200,11 @@ end;
 
 class function Tch2ProviderMSHelp.GetNamespaces: IHxRegNamespaceList;
 begin
-  Result := CoHxRegistryWalker.Create.RegisteredNamespaceList[''];
+  try
+    Result := CoHxRegistryWalker.Create.RegisteredNamespaceList[''];
+  except
+    raise Exception.Create('An error occured while talking to HX. Maybe there is no MS Document Explorer installed.');
+  end;
 end;
 
 function Tch2ProviderMSHelp.GetNamespaceSearchType(ANamespace: String): String;
