@@ -36,8 +36,7 @@ requires
   vclx,
   vclie,
   VclSmp,
-  TUOCommon,
-  JediApi_SingleUnits;
+  TUOCommon;
 
 contains
   uch2Configure in '..\..\uch2Configure.pas',
