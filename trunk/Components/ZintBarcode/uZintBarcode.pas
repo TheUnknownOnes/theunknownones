@@ -1,5 +1,5 @@
 {-----------------------------------------------------------------------------
- Purpose: The interface to the zint.dll 
+ Purpose: The interface to the zint.dll
  Created: 03.12.2009 14:28:36
 
  (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
@@ -16,7 +16,8 @@ uses
   Controls,
   uZintInterface,
   SysUtils,
-  Graphics;
+  Graphics,
+  Dialogs;
 
 type
   TZBRotation = (r0, r90, r180, r270);
@@ -346,8 +347,11 @@ begin
 end;
 
 function TZintBarcode.ErrorTextFromSymbol: String;
+var
+  s : AnsiString;
 begin
-  Result := StrPas(PAnsiChar(@FSymbol.errtxt));
+  s := FSymbol.errtxt;
+  Result := s;
 end;
 
 procedure TZintBarcode.FreeSymbol;
