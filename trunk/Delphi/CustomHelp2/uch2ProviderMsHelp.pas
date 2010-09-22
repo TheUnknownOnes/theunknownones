@@ -403,28 +403,32 @@ var
   Parent : Pointer;
   idx: Integer;
 begin
-  for intf in FEnabledhxSessions do
-  begin
-    Topics:=nil;
-    SearchType:=GetNamespaceSearchType(GetNamespaceName(Session));
-    if SameText(SearchType, VALUE_SEARCHTYPE_FULLTEXT) then
-      Topics:=QueryInHxSession(Session, AKeyword)
-    else
+  try
+    for intf in FEnabledhxSessions do
     begin
-      if CheckIndexInHxSession(Session, hxIndex) then
-        Topics := SearchInHxSession(Session, AKeyword, hxIndex);
+      Topics:=nil;
+      SearchType:=GetNamespaceSearchType(GetNamespaceName(Session));
+      if SameText(SearchType, VALUE_SEARCHTYPE_FULLTEXT) then
+        Topics:=QueryInHxSession(Session, AKeyword)
+      else
+      begin
+        if CheckIndexInHxSession(Session, hxIndex) then
+          Topics := SearchInHxSession(Session, AKeyword, hxIndex);
+      end;
+
+      if Assigned(Topics) and (Topics.Count>0) then
+      begin
+        Parent:=AGUI.AddHelpItem(Tch2ProviderMsHelpItemCategory.Create(Self, GetNamespaceTitle(Session), GetNamespaceName(Session)));
+
+        for idx := 1 to Topics.Count do
+          AGUI.AddHelpItem(Tch2ProviderMsHelpItemItem.Create(Self,
+             Topics.Item(idx).Title[HxTopicGetRLTitle, 0],
+             Topics.Item(idx).URL,'',GetNamespaceName(Session)), Parent);
+
+      end;
     end;
-
-    if Assigned(Topics) and (Topics.Count>0) then
-    begin
-      Parent:=AGUI.AddHelpItem(Tch2ProviderMsHelpItemCategory.Create(Self, GetNamespaceTitle(Session), GetNamespaceName(Session)));
-
-      for idx := 1 to Topics.Count do
-        AGUI.AddHelpItem(Tch2ProviderMsHelpItemItem.Create(Self,
-           Topics.Item(idx).Title[HxTopicGetRLTitle, 0],
-           Topics.Item(idx).URL,'',GetNamespaceName(Session)), Parent);
-
-    end;
+  except
+    //very dirty ... i know
   end;
 end;
 
