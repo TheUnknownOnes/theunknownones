@@ -134,6 +134,7 @@ type
   end;
 
 {$R *.dfm}
+{$I CustomHelp2.inc}
 
 { Tch2ProviderMSHelp }
 
@@ -663,7 +664,7 @@ begin
 end;
 
 initialization
-  ch2Main.RegisterProvider(Tch2ProviderMSHelp.Create as Ich2Provider);
+  {$IFDEF ProviderMSHelp}ch2Main.RegisterProvider(Tch2ProviderMSHelp.Create as Ich2Provider);{$ENDIF}
 
 
 end.

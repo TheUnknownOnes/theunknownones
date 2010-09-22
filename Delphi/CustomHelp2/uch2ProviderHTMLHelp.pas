@@ -91,6 +91,7 @@ implementation
 uses uch2Data;
 
 {$R *.dfm}
+{$I CustomHelp2.inc}
 
 const
   Settings_Value_Priority = 'Priority';
@@ -482,6 +483,6 @@ begin
 end;
 
 initialization
-  ch2Main.RegisterProvider(Tch2ProviderHTMLHelp.Create);
+  {$IFDEF ProviderHTMLHelp}ch2Main.RegisterProvider(Tch2ProviderHTMLHelp.Create);{$ENDIF}
 
 end.

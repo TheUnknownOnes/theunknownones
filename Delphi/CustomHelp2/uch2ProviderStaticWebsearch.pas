@@ -89,6 +89,7 @@ implementation
 uses uch2Tools, uch2Data;
 
 {$R *.dfm}
+{$I CustomHelp2.inc}
 
 const
   Settings_Value_Priority = 'Priority';
@@ -476,6 +477,6 @@ begin
 end;
 
 initialization
-  ch2Main.RegisterProvider(Tch2ProviderStaticWebsearch.Create as Ich2Provider);
+  {$IFDEF ProviderStaticWebsearch}ch2Main.RegisterProvider(Tch2ProviderStaticWebsearch.Create as Ich2Provider);{$ENDIF}
 
 end.

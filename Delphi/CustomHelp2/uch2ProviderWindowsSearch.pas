@@ -125,6 +125,7 @@ type
   end;
 
 {$R *.dfm}
+{$I CustomHelp2.inc}
 
 { Tch2ProviderWindowsSearch }
 const
@@ -654,7 +655,7 @@ begin
 end;
 
 initialization
-  ch2Main.RegisterProvider(Tch2ProviderWindowsSearch.Create as Ich2Provider);
+  {$IFDEF ProviderWindowsSearch}ch2Main.RegisterProvider(Tch2ProviderWindowsSearch.Create as Ich2Provider);{$ENDIF}
 
 
 end.
