@@ -146,14 +146,10 @@ begin
   Result:=nil;
   FSessionLock.Acquire;
   try
-    try
-      slot := hxIndex.GetSlotFromString(HelpString);
-      if ContainsText(hxIndex.GetStringFromSlot(slot), HelpString) then
-      begin
-        Result := hxIndex.GetTopicsFromSlot(slot);
-      end;
-    except
-      //just a test :)
+    slot := hxIndex.GetSlotFromString(HelpString);
+    if (slot <> 0) and ContainsText(hxIndex.GetStringFromSlot(slot), HelpString) then
+    begin
+      Result := hxIndex.GetTopicsFromSlot(slot);
     end;
   finally
     FSessionLock.Release;
