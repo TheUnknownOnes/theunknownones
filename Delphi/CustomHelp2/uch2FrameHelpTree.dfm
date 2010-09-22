@@ -49,6 +49,7 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
       Width = 385
       Height = 21
       Align = alClient
+      ItemHeight = 13
       TabOrder = 0
       OnCloseUp = cbKeywordsCloseUp
       OnKeyPress = cbKeywordsKeyPress

@@ -29,7 +29,7 @@ package VirtualActionTree_D100R;
 requires
   rtl,
   vcl,
-  VirtualTreesD10,
+  VirtualTreesR,
   TntUnicodeVcl,
   vclactnband,
   vclx,

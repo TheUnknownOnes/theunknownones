@@ -74,13 +74,15 @@ begin
     FocusWindow(Form);
   end
   else
+  begin
     Form.Show;
+  end;
 end;
 
 procedure CreateDockableForm(var FormVar: TDockableForm; FormClass: TDockableFormClass);
 begin
-  TCustomForm(FormVar) := FormClass.Create(nil);
-  RegisterDockableForm(FormClass, FormVar, TCustomForm(FormVar).Name);
+  FormVar := FormClass.Create(nil);
+  RegisterDockableForm(FormClass, FormVar, FormVar.Name);
 end;
 
 procedure FreeDockableForm(var FormVar: TDockableForm);
@@ -140,6 +142,7 @@ end;
 
 procedure Tch2FormGUIDockableTree.FormCreate(Sender: TObject);
 begin
+  inherited;
   Self.AutoSave:=True;
   Self.DeskSection:='CustomHelp2_GUI_DOCKABLE_TREE';
 end;

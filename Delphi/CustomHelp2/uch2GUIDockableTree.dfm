@@ -2,8 +2,8 @@ object ch2FormGUIDockableTree: Tch2FormGUIDockableTree
   Left = 0
   Top = 0
   Caption = 'Custom Help 2'
-  ClientHeight = 212
-  ClientWidth = 414
+  ClientHeight = 253
+  ClientWidth = 452
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,76 +11,41 @@ object ch2FormGUIDockableTree: Tch2FormGUIDockableTree
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poMainFormCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 12
   inline Frame: Tch2FrameHelpTree
     Left = 0
     Top = 0
-    Width = 414
-    Height = 212
-    Margins.Left = 2
-    Margins.Top = 2
-    Margins.Right = 2
-    Margins.Bottom = 2
+    Width = 452
+    Height = 253
     Align = alClient
     TabOrder = 0
     TabStop = True
-    ExplicitWidth = 414
-    ExplicitHeight = 212
+    ExplicitWidth = 452
+    ExplicitHeight = 253
     inherited TreeView1: TTreeView
-      Left = 2
-      Top = 25
-      Width = 410
-      Height = 185
-      Margins.Left = 2
-      Margins.Top = 2
-      Margins.Right = 2
-      Margins.Bottom = 2
-      ExplicitLeft = 2
-      ExplicitTop = 25
-      ExplicitWidth = 410
-      ExplicitHeight = 185
+      Width = 446
+      Height = 217
+      ExplicitWidth = 446
+      ExplicitHeight = 217
     end
     inherited Panel1: TPanel
-      Width = 414
-      Height = 23
-      Margins.Left = 2
-      Margins.Top = 2
-      Margins.Right = 2
-      Margins.Bottom = 2
-      ExplicitWidth = 414
-      ExplicitHeight = 23
+      Width = 452
+      ExplicitWidth = 452
       inherited Label1: TLabel
-        Left = 2
-        Top = 2
         Width = 51
-        Height = 19
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Margins.Bottom = 2
-        Font.Height = -10
-        ParentFont = False
-        ExplicitLeft = 2
-        ExplicitTop = 2
         ExplicitWidth = 51
         ExplicitHeight = 12
       end
       inherited cbKeywords: TComboBox
-        Left = 57
-        Top = 2
-        Width = 355
+        Left = 60
+        Width = 389
         Height = 20
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Margins.Bottom = 2
-        Font.Height = -10
-        ParentFont = False
-        ExplicitLeft = 57
-        ExplicitTop = 2
-        ExplicitWidth = 355
+        ItemHeight = 12
+        ExplicitLeft = 60
+        ExplicitWidth = 389
         ExplicitHeight = 20
       end
     end

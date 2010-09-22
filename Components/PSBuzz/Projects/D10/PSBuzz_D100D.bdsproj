@@ -170,10 +170,7 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>  
-    
-    
-    <Excluded_Packages>
+		</VersionInfoKeys>  <Excluded_Packages>
       <Excluded_Packages Name="C:\Program Files (x86)\madCollection\madExcept\DeXter\madExceptIde_.bpl">Datei C:\Program Files (x86)\madCollection\madExcept\DeXter\madExceptIde_.bpl nicht gefunden</Excluded_Packages>
       <Excluded_Packages Name="C:\Program Files (x86)\madCollection\madExcept\DeXter\madExceptWizard_.bpl">Datei C:\Program Files (x86)\madCollection\madExcept\DeXter\madExceptWizard_.bpl nicht gefunden</Excluded_Packages>
     </Excluded_Packages>

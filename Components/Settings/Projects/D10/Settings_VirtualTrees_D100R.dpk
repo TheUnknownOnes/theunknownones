@@ -29,7 +29,7 @@ package Settings_VirtualTrees_D100R;
 requires
   rtl,
   Settings_D100R,
-  VirtualTreesD10,
+  VirtualTreesR,
   vcl,
   designide,
   xmlrtl,
