@@ -16,7 +16,8 @@ uses
   Windows,
   Classes,
   SysUtils,
-  Graphics;
+  Graphics,
+  Dialogs;
 
 type
   TZSymbol = record
@@ -32,6 +33,7 @@ type
     option_1 : Integer;
     option_2 : Integer;
     option_3 : Integer;
+    show_human_readable_text : Integer;
     input_mode : Integer;
     text : array[0..127] of AnsiChar;
     rows : Integer;
@@ -43,7 +45,7 @@ type
     bitmap : PAnsiChar;
     bitmap_width : Integer;
     bitmap_height : Integer;
-    show_human_readable_text : Integer;
+    rendered : Pointer;
   end;
   PZSymbol = ^TZSymbol;
 
@@ -188,6 +190,7 @@ var
 begin
   ABitmap.PixelFormat := pf24bit;
   ABitmap.SetSize(ASymbol.bitmap_width, ASymbol.bitmap_height);
+
 
   {FillMemory(@bmpinfo.bmiHeader, sizeof(bmpinfo.bmiHeader), 0);
   bmpinfo.bmiHeader.biSize := SizeOf(bmpinfo.bmiHeader);
