@@ -64,6 +64,7 @@ uses
   SysUtils;
 
 {$R *.dfm}
+{$I CustomHelp2.inc}
 
 function GetImplementingObject(const I: IInterface): TObject;
 const
@@ -563,6 +564,6 @@ end;
 
 
 initialization
-  ch2Main.RegisterProvider(Tch2Provider3rdPartyHelp.Create as Ich2Provider);
+  {$IFDEF Provider3rdPartyHelp}ch2Main.RegisterProvider(Tch2Provider3rdPartyHelp.Create as Ich2Provider);{$ENDIF}
 
 end.

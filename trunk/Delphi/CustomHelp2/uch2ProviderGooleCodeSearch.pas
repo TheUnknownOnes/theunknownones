@@ -103,6 +103,7 @@ implementation
 uses uch2Tools, uch2Data;
 
 {$R *.dfm}
+{$I CustomHelp2.inc}
 
 const
   Settings_Value_Name = 'Name';
@@ -791,6 +792,6 @@ begin
 end;
 
 initialization
-  ch2Main.RegisterProvider(Tch2ProviderGoogleCodeSearch.Create);
+  {$IFDEF ProviderGoogelCodeSearch}ch2Main.RegisterProvider(Tch2ProviderGoogleCodeSearch.Create);{$ENDIF}
 
 end.
