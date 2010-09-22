@@ -170,10 +170,7 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>  
-    
-    
-    <Excluded_Packages>
+		</VersionInfoKeys>  <Excluded_Packages>
       <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\ConsoleTools_D100D.bpl">ConsoleTools - Design</Excluded_Packages>
       <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\Fastreport_Components_D100.bpl">Fastreport Components</Excluded_Packages>
       <Excluded_Packages Name="C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\RegExp_d100.bpl">Datei C:\Users\BSchwarze\Documents\Borland Studio-Projekte\Bpl\RegExp_d100.bpl nicht gefunden</Excluded_Packages>
