@@ -85,17 +85,17 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
         ExplicitHeight = 21
         inherited Label1: TLabel
           Left = 328
-          Height = 15
+          Height = 13
           ExplicitLeft = 328
         end
         inherited Label2: TLabel
           Left = 217
-          Height = 15
+          Height = 13
           ExplicitLeft = 217
         end
         inherited lbl_Caption: TLabel
-          Width = 208
-          Height = 15
+          Width = 72
+          Height = 13
           Caption = 'Sample Header'
           ExplicitWidth = 72
         end

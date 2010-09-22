@@ -146,10 +146,14 @@ begin
   Result:=nil;
   FSessionLock.Acquire;
   try
-    slot := hxIndex.GetSlotFromString(HelpString);
-    if ContainsText(hxIndex.GetStringFromSlot(slot), HelpString) then
-    begin
-      Result := hxIndex.GetTopicsFromSlot(slot);
+    try
+      slot := hxIndex.GetSlotFromString(HelpString);
+      if ContainsText(hxIndex.GetStringFromSlot(slot), HelpString) then
+      begin
+        Result := hxIndex.GetTopicsFromSlot(slot);
+      end;
+    except
+      //just a test :)
     end;
   finally
     FSessionLock.Release;
@@ -403,32 +407,28 @@ var
   Parent : Pointer;
   idx: Integer;
 begin
-  try
-    for intf in FEnabledhxSessions do
+  for intf in FEnabledhxSessions do
+  begin
+    Topics:=nil;
+    SearchType:=GetNamespaceSearchType(GetNamespaceName(Session));
+    if SameText(SearchType, VALUE_SEARCHTYPE_FULLTEXT) then
+      Topics:=QueryInHxSession(Session, AKeyword)
+    else
     begin
-      Topics:=nil;
-      SearchType:=GetNamespaceSearchType(GetNamespaceName(Session));
-      if SameText(SearchType, VALUE_SEARCHTYPE_FULLTEXT) then
-        Topics:=QueryInHxSession(Session, AKeyword)
-      else
-      begin
-        if CheckIndexInHxSession(Session, hxIndex) then
-          Topics := SearchInHxSession(Session, AKeyword, hxIndex);
-      end;
-
-      if Assigned(Topics) and (Topics.Count>0) then
-      begin
-        Parent:=AGUI.AddHelpItem(Tch2ProviderMsHelpItemCategory.Create(Self, GetNamespaceTitle(Session), GetNamespaceName(Session)));
-
-        for idx := 1 to Topics.Count do
-          AGUI.AddHelpItem(Tch2ProviderMsHelpItemItem.Create(Self,
-             Topics.Item(idx).Title[HxTopicGetRLTitle, 0],
-             Topics.Item(idx).URL,'',GetNamespaceName(Session)), Parent);
-
-      end;
+      if CheckIndexInHxSession(Session, hxIndex) then
+        Topics := SearchInHxSession(Session, AKeyword, hxIndex);
     end;
-  except
-    //very dirty ... i know
+
+    if Assigned(Topics) and (Topics.Count>0) then
+    begin
+      Parent:=AGUI.AddHelpItem(Tch2ProviderMsHelpItemCategory.Create(Self, GetNamespaceTitle(Session), GetNamespaceName(Session)));
+
+      for idx := 1 to Topics.Count do
+        AGUI.AddHelpItem(Tch2ProviderMsHelpItemItem.Create(Self,
+           Topics.Item(idx).Title[HxTopicGetRLTitle, 0],
+           Topics.Item(idx).URL,'',GetNamespaceName(Session)), Parent);
+
+    end;
   end;
 end;
 
