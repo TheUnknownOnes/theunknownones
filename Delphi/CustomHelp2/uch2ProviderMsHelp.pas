@@ -230,6 +230,9 @@ begin
 
       Result:=reg.ReadString(REG_VALUE_SEARCHTYPE);
 
+      if SameText(Result, 'Index') then
+        Result := VALUE_SEARCHTYPE_IDX_Def;
+
       Reg.CloseKey;
     end;
   finally
