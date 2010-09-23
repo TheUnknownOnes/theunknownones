@@ -16,37 +16,6 @@ object ch2FormConfigShellCommand: Tch2FormConfigShellCommand
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel1: TPanel
-    Left = 0
-    Top = 0
-    Width = 570
-    Height = 25
-    Align = alTop
-    BevelOuter = bvNone
-    TabOrder = 0
-    object Label1: TLabel
-      AlignWithMargins = True
-      Left = 3
-      Top = 3
-      Width = 38
-      Height = 19
-      Align = alLeft
-      Caption = 'Priority:'
-      Layout = tlCenter
-      ExplicitHeight = 13
-    end
-    object ed_Prio: TSpinEdit
-      Left = 54
-      Top = 3
-      Width = 59
-      Height = 22
-      MaxValue = 0
-      MinValue = 0
-      TabOrder = 0
-      Value = 0
-      OnChange = ed_PrioChange
-    end
-  end
   object Panel2: TPanel
     Left = 0
     Top = 342
@@ -54,7 +23,7 @@ object ch2FormConfigShellCommand: Tch2FormConfigShellCommand
     Height = 31
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 1
+    TabOrder = 0
     object btn_Ok: TButton
       AlignWithMargins = True
       Left = 492
@@ -62,6 +31,7 @@ object ch2FormConfigShellCommand: Tch2FormConfigShellCommand
       Width = 75
       Height = 25
       Align = alRight
+      Cancel = True
       Caption = 'OK'
       Default = True
       ModalResult = 1
@@ -71,17 +41,17 @@ object ch2FormConfigShellCommand: Tch2FormConfigShellCommand
   object GroupBox1: TGroupBox
     AlignWithMargins = True
     Left = 3
-    Top = 28
+    Top = 3
     Width = 564
-    Height = 311
+    Height = 336
     Align = alClient
     Caption = 'Commands'
-    TabOrder = 2
+    TabOrder = 1
     object lv: TListView
       Left = 2
       Top = 51
       Width = 560
-      Height = 196
+      Height = 221
       Align = alClient
       Columns = <
         item
@@ -104,7 +74,7 @@ object ch2FormConfigShellCommand: Tch2FormConfigShellCommand
     end
     object Panel3: TPanel
       Left = 2
-      Top = 247
+      Top = 272
       Width = 560
       Height = 62
       Align = alBottom

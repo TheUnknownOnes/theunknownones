@@ -31,6 +31,7 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
       Width = 75
       Height = 25
       Align = alRight
+      Cancel = True
       Caption = 'OK'
       Default = True
       ModalResult = 1
@@ -40,9 +41,9 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
   object GroupBox2: TGroupBox
     AlignWithMargins = True
     Left = 3
-    Top = 28
+    Top = 3
     Width = 596
-    Height = 380
+    Height = 405
     Align = alClient
     Caption = 'URL'#39's'
     TabOrder = 1
@@ -51,7 +52,7 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
       Left = 5
       Top = 54
       Width = 586
-      Height = 266
+      Height = 291
       Align = alClient
       Columns = <
         item
@@ -70,7 +71,7 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
     end
     object Panel2: TPanel
       Left = 2
-      Top = 323
+      Top = 348
       Width = 592
       Height = 55
       Align = alBottom
@@ -202,37 +203,6 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
         ImageIndex = 2
         OnClick = btn_DelClick
       end
-    end
-  end
-  object Panel3: TPanel
-    Left = 0
-    Top = 0
-    Width = 602
-    Height = 25
-    Align = alTop
-    BevelOuter = bvNone
-    TabOrder = 2
-    object Label1: TLabel
-      AlignWithMargins = True
-      Left = 3
-      Top = 3
-      Width = 38
-      Height = 19
-      Align = alLeft
-      Caption = 'Priority:'
-      Layout = tlCenter
-      ExplicitHeight = 13
-    end
-    object ed_Prio: TSpinEdit
-      Left = 47
-      Top = 0
-      Width = 59
-      Height = 22
-      MaxValue = 0
-      MinValue = 0
-      TabOrder = 0
-      Value = 0
-      OnChange = ed_PrioChange
     end
   end
 end

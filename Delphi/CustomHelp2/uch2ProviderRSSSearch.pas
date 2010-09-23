@@ -45,6 +45,7 @@ type
     procedure Configure;
 
     function GetPriority : Integer;
+    procedure SetPriority(ANewPriority : Integer);
     {$ENDREGION}
 
     property URLs : TObjectList read FURLs;
@@ -381,6 +382,24 @@ begin
     Reg.Free;
   end;
 
+end;
+
+procedure Tch2ProviderRSSSearch.SetPriority(ANewPriority: Integer);
+var
+  Reg : TRegistry;
+begin
+  FPriority:=ANewPriority;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID], true) then
+    begin
+      Reg.WriteInteger(Settings_Value_Priority, FPriority);
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
 end;
 
 { Tch2RSSURL }

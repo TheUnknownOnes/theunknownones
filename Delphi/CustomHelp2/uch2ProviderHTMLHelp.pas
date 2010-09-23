@@ -43,6 +43,7 @@ type
     procedure Configure;
 
     function GetPriority : Integer;
+    procedure SetPriority(ANewPriority : Integer);
     {$ENDREGION}
 
     property Items : TObjectList read FItems;
@@ -51,9 +52,6 @@ type
 
 
   Tch2FormConfigHTMLHelp = class(TForm)
-    Panel3: TPanel;
-    Label1: TLabel;
-    ed_Prio: TSpinEdit;
     Panel1: TPanel;
     btn_OK: TButton;
     GroupBox2: TGroupBox;
@@ -77,7 +75,6 @@ type
     procedure ed_NameChange(Sender: TObject);
     procedure ed_FileChange(Sender: TObject);
     procedure btn_FindFileClick(Sender: TObject);
-    procedure ed_PrioChange(Sender: TObject);
   private
     FProvider : Tch2ProviderHTMLHelp;
 
@@ -308,6 +305,24 @@ begin
 
 end;
 
+procedure Tch2ProviderHTMLHelp.SetPriority(ANewPriority: Integer);
+var
+  Reg : TRegistry;
+begin
+  FPriority:=ANewPriority;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID], true) then
+    begin
+      Reg.WriteInteger(Settings_Value_Priority, FPriority);
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
+end;
+
 { Tch2FormConfigHTMLHelp }
 
 procedure Tch2FormConfigHTMLHelp.btn_AddClick(Sender: TObject);
@@ -362,11 +377,6 @@ begin
   end;
 end;
 
-procedure Tch2FormConfigHTMLHelp.ed_PrioChange(Sender: TObject);
-begin
-  FProvider.FPriority := ed_Prio.Value;
-end;
-
 class function Tch2FormConfigHTMLHelp.Execute(
   AProvider: Tch2ProviderHTMLHelp): Boolean;
 var
@@ -395,8 +405,6 @@ begin
       Data := item;
     end;
   end;
-
-  ed_Prio.Value := FProvider.FPriority;
 
   frame_Deco.OnChange := OnDecoChange;
 end;

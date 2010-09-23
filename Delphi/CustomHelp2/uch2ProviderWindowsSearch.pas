@@ -11,7 +11,6 @@ type
   Tch2ProviderWindowsSearch = class(TInterfacedObject, Ich2Provider)
   private
     FPriority : Integer;
-    procedure SetPriority(APriority: Integer);
     procedure Search(ASearch, AQuery: String; AGUI: Ich2GUI);
   protected
     function GetDecoration(AName: String): Tch2HelpItemDecoration;
@@ -34,6 +33,7 @@ type
     procedure Configure;
 
     function GetPriority : Integer;
+    procedure SetPriority(ANewPriority : Integer);
     {$ENDREGION}
   end;
 
@@ -52,9 +52,6 @@ type
     btn_Del: TToolButton;
     Panel1: TPanel;
     btn_OK: TButton;
-    Panel3: TPanel;
-    Label1: TLabel;
-    ed_Prio: TSpinEdit;
     Label4: TLabel;
     ed_maxResults: TSpinEdit;
     procedure btn_AddClick(Sender: TObject);
@@ -414,11 +411,11 @@ begin
   end;
 end;
 
-procedure Tch2ProviderWindowsSearch.SetPriority(APriority: Integer);
+procedure Tch2ProviderWindowsSearch.SetPriority(ANewPriority: Integer);
 var
   Reg : TRegistry;
 begin
-  FPriority:=APriority;
+  FPriority:=ANewPriority;
 
   Reg := TRegistry.Create(KEY_ALL_ACCESS);
   try
@@ -544,12 +541,12 @@ begin
   end;
 end;
 
-procedure Tuch2FormProviderWindowsSearch.Init;   
+procedure Tuch2FormProviderWindowsSearch.Init;
 var
   sl : TStringList;
   idx: Integer;        
 begin
-  frame_Deco.OnChange:=OnDecoChange;  
+  frame_Deco.OnChange:=OnDecoChange;
   sl:=TStringList.Create;
   try
     FProvider.GetProviderList(sl);

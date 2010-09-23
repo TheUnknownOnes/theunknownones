@@ -11,7 +11,6 @@ type
   Tch2Provider3rdPartyHelp = class(TInterfacedObject, Ich2Provider)
   private
     FPriority : Integer;
-    procedure SetPriority(APriority: Integer);
   protected
     function GetGUIDForHelpViewer(AName: String): TGUID;
 
@@ -33,22 +32,19 @@ type
     procedure Configure;
 
     function GetPriority : Integer;
+    procedure SetPriority(ANewPriority : Integer);
     {$ENDREGION}
   end;
 
   Tch2FormProvider3rdPartyHelp = class(TForm)
     clbProviders: TCheckListBox;
     GroupBox2: TGroupBox;
-    Panel1: TPanel;
-    Label1: TLabel;
-    EditPrio: TSpinEdit;
     GroupBox1: TGroupBox;
     FrameHelpItemDeco: Tch2FrameHelpItemDecoration;
     Panel2: TPanel;
     btn_OK: TButton;
     procedure clbProvidersClick(Sender: TObject);
     procedure clbProvidersClickCheck(Sender: TObject);
-    procedure EditPrioChange(Sender: TObject);
   private
     FProvider : Tch2Provider3rdPartyHelp;
 
@@ -185,11 +181,11 @@ begin
   end;
 end;
 
-procedure Tch2Provider3rdPartyHelp.SetPriority(APriority: Integer);
+procedure Tch2Provider3rdPartyHelp.SetPriority(ANewPriority: Integer);
 var
   Reg : TRegistry;
 begin
-  FPriority:=APriority;
+  FPriority:=ANewPriority;
 
   Reg := TRegistry.Create(KEY_ALL_ACCESS);
   try
@@ -399,11 +395,6 @@ begin
   end;
 end;
 
-procedure Tch2FormProvider3rdPartyHelp.EditPrioChange(Sender: TObject);
-begin
-  FProvider.SetPriority(EditPrio.Value);
-end;
-
 class procedure Tch2FormProvider3rdPartyHelp.Execute(AProvider: Tch2Provider3rdPartyHelp);
 var
   Form: Tch2FormProvider3rdPartyHelp;
@@ -427,7 +418,7 @@ var
 begin
   FrameHelpItemDeco.OnChange:=onDecoChange;
   ViewerList:=GetHelpManagerHackObject.FViewerList;
-  EditPrio.Value:=FProvider.GetPriority;
+
   clbProviders.Items.BeginUpdate;
   try
 

@@ -21,8 +21,9 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure btn_OKClick(Sender: TObject);
     procedure lv_ProviderDblClick(Sender: TObject);
-    procedure lv_ProviderCompare(Sender: TObject; Item1, Item2: TListItem;
-      Data: Integer; var Compare: Integer);
+    procedure lv_ProviderDragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
+    procedure lv_ProviderDragDrop(Sender, Source: TObject; X, Y: Integer);
   private
     { Private-Deklarationen }
   public
@@ -59,6 +60,11 @@ begin
       ch2Main.CurrentGUI := gd^.GUI;
       break;
     end;
+  end;
+
+  for i in lv_Provider.Items do
+  begin
+    PProviderData(i.Data)^.Provider.SetPriority(lv_Provider.Items.Count - i.Index);
   end;
 end;
 
@@ -151,19 +157,6 @@ begin
   end;
 end;
 
-procedure Tch2FormConfigure.lv_ProviderCompare(Sender: TObject; Item1,
-  Item2: TListItem; Data: Integer; var Compare: Integer);
-var
-  pd1,
-  pd2 : PProviderData;
-begin
-  pd1 := Item1.Data;
-  pd2 := Item2.Data;
-
-  //thats not a bug ... its descending ordering
-  Compare := CompareValue(pd2^.Provider.GetPriority, pd1^.Provider.GetPriority);
-end;
-
 procedure Tch2FormConfigure.lv_ProviderDblClick(Sender: TObject);
 var
   pd : PProviderData;
@@ -172,8 +165,53 @@ begin
   begin
     pd := lv_Provider.Selected.Data;
     pd^.Provider.Configure;
-    lv_Provider.CustomSort(nil, 0);
   end;
+end;
+
+procedure Tch2FormConfigure.lv_ProviderDragDrop(Sender, Source: TObject; X,
+  Y: Integer);
+var
+  MovingItem,
+  TargetItem : TListItem;
+  idx : Integer;
+begin
+  MovingItem := lv_Provider.Selected;
+  TargetItem := lv_Provider.GetItemAt(X, Y);
+
+  if not Assigned(TargetItem) then
+  begin
+    TargetItem := lv_Provider.Items[lv_Provider.Items.Count - 1];
+  end;
+
+  if TargetItem = MovingItem then
+    exit;
+
+  if MovingItem.Index < TargetItem.Index then
+    idx := TargetItem.Index + 1
+  else
+    idx := TargetItem.Index;
+
+  with lv_Provider.Items.Insert(idx) do
+  begin
+    Data := MovingItem.Data;
+    Caption := MovingItem.Caption;
+    SubItems.AddStrings(MovingItem.SubItems);
+  end;
+
+  MovingItem.Delete;
+end;
+
+procedure Tch2FormConfigure.lv_ProviderDragOver(Sender, Source: TObject; X,
+  Y: Integer; State: TDragState; var Accept: Boolean);
+var
+  TargetItem : TListItem;
+begin
+  TargetItem := lv_Provider.GetItemAt(X, Y);
+
+  Accept := (Source = Sender);
+
+  if Assigned(TargetItem) then
+    Accept := Accept and (TargetItem <> lv_Provider.Selected);
 end;
 
 end.

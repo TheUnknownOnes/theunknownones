@@ -43,6 +43,7 @@ type
     procedure Configure;
 
     function GetPriority : Integer;
+    procedure SetPriority(ANewPriority : Integer);
     {$ENDREGION}
 
     property URLs : TObjectList read FURLs;
@@ -65,16 +66,12 @@ type
     com_Location: TComboBox;
     Label9: TLabel;
     frame_Deco: Tch2FrameHelpItemDecoration;
-    Panel3: TPanel;
-    Label1: TLabel;
-    ed_Prio: TSpinEdit;
     procedure ed_NameChange(Sender: TObject);
     procedure ed_URLChange(Sender: TObject);
     procedure LVSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
     procedure btn_AddClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btn_DelClick(Sender: TObject);
-    procedure ed_PrioChange(Sender: TObject);
     procedure com_LocationChange(Sender: TObject);
   private
     FProvider : Tch2ProviderStaticWebsearch;
@@ -270,6 +267,24 @@ begin
 
 end;
 
+procedure Tch2ProviderStaticWebsearch.SetPriority(ANewPriority: Integer);
+var
+  Reg : TRegistry;
+begin
+  FPriority:=ANewPriority;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID], true) then
+    begin
+      Reg.WriteInteger(Settings_Value_Priority, FPriority);
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
+end;
+
 { Tch2StatWebURL }
 
 constructor Tch2StatWebURL.Create;
@@ -350,11 +365,6 @@ begin
   end;
 end;
 
-procedure Tch2FormConfigStaticWebsearch.ed_PrioChange(Sender: TObject);
-begin
-  FProvider.FPriority := ed_Prio.Value;
-end;
-
 procedure Tch2FormConfigStaticWebsearch.ed_URLChange(Sender: TObject);
 begin
   if Assigned(lv.Selected) then
@@ -397,8 +407,6 @@ begin
   for l := Low(Tch2URLOpenLocation) to High(Tch2URLOpenLocation) do
     com_Location.AddItem(ch2URLOpenLocationTexts[l], TObject(l));
   com_Location.ItemIndex := com_Location.Items.IndexOfObject(TObject(olDefaultBrowser));
-
-  ed_Prio.Value := FProvider.FPriority;
 
   frame_Deco.OnChange := OnDecoChange;
 end;

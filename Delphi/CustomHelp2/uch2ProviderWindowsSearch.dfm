@@ -17,9 +17,9 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
   object GroupBox2: TGroupBox
     AlignWithMargins = True
     Left = 3
-    Top = 28
+    Top = 3
     Width = 650
-    Height = 313
+    Height = 338
     Align = alClient
     Caption = 'Searches'
     TabOrder = 0
@@ -28,7 +28,7 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
       Left = 5
       Top = 54
       Width = 640
-      Height = 197
+      Height = 222
       Align = alClient
       Columns = <
         item
@@ -52,7 +52,7 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
     end
     object Panel2: TPanel
       Left = 2
-      Top = 254
+      Top = 279
       Width = 646
       Height = 57
       Align = alBottom
@@ -117,17 +117,14 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
         ExplicitWidth = 646
         inherited Label1: TLabel
           Left = 368
-          Height = 13
           ExplicitLeft = 368
         end
         inherited Label2: TLabel
           Left = 231
-          Height = 13
           ExplicitLeft = 231
         end
         inherited lbl_Caption: TLabel
-          Width = 63
-          Height = 13
+          Width = 222
           Caption = 'Sample entry'
           ExplicitWidth = 63
         end
@@ -222,39 +219,11 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
       Width = 75
       Height = 25
       Align = alRight
+      Cancel = True
       Caption = 'OK'
       Default = True
       TabOrder = 0
       OnClick = btn_OKClick
-    end
-  end
-  object Panel3: TPanel
-    Left = 0
-    Top = 0
-    Width = 656
-    Height = 25
-    Align = alTop
-    BevelOuter = bvNone
-    TabOrder = 2
-    object Label1: TLabel
-      AlignWithMargins = True
-      Left = 3
-      Top = 3
-      Width = 38
-      Height = 13
-      Align = alLeft
-      Caption = 'Priority:'
-      Layout = tlCenter
-    end
-    object ed_Prio: TSpinEdit
-      Left = 54
-      Top = 3
-      Width = 59
-      Height = 22
-      MaxValue = 0
-      MinValue = 0
-      TabOrder = 0
-      Value = 0
     end
   end
 end

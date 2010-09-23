@@ -19,9 +19,9 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
   object GroupBox2: TGroupBox
     AlignWithMargins = True
     Left = 3
-    Top = 114
+    Top = 87
     Width = 619
-    Height = 274
+    Height = 301
     Align = alClient
     Caption = 'Queries'
     TabOrder = 0
@@ -30,7 +30,7 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
       Left = 5
       Top = 54
       Width = 609
-      Height = 138
+      Height = 165
       Align = alClient
       Columns = <
         item
@@ -49,7 +49,7 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
     end
     object Panel2: TPanel
       Left = 2
-      Top = 195
+      Top = 222
       Width = 615
       Height = 77
       Align = alBottom
@@ -231,6 +231,7 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
       Width = 75
       Height = 25
       Align = alRight
+      Cancel = True
       Caption = 'OK'
       Default = True
       ModalResult = 1
@@ -242,50 +243,42 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
     Left = 3
     Top = 3
     Width = 619
-    Height = 105
+    Height = 78
     Align = alTop
     Caption = 'General'
     TabOrder = 2
     DesignSize = (
       619
-      105)
-    object Label1: TLabel
-      AlignWithMargins = True
-      Left = 29
-      Top = 18
-      Width = 38
-      Height = 13
-      Caption = 'Priority:'
-      Layout = tlCenter
-    end
+      78)
     object Label5: TLabel
       Left = 16
-      Top = 46
+      Top = 22
       Width = 51
       Height = 13
       Caption = 'Feed-URL:'
     end
     object Label6: TLabel
       Left = 16
-      Top = 73
+      Top = 49
       Width = 49
       Height = 13
       Caption = 'Web-URL:'
     end
-    object ed_Prio: TSpinEdit
-      Left = 73
-      Top = 15
-      Width = 59
-      Height = 22
-      MaxValue = 0
-      MinValue = 0
-      TabOrder = 0
-      Value = 0
-      OnChange = ed_PrioChange
-    end
     object ed_FeedURL: TEdit
       Left = 73
-      Top = 43
+      Top = 19
+      Width = 536
+      Height = 21
+      Hint = 'The query will be appended'
+      Anchors = [akLeft, akTop, akRight]
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 0
+      OnChange = ed_FeedURLChange
+    end
+    object ed_WebURL: TEdit
+      Left = 73
+      Top = 46
       Width = 536
       Height = 21
       Hint = 'The query will be appended'
@@ -293,18 +286,6 @@ object ch2FormConfigGoogleCodeSearch: Tch2FormConfigGoogleCodeSearch
       ParentShowHint = False
       ShowHint = True
       TabOrder = 1
-      OnChange = ed_FeedURLChange
-    end
-    object ed_WebURL: TEdit
-      Left = 73
-      Top = 70
-      Width = 536
-      Height = 21
-      Hint = 'The query will be appended'
-      Anchors = [akLeft, akTop, akRight]
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 2
       OnChange = ed_WebURLChange
     end
   end
