@@ -10,7 +10,7 @@ uses
 type
   Tch2ProviderMSHelp = class(TInterfacedObject, Ich2Provider)
   private
-    FPrority : Integer;
+    FPriority : Integer;
     FEnabledhxSessions: TInterfaceList;
     FSessionLock:     TCriticalSection;
 
@@ -50,14 +50,13 @@ type
     procedure Configure;
 
     function GetPriority : Integer;
+    procedure SetPriority(ANewPriority : Integer);
     {$ENDREGION}
   end;
 
   Tch2FormProviderMsHelp = class(TForm)
     GroupBox2: TGroupBox;
     lvNamespaces: TListView;
-    GroupBox1: TGroupBox;
-    ed_Prio: TSpinEdit;
     GroupBox3: TGroupBox;
     FrameHelpItemDeco: Tch2FrameHelpItemDecoration;
     Panel1: TPanel;
@@ -65,7 +64,6 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lvNamespacesChange(Sender: TObject; Item: TListItem;
       Change: TItemChange);
-    procedure ed_PrioChange(Sender: TObject);
   private
     FProvider: Tch2ProviderMSHelp;
     procedure Init;
@@ -257,7 +255,7 @@ var
 begin
   inherited;
 
-  FPrority := 0;
+  FPriority := 0;
 
   Reg := TRegistry.Create(KEY_ALL_ACCESS);
   try
@@ -265,7 +263,7 @@ begin
     if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID], true) then
     begin
       if Reg.ValueExists(REG_VALUE_Priority) then
-        FPrority := Reg.ReadInteger(REG_VALUE_Priority);
+        FPriority := Reg.ReadInteger(REG_VALUE_Priority);
     end;
 
   finally
@@ -359,7 +357,7 @@ end;
 
 function Tch2ProviderMSHelp.GetPriority: Integer;
 begin
-  Result:=FPrority;
+  Result:=FPriority;
 end;
 
 procedure Tch2ProviderMSHelp.InitSessions;
@@ -488,6 +486,24 @@ begin
   end;
 end;
 
+procedure Tch2ProviderMSHelp.SetPriority(ANewPriority: Integer);
+var
+  Reg : TRegistry;
+begin
+  FPriority:=ANewPriority;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID], true) then
+    begin
+      Reg.WriteInteger(REG_VALUE_PRIORITY, FPriority);
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
+end;
+
 { Tch2FormProviderMsHelp }
 
 
@@ -497,11 +513,6 @@ begin
   begin
     FProvider.SetDecoration(lvNamespaces.Selected.Caption, FrameHelpItemDeco.Decoration);
   end;
-end;
-
-procedure Tch2FormProviderMsHelp.ed_PrioChange(Sender: TObject);
-begin
-  FProvider.FPrority := ed_Prio.Value;
 end;
 
 class procedure Tch2FormProviderMsHelp.Execute(AProvider: Tch2ProviderMSHelp);
@@ -534,7 +545,7 @@ begin
   try
     if Reg.OpenKey(ch2Main.RegRootKeyProvider[FProvider.GetGUID], true) then
     begin
-      Reg.WriteInteger(REG_VALUE_Priority, FProvider.FPrority);
+      Reg.WriteInteger(REG_VALUE_Priority, FProvider.FPriority);
       Reg.CloseKey;
     end;
   finally
@@ -565,8 +576,6 @@ begin
     li.Checked:=FProvider.GetNamespaceEnabled(li.Caption);
   end;
   lvNamespaces.Items.EndUpdate;
-
-  ed_Prio.Value := FProvider.FPrority;
 end;
 
 

@@ -31,6 +31,7 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
       Width = 75
       Height = 25
       Align = alRight
+      Cancel = True
       Caption = 'OK'
       Default = True
       ModalResult = 1
@@ -129,6 +130,7 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         Width = 142
         Height = 21
         Style = csDropDownList
+        ItemHeight = 13
         TabOrder = 2
         OnChange = com_LocationChange
       end

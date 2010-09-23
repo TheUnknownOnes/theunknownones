@@ -65,6 +65,7 @@ type
     procedure Configure;
 
     function GetPriority : Integer;
+    procedure SetPriority(ANewPriority : Integer);
   end;
 
   Tch2HelpViewer = class(TInterfacedObject, ICustomHelpViewer)
@@ -145,6 +146,8 @@ type
 
     procedure QuickSortProviderList(ALeft, ARight : Integer);
     procedure SortProviderList;
+
+    function GetNextFreePriority(ACurrentPriority : Integer) : Integer;
   public
     constructor Create();
     destructor Destroy; override;
@@ -512,6 +515,32 @@ begin
     Result := nil;
 end;
 
+function Tch2Main.GetNextFreePriority(ACurrentPriority : Integer): Integer;
+
+  function PriorityInUse(APriority : Integer) : Boolean;
+  var
+    P : IInterface;
+    Prov : Ich2Provider absolute p;
+  begin
+    Result := false;
+
+    for p in FProviders do
+    begin
+      Result := Prov.GetPriority = APriority;
+
+      if Result then
+        break;
+    end;
+  end;
+
+begin
+  for Result := ACurrentPriority to MaxInt do
+  begin
+    if not PriorityInUse(Result) then
+      break;
+  end;
+end;
+
 function Tch2Main.GetProvider(AIndex: Integer): Ich2Provider;
 begin
   if not Supports(FProviders[AIndex], Ich2Provider, Result) then
@@ -667,6 +696,7 @@ end;
 
 procedure Tch2Main.RegisterProvider(AProvider: Ich2Provider);
 begin
+  AProvider.SetPriority(GetNextFreePriority(AProvider.GetPriority));
   Providers.Add(AProvider);
   SortProviderList;
 end;

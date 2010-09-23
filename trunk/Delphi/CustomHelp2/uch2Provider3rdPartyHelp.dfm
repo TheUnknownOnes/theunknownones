@@ -17,9 +17,9 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
   object GroupBox2: TGroupBox
     AlignWithMargins = True
     Left = 2
-    Top = 31
+    Top = 2
     Width = 687
-    Height = 328
+    Height = 357
     Margins.Left = 2
     Margins.Top = 2
     Margins.Right = 2
@@ -38,7 +38,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
       Left = 4
       Top = 17
       Width = 679
-      Height = 307
+      Height = 336
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2
@@ -48,58 +48,6 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
       ItemHeight = 13
       TabOrder = 0
       OnClick = clbProvidersClick
-    end
-  end
-  object Panel1: TPanel
-    AlignWithMargins = True
-    Left = 2
-    Top = 2
-    Width = 687
-    Height = 25
-    Margins.Left = 2
-    Margins.Top = 2
-    Margins.Right = 2
-    Margins.Bottom = 2
-    Align = alTop
-    BevelOuter = bvNone
-    TabOrder = 1
-    object Label1: TLabel
-      Left = 6
-      Top = 8
-      Width = 34
-      Height = 13
-      Margins.Left = 2
-      Margins.Top = 2
-      Margins.Right = 2
-      Margins.Bottom = 2
-      Caption = 'Priority'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentFont = False
-    end
-    object EditPrio: TSpinEdit
-      Left = 49
-      Top = 3
-      Width = 62
-      Height = 22
-      Margins.Left = 2
-      Margins.Top = 2
-      Margins.Right = 2
-      Margins.Bottom = 2
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      MaxValue = 0
-      MinValue = 0
-      ParentFont = False
-      TabOrder = 0
-      Value = 0
-      OnChange = EditPrioChange
     end
   end
   object GroupBox1: TGroupBox
@@ -114,7 +62,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
     Margins.Bottom = 2
     Align = alBottom
     Caption = 'Options'
-    TabOrder = 2
+    TabOrder = 1
     inline FrameHelpItemDeco: Tch2FrameHelpItemDecoration
       AlignWithMargins = True
       Left = 4
@@ -249,7 +197,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
     Height = 30
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 3
+    TabOrder = 2
     object btn_OK: TButton
       AlignWithMargins = True
       Left = 614
@@ -257,6 +205,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
       Width = 74
       Height = 24
       Align = alRight
+      Cancel = True
       Caption = 'OK'
       Default = True
       ModalResult = 1

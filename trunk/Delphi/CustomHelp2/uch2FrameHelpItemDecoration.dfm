@@ -119,6 +119,7 @@ object ch2FrameHelpItemDecoration: Tch2FrameHelpItemDecoration
     NoneColorColor = clDefault
     Selected = clDefault
     Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeDefault, cbCustomColors]
+    ItemHeight = 16
     TabOrder = 4
     OnChange = cob_TextChange
   end
@@ -132,6 +133,7 @@ object ch2FrameHelpItemDecoration: Tch2FrameHelpItemDecoration
     NoneColorColor = clDefault
     Selected = clDefault
     Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeDefault, cbCustomColors]
+    ItemHeight = 16
     TabOrder = 5
     OnChange = cob_BackChange
   end

@@ -44,6 +44,7 @@ type
     procedure Configure;
 
     function GetPriority : Integer;
+    procedure SetPriority(ANewPriority : Integer);
     {$ENDREGION}
 
     property Commands : TObjectList read FCommands;
@@ -52,9 +53,6 @@ type
   end;
 
   Tch2FormConfigShellCommand = class(TForm)
-    Panel1: TPanel;
-    Label1: TLabel;
-    ed_Prio: TSpinEdit;
     Panel2: TPanel;
     btn_Ok: TButton;
     GroupBox1: TGroupBox;
@@ -70,7 +68,6 @@ type
     procedure btn_AddClick(Sender: TObject);
     procedure btn_DelClick(Sender: TObject);
     procedure lvSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
-    procedure ed_PrioChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure ed_NameChange(Sender: TObject);
     procedure ed_CommandChange(Sender: TObject);
@@ -273,6 +270,24 @@ begin
 
 end;
 
+procedure Tch2ProviderShellCommand.SetPriority(ANewPriority: Integer);
+var
+  Reg : TRegistry;
+begin
+  FPriority:=ANewPriority;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID], true) then
+    begin
+      Reg.WriteInteger(Settings_Value_Priority, FPriority);
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
+end;
+
 { Tch2ShellCommand }
 
 constructor Tch2ShellCommand.Create;
@@ -376,8 +391,6 @@ begin
     end;
   end;
 
-  ed_Prio.Value := FProvider.FPriority;
-
   frame_Deco.OnChange := OnDecoChange;
 end;
 
@@ -436,11 +449,6 @@ begin
     Tch2ShellCommand(lv.Selected.Data).Params := ed_Params.Text;
     lv.Selected.SubItems[1] := ed_Params.Text;
   end;
-end;
-
-procedure Tch2FormConfigShellCommand.ed_PrioChange(Sender: TObject);
-begin
-  FProvider.FPriority := ed_Prio.Value;
 end;
 
 { Tch2HIShellCommand }

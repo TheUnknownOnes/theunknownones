@@ -18,9 +18,9 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
   object GroupBox2: TGroupBox
     AlignWithMargins = True
     Left = 4
-    Top = 65
+    Top = 4
     Width = 597
-    Height = 313
+    Height = 374
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
@@ -39,7 +39,7 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
       Left = 6
       Top = 19
       Width = 585
-      Height = 238
+      Height = 299
       Margins.Left = 4
       Margins.Top = 4
       Margins.Right = 4
@@ -64,7 +64,7 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
     object GroupBox3: TGroupBox
       AlignWithMargins = True
       Left = 5
-      Top = 264
+      Top = 325
       Width = 587
       Height = 44
       Align = alBottom
@@ -85,17 +85,17 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
         ExplicitHeight = 21
         inherited Label1: TLabel
           Left = 328
-          Height = 13
+          Height = 15
           ExplicitLeft = 328
         end
         inherited Label2: TLabel
           Left = 217
-          Height = 13
+          Height = 15
           ExplicitLeft = 217
         end
         inherited lbl_Caption: TLabel
-          Width = 72
-          Height = 13
+          Width = 208
+          Height = 15
           Caption = 'Sample Header'
           ExplicitWidth = 72
         end
@@ -144,41 +144,6 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
       end
     end
   end
-  object GroupBox1: TGroupBox
-    AlignWithMargins = True
-    Left = 4
-    Top = 4
-    Width = 597
-    Height = 53
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
-    Align = alTop
-    Caption = 'Priority'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 1
-    object ed_Prio: TSpinEdit
-      Left = 11
-      Top = 20
-      Width = 69
-      Height = 22
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
-      MaxValue = 0
-      MinValue = 0
-      TabOrder = 0
-      Value = 0
-      OnChange = ed_PrioChange
-    end
-  end
   object Panel1: TPanel
     Left = 0
     Top = 382
@@ -190,7 +155,7 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
     Margins.Bottom = 4
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 2
+    TabOrder = 1
     object btn_OK: TButton
       AlignWithMargins = True
       Left = 528
@@ -202,6 +167,7 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
       Margins.Right = 4
       Margins.Bottom = 4
       Align = alRight
+      Cancel = True
       Caption = 'OK'
       Default = True
       ModalResult = 1

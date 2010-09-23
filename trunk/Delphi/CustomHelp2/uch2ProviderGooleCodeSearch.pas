@@ -47,6 +47,7 @@ type
     procedure Configure;
 
     function GetPriority : Integer;
+    procedure SetPriority(ANewPriority : Integer);
     {$ENDREGION}
 
     property Queries : TObjectList read FQueries;
@@ -72,8 +73,6 @@ type
     com_Location: TComboBox;
     Label9: TLabel;
     GroupBox1: TGroupBox;
-    ed_Prio: TSpinEdit;
-    Label1: TLabel;
     Label5: TLabel;
     ed_FeedURL: TEdit;
     ed_WebURL: TEdit;
@@ -85,7 +84,6 @@ type
     procedure btn_DelClick(Sender: TObject);
     procedure ed_NameChange(Sender: TObject);
     procedure ed_QueryChange(Sender: TObject);
-    procedure ed_PrioChange(Sender: TObject);
     procedure com_LocationChange(Sender: TObject);
     procedure ed_FeedURLChange(Sender: TObject);
     procedure ed_WebURLChange(Sender: TObject);
@@ -253,11 +251,6 @@ begin
   end;
 end;
 
-procedure Tch2FormConfigGoogleCodeSearch.ed_PrioChange(Sender: TObject);
-begin
-  FProvider.FPriority := ed_Prio.Value;
-end;
-
 procedure Tch2FormConfigGoogleCodeSearch.ed_QueryChange(Sender: TObject);
 begin
   if Assigned(lv.Selected) then
@@ -306,7 +299,6 @@ begin
     com_Location.AddItem(ch2URLOpenLocationTexts[l], TObject(l));
   com_Location.ItemIndex := com_Location.Items.IndexOfObject(TObject(olDefaultBrowser));
 
-  ed_Prio.Value := FProvider.FPriority;
   ed_FeedURL.Text := FProvider.FFeedURL;
   ed_WebURL.Text := FProvider.FWebURL;
 
@@ -703,6 +695,24 @@ begin
     Reg.Free;
   end;
 
+end;
+
+procedure Tch2ProviderGoogleCodeSearch.SetPriority(ANewPriority: Integer);
+var
+  Reg : TRegistry;
+begin
+  FPriority:=ANewPriority;
+
+  Reg := TRegistry.Create(KEY_ALL_ACCESS);
+  try
+    if Reg.OpenKey(ch2Main.RegRootKeyProvider[GetGUID], true) then
+    begin
+      Reg.WriteInteger(Settings_Value_Priority, FPriority);
+      Reg.CloseKey;
+    end;
+  finally
+    Reg.Free;
+  end;
 end;
 
 { THIEntry }
