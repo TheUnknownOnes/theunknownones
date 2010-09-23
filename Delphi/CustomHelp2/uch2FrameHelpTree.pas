@@ -62,7 +62,7 @@ function Tch2FrameHelpTree.AddHelpItem(AHelpItem: Ich2HelpItem;
 var
   Node : TTreeNode;
 begin
-  Node:=TreeView1.Items.AddChild(AParent, AHelpItem.GetCaption);
+  Node:=TreeView1.Items.AddChild(AParent, AHelpItem.GetCaption+AHelpItem.GetDescription);
   Node.Data:=TNodeData.Create(AHelpItem);
 
   if Assigned(AParent) then

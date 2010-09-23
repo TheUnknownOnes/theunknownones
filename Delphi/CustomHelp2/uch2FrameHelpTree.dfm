@@ -16,6 +16,7 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
     Images = ch2Data.ch2Images16
     Indent = 19
     ReadOnly = True
+    RowSelect = True
     TabOrder = 0
     OnAdvancedCustomDrawItem = TreeView1AdvancedCustomDrawItem
     OnCollapsed = TreeView1Expanded
@@ -35,21 +36,21 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 54
+      Width = 65
       Height = 24
       Align = alLeft
       Caption = 'Search for:'
       Layout = tlCenter
-      ExplicitHeight = 13
+      ExplicitHeight = 16
     end
     object cbKeywords: TComboBox
       AlignWithMargins = True
-      Left = 63
+      Left = 74
       Top = 3
-      Width = 385
-      Height = 21
+      Width = 374
+      Height = 24
       Align = alClient
-      ItemHeight = 13
+      ItemHeight = 16
       TabOrder = 0
       OnCloseUp = cbKeywordsCloseUp
       OnKeyPress = cbKeywordsKeyPress

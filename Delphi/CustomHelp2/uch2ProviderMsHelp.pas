@@ -23,11 +23,9 @@ type
     function GetDecoration(ANamespace: String): Tch2HelpItemDecoration;
     procedure SetDecoration(ANamespace: String; ADeco: Tch2HelpItemDecoration);
 
-
-
     procedure InitSessions;
     function QueryInHxSession(hxSession: IHxSession;
-      const HelpString: string) : IHxTopicList;
+      const HelpString: string; ASearchType: String) : IHxTopicList;
     function SearchInHxSession(hxSession: IHxSession; const HelpString: string;
       hxIndex: IHxIndex): IHxTopicList;
   public
@@ -36,7 +34,7 @@ type
 
     class function GetNamespaces: IHxRegNamespaceList; static;
     class function CheckIndexInHxSession(hxSession: IHxSession;
-      var hxIndex: IHxIndex): Boolean; static;
+      var hxIndex: IHxIndex; AIndexName: String): Boolean; static;
     class function GetNamespaceTitle(Session: IHxSession): string; static;
     class function GetNamespaceName(Session: IHxSession): string; static;
 
@@ -56,14 +54,20 @@ type
 
   Tch2FormProviderMsHelp = class(TForm)
     GroupBox2: TGroupBox;
-    lvNamespaces: TListView;
+    lvNameSpaces: TListView;
     GroupBox3: TGroupBox;
     FrameHelpItemDeco: Tch2FrameHelpItemDecoration;
     Panel1: TPanel;
     btn_OK: TButton;
+    Panel2: TPanel;
+    Label1: TLabel;
+    cbSearchType: TComboBox;
+    Label2: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure lvNamespacesChange(Sender: TObject; Item: TListItem;
+    procedure lvNameSpacesChange(Sender: TObject; Item: TListItem;
       Change: TItemChange);
+    procedure cbSearchTypeChange(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     FProvider: Tch2ProviderMSHelp;
     procedure Init;
@@ -84,8 +88,11 @@ const
   REG_VALUE_SEARCHTYPE = 'SearchType';
   REG_VALUE_Priority = 'Priority';
 
-  VALUE_SEARCHTYPE_IDX = 'Index';
-  VALUE_SEARCHTYPE_FULLTEXT = 'FullText';
+  VALUE_SEARCHTYPE_IDX_Def = '!DefaultKeywordIndex';
+  VALUE_SEARCHTYPE_IDX_Ass = '!DefaultAssociativeIndex';
+  VALUE_SEARCHTYPE_IDX_Con = '!DefaultContextWindowIndex';
+  VALUE_SEARCHTYPE_IDX_Url = '!DefaultNamedUrlIndex';
+  VALUE_SEARCHTYPE_FULLTEXT = '!DefaultFullTextSearch';
 
 type
   Tch2ProviderMsHelpItemCategory = class(TInterfacedObject, Ich2HelpItem)
@@ -155,12 +162,12 @@ begin
 end;
 
 function Tch2ProviderMSHelp.QueryInHxSession(hxSession: IHxSession;
-  const HelpString: string): IHxTopicList;
+  const HelpString: string; ASearchType: String): IHxTopicList;
 begin
   Result := Nil;
   FSessionLock.Acquire;
   try
-    Result := hxSession.Query(HelpString, '!DefaultFullTextSearch', HxQuery_No_Option, '');
+    Result := hxSession.Query(HelpString, ASearchType, HxQuery_No_Option, '');
   finally
     FSessionLock.Release;
   end;
@@ -218,7 +225,7 @@ begin
     begin
       if not Reg.ValueExists(REG_VALUE_SEARCHTYPE) then
       begin
-        Reg.WriteString(REG_VALUE_SEARCHTYPE, VALUE_SEARCHTYPE_IDX);
+        Reg.WriteString(REG_VALUE_SEARCHTYPE, VALUE_SEARCHTYPE_IDX_Def);
       end;
 
       Result:=reg.ReadString(REG_VALUE_SEARCHTYPE);
@@ -283,9 +290,9 @@ begin
 end;
 
 class function Tch2ProviderMSHelp.CheckIndexInHxSession(hxSession: IHxSession;
-  var hxIndex: IHxIndex): Boolean;
+  var hxIndex: IHxIndex; AIndexName: String): Boolean;
 begin
-  Result := Supports(hxSession.GetNavigationObject('!DefaultKeywordIndex', ''),
+  Result := Supports(hxSession.GetNavigationObject(AIndexName, ''),
     IID_IHxIndex, hxIndex);
 end;
 
@@ -376,7 +383,7 @@ begin
         hxSession := CoHxSession.Create;
         hxSession.Initialize('ms-help://' + NamespaceList.Item(idx).Name, 0);
 
-        CheckIndexInHxSession(hxSession, hxIndex);
+        CheckIndexInHxSession(hxSession, hxIndex, GetNamespaceSearchType(NamespaceList.Item(idx).Name));
 
         FEnabledhxSessions.Add(hxSession);
       except
@@ -406,10 +413,10 @@ begin
     Topics:=nil;
     SearchType:=GetNamespaceSearchType(GetNamespaceName(Session));
     if SameText(SearchType, VALUE_SEARCHTYPE_FULLTEXT) then
-      Topics:=QueryInHxSession(Session, AKeyword)
+      Topics:=QueryInHxSession(Session, AKeyword, SearchType)
     else
     begin
-      if CheckIndexInHxSession(Session, hxIndex) then
+      if CheckIndexInHxSession(Session, hxIndex, SearchType) then
         Topics := SearchInHxSession(Session, AKeyword, hxIndex);
     end;
 
@@ -515,6 +522,18 @@ begin
   end;
 end;
 
+procedure Tch2FormProviderMsHelp.cbSearchTypeChange(Sender: TObject);
+var
+  li : TListItem;
+begin
+  li:=lvNameSpaces.Selected;
+  if Assigned(li) then
+  begin
+    FProvider.SetNamespaceSearchType(li.Caption, cbSearchType.Text);
+    li.SubItems[1]:=FProvider.GetNamespaceSearchType(li.Caption);
+  end;
+end;
+
 class procedure Tch2FormProviderMsHelp.Execute(AProvider: Tch2ProviderMSHelp);
 var
   Form : Tch2FormProviderMsHelp;
@@ -553,6 +572,16 @@ begin
   end;
 end;
 
+procedure Tch2FormProviderMsHelp.FormShow(Sender: TObject);
+begin
+  cbSearchType.Items.Clear;
+  cbSearchType.Items.Add(VALUE_SEARCHTYPE_IDX_Def);
+  cbSearchType.Items.Add(VALUE_SEARCHTYPE_IDX_Ass);
+  cbSearchType.Items.Add(VALUE_SEARCHTYPE_IDX_Con);
+  cbSearchType.Items.Add(VALUE_SEARCHTYPE_IDX_Url);
+  cbSearchType.Items.Add(VALUE_SEARCHTYPE_FULLTEXT);
+end;
+
 procedure Tch2FormProviderMsHelp.Init;
 var
   EnumNamespaces : IEnumVariant;
@@ -573,18 +602,20 @@ begin
     li:=lvNamespaces.Items.Add;
     li.Caption:=NamespaceIntf.Name;
     li.SubItems.Add(NamespaceIntf.GetProperty(HxRegNamespaceDescription));
+    li.SubItems.Add(FProvider.GetNamespaceSearchType(NamespaceIntf.Name));
     li.Checked:=FProvider.GetNamespaceEnabled(li.Caption);
   end;
   lvNamespaces.Items.EndUpdate;
 end;
 
 
-procedure Tch2FormProviderMsHelp.lvNamespacesChange(Sender: TObject;
+procedure Tch2FormProviderMsHelp.lvNameSpacesChange(Sender: TObject;
   Item: TListItem; Change: TItemChange);
 begin
   if Item=lvNamespaces.Selected then
   begin
-    FrameHelpItemDeco.Decoration:=FProvider.GetDecoration(Item.Caption)
+    FrameHelpItemDeco.Decoration:=FProvider.GetDecoration(Item.Caption);
+    cbSearchType.Text:=FProvider.GetNamespaceSearchType(Item.Caption);
   end;
 end;
 
