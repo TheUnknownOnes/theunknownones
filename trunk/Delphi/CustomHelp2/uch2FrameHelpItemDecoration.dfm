@@ -7,39 +7,39 @@ object ch2FrameHelpItemDecoration: Tch2FrameHelpItemDecoration
   TabStop = True
   object Label1: TLabel
     AlignWithMargins = True
-    Left = 286
+    Left = 281
     Top = 3
-    Width = 26
+    Width = 31
     Height = 22
     Align = alRight
     Caption = 'Back:'
     Layout = tlCenter
-    ExplicitHeight = 13
+    ExplicitHeight = 16
   end
   object Label2: TLabel
     AlignWithMargins = True
-    Left = 150
+    Left = 141
     Top = 3
-    Width = 26
+    Width = 30
     Height = 22
     Align = alRight
     Caption = 'Text:'
     Layout = tlCenter
-    ExplicitHeight = 13
+    ExplicitHeight = 16
   end
   object lbl_Caption: TLabel
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 141
+    Width = 132
     Height = 22
     Align = alClient
     Alignment = taCenter
     Caption = 'Sample'
     Transparent = False
     Layout = tlCenter
-    ExplicitWidth = 34
-    ExplicitHeight = 13
+    ExplicitWidth = 43
+    ExplicitHeight = 16
   end
   object cb_Bold: TCheckBox
     AlignWithMargins = True
@@ -111,7 +111,7 @@ object ch2FrameHelpItemDecoration: Tch2FrameHelpItemDecoration
   end
   object cob_Text: TColorBox
     AlignWithMargins = True
-    Left = 182
+    Left = 177
     Top = 3
     Width = 98
     Height = 22
@@ -122,6 +122,7 @@ object ch2FrameHelpItemDecoration: Tch2FrameHelpItemDecoration
     ItemHeight = 16
     TabOrder = 4
     OnChange = cob_TextChange
+    ExplicitLeft = 182
   end
   object cob_Back: TColorBox
     AlignWithMargins = True
