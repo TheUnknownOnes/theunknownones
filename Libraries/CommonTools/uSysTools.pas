@@ -61,6 +61,7 @@ function MakeFileName(ADesiredFName : String): String;
 
 {$REGION 'Variant operations'}
 function VarRecToVariant (AValue : TVarRec) : Variant;
+function VariantToTypedVarRec(const Item: Variant; VarType: TVarType): TVarRec;
 function VariantToVarRec(const Item: Variant): TVarRec;
 procedure FinalizeVarRec(var Item: TVarRec);
 {$ENDREGION}
@@ -506,11 +507,11 @@ begin
   end;
 end;
 
-function VariantToVarRec(const Item: Variant): TVarRec;
+function VariantToTypedVarRec(const Item: Variant; VarType: TVarType): TVarRec;
 var
   W: WideString;
 begin
-  case TVarData(Item).VType of
+  case VarType of
     varInteger, varSmallint, varShortInt, varByte, varWord, varLongWord:
       begin
         Result.VType:=vtInteger;
@@ -571,6 +572,11 @@ begin
       end;
     {$ENDIF}
   end;
+end;
+
+function VariantToVarRec(const Item: Variant): TVarRec;
+begin
+  Result:=VariantToTypedVarRec(Item, TVarData(Item).VType);
 end;
 
 procedure FinalizeVarRec(var Item: TVarRec);
