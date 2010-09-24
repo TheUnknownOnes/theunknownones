@@ -162,7 +162,7 @@ begin
       Sender.Canvas.FillRect(Rect);
 
       Rect:=Node.DisplayRect(True);
-      s:=Node.Text;
+      s:=HelpItem.GetCaption;
       if trim(HelpItem.GetDescription)<>'' then
         s:=s+' ('+HelpItem.GetDescription+')';
 
