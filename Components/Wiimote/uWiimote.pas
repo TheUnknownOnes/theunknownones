@@ -310,6 +310,8 @@ type
   protected
     FHandle : THandle;
 
+    FLappen : TOverlapped;
+
     FOnConnected: TNotifyEvent;
     FOnDisconnected: TNotifyEvent;
 
@@ -528,6 +530,10 @@ end;
 constructor TwmDeviceConnection.Create;
 begin
   FHandle := 0;
+
+  FLappen.Offset := 0;
+  FLappen.OffsetHigh := 0;
+  FLappen.hEvent := CreateEvent(nil, true, true, nil);
 end;
 
 destructor TwmDeviceConnection.Destroy;
@@ -656,78 +662,61 @@ end;
 function TwmDeviceConnection.ReadReport(out AReport: TwmReport): Boolean;
 var
   BytesRead : Cardinal;
-  Lappen : TOverlapped;
   RawReport : TwmRawReport;
 begin
   Result := Connected;
 
   if Result then
   begin
-    Lappen.Offset := 0;
-    Lappen.OffsetHigh := 0;
-    Lappen.hEvent := CreateEvent(nil, true, true, 'TwmDeviceConnection.ReadReport');
-    try
-      Result := not ReadFile(FHandle,
-                             RawReport,
-                             WIIMOTE_REPORT_LEN,
-                             BytesRead,
-                             @Lappen);
+    ReadFile(FHandle,
+             RawReport,
+             WIIMOTE_REPORT_LEN,
+             BytesRead,
+             @FLappen);
 
-      Result := GetLastError = ERROR_IO_PENDING;
+    Result := GetLastError = ERROR_IO_PENDING;
 
-      if Result then
-      begin
-        case WaitForSingleObject(Lappen.hEvent, 100) of
-          WAIT_FAILED:
-          begin
-            Result := False;
-            //Disconnect;
-          end;
+    if Result then
+    begin
+      case WaitForSingleObject(FLappen.hEvent, 100) of
+        WAIT_FAILED:
+        begin
+          Result := False;
+          //Disconnect;
+        end;
 
-          WAIT_TIMEOUT:
-          begin
-            CancelIo(FHandle);
-            Result := false;
-            //Disconnect;
-          end
+        WAIT_TIMEOUT:
+        begin
+          CancelIo(FHandle);
+          Result := false;
+          //Disconnect;
+        end
 
-          else
-          begin
-            Result := GetOverlappedResult(FHandle, Lappen, BytesRead, true);
-            if Result then
-              Result := TwmReport.CreateReport(RawReport, AReport);
-          end;
+        else
+        begin
+          Result := GetOverlappedResult(FHandle, FLappen, BytesRead, true);
+          if Result then
+            Result := TwmReport.CreateReport(RawReport, AReport);
         end;
       end;
-
-    finally
-      CloseHandle(Lappen.hEvent);
     end;
-
   end;
 end;
 
 function TwmDeviceConnection.WriteReport(const AReport: TwmReport): Boolean;
 var
   BytesWritten : Cardinal;
-  Lappen : TOverlapped;
 begin
   Result := Connected;
 
   if Result then
   begin
-    Lappen.Offset := 0;
-    Lappen.OffsetHigh := 0;
-    Lappen.hEvent := CreateEvent(nil, true, false, 'TwmDeviceConnection.WriteReport');
-    try
-      Result := WriteFile(FHandle,
-                          AReport.FBuffer,
-                          WIIMOTE_REPORT_LEN,
-                          BytesWritten,
-                          @Lappen);
-    finally
-      CloseHandle(Lappen.hEvent);
-    end;
+    WriteFile(FHandle,
+              AReport.FBuffer,
+              WIIMOTE_REPORT_LEN,
+              BytesWritten,
+              @FLappen);
+    Result := GetLastError = ERROR_IO_PENDING;
   end;
 end;
 
