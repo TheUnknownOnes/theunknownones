@@ -600,7 +600,7 @@ begin
     //Alloc Mem for the device detail data                                    
     GetMem(DeviceDetailData, DetailDataSize);
     try
-      DeviceDetailData^.cbSize := 5;
+      DeviceDetailData^.cbSize := SizeOf(TSPDeviceInterfaceDetailData);
 
       //get the device details
       if SetupDiGetDeviceInterfaceDetail(AllDevices,
