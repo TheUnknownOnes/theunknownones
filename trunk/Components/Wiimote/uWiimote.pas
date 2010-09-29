@@ -717,6 +717,9 @@ begin
               BytesWritten,
               @FLappen);
     Result := GetLastError = ERROR_IO_PENDING;
+
+    //for MS-Stack th following should work
+    //Result := HidD_SetOutputReport(FHandle, @AReport.FBuffer, WIIMOTE_REPORT_LEN);
   end;
 end;
 
