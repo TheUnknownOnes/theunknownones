@@ -28,9 +28,23 @@ const
   WIIMOTE_MEMADDR_IR_SENSITIVITY_2	= $04B0001A;
   WIIMOTE_MEMADDR_IR_MODE			= $04B00033;
 
+  WIIMOTE_KNOWN_REPORTS : array[0..11] of Byte = ($11,
+                                                  $12,
+                                                  $13,
+                                                  $15,
+                                                  $16,
+                                                  $17,
+                                                  $1A,
+                                                  $20,
+                                                  $21,
+                                                  $30,
+                                                  $31,
+                                                  $33);
+
 
 type
   TwmRawReport = array[0..WIIMOTE_REPORT_LEN - 1] of Byte;
+  PwmRawReport = ^TwmRawReport;
   TwmRawData = array of Byte;
 
   TwmButton = (wmbA,
@@ -102,6 +116,7 @@ type
   end;
 
   TwmReportClass = class of TwmReport;
+
 
 //==============================================================================
 
@@ -305,17 +320,31 @@ type
 
 //==============================================================================
 
+  TwmOnReportProc = procedure(const AReport : TwmReport) of object;
 
-  TwmDeviceConnection = class
+//==============================================================================
+
+
+  TwmDeviceConnection = class(TThread)
   protected
     FHandle : THandle;
 
-    FLappen : TOverlapped;
+    FReportsToWrite : TThreadList;
 
     FOnConnected: TNotifyEvent;
     FOnDisconnected: TNotifyEvent;
 
+    FOnNewReport: TwmOnReportProc;
+
+    FNewReport : TwmReport;
+
     function GetConnected: Boolean;
+
+    procedure Execute; override;
+
+    procedure DoWriteReports;
+    procedure DoReadReports;
+    procedure DoNewReport;
   public
     class function ListDevices(AList : TStrings) : Integer;
 
@@ -325,7 +354,6 @@ type
     function Connect(ADevicePath : String) : Boolean;
     function Disconnect : Boolean;
 
-    function ReadReport(out AReport : TwmReport) : Boolean;
     function WriteReport(const AReport : TwmReport) : Boolean;
 
     property Connected : Boolean read GetConnected;
@@ -333,31 +361,7 @@ type
 
     property OnConnected : TNotifyEvent read FOnConnected write FOnConnected;
     property OnDisconnected : TNotifyEvent read FOnDisconnected write FOnDisconnected;
-  end;
-
-
-//==============================================================================
-
-
-  TwmOnReportProc = procedure(const AReport : TwmReport) of object;
-
-
-//==============================================================================
-
-
-  TwmReportReader = class(TThread)
-  protected
-    FConnection : TwmDeviceConnection;
-    FOnNewReport : TwmOnReportProc;
-
-    FReport : TwmReport;
-
-    procedure Execute(); override;
-
-    procedure SyncDoNewReport();
-  public
-    constructor Create(const AConnection : TwmDeviceConnection;
-                       AOnNewReport : TwmOnReportProc);
+    property OnNewReport : TwmOnReportProc read FOnNewReport write FOnNewReport;
   end;
 
 
@@ -373,7 +377,6 @@ type
   TCustomWiimote = class(TComponent)
   protected
     FConnection : TwmDeviceConnection;
-    FReportReader : TwmReportReader;
 
     FReadMemStack : TStringList;
     //Identifies, which memory-block is replied in the next reports
@@ -415,8 +418,6 @@ type
     procedure ExtractStatusinfos(AReport : TwmInputReportStatus);
     procedure ExtractIRInfos(AReport : TwmInputReportButtonsAccelIR);
 
-    function GetActive: Boolean;
-    procedure SetActive(const Value: Boolean);
     function GetCurrentAccel(const Index: Integer): Single;
     function GetButtonsDown: TwmButtons;
     function GetConnected: Boolean;
@@ -434,7 +435,6 @@ type
 
     procedure RequestStatus;
 
-    property Active : Boolean read GetActive write SetActive;
     property Connected : Boolean read GetConnected;
 
     property Rumble : Boolean read FRumble write SetRumble;
@@ -500,6 +500,10 @@ procedure HidD_GetHidGuid(out AGUID : TGUID); stdcall; external 'hid.dll';
 function HidD_GetAttributes(ADeviceHandle : THandle;
                             out AAttributes : THID_Attributes) : BOOL; stdcall; external 'hid.dll';
 
+function HidD_GetInputReport(HidDeviceObject: THandle; Buffer: Pointer; BufferLength: ULONG): LongBool; stdcall; external 'hid.dll';
+function HidD_SetOutputReport(HidDeviceObject: THandle; Buffer: Pointer; BufferLength: ULONG): LongBool; stdcall; external 'hid.dll';
+
+
 
 //==============================================================================
 
@@ -529,16 +533,36 @@ end;
 
 constructor TwmDeviceConnection.Create;
 begin
+  inherited Create(true);
+  FreeOnTerminate := true;
+
   FHandle := 0;
 
-  FLappen.Offset := 0;
-  FLappen.OffsetHigh := 0;
-  FLappen.hEvent := CreateEvent(nil, true, true, nil);
+  FReportsToWrite := TThreadList.Create;
+
+  Resume;
 end;
 
 destructor TwmDeviceConnection.Destroy;
+var
+  lst : TList;
+  Data : PwmRawReport;
 begin
   Disconnect;
+
+  lst := FReportsToWrite.LockList;
+  try
+    while lst.Count > 0 do
+    begin
+      Data := lst[0];
+      Dispose(Data);
+      lst.Delete(0);
+    end;
+  finally
+    FReportsToWrite.UnlockList;
+  end;
+
+  FReportsToWrite.Free;
 
   inherited;
 end;
@@ -557,6 +581,77 @@ begin
 
   if Result and Assigned(FOnDisconnected) then
     FOnDisconnected(Self);
+end;
+
+procedure TwmDeviceConnection.DoNewReport;
+begin
+  if Assigned(FOnNewReport) then
+    FOnNewReport(FNewReport);
+end;
+
+procedure TwmDeviceConnection.DoReadReports;
+var
+  ReportID : Byte;
+  RawReport : TwmRawReport;
+begin
+  if Connected then
+  begin
+    for ReportID in WIIMOTE_KNOWN_REPORTS do
+    begin
+      RawReport[0] := ReportID;
+
+      if HidD_GetInputReport(FHandle, @RawReport, WIIMOTE_REPORT_LEN) then
+      begin
+        TwmReport.CreateReport(RawReport, FNewReport);
+        try
+          Synchronize(DoNewReport);
+        finally
+          FNewReport.Free;
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TwmDeviceConnection.DoWriteReports;
+var
+  lst : TList;
+  Data : PwmRawReport;
+begin
+  if Connected then
+  begin
+    lst := FReportsToWrite.LockList;
+    try
+      while lst.Count > 0 do
+      begin
+        try
+          Data := lst[0];
+          HidD_SetOutputReport(FHandle, Data, WIIMOTE_REPORT_LEN);
+          Dispose(Data);
+        finally
+          lst.Delete(0);
+        end;
+      end;
+    finally
+      FReportsToWrite.UnlockList;
+    end;
+  end;
+end;
+
+procedure TwmDeviceConnection.Execute;
+begin
+  while not Terminated do
+  begin
+
+    try
+      DoWriteReports;
+      DoReadReports;
+    except
+      Disconnect;
+    end;
+
+    Sleep(100);
+  end;
 end;
 
 function TwmDeviceConnection.GetConnected: Boolean;
@@ -659,67 +754,24 @@ begin
   SetupDiDestroyDeviceInfoList(AllDevices);
 end;
 
-function TwmDeviceConnection.ReadReport(out AReport: TwmReport): Boolean;
-var
-  BytesRead : Cardinal;
-  RawReport : TwmRawReport;
-begin
-  Result := Connected;
-
-  if Result then
-  begin
-    ReadFile(FHandle,
-             RawReport,
-             WIIMOTE_REPORT_LEN,
-             BytesRead,
-             @FLappen);
-
-    Result := GetLastError = ERROR_IO_PENDING;
-
-    if Result then
-    begin
-      case WaitForSingleObject(FLappen.hEvent, 100) of
-        WAIT_FAILED:
-        begin
-          Result := False;
-          //Disconnect;
-        end;
-
-        WAIT_TIMEOUT:
-        begin
-          CancelIo(FHandle);
-          Result := false;
-          //Disconnect;
-        end
-
-        else
-        begin
-          Result := GetOverlappedResult(FHandle, FLappen, BytesRead, true);
-          if Result then
-            Result := TwmReport.CreateReport(RawReport, AReport);
-        end;
-      end;
-    end;
-  end;
-end;
 
 function TwmDeviceConnection.WriteReport(const AReport: TwmReport): Boolean;
 var
-  BytesWritten : Cardinal;
+  lst : TList;
+  Data : PwmRawReport;
 begin
   Result := Connected;
 
   if Result then
   begin
-    WriteFile(FHandle,
-              AReport.FBuffer,
-              WIIMOTE_REPORT_LEN,
-              BytesWritten,
-              @FLappen);
-    Result := GetLastError = ERROR_IO_PENDING;
-
-    //for MS-Stack th following should work
-    //Result := HidD_SetOutputReport(FHandle, @AReport.FBuffer, WIIMOTE_REPORT_LEN);
+    lst := FReportsToWrite.LockList;
+    try
+      New(Data);
+      CopyMemory(Data, @AReport.FBuffer, WIIMOTE_REPORT_LEN);
+      lst.Add(Data);
+    finally
+      FReportsToWrite.UnlockList;
+    end;
   end;
 end;
 
@@ -1312,22 +1364,26 @@ begin
 
   FillChar(FAccelCalibration, SizeOf(FAccelCalibration), 0);
 
-  FConnection := TwmDeviceConnection.Create;
-  FConnection.OnConnected := DoConnect;
-  FConnection.OnDisconnected := DoDisconnect;
-
   if not (csDesigning in ComponentState) then
-    FReportReader := TwmReportReader.Create(FConnection, DoNewReport)
+  begin
+    FConnection := TwmDeviceConnection.Create;
+    FConnection.OnConnected := DoConnect;
+    FConnection.OnDisconnected := DoDisconnect;
+    FConnection.OnNewReport := DoNewReport;
+  end
   else
-    FReportReader := nil;
+  begin
+    FConnection := nil;
+  end;
 end;
 
 destructor TCustomWiimote.Destroy;
 begin
-  if Assigned(FReportReader) then
-    FReportReader.Terminate;
-
-  FConnection.Free;
+  if Assigned(FConnection) then
+  begin
+    FConnection.Resume;
+    FConnection.Terminate;
+  end;
 
   FReadMemStack.Free;
 
@@ -1337,11 +1393,6 @@ end;
 function TCustomWiimote.Disconnect: Boolean;
 begin
   Result := FConnection.Disconnect;
-end;
-
-function TCustomWiimote.GetActive: Boolean;
-begin
-  Result := not FReportReader.Suspended;
 end;
 
 function TCustomWiimote.GetButtonsDown: TwmButtons;
@@ -1474,11 +1525,6 @@ begin
   finally
     Rep.Free;
   end;
-end;
-
-procedure TCustomWiimote.SetActive(const Value: Boolean);
-begin
-  FReportReader.Suspended := not Value;
 end;
 
 procedure TCustomWiimote.SetIRMode(const Value: TwmIRMode);
@@ -1734,56 +1780,8 @@ begin
       FAccelCalibration.ZG := Data[6];
     end;
 
-
-
     FReadMemStack.Delete(0);
   end;
-end;
-
-//==============================================================================
-
-
-{ TwmReportReader }
-
-constructor TwmReportReader.Create(const AConnection: TwmDeviceConnection;
-  AOnNewReport: TwmOnReportProc);
-begin
-  inherited Create(true);
-
-  FConnection := AConnection;
-  FOnNewReport := AOnNewReport;
-
-  FreeOnTerminate := true;
-
-  Resume;
-end;
-
-procedure TwmReportReader.Execute;
-begin
-  while not Terminated do
-  begin
-
-    if (not Suspended) and FConnection.Connected then
-    begin
-      if FConnection.ReadReport(FReport) then
-      begin
-        try
-          Synchronize(SyncDoNewReport);
-        except
-        end;
-
-        FReport.Free;
-      end;
-    end;
-
-    sleep(1);
-  end;
-end;
-
-procedure TwmReportReader.SyncDoNewReport;
-begin
-  if Assigned(FOnNewReport) then
-    FOnNewReport(FReport);
 end;
 
 initialization
