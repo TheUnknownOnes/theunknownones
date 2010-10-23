@@ -28,14 +28,7 @@ package Wiimote_D120R;
 
 requires
   rtl,
-  JvSystem,
-  vcl,
-  vclx,
-  Jcl,
-  JvCore,
-  vcldb,
-  dbrtl,
-  JclVcl;
+  vcl;
 
 contains
   uWiimote in '..\..\uWiimote.pas';
