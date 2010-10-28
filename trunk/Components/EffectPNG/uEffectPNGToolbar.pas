@@ -18,7 +18,12 @@ type
   TEffectPNGToolButton = class(TToolButton)
   private
     FImage: TPNGObject;
+    FUseParentEffect: Boolean;
+    FEffect: TPNGEffects;
     procedure SetImage(const Value: TPNGObject);
+    procedure SetEffect(const Value: TPNGEffects);
+    procedure SetUseParentEffect(const Value: Boolean);
+    procedure OnEffectChange(Sender : TObject);
   protected
     procedure Paint(); override;
   public
@@ -26,7 +31,8 @@ type
     destructor Destroy(); override;
   published
     property Image : TPNGObject read FImage write SetImage;
-
+    property Effect : TPNGEffects read FEffect write SetEffect;
+    property UseParentEffect : Boolean read FUseParentEffect write SetUseParentEffect default True;
   end;
 
   TEffectPNGToolBar = class(TToolBar)
@@ -49,48 +55,72 @@ implementation
 constructor TEffectPNGToolButton.Create(AOwner: TComponent);
 begin
   FImage:=TPNGObject.Create;
-  
+  FEffect:=TPNGEffects.Create;
+  FEffect.OnChange:=OnEffectChange;
+  FUseParentEffect:=True;
   inherited;
 end;
 
 destructor TEffectPNGToolButton.Destroy;
 begin
   FImage.Free;
-  
+  FEffect.Free;
   inherited;
+end;
+
+procedure TEffectPNGToolButton.OnEffectChange(Sender: TObject);
+begin
+  Invalidate;
 end;
 
 procedure TEffectPNGToolButton.Paint;
 var
   PNGToDraw : TPNGObject;
+  myEffect : TPngEffects;
 begin
   inherited;
 
-  if Parent is TEffectPNGToolBar then
+  if (UseParentEffect and (Parent is TEffectPNGToolBar)) then
   begin
-    if not FImage.Empty then
-    begin
-      PNGToDraw:=TPNGObject.Create;
-      PNGToDraw.Assign(FImage);
+    if Self.Enabled then
+      myEffect:=TEffectPNGToolBar(Parent).ImageEffectDefault
+    else
+      myEffect:=TEffectPNGToolBar(Parent).ImageEffectDisabled;
+  end
+  else
+    myEffect:=Self.Effect;
 
-      if Self.Enabled then
-        TEffectPNGToolBar(Parent).ImageEffectDefault.ApplyEffects(PNGToDraw)
-      else
-        TEffectPNGToolBar(Parent).ImageEffectDisabled.ApplyEffects(PNGToDraw);
+  if not FImage.Empty then
+  begin
+    PNGToDraw:=TPNGObject.Create;
+    PNGToDraw.Assign(FImage);
 
-      Self.Canvas.Draw((Self.Width div 2)-(PNGToDraw.Width div 2),
-                       (Self.Height div 2)-(PNGToDraw.Height div 2),
-                       PNGToDraw);
+    myEffect.ApplyEffects(PNGToDraw);
 
-      PNGToDraw.Free;
-    end;
+    Self.Canvas.Draw((Self.Width div 2)-(PNGToDraw.Width div 2),
+                     (Self.Height div 2)-(PNGToDraw.Height div 2),
+                     PNGToDraw);
+
+    PNGToDraw.Free;
   end;
+end;
+
+procedure TEffectPNGToolButton.SetEffect(const Value: TPNGEffects);
+begin
+  FEffect.Assign(Value);
+  Invalidate;
 end;
 
 procedure TEffectPNGToolButton.SetImage(const Value: TPNGObject);
 begin
   FImage.Assign(Value);
   Invalidate;
+end;
+
+procedure TEffectPNGToolButton.SetUseParentEffect(const Value: Boolean);
+begin
+  FUseParentEffect := Value;
+  invalidate;
 end;
 
 constructor TEffectPNGToolBar.Create(AOwner: TComponent);
