@@ -6,6 +6,9 @@
 unit uIB2007;
 
 interface
+{$IFDEF FPC}
+{$MODE Delphi}
+{$ENDIF}
 
 uses
   uIBFBGLobals,
