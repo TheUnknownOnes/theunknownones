@@ -54,13 +54,23 @@ const
   DTYPE_TYPE_MAX = 21;
 
 
-function ParamIsNull(AParam : TParamDsc) : Boolean;
+function ParamIsNull(AParam : PParamDsc) : Boolean;
+
+function NewParamDsc : PParamDSC;
 
 implementation
 
-function ParamIsNull(AParam : TParamDsc) : Boolean;
+function ParamIsNull(AParam : PParamDsc) : Boolean;
 begin
-  Result := (AParam.dsc_flags and DSC_null) = DSC_null;
+  Result := (AParam = nil) or
+            (AParam^.dsc_address = nil) or
+            (AParam.dsc_flags and DSC_null > 0);
+end;
+
+function NewParamDsc : PParamDSC;
+begin
+  Result :=ib_util_malloc(sizeof(paramdsc));
+  FillChar(Result^, sizeof(paramdsc), #0);
 end;
 
 end.
