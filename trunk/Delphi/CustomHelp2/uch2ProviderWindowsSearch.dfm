@@ -12,6 +12,7 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poMainFormCenter
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox2: TGroupBox

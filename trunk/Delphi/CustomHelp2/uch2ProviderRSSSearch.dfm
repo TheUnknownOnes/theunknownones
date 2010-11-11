@@ -41,18 +41,20 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
   object GroupBox2: TGroupBox
     AlignWithMargins = True
     Left = 3
-    Top = 28
+    Top = 3
     Width = 614
-    Height = 410
+    Height = 435
     Align = alClient
     Caption = 'URL'#39's'
     TabOrder = 1
+    ExplicitTop = 28
+    ExplicitHeight = 410
     object LV: TListView
       AlignWithMargins = True
       Left = 5
       Top = 54
       Width = 604
-      Height = 294
+      Height = 319
       Align = alClient
       Columns = <
         item
@@ -68,15 +70,17 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
       TabOrder = 0
       ViewStyle = vsReport
       OnSelectItem = LVSelectItem
+      ExplicitHeight = 294
     end
     object Panel2: TPanel
       Left = 2
-      Top = 351
+      Top = 376
       Width = 610
       Height = 57
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitTop = 351
       object Label2: TLabel
         Left = 9
         Top = 6
@@ -214,37 +218,6 @@ object ch2FormConfigRSSSearch: Tch2FormConfigRSSSearch
         ImageIndex = 2
         OnClick = btn_DelClick
       end
-    end
-  end
-  object Panel3: TPanel
-    Left = 0
-    Top = 0
-    Width = 620
-    Height = 25
-    Align = alTop
-    BevelOuter = bvNone
-    TabOrder = 2
-    object Label1: TLabel
-      AlignWithMargins = True
-      Left = 3
-      Top = 3
-      Width = 38
-      Height = 19
-      Align = alLeft
-      Caption = 'Priority:'
-      Layout = tlCenter
-      ExplicitHeight = 13
-    end
-    object ed_Prio: TSpinEdit
-      Left = 54
-      Top = 3
-      Width = 59
-      Height = 22
-      MaxValue = 0
-      MinValue = 0
-      TabOrder = 0
-      Value = 0
-      OnChange = ed_PrioChange
     end
   end
 end
