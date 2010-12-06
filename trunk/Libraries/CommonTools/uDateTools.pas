@@ -18,6 +18,8 @@ type
     procedure SetYear(AYear: Word);
     function GetYear: Word;
 
+    procedure Verify;
+
     function ToString : String;
     function ToInteger: Integer;
     function WeekStart : TDateTime;
@@ -32,10 +34,10 @@ type
     FYear : Word;
   public
     {$REGION 'Constructors'}
-    constructor FromString(AString : String);
-    constructor FromInteger(AInteger: Integer);
+    constructor FromString(AString : String; AVerifyInput : Boolean = False);
+    constructor FromInteger(AInteger: Integer; AVerifyInput : Boolean = False);
     constructor FromDateTime(ADateTime: TDateTime);
-    constructor FromWeekYear(AWeek: Byte; AYear: Word);
+    constructor FromWeekYear(AWeek: Byte; AYear: Word; AVerifyInput : Boolean = False);
     {$ENDREGION}
 
     {$REGION 'ICalendarWeek'}
@@ -43,6 +45,8 @@ type
     function GetWeek: Byte;
     procedure SetYear(AYear: Word);
     function GetYear: Word;
+
+    procedure Verify;
 
     function ToString : String;
     function ToInteger: Integer;
@@ -279,7 +283,7 @@ begin
   FWeek:=WeekOfTheYear(ADateTime, FYear);
 end;
 
-constructor TCalendarWeek.FromInteger(AInteger: Integer);
+constructor TCalendarWeek.FromInteger(AInteger: Integer; AVerifyInput : Boolean = False);
 var
   PartYear : String[CW_YEARLEN];
   PartWeek : String[CW_WEEKLEN];
@@ -294,9 +298,12 @@ begin
 
   FWeek:=StrToIntDef(PartWeek,1);
   FYear:=StrToIntDef(PartYear,1899);
+
+  if AVerifyInput then
+    Verify;
 end;
 
-constructor TCalendarWeek.FromString(AString : String);
+constructor TCalendarWeek.FromString(AString : String; AVerifyInput : Boolean = False);
 var
   PartYear : String[CW_YEARLEN];
   PartWeek : String[CW_WEEKLEN];
@@ -308,13 +315,19 @@ begin
 
   FWeek:=StrToInt(PartWeek);
   FYear:=StrToInt(PartYear);
+
+  if AVerifyInput then
+    Verify;
 end;
 
-constructor TCalendarWeek.FromWeekYear(AWeek: Byte; AYear: Word);
+constructor TCalendarWeek.FromWeekYear(AWeek: Byte; AYear: Word; AVerifyInput : Boolean = False);
 begin
   inherited Create;
   FWeek:=AWeek;
   FYear:=AYear;
+
+  if AVerifyInput then
+    Verify;
 end;
 
 function TCalendarWeek.GetWeek: Byte;
@@ -356,6 +369,11 @@ begin
     Fmt:='%.'+InttoStr(CW_YEARLEN)+'d/%.'+InttoStr(CW_WEEKLEN)+'d';
     Result:=Format(FMT, [FYear, FWeek]);
   end;
+end;
+
+procedure TCalendarWeek.Verify;
+begin
+  StartOfAWeek(FYear, FWeek);
 end;
 
 function TCalendarWeek.WeekEnd: TDateTime;
