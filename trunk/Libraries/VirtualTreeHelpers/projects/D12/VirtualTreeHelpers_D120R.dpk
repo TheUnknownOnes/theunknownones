@@ -35,6 +35,6 @@ requires
 
 contains
   uVirtualTreeHelpers in '..\..\uVirtualTreeHelpers.pas',
-  uNodeData in '..\..\uNodeData.pas';
+  uCustomNodeData in '..\..\uCustomNodeData.pas';
 
 end.
