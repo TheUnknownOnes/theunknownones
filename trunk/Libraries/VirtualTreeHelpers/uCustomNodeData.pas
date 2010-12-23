@@ -33,6 +33,8 @@ type
   public
     class procedure InitEvents(ATree: TVirtualStringTree; AEvents : TNodeDataEvents); overload; virtual;
     class procedure InitEvents(ATree: TVirtualDrawTree; AEvents : TNodeDataEvents); overload; virtual;
+    class procedure InitEvents(ATree: TVirtualDrawTree); overload; virtual;
+    class procedure InitEvents(ATree: TVirtualStringTree); overload; virtual;
   end;
 
 var
@@ -89,6 +91,30 @@ procedure TNodeDataEventHandler.DoGetNodeDataSize(Sender: TBaseVirtualTree;
   var NodeDataSize: Integer);
 begin
   NodeDataSize := SizeOf(TCustomNodeData);
+end;
+
+class procedure TNodeDataEventHandler.InitEvents(ATree: TVirtualDrawTree);
+var
+  nde : TNodeDataEvent;
+  ndes : TNodeDataEvents;
+begin
+  ndes := [];
+  for nde := Low(TNodeDataEvent) to High(TNodeDataEvent) do
+    Include(ndes, nde);
+
+  InitEvents(ATree, ndes);
+end;
+
+class procedure TNodeDataEventHandler.InitEvents(ATree: TVirtualStringTree);
+var
+  nde : TNodeDataEvent;
+  ndes : TNodeDataEvents;
+begin
+  ndes := [];
+  for nde := Low(TNodeDataEvent) to High(TNodeDataEvent) do
+    Include(ndes, nde);
+
+  InitEvents(ATree, ndes);
 end;
 
 class procedure TNodeDataEventHandler.InitEvents(ATree: TVirtualStringTree;
