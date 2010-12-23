@@ -72,11 +72,17 @@ end;
 
 class function TCustomNodeData.GetNodeData(
   ANode: PVirtualNode; ATree : TBaseVirtualTree): TCustomNodeData;
+var
+  Data : Pointer;
 begin
   if not Assigned(ATree) then
     ATree:=TreeFromNode(ANode);
 
-  Result := PCustomNodeData(ATree.GetNodeData(ANode))^;
+  Data := ATree.GetNodeData(ANode);
+  if Assigned(Data) then
+    Result := PCustomNodeData(Data)^
+  else
+    Result := nil;
 end;
 
 { TNodeDataEventHandler }
