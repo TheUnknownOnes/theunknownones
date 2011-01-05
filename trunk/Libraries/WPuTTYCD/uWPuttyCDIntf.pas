@@ -9,12 +9,14 @@ unit uWPuttyCDIntf;
 interface
 
 uses
+  SysUtils,
   Classes,
   Windows,
   Messages;
 
 const
   DLLName = 'WPuTTYCD.dll';
+  FILENAME_MAX = 260;
 
 type
   WPCD_HINST = Pointer;
@@ -70,12 +72,6 @@ const
   WPCN_ENABLEALL = $FFFFFFFF;  //* def all events enabled.	*/
   WPCN_NMWPARAM_MIN = $0001;    //* min value for NM WPARAM.*/
   WPCN_NMWPARAM_MAX = $0020;    //* max value for NM WPARAM.*/
-
-  //* Macros for events, bit mask handling */
-  function WPCD_ISVALIDEVENT(id_event : DWORD) : Boolean;
-  function _WPCD_ISEVENTNOTIFY(nm_mask, id_event : DWORD) : Boolean;
-  procedure _WPCD_SETEVENTNOTIFY(var nm_mask : DWORD; id_event : DWORD);
-  procedure WPCD_RESETEVENTNOTIFY(var nm_mask : DWORD; id_event : DWORD);
 
 const
   //* Notification message WPARAM */
@@ -293,20 +289,7 @@ const
   MODE_OFF = FALSE;       //* Mode disabled.                */
   MODE_ON = not MODE_OFF;   //* Mode enabled.                 */
 
-
 type
-  //* Current Connection Protocol, Trying to keep on PuTTY style           */
-  ConnectionProtocol = (
-                         //* Protocol undefined */
-                         WPCD_PROT_UNDEFINED = 0,            //* undefined protocol.           */
-                         //* Protocol back ends*/
-                         WPCD_PROT_RAW,                      //* Raw protocol.                 */
-                         WPCD_PROT_TELNET,                   //* TelNet protocol.              */
-                         WPCD_PROT_RLOGIN,                   //* Remote Login protocol.        */
-                         WPCD_PROT_SSH,                      //* SSH  protocol.                */
-                         //* PROT_SERIAL is supported on a subset of platforms */
-                         WPCD_PROT_SERIAL                    //* Serial Connection.            */
-                        );
 
   //*===================== List of Data Types =============================*/
   CONNENUMPROC = function(hFrontEnd : WPCD_HINST; lpSid : Pointer; _lParam : LPARAM) : BOOL; stdcall;
@@ -357,7 +340,7 @@ type
     agentfwd : Integer;
     change_username : Integer;	       //* allow username switching in SSH-2   */
     ssh_cipherlist : array[0..SESCFG_CIPHER_MAX - 1] of integer;
-    keyfile : array[0..254] of Ansichar;
+    keyfile : array[0..FILENAME_MAX - 1] of Ansichar;
     sshprot : Integer;		       //* use v1 or v2 when both available    */
     ssh2_des_cbc : Integer;		       //* "des-cbc" unrecommended SSH-2 cipher*/
     ssh_no_userauth : Integer;	       //* bypass "ssh-userauth" (SSH-2 only)  */
@@ -374,7 +357,7 @@ type
     termspeed : array[0..31] of Ansichar;
     ttymodes : array[0..767] of Ansichar;		       //* MODE\tVvalue\0MODE\tA\0\0           */
     environmt : array[0..1023] of Ansichar;	       //* VAR\tvalue\0VAR\tvalue\0\0          */
-    username : array[0..99] of Ansichar;
+    username : array[0..99] of AnsiChar;
     localusername : array[0..99] of Ansichar;
     rfc_environ : Integer;
     passive_telnet : Integer;
@@ -388,7 +371,7 @@ type
     serflow : Integer;
 
     //* Logging */
-    logfilename : array[0..254] of Ansichar;
+    logfilename : array[0..FILENAME_MAX - 1] of Ansichar;
     logtype : Integer;
     logxfovr : Integer;
     logflush : Integer;
@@ -528,25 +511,5 @@ type
 
 implementation
 
-function WPCD_ISVALIDEVENT(id_event : DWORD) : Boolean;
-begin
-  Result := (id_event >= WPCN_NMWPARAM_MIN) and
-            (id_event <= WPCN_NMWPARAM_MAX);
-end;
-
-function _WPCD_ISEVENTNOTIFY(nm_mask, id_event : DWORD) : Boolean;
-begin
-  Result := (nm_mask and (1 shl (id_event - 1))) = 1;
-end;
-
-procedure _WPCD_SETEVENTNOTIFY(var nm_mask : DWORD; id_event : DWORD);
-begin
-  nm_mask := nm_mask or (1 shl (id_event - 1));
-end;
-
-procedure WPCD_RESETEVENTNOTIFY(var nm_mask : DWORD; id_event : DWORD);
-begin
-  nm_mask := nm_mask and (not (1 shl (id_event - 1)));
-end;
 
 end.
