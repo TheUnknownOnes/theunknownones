@@ -34,6 +34,10 @@ procedure FindFileInPaths(const AFileName: String;            //Filename to be s
 procedure PrintWindow(Wnd: HWND; ATo: TBitmap);
 {$ENDREGION}
 
+{$REGION 'Window-Helper'}
+function GetWindowByClassTree(const AClassTree: TStringList; AParent : HWND; AWithWildCards : Boolean): HWND;
+{$ENDREGION}
+
 {$REGION 'Fileoperations'}
   function GetTempFile(AExtension : String = '') : String;
   function DeleteFileToWasteBin(AFileName:string): boolean;
@@ -56,6 +60,8 @@ function MultipleStringReplace(AString: String;
                               ): String;
 
 function MakeFileName(ADesiredFName : String): String;
+
+function IsLike(AString, APattern : String) : Boolean;
 
 {$ENDREGION}
 
@@ -276,6 +282,84 @@ begin
 end;
 {$ENDREGION}
 
+{$REGION 'Window-Helper'}
+
+type
+  TCWBCMParams = record
+    ClassName : String;
+    Result : Integer;
+    SearchAfter : HWND;
+  end;
+  PCWBCMParams = ^TCWBCMParams;
+
+function EnumProc(AChild : HWND; ALParam : LPARAM) : BOOL; stdcall;
+var
+  buffer : array[0..255] of WideChar;
+  clsname : WideString;
+begin
+  Result := true;
+
+  if PCWBCMParams(ALParam)^.SearchAfter = AChild then
+    PCWBCMParams(ALParam)^.SearchAfter := 0
+  else if PCWBCMParams(ALParam)^.SearchAfter = 0 then
+  begin
+    GetClassName(AChild, @buffer[0], Length(buffer) - 1);
+    clsname := buffer;
+    if IsLike(clsname, PCWBCMParams(ALParam)^.ClassName) then
+    begin
+      PCWBCMParams(ALParam)^.Result := AChild;
+      result := false;
+    end;
+  end;
+end;
+
+function FindChildWindowByClass(AParent, AAfterChild : HWND; AClassName : String; AWithWildCards : Boolean) : HWND;
+var
+  params : PCWBCMParams;
+begin
+  New(params);
+  params^.ClassName := AClassName;
+  params^.Result := 0;
+  params^.SearchAfter := AAfterChild;
+
+  EnumChildWindows(AParent, @EnumProc, Integer(params));
+  Result := params^.Result;
+  Dispose(params);
+end;
+
+function GetWindowByClassTree(const AClassTree: TStringList; AParent : HWND; AWithWildCards : Boolean): HWND;
+var
+  idx, idy : Integer;
+  wndParent,
+  wndChild : HWND;
+begin
+  Result := 0;
+
+  repeat
+    wndParent := AParent;
+
+    for idx := 0 to AClassTree.Count - 1 do
+    begin
+      wndChild := FindChildWindowByClass(wndParent, HWND(AClassTree.Objects[idx]), AClassTree[idx], AWithWildCards);
+      AClassTree.Objects[idx] := TObject(wndChild);
+
+      if wndChild = 0 then
+      begin
+        for idy := 0 to idx - 2 do
+          AClassTree.Objects[idy] := nil;
+        break;
+      end;
+
+      if idx = AClassTree.Count - 1 then
+        Result := wndChild;
+
+      wndParent := wndChild;
+    end;
+
+  until Result > 0;
+end;
+{$ENDREGION}
+
 {$REGION 'Fileoperations'}
 function GetTempFile(AExtension : String = '') : String;
 var
@@ -467,6 +551,41 @@ const
   ToBeReplacedWith : Array [0..8] of String = ('_','_',' ',' ','''',' ',' ','I','.');
 begin
   Result:=MultipleStringReplace(ADesiredFName,NotAllowed,ToBeReplacedWith,[rfReplaceAll]);
+end;
+
+
+//stolen from http://delphi.about.com/cs/adptips2003/a/bltip0203_3.htm
+function IsLike(AString, APattern: String): Boolean;
+var
+   j, n, n1, n2: integer ;
+   p1, p2: pchar ;
+label
+   match, nomatch;
+begin
+   AString := UpperCase(AString) ;
+   APattern := UpperCase(APattern) ;
+   n1 := Length(AString) ;
+   n2 := Length(APattern) ;
+   if n1 < n2 then n := n1 else n := n2;
+   p1 := pchar(AString) ;
+   p2 := pchar(APattern) ;
+   for j := 1 to n do begin
+     if p2^ = '*' then goto match;
+     if (p2^ <> '?') and ( p2^ <> p1^ ) then goto nomatch;
+     inc(p1) ; inc(p2) ;
+   end;
+   if n1 > n2 then begin
+nomatch:
+     Result := False;
+     exit;
+   end else if n1 < n2 then begin
+     for j := n1 + 1 to n2 do begin
+       if not ( p2^ in ['*','?'] ) then goto nomatch ;
+       inc(p2) ;
+     end;
+   end;
+match:
+   Result := True
 end;
 
 {$ENDREGION}
