@@ -16,10 +16,13 @@ uses
   idHash,
   RegExpr;
 
+  //Magic Bytes
 const
-  FrameStart = $00;
-  FrameEnd = $FF;
-  FrameSizeStart = $80;
+  MBFrameStart = $00;
+  MBFrameEnd = $FF;
+  MBFrameSizeStart = $80;
+  MBPing = $01;
+  MBPong = $02;
 
 type
   TCustomWebsocketServer = class;
@@ -131,33 +134,69 @@ var
   StringData : String;
   Buffer : TBytes;
   idxBuffer : Integer;
+  b : Byte;
+  len : Integer;
+  b_v : Byte;
 const
   BufferInc = 1024;
 begin
   SetLength(Buffer, BufferInc);
   idxBuffer := -1;
 
-  case AContext.Connection.Socket.ReadByte of
-    FrameStart:
-    begin
-      repeat
-        Inc(idxBuffer);
+  b := AContext.Connection.Socket.ReadByte;
+  {$IFDEF DEBUG}writeln('Received type identifier 0x' + IntToHex(b, 2));{$ENDIF}
 
-        if idxBuffer > High(Buffer) then
-          SetLength(Buffer, Length(Buffer) + BufferInc);
+  if (b shr 7) = 0 then
+  begin
+    {$IFDEF DEBUG}writeln('MSBit not set');{$ENDIF}
 
-        Buffer[idxBuffer] := AContext.Connection.Socket.ReadByte;
-      until Buffer[idxBuffer] = FrameEnd;
+    case b of
+      MBFrameStart:
+      begin
+        repeat
+          Inc(idxBuffer);
 
-      SetLength(Buffer, idxBuffer);
+          if idxBuffer > High(Buffer) then
+            SetLength(Buffer, Length(Buffer) + BufferInc);
 
-      StringData := TEncoding.UTF8.GetString(Buffer);
+          Buffer[idxBuffer] := AContext.Connection.Socket.ReadByte;
+          {$IFDEF DEBUG}writeln('Received byte 0x' + IntToHex(Buffer[idxBuffer], 2) + ' nested in TextFrame');{$ENDIF}
+        until (Buffer[idxBuffer] = MBFrameEnd);
 
-      if Assigned(FOnStringDataReceived) then
-        FOnStringDataReceived(TCustomWebsocketClient(AContext.Data), StringData);
+        SetLength(Buffer, idxBuffer);
 
-      TCustomWebsocketClient(AContext.Data).SendData('I''ve recüved säh vollowing: ' + StringData);
+        StringData := TEncoding.UTF8.GetString(Buffer);
+
+        if Assigned(FOnStringDataReceived) then
+          FOnStringDataReceived(TCustomWebsocketClient(AContext.Data), StringData);
+
+        TCustomWebsocketClient(AContext.Data).SendData('I''ve recüved säh vollowing: ' + StringData);
+      end;
+      else
+      begin
+        {$IFDEF DEBUG}writeln('Received unknown byte 0x' + IntToHex(b, 2));{$ENDIF}
+      end;
     end;
+  end
+  else
+  begin
+    {$IFDEF DEBUG}writeln('MSBit set');{$ENDIF}
+
+    len := 0;
+    repeat
+      b := AContext.Connection.Socket.ReadByte;
+
+      if b > $00 then
+      begin
+        b_v := b and $7F;
+        len := len * 128 + b_v;
+
+      end;
+    until (b and $80) <> $80;
+
+    AContext.Connection.Socket.ReadBytes(Buffer, len, false);
+
+    {$IFDEF DEBUG}writeln('Received ' + IntToStr(len) + ' bytes of binary data');{$ENDIF}
   end;
 
 end;
@@ -184,7 +223,7 @@ begin
     line := '-';
     while line <> '' do
     begin
-      line := AContext.Connection.Socket.ReadLn(#13#10, TEncoding.ASCII);
+      line := AContext.Connection.Socket.ReadLn(#13#10, TEncoding.UTF8);
       RegEx.InputString := line;
 
       RegEx.Expression := Expr_Document;
@@ -278,7 +317,10 @@ procedure TCustomWebsocketClient.InitialAnswer;
 var
   b : TIdBytes;
   md5 : TIdHashMessageDigest5;
+  Enc : TEncoding;
 begin
+  Enc := TEncoding.UTF8;
+
   b := ToBytes(IntToIntBigEndian(DecodeSecWebSocketKey(InitialRequest.WebsocketKey1)));
   AppendBytes(b, ToBytes(IntToIntBigEndian(DecodeSecWebSocketKey(InitialRequest.WebsocketKey2))));
   AppendBytes(b, InitialRequest.ChallengeData);
@@ -292,14 +334,14 @@ begin
 
   with FContext.Connection.Socket do
   begin
-    WriteLn('HTTP/1.1 101 WebSocket Protocol Handshake', TEncoding.ASCII);
-    WriteLn('Upgrade: WebSocket', TEncoding.ASCII);
-    WriteLn('Connection: Upgrade', TEncoding.ASCII);
-    WriteLn('Sec-WebSocket-Origin: ' + InitialRequest.Origin, TEncoding.ASCII);
-    WriteLn('Sec-WebSocket-Location: ws://' + InitialRequest.Host + InitialRequest.Document, TEncoding.ASCII);
+    WriteLn('HTTP/1.1 101 WebSocket Protocol Handshake', Enc);
+    WriteLn('Upgrade: WebSocket', Enc);
+    WriteLn('Connection: Upgrade', Enc);
+    WriteLn('Sec-WebSocket-Origin: ' + InitialRequest.Origin, Enc);
+    WriteLn('Sec-WebSocket-Location: ws://' + InitialRequest.Host + InitialRequest.Document, Enc);
     if InitialRequest.WebsocketProtocol <> '' then
-      WriteLn('Sec-WebSocket-Protocol: ' + InitialRequest.WebsocketProtocol, TEncoding.ASCII);
-    WriteLn(TEncoding.ASCII);
+      WriteLn('Sec-WebSocket-Protocol: ' + InitialRequest.WebsocketProtocol, Enc);
+    WriteLn(Enc);
     Write(b);
   end;
 end;
@@ -320,9 +362,9 @@ var
   b : TIdBytes;
 begin
 
-  AppendBytes(b, ToBytes(Byte(FrameStart)));
+  AppendBytes(b, ToBytes(Byte(MBFrameStart)));
   AppendBytes(b, ToBytes(AData, TEncoding.UTF8));
-  AppendBytes(b, ToBytes(Byte(FrameEnd)));
+  AppendBytes(b, ToBytes(Byte(MBFrameEnd)));
 
   FContext.Connection.Socket.WriteBufferOpen;
   try
