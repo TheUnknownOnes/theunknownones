@@ -24,12 +24,10 @@ uses
 const
   MBFrameStart = $00;
   MBFrameEnd = $FF;
-  MBPing = $01;
-  MBPong = $02;
 
 type
-  TCustomWebsocketServer = class;
-  TCustomWebsocketClient = class;
+  TWebsocketServer = class;
+  TWebsocketConnection = class;
 
   TWebsocketInitialRequest = class
   protected
@@ -52,7 +50,7 @@ type
   end;
 
 
-  TCustomWebsocketClient = class(TIdServerContext)
+  TWebsocketConnection = class(TIdServerContext)
   protected
     FInitialRequest : TWebsocketInitialRequest;
 
@@ -71,13 +69,11 @@ type
     property InitialRequest : TWebsocketInitialRequest read FInitialRequest;
   end;
 
-  TWebsocketClientClass = class of TCustomWebsocketClient;
+  TWebsocketConnectionClass = class of TWebsocketConnection;
 
 
 
-  TCustomWebsocketServer = class(TIdCustomTCPServer)
-  private
-    property ContextClass;
+  TWebsocketServer = class(TIdCustomTCPServer)
   protected const
     DefaultReadTimeout = 1000;
   protected var
@@ -87,47 +83,43 @@ type
     procedure DoConnect(AContext: TIdContext); override;
     procedure DoDisconnect(AContext: TIdContext); override;
 
-    function GetClientClass: TWebsocketClientClass;
-    procedure SetClientClass(const Value: TWebsocketClientClass);
-
-
+    function GetClientClass: TWebsocketConnectionClass;
+    procedure SetClientClass(const Value: TWebsocketConnectionClass); virtual;
   public
-    constructor Create(AOwner: TComponent);
+    procedure AfterConstruction; override;
 
     property ReadTimeout : Integer read FReadTimeout write FReadTimeout;
 
-    property ClientClass : TWebsocketClientClass read GetClientClass write SetClientClass;
+    property ContextClass : TWebsocketConnectionClass read GetClientClass write SetClientClass;
   end;
 
 
 
 implementation
 
-{ TCustomWebsocketServer }
+{ TWebsocketServer }
 
-constructor TCustomWebsocketServer.Create(AOwner: TComponent);
+procedure TWebsocketServer.AfterConstruction;
 begin
-  ClientClass := TCustomWebsocketClient;
-
   inherited;
 
+  ContextClass := TWebsocketConnection;
   FReadTimeout := DefaultReadTimeout;
 end;
 
-
-procedure TCustomWebsocketServer.DoConnect(AContext: TIdContext);
+procedure TWebsocketServer.DoConnect(AContext: TIdContext);
 begin
   inherited;
 
-  TCustomWebsocketClient(AContext).Connection.Socket.ReadTimeout := FReadTimeout;
+  TWebsocketConnection(AContext).Connection.Socket.ReadTimeout := FReadTimeout;
 end;
 
-procedure TCustomWebsocketServer.DoDisconnect(AContext: TIdContext);
+procedure TWebsocketServer.DoDisconnect(AContext: TIdContext);
 begin
   inherited;
 end;
 
-function TCustomWebsocketServer.DoExecute(AContext: TIdContext): Boolean;
+function TWebsocketServer.DoExecute(AContext: TIdContext): Boolean;
 var
   StringData : String;
   Buffer : TBytes;
@@ -144,7 +136,7 @@ begin
     b := AContext.Connection.Socket.ReadByte;
   except
     on E : EIdReadTimeout do
-      exit
+      exit;
   end;
 
   if (b shr 7) = 0 then
@@ -169,7 +161,7 @@ begin
 
         StringData := TEncoding.UTF8.GetString(Buffer);
 
-        TCustomWebsocketClient(AContext).DoProcessIncomingStringData(StringData);
+        TWebsocketConnection(AContext).DoProcessIncomingStringData(StringData);
       end;
     end;
   end
@@ -191,15 +183,15 @@ begin
   end;
 end;
 
-function TCustomWebsocketServer.GetClientClass: TWebsocketClientClass;
+function TWebsocketServer.GetClientClass: TWebsocketConnectionClass;
 begin
-  Result := TWebsocketClientClass(ContextClass);
+  Result := TWebsocketConnectionClass(inherited ContextClass);
 end;
 
-procedure TCustomWebsocketServer.SetClientClass(
-  const Value: TWebsocketClientClass);
+procedure TWebsocketServer.SetClientClass(
+  const Value: TWebsocketConnectionClass);
 begin
-  ContextClass := Value;
+  inherited ContextClass := Value;
 end;
 
 { TWebsocketInitialRequest }
@@ -272,11 +264,11 @@ begin
   Result := FValues[Index];
 end;
 
-{ TCustomWebsocketClient }
+{ TWebsocketConnection }
 
 
 
-constructor TCustomWebsocketClient.Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TThreadList = nil);
+constructor TWebsocketConnection.Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TThreadList = nil);
 begin
   inherited;
 
@@ -284,7 +276,7 @@ begin
   InitialAnswer;
 end;
 
-destructor TCustomWebsocketClient.Destroy;
+destructor TWebsocketConnection.Destroy;
 begin
   FInitialRequest.Free;
 
@@ -292,11 +284,11 @@ begin
 end;
 
 
-procedure TCustomWebsocketClient.DoProcessIncomingStringData(AData: String);
+procedure TWebsocketConnection.DoProcessIncomingStringData(AData: String);
 begin
 end;
 
-class function TCustomWebsocketClient.DecodeSecWebSocketKey(AKey : String) : Integer;
+class function TWebsocketConnection.DecodeSecWebSocketKey(AKey : String) : Integer;
 var
   KeyStr : String;
   KeySpaces : Int64;
@@ -317,7 +309,7 @@ begin
   Result := Integer(KeyNumber div KeySpaces);
 end;
 
-procedure TCustomWebsocketClient.InitialAnswer;
+procedure TWebsocketConnection.InitialAnswer;
 var
   b : TIdBytes;
   md5 : TIdHashMessageDigest5;
@@ -350,7 +342,7 @@ begin
   end;
 end;
 
-class function TCustomWebsocketClient.IntToIntBigEndian(AInt: Integer): Integer;
+class function TWebsocketConnection.IntToIntBigEndian(AInt: Integer): Integer;
 var
   FromInt : array[0..3] of Byte absolute AInt;
   ToInt : array[0..3] of Byte absolute Result;
@@ -361,7 +353,7 @@ begin
   ToInt[3] := FromInt[0];
 end;
 
-procedure TCustomWebsocketClient.SendData(AData: String);
+procedure TWebsocketConnection.SendData(AData: String);
 var
   b : TIdBytes;
 begin
