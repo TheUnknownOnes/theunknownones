@@ -8,24 +8,28 @@ uses
   SysUtils,
   StrUtils,
   IdGlobal,
+  IdTCPConnection,
   IdContext,
   IdBaseComponent,
   IdComponent,
+  IdYarn,
   IdCustomTCPServer,
   IdHashMessageDigest,
   idHash,
-  RegExpr;
+  RegExpr,
+  IdException,
+  IdExceptionCore;
 
   //Magic Bytes
 const
   MBFrameStart = $00;
   MBFrameEnd = $FF;
-  MBFrameSizeStart = $80;
   MBPing = $01;
   MBPong = $02;
 
 type
   TCustomWebsocketServer = class;
+  TCustomWebsocketClient = class;
 
   TWebsocketInitialRequest = class
   protected
@@ -34,8 +38,7 @@ type
 
     function GetValue(const Index: Integer): String;
   public
-    constructor Create(AContext : TIdContext;
-                       AServer : TCustomWebsocketServer); virtual;
+    constructor Create(AContext : TIdContext); virtual;
 
     property Document : String index 0 read GetValue;
     property HTTPVersion : String index 1 read GetValue;
@@ -48,15 +51,16 @@ type
     property ChallengeData : TBytes read FChallengeData;
   end;
 
-  TCustomWebsocketClient = class
+
+  TCustomWebsocketClient = class(TIdServerContext)
   protected
     FInitialRequest : TWebsocketInitialRequest;
-    FContext : TIdContext;
+
+    procedure DoProcessIncomingStringData(AData : String); virtual;
 
     procedure InitialAnswer; virtual;
   public
-    constructor Create(AContext : TIdContext;
-                       AInitialRequest : TWebsocketInitialRequest); virtual;
+    constructor Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TThreadList = nil); override;
     destructor Destroy(); override;
 
     procedure SendData(AData : String); overload;
@@ -67,32 +71,32 @@ type
     property InitialRequest : TWebsocketInitialRequest read FInitialRequest;
   end;
 
-  TWebsocketClientEvent = procedure(AClient : TCustomWebsocketClient) of Object;
-  TWebsocketStringDataReceivedEvent = procedure(AClient : TCustomWebsocketClient; AData : String) of Object;
+  TWebsocketClientClass = class of TCustomWebsocketClient;
+
+
 
   TCustomWebsocketServer = class(TIdCustomTCPServer)
+  private
+    property ContextClass;
   protected const
     DefaultReadTimeout = 1000;
-
-
   protected var
     FReadTimeout: Integer;
 
-    FOnClientConnected: TWebsocketClientEvent;
-    FOnStringDataReceived: TWebsocketStringDataReceivedEvent;
-    FOnClientDisconnected: TWebsocketClientEvent;
+    function DoExecute(AContext : TIdContext): Boolean; override;
+    procedure DoConnect(AContext: TIdContext); override;
+    procedure DoDisconnect(AContext: TIdContext); override;
 
-    procedure OnTCPConnect(AContext : TIdContext); virtual;
-    procedure OnTCPDisconnect(AContext : TIdContext); virtual;
-    procedure OnTCPExecute(AContext : TIdContext); virtual;
+    function GetClientClass: TWebsocketClientClass;
+    procedure SetClientClass(const Value: TWebsocketClientClass);
+
+
   public
     constructor Create(AOwner: TComponent);
 
     property ReadTimeout : Integer read FReadTimeout write FReadTimeout;
 
-    property OnClientConnected : TWebsocketClientEvent read FOnClientConnected write FOnClientConnected;
-    property OnClientDisconnected : TWebsocketClientEvent read FOnClientDisconnected write FOnClientDisconnected;
-    property OnStringDataReceived : TWebsocketStringDataReceivedEvent read FOnStringDataReceived write FOnStringDataReceived;
+    property ClientClass : TWebsocketClientClass read GetClientClass write SetClientClass;
   end;
 
 
@@ -103,33 +107,27 @@ implementation
 
 constructor TCustomWebsocketServer.Create(AOwner: TComponent);
 begin
+  ClientClass := TCustomWebsocketClient;
+
   inherited;
 
   FReadTimeout := DefaultReadTimeout;
-
-  OnConnect := OnTCPConnect;
-  OnExecute := OnTCPExecute;
-  OnDisconnect := OnTCPDisconnect;
 end;
 
 
-procedure TCustomWebsocketServer.OnTCPConnect(AContext: TIdContext);
-var
-  client : TCustomWebsocketClient;
+procedure TCustomWebsocketServer.DoConnect(AContext: TIdContext);
 begin
-  client := TCustomWebsocketClient.Create(AContext, TWebsocketInitialRequest.Create(AContext, Self));
+  inherited;
 
-  if Assigned(FOnClientConnected) then
-    FOnClientConnected(client);
+  TCustomWebsocketClient(AContext).Connection.Socket.ReadTimeout := FReadTimeout;
 end;
 
-procedure TCustomWebsocketServer.OnTCPDisconnect(AContext: TIdContext);
+procedure TCustomWebsocketServer.DoDisconnect(AContext: TIdContext);
 begin
-  if Assigned(FOnClientDisconnected) then
-    FOnClientDisconnected(TCustomWebsocketClient(AContext.Data));
+  inherited;
 end;
 
-procedure TCustomWebsocketServer.OnTCPExecute(AContext: TIdContext);
+function TCustomWebsocketServer.DoExecute(AContext: TIdContext): Boolean;
 var
   StringData : String;
   Buffer : TBytes;
@@ -140,19 +138,24 @@ var
 const
   BufferInc = 1024;
 begin
-  SetLength(Buffer, BufferInc);
-  idxBuffer := -1;
+  Result := true;
 
-  b := AContext.Connection.Socket.ReadByte;
-  {$IFDEF DEBUG}writeln('Received type identifier 0x' + IntToHex(b, 2));{$ENDIF}
+  try
+    b := AContext.Connection.Socket.ReadByte;
+  except
+    on E : EIdReadTimeout do
+      exit
+  end;
 
   if (b shr 7) = 0 then
   begin
-    {$IFDEF DEBUG}writeln('MSBit not set');{$ENDIF}
 
     case b of
       MBFrameStart:
       begin
+        SetLength(Buffer, BufferInc);
+        idxBuffer := -1;
+
         repeat
           Inc(idxBuffer);
 
@@ -160,28 +163,18 @@ begin
             SetLength(Buffer, Length(Buffer) + BufferInc);
 
           Buffer[idxBuffer] := AContext.Connection.Socket.ReadByte;
-          {$IFDEF DEBUG}writeln('Received byte 0x' + IntToHex(Buffer[idxBuffer], 2) + ' nested in TextFrame');{$ENDIF}
         until (Buffer[idxBuffer] = MBFrameEnd);
 
         SetLength(Buffer, idxBuffer);
 
         StringData := TEncoding.UTF8.GetString(Buffer);
 
-        if Assigned(FOnStringDataReceived) then
-          FOnStringDataReceived(TCustomWebsocketClient(AContext.Data), StringData);
-
-        TCustomWebsocketClient(AContext.Data).SendData('I''ve recüved säh vollowing: ' + StringData);
-      end;
-      else
-      begin
-        {$IFDEF DEBUG}writeln('Received unknown byte 0x' + IntToHex(b, 2));{$ENDIF}
+        TCustomWebsocketClient(AContext).DoProcessIncomingStringData(StringData);
       end;
     end;
   end
   else
   begin
-    {$IFDEF DEBUG}writeln('MSBit set');{$ENDIF}
-
     len := 0;
     repeat
       b := AContext.Connection.Socket.ReadByte;
@@ -195,16 +188,23 @@ begin
     until (b and $80) <> $80;
 
     AContext.Connection.Socket.ReadBytes(Buffer, len, false);
-
-    {$IFDEF DEBUG}writeln('Received ' + IntToStr(len) + ' bytes of binary data');{$ENDIF}
   end;
+end;
 
+function TCustomWebsocketServer.GetClientClass: TWebsocketClientClass;
+begin
+  Result := TWebsocketClientClass(ContextClass);
+end;
+
+procedure TCustomWebsocketServer.SetClientClass(
+  const Value: TWebsocketClientClass);
+begin
+  ContextClass := Value;
 end;
 
 { TWebsocketInitialRequest }
 
-constructor TWebsocketInitialRequest.Create(AContext: TIdContext;
-                                            AServer : TCustomWebsocketServer);
+constructor TWebsocketInitialRequest.Create(AContext: TIdContext);
 var
   line : String;
   RegEx : TRegExpr;
@@ -274,15 +274,14 @@ end;
 
 { TCustomWebsocketClient }
 
-constructor TCustomWebsocketClient.Create(AContext : TIdContext;
-                                          AInitialRequest : TWebsocketInitialRequest);
+
+
+constructor TCustomWebsocketClient.Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TThreadList = nil);
 begin
-  FInitialRequest := AInitialRequest;
-  FContext := AContext;
+  inherited;
 
+  FInitialRequest := TWebsocketInitialRequest.Create(Self);
   InitialAnswer;
-
-  AContext.Data := Self;
 end;
 
 destructor TCustomWebsocketClient.Destroy;
@@ -290,6 +289,11 @@ begin
   FInitialRequest.Free;
 
   inherited;
+end;
+
+
+procedure TCustomWebsocketClient.DoProcessIncomingStringData(AData: String);
+begin
 end;
 
 class function TCustomWebsocketClient.DecodeSecWebSocketKey(AKey : String) : Integer;
@@ -332,7 +336,7 @@ begin
     md5.Free;
   end;
 
-  with FContext.Connection.Socket do
+  with Connection.Socket do
   begin
     WriteLn('HTTP/1.1 101 WebSocket Protocol Handshake', Enc);
     WriteLn('Upgrade: WebSocket', Enc);
@@ -366,11 +370,11 @@ begin
   AppendBytes(b, ToBytes(AData, TEncoding.UTF8));
   AppendBytes(b, ToBytes(Byte(MBFrameEnd)));
 
-  FContext.Connection.Socket.WriteBufferOpen;
+  Connection.Socket.WriteBufferOpen;
   try
-    FContext.Connection.Socket.WriteDirect(b);
+    Connection.Socket.WriteDirect(b);
   finally
-    FContext.Connection.Socket.WriteBufferClose;
+    Connection.Socket.WriteBufferClose;
   end;
 end;
 
