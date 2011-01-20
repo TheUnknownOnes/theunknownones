@@ -16,6 +16,7 @@ uses
   IdCustomTCPServer,
   IdHashMessageDigest,
   idHash,
+  IdURI,
   RegExpr,
   IdException,
   IdExceptionCore;
@@ -27,30 +28,41 @@ const
 
 type
   TWebsocketServer = class;
-  TWebsocketConnection = class;
+  TWebsocketContext = class;
+
+
 
   TWebsocketInitialRequest = class
   protected
-    FValues : array[0..6] of String;
+    FValues : array[0..8] of String;
     FChallengeData : TBytes;
 
+    FParams : TStringList;
+
     function GetValue(const Index: Integer): String;
+    function GetParam(AName: String): String;
   public
     constructor Create(AContext : TIdContext); virtual;
+    destructor Destroy; override;
 
-    property Document : String index 0 read GetValue;
+    property RawDocument : String index 0 read GetValue;
     property HTTPVersion : String index 1 read GetValue;
     property Host : String index 2 read GetValue;
     property WebsocketProtocol : String index 3 read GetValue;
     property WebsocketKey1 : String index 4 read GetValue;
     property WebsocketKey2 : String index 5 read GetValue;
     property Origin : String index 6 read GetValue;
+    property Params : String index 7 read GetValue;
+    property Document : String index 8 read GetValue;
+
+    property Param[AName : String] : String read GetParam;
 
     property ChallengeData : TBytes read FChallengeData;
   end;
 
 
-  TWebsocketConnection = class(TIdServerContext)
+
+  TWebsocketContext = class(TIdServerContext)
   protected
     FInitialRequest : TWebsocketInitialRequest;
 
@@ -69,7 +81,7 @@ type
     property InitialRequest : TWebsocketInitialRequest read FInitialRequest;
   end;
 
-  TWebsocketConnectionClass = class of TWebsocketConnection;
+  TWebsocketConnectionClass = class of TWebsocketContext;
 
 
 
@@ -103,15 +115,13 @@ procedure TWebsocketServer.AfterConstruction;
 begin
   inherited;
 
-  ContextClass := TWebsocketConnection;
+  ContextClass := TWebsocketContext;
   FReadTimeout := DefaultReadTimeout;
 end;
 
 procedure TWebsocketServer.DoConnect(AContext: TIdContext);
 begin
   inherited;
-
-  TWebsocketConnection(AContext).Connection.Socket.ReadTimeout := FReadTimeout;
 end;
 
 procedure TWebsocketServer.DoDisconnect(AContext: TIdContext);
@@ -161,7 +171,7 @@ begin
 
         StringData := TEncoding.UTF8.GetString(Buffer);
 
-        TWebsocketConnection(AContext).DoProcessIncomingStringData(StringData);
+        TWebsocketContext(AContext).DoProcessIncomingStringData(StringData);
       end;
     end;
   end
@@ -200,6 +210,7 @@ constructor TWebsocketInitialRequest.Create(AContext: TIdContext);
 var
   line : String;
   RegEx : TRegExpr;
+  u : TIdURI;
 const
   Expr_Document = 'GET (/.*) HTTP/(.+)';
   Expr_Host = 'Host: (.*)';
@@ -207,6 +218,10 @@ const
   Expr_Prot = 'Sec-WebSocket-Protocol: (.+)';
   Expr_Origin = 'Origin: (.+)';
 begin
+  FParams := TStringList.Create;
+  FParams.Delimiter := '&';
+  FParams.StrictDelimiter := true;
+
   RegEx := TRegExpr.Create;
   try
     RegEx.ModifierM := false;
@@ -223,6 +238,16 @@ begin
       begin
         FValues[0] := RegEx.Substitute('$1');
         FValues[1] := RegEx.Substitute('$2');
+
+        u := TIdURI.Create(RawDocument);
+        try
+          FValues[7] := u.Params;
+          FValues[8] := u.Document;
+        finally
+          u.Free;
+        end;
+
+        FParams.DelimitedText := Params;
       end;
 
       RegEx.Expression := Expr_Host;
@@ -259,16 +284,27 @@ begin
   AContext.Connection.Socket.ReadBytes(FChallengeData, 8, false);
 end;
 
+destructor TWebsocketInitialRequest.Destroy;
+begin
+  FParams.Free;
+  inherited;
+end;
+
+function TWebsocketInitialRequest.GetParam(AName: String): String;
+begin
+  Result := TIdURI.URLDecode(FParams.Values[TIdURI.ParamsEncode(AName)]);
+end;
+
 function TWebsocketInitialRequest.GetValue(const Index: Integer): String;
 begin
   Result := FValues[Index];
 end;
 
-{ TWebsocketConnection }
+{ TWebsocketContext }
 
 
 
-constructor TWebsocketConnection.Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TThreadList = nil);
+constructor TWebsocketContext.Create(AConnection: TIdTCPConnection; AYarn: TIdYarn; AList: TThreadList = nil);
 begin
   inherited;
 
@@ -276,7 +312,7 @@ begin
   InitialAnswer;
 end;
 
-destructor TWebsocketConnection.Destroy;
+destructor TWebsocketContext.Destroy;
 begin
   FInitialRequest.Free;
 
@@ -284,11 +320,11 @@ begin
 end;
 
 
-procedure TWebsocketConnection.DoProcessIncomingStringData(AData: String);
+procedure TWebsocketContext.DoProcessIncomingStringData(AData: String);
 begin
 end;
 
-class function TWebsocketConnection.DecodeSecWebSocketKey(AKey : String) : Integer;
+class function TWebsocketContext.DecodeSecWebSocketKey(AKey : String) : Integer;
 var
   KeyStr : String;
   KeySpaces : Int64;
@@ -309,7 +345,7 @@ begin
   Result := Integer(KeyNumber div KeySpaces);
 end;
 
-procedure TWebsocketConnection.InitialAnswer;
+procedure TWebsocketContext.InitialAnswer;
 var
   b : TIdBytes;
   md5 : TIdHashMessageDigest5;
@@ -334,7 +370,7 @@ begin
     WriteLn('Upgrade: WebSocket', Enc);
     WriteLn('Connection: Upgrade', Enc);
     WriteLn('Sec-WebSocket-Origin: ' + InitialRequest.Origin, Enc);
-    WriteLn('Sec-WebSocket-Location: ws://' + InitialRequest.Host + InitialRequest.Document, Enc);
+    WriteLn('Sec-WebSocket-Location: ws://' + InitialRequest.Host + InitialRequest.RawDocument, Enc);
     if InitialRequest.WebsocketProtocol <> '' then
       WriteLn('Sec-WebSocket-Protocol: ' + InitialRequest.WebsocketProtocol, Enc);
     WriteLn(Enc);
@@ -342,7 +378,7 @@ begin
   end;
 end;
 
-class function TWebsocketConnection.IntToIntBigEndian(AInt: Integer): Integer;
+class function TWebsocketContext.IntToIntBigEndian(AInt: Integer): Integer;
 var
   FromInt : array[0..3] of Byte absolute AInt;
   ToInt : array[0..3] of Byte absolute Result;
@@ -353,7 +389,7 @@ begin
   ToInt[3] := FromInt[0];
 end;
 
-procedure TWebsocketConnection.SendData(AData: String);
+procedure TWebsocketContext.SendData(AData: String);
 var
   b : TIdBytes;
 begin
