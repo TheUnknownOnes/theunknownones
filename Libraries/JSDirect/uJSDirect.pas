@@ -9,8 +9,13 @@ uses
   DateUtils,
   Windows,
   Variants,
+  Math,
   IdUri,
   uWebsocketServer;
+
+const
+  jsElementNamePlaceHolder = '%Name%';
+  jsElementGUIDPlaceHolder = '%GUID%';
 
 type
   TjsdApplication = class;
@@ -31,10 +36,12 @@ type
     FInitialJSCommand : String;
     FFinalJSCommand : String;
 
+    function ExpandPlaceholders(AString : String) : String;
+
     procedure DoResponse(AData : String); virtual;
   public
-    GUID : String;
-    Name : String;
+    _GUID : String;
+    _Name : String;
 
     constructor Create(AApplication : TjsdApplication); virtual;
 
@@ -110,14 +117,20 @@ type
   TjsObject = class(TjsElement)
   protected
     procedure SetPropertyValue(AProperty : String; AValue : Variant); virtual;
-    function GetPropertyValue(AProperty : String) : String; virtual;
+
+    function GetPropertyValue(AProperty : String) : String; overload;
+    procedure GetPropertyValue(AProperty : String; out AValue : String; ADefault : String = ''; ACheckNullUndefined : Boolean = true); overload; virtual;
+    procedure GetPropertyValue(AProperty : String; out AValue : Integer; ADefault : Integer = 0); overload; virtual;
+    procedure GetPropertyValue(AProperty : String; out AValue : Int64; ADefault : Integer = 0); overload; virtual;
+    procedure GetPropertyValue(AProperty : String; out AValue : Double; ADefault : Double = 0); overload; virtual;
+    procedure GetPropertyValue(AProperty : String; out AValue : Boolean; ADefault : Boolean = false); overload; virtual;
   public
     constructor Create(AApplication : TjsdApplication); override;
   end;
 
-  TjsExistingObject = class(TjsObject)
+  TjsObjectEx = class(TjsObject)
   public
-    constructor Create(AApplication : TjsdApplication; AExistingObject : String); reintroduce; virtual;
+    constructor Create(AApplication : TjsdApplication; ACreateCommand : String); reintroduce; virtual;
   end;
 
 
@@ -183,6 +196,7 @@ type
     destructor Destroy(); override;
 
     procedure ExecJSCommand(ACommand : String);
+    function ExecBlockingCommand(ACommand : String) : String;
     property GUID : String read FGUID;
   end;
 
@@ -308,7 +322,7 @@ procedure TjsdApplication.AddElement(AElement: TjsRespondingElement);
 begin
   EnterCriticalSection(FElementsLock);
   try
-    FElements.AddObject(AElement.GUID, AElement);
+    FElements.AddObject(AElement._GUID, AElement);
   finally
     LeaveCriticalSection(FElementsLock);
   end;
@@ -360,7 +374,7 @@ var
 begin
   EnterCriticalSection(FElementsLock);
   try
-    idx := FElements.IndexOf(AElement.GUID);
+    idx := FElements.IndexOf(AElement._GUID);
     if idx > -1 then
       FElements.Delete(idx);
   finally
@@ -398,6 +412,19 @@ end;
 
 procedure TjsdApplication.DoTerminated;
 begin
+end;
+
+function TjsdApplication.ExecBlockingCommand(ACommand: String) : String;
+var
+  rc : TjsRespondingCommand;
+begin
+  rc := TjsRespondingCommand.Create(Self, ACommand);
+  try
+    rc.WaitFor;
+    Result := rc.Result;
+  finally
+    rc.Free;
+  end;
 end;
 
 procedure TjsdApplication.ExecJSCommand(ACommand: String);
@@ -565,14 +592,18 @@ begin
   inherited;
 
   if FInitialJSCommand <> EmptyStr then
-    FApplication.FContext.SendData(FInitialJSCommand);
+  begin
+    FApplication.FContext.SendData(ExpandPlaceholders(FInitialJSCommand));
+  end;
 end;
 
 procedure TjsElement.BeforeDestruction;
 begin
   if Assigned(FApplication.FContext) and
     (FFinalJSCommand <> EmptyStr) then
-    FApplication.FContext.SendData(FFinalJSCommand);
+  begin
+    FApplication.FContext.SendData(ExpandPlaceholders(FFinalJSCommand));
+  end;
 
   inherited;
 end;
@@ -584,14 +615,20 @@ begin
   FApplication := AApplication;
 
   CreateGUID(lGUID);
-  GUID := GUIDToString(lGUID);
+  _GUID := GUIDToString(lGUID);
 
-  Name := '_' + StringReplace(Copy(GUID, 2, 36), '-', '', [rfReplaceAll]);
+  _Name := '_' + StringReplace(Copy(_GUID, 2, 36), '-', '', [rfReplaceAll]);
 end;
 
 procedure TjsElement.DoResponse(AData: String);
 begin
 
+end;
+
+function TjsElement.ExpandPlaceholders(AString: String): String;
+begin
+  Result := StringReplace(AString, jsElementNamePlaceHolder, _Name, [rfReplaceAll, rfIgnoreCase]);
+  Result := StringReplace(Result, jsElementGUIDPlaceHolder, _GUID, [rfReplaceAll, rfIgnoreCase]);
 end;
 
 { TaeElementResponse }
@@ -630,10 +667,10 @@ var
 begin
   inherited Create(AAplication);
 
-  FInitialJSCommand := Name + ' = function(' + AParams + ')';
+  FInitialJSCommand := _Name + ' = function(' + AParams + ')';
   FInitialJSCommand := FInitialJSCommand + '{' + ABody;
 
-  FInitialJSCommand := FInitialJSCommand + FApplication.FContext.InitialRequest.Param['cResponse'] + '("' + GUID + '"';
+  FInitialJSCommand := FInitialJSCommand + FApplication.FContext.InitialRequest.Param['cResponse'] + '("' + _GUID + '"';
 
   sl := TStringList.Create;
   try
@@ -653,7 +690,7 @@ begin
 
   FInitialJSCommand := FInitialJSCommand + ');}';
 
-  FFinalJSCommand := Name + '=null';
+  FFinalJSCommand := _Name + '=null';
 
   HandlerProc := nil;
 end;
@@ -769,26 +806,51 @@ constructor TjsObject.Create(AApplication: TjsdApplication);
 begin
   inherited;
 
-  FInitialJSCommand := Name + '=new Object';
-  FFinalJSCommand := Name + '=null';
+  FInitialJSCommand := _Name + '=new Object';
+  FFinalJSCommand := _Name + '=null';
+end;
+
+procedure TjsObject.GetPropertyValue(AProperty: String; out AValue: Integer;
+  ADefault: Integer);
+begin
+  AValue := StrToIntDef(GetPropertyValue(AProperty), ADefault);
+end;
+
+procedure TjsObject.GetPropertyValue(AProperty: String; out AValue: String;
+  ADefault: String; ACheckNullUndefined : Boolean);
+var
+  s : String;
+begin
+  s := GetPropertyValue(AProperty);
+  AValue := IfThen(ACheckNullUndefined and ((s = 'null') or (s = 'undefined')), ADefault, s);
 end;
 
 function TjsObject.GetPropertyValue(AProperty: String): String;
-var
-  rc : TjsRespondingCommand;
 begin
-  rc := TjsRespondingCommand.Create(FApplication, Name + '.' + AProperty);
-  try
-    rc.WaitFor;
-    Result := rc.Result;
-  finally
-    rc.Free;
-  end;
+  Result := FApplication.ExecBlockingCommand(_Name + '.' + AProperty);
+end;
+
+procedure TjsObject.GetPropertyValue(AProperty: String; out AValue: Boolean;
+  ADefault: Boolean);
+begin
+  AValue := StrToBoolDef(GetPropertyValue(AProperty), ADefault);
+end;
+
+procedure TjsObject.GetPropertyValue(AProperty: String; out AValue: Double;
+  ADefault: Double);
+begin
+  AValue := StrToFloatDef(GetPropertyValue(AProperty), ADefault);
+end;
+
+procedure TjsObject.GetPropertyValue(AProperty: String; out AValue: Int64;
+  ADefault: Integer);
+begin
+  AValue := StrToInt64Def(GetPropertyValue(AProperty), ADefault);
 end;
 
 procedure TjsObject.SetPropertyValue(AProperty : String; AValue : Variant);
 begin
-  FApplication.ExecJSCommand(Name + '.' + AProperty + '=' + ToJSCode(AValue));
+  FApplication.ExecJSCommand(_Name + '.' + AProperty + '=' + ToJSCode(AValue));
 end;
 
 { TjsRespondingCommand }
@@ -801,7 +863,7 @@ begin
   Result := EmptyStr;
 
   FApplication.NeedConnection;
-  FApplication.FContext.SendData(GUID + ACommand);
+  FApplication.FContext.SendData(_GUID + ACommand);
 end;
 
 procedure TjsRespondingCommand.DoResponse(AData: String);
@@ -812,12 +874,12 @@ end;
 
 { TjsExistingObject }
 
-constructor TjsExistingObject.Create(AApplication: TjsdApplication;
-  AExistingObject: String);
+constructor TjsObjectEx.Create(AApplication: TjsdApplication;
+  ACreateCommand: String);
 begin
   inherited Create(AApplication);
 
-  FInitialJSCommand := Name + '=' + AExistingObject;
+  FInitialJSCommand := _Name + '=' + ACreateCommand;
 end;
 
 initialization
