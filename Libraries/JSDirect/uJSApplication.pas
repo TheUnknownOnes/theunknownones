@@ -10,7 +10,7 @@ uses
   uJSDirect;
 
 type
-  TjsWindow = class(TjsObjectEx)
+  TjsWindow = class(TjsdObjectEx)
   private
     function GetClosed: Boolean;
     function GetInnerHeight: Integer;
@@ -30,10 +30,10 @@ type
     procedure SetPageXOffset(const Value: Integer);
     procedure SetPageYOffset(const Value: Integer);
   public
+    procedure AfterConstruction(); override;
     procedure BeforeDestruction(); override;
 
     function Open(uri : String;
-                  name : String = jsElementNamePlaceHolder;
                   width : Integer = -1;
                   height : Integer = -1;
                   top : Integer = -1;
@@ -97,14 +97,20 @@ end;
 
 { TjsWindow }
 
+procedure TjsWindow.AfterConstruction;
+begin
+  inherited;
+  Name := _JSVar;
+end;
+
 procedure TjsWindow.Alert(AMessage: String);
 begin
-  FApplication.ExecBlockingCommand(_name + '.alert(' + ToJSString(AMessage) + ')');
+  ExecMethod('alert('+ToJSString(AMessage)+')', true);
 end;
 
 procedure TjsWindow.Back;
 begin
-  FApplication.ExecBlockingCommand(_Name + '.back()');
+  ExecMethod('back', true);
 end;
 
 procedure TjsWindow.BeforeDestruction;
@@ -115,17 +121,17 @@ end;
 
 procedure TjsWindow.Blur;
 begin
-  FApplication.ExecJSCommand(_Name + '.blur()');
+  ExecMethod('blur');
 end;
 
 procedure TjsWindow.Close;
 begin
-  FApplication.ExecJSCommand(_Name + '.close()');
+  ExecMethod('close');
 end;
 
 function TjsWindow.Confirm(AMessage: String): Boolean;
 begin
-  result:=StrToBool(FApplication.ExecBlockingCommand(_Name + '.confirm(' + ToJSString(AMessage) + ')'));
+  result:=StrToBool(ExecMethod('confirm(' + ToJSString(AMessage) + ')', true));
 end;
 
 function TjsWindow.GetClosed: Boolean;
@@ -160,7 +166,7 @@ end;
 
 function TjsWindow.GetOuterWidth: Integer;
 begin
-  GetPropertyValue('outerWidth');
+  GetPropertyValue('outerWidth', Result);
 end;
 
 function TjsWindow.GetPageXOffset: Integer;
@@ -173,7 +179,7 @@ begin
   GetPropertyValue('pageYOffset', Result);
 end;
 
-function TjsWindow.Open(uri, name: String; width, height, top, left: Integer;
+function TjsWindow.Open(uri: String; width, height, top, left: Integer;
   dependent, hotkeys: Boolean; innerHeight, innerWidth: Integer; location,
   menubar, resizable: Boolean; screenX, screenY: Integer; scrollbars, status,
   toolbar: Boolean): TjsWindow;
@@ -198,7 +204,7 @@ begin
     if status then opts.Values['status'] := 'yes';
     if toolbar then opts.Values['toolbar'] := 'yes';
 
-    Result := TjsWindow.Create(FApplication, _name + '.open(' + ToJSString(uri) + ', ' +
+    Result := TjsWindow.Create(FApplication, _JSVar + '.open(' + ToJSString(uri) + ', ' +
                                                                ToJSString(name) + ', ' +
                                                                ToJSString(opts.CommaText) + ')');
   finally

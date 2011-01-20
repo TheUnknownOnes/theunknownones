@@ -130,8 +130,8 @@ begin
           if o is TJSONObject then
             Result := Result + Props[idx] + ':' + TJSONObject(o).ToJSON
           else
-          if o is TjsElement then
-            Result := Result + Props[idx] + ':' + TjsElement(o)._Name;
+          if o is TjsdElement then
+            Result := Result + Props[idx] + ':' + TjsdElement(o)._JSVar;
         end;
       end;
       tkString, tkChar, tkWChar, tkLString, tkWString, tkVariant, tkUString:
