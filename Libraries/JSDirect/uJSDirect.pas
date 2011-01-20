@@ -104,6 +104,7 @@ type
     constructor Create(AAplication : TjsdApplication;
                        AParams : String; //'P1,P2,P3'
                        AResponseParams : String; //'RetVal1=P1;RetVal2=MyVar'
+                       AHandlerProc : TjsFunctionHandlerProc = nil;
                        ABody : String = ''); reintroduce;
 
     function WaitFor(AReturnParamName : String;
@@ -660,6 +661,7 @@ end;
 constructor TjsFunction.Create(AAplication : TjsdApplication;
                                AParams : String;
                                AResponseParams : String;
+                               AHandlerProc : TjsFunctionHandlerProc = nil;
                                ABody : String = '');
 var
   sl : TStringList;
@@ -692,7 +694,7 @@ begin
 
   FFinalJSCommand := _Name + '=null';
 
-  HandlerProc := nil;
+  HandlerProc := AHandlerProc;
 end;
 
 procedure TjsFunction.DoResponse(AData: String);

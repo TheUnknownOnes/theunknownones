@@ -56,6 +56,7 @@ type
     procedure Back();
     procedure Blur();
     procedure Close();
+    function Confirm(AMessage : String): Boolean;
 
     property Closed : Boolean read GetClosed;
     property InnerHeight : Integer read GetInnerHeight write SetInnerHeight;
@@ -120,6 +121,11 @@ end;
 procedure TjsWindow.Close;
 begin
   FApplication.ExecJSCommand(_Name + '.close()');
+end;
+
+function TjsWindow.Confirm(AMessage: String): Boolean;
+begin
+  result:=StrToBool(FApplication.ExecBlockingCommand(_Name + '.confirm(' + ToJSString(AMessage) + ')'));
 end;
 
 function TjsWindow.GetClosed: Boolean;
