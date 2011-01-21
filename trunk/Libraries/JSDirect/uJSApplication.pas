@@ -95,7 +95,7 @@ type
     procedure OnResizeFuncHandler(AParams : TjsdFunctionHandlerParams);
     procedure OnScrollFuncHandler(AParams : TjsdFunctionHandlerParams);
     procedure OnUnloadFuncHandler(AParams : TjsdFunctionHandlerParams);
-    function GetDocument: IHTMLDocument;
+    function GetDocument: IHTMLDocument2;
     procedure SetOnError(const Value: TjsWindowOnErrorProc);
     procedure SetOnBeforeUnload(const Value: TjsWindowOnBeforeUnloadProc);
     procedure SetOnBlur(const Value: TjsWindowOnBlurProc);
@@ -151,7 +151,7 @@ type
     procedure Stop();
 
     property Closed : Boolean read GetClosed;
-    property Document : IHTMLDocument read GetDocument;
+    property Document : IHTMLDocument2 read GetDocument;
     property InnerHeight : Integer read GetInnerHeight write SetInnerHeight;
     property InnerWidth : Integer read GetInnerWidth write SetInnerWidth;
     property LocationBar : Boolean read GetLocationBar write SetLocationBar;
@@ -256,7 +256,7 @@ begin
   GetPropertyValue('closed', Result);
 end;
 
-function TjsWindow.GetDocument: IHTMLDocument;
+function TjsWindow.GetDocument: IHTMLDocument2;
 begin
   Result:=TjsDOMDocument.Create(FApplication, _JSVar + '.document');
 end;
