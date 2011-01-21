@@ -11,7 +11,8 @@ uses
   mshtml,
   TypInfo,
   Windows,
-  Variants, ActiveX;
+  Variants,
+  ActiveX;
 
 type
   IjsElement = interface
@@ -20,7 +21,7 @@ type
     function get_GUID: String;
   end;
 
-  TjsDOMObject = class(TjsdObjectEx, IDispatch, IjsElement)
+  TjsDOMObject = class(TjsdBaseObject, IDispatch, IjsElement)
   private
     FRefCount: Integer;
   protected
@@ -223,7 +224,7 @@ type
 
   end;
 
-  TjsDOMDocument = class(TjsHTMLDOMNode, IHTMLDocument2)
+  TjsHTMLDocument = class(TjsHTMLDOMNode, IHTMLDocument2)
   protected
     function Get_Script: IDispatch; safecall;
 
@@ -339,6 +340,86 @@ type
     {$ENDREGION}
   end;
 
+  TjsHTMLFramesCollection = class(TjsDOMObject, IHTMLFramesCollection2)
+  protected
+    function item(const pvarIndex: OleVariant): OleVariant; safecall;
+    function Get_length: Integer; safecall;
+  end;
+
+  TjsHTMLWindow = class(TjsHTMLFramesCollection, IHTMLWindow2)
+  protected
+    function Get_frames: IHTMLFramesCollection2; safecall;
+    procedure Set_defaultStatus(const p: WideString); safecall;
+    function Get_defaultStatus: WideString; safecall;
+    procedure Set_status(const p: WideString); safecall;
+    function Get_status: WideString; safecall;
+    function setTimeout(const expression: WideString; msec: Integer; var language: OleVariant): Integer; safecall;
+    procedure clearTimeout(timerID: Integer); safecall;
+    procedure alert(const message: WideString); safecall;
+    function confirm(const message: WideString): WordBool; safecall;
+    function prompt(const message: WideString; const defstr: WideString): OleVariant; safecall;
+    function Get_Image: IHTMLImageElementFactory; safecall;
+    function Get_location: IHTMLLocation; safecall;
+    function Get_history: IOmHistory; safecall;
+    procedure close; safecall;
+    procedure Set_opener(p: OleVariant); safecall;
+    function Get_opener: OleVariant; safecall;
+    function Get_navigator: IOmNavigator; safecall;
+    procedure Set_name(const p: WideString); safecall;
+    function Get_name: WideString; safecall;
+    function Get_parent: IHTMLWindow2; safecall;
+    function open(const url: WideString; const name: WideString; const features: WideString;
+                  replace: WordBool): IHTMLWindow2; safecall;
+    function Get_self: IHTMLWindow2; safecall;
+    function Get_top: IHTMLWindow2; safecall;
+    function Get_window: IHTMLWindow2; safecall;
+    procedure navigate(const url: WideString); safecall;
+    procedure Set_onfocus(p: OleVariant); safecall;
+    function Get_onfocus: OleVariant; safecall;
+    procedure Set_onblur(p: OleVariant); safecall;
+    function Get_onblur: OleVariant; safecall;
+    procedure Set_onload(p: OleVariant); safecall;
+    function Get_onload: OleVariant; safecall;
+    procedure Set_onbeforeunload(p: OleVariant); safecall;
+    function Get_onbeforeunload: OleVariant; safecall;
+    procedure Set_onunload(p: OleVariant); safecall;
+    function Get_onunload: OleVariant; safecall;
+    procedure Set_onhelp(p: OleVariant); safecall;
+    function Get_onhelp: OleVariant; safecall;
+    procedure Set_onerror(p: OleVariant); safecall;
+    function Get_onerror: OleVariant; safecall;
+    procedure Set_onresize(p: OleVariant); safecall;
+    function Get_onresize: OleVariant; safecall;
+    procedure Set_onscroll(p: OleVariant); safecall;
+    function Get_onscroll: OleVariant; safecall;
+    function Get_document: IHTMLDocument2; safecall;
+    function Get_event: IHTMLEventObj; safecall;
+    function Get__newEnum: IUnknown; safecall;
+    function showModalDialog(const dialog: WideString; var varArgIn: OleVariant;
+                             var varOptions: OleVariant): OleVariant; safecall;
+    procedure showHelp(const helpURL: WideString; helpArg: OleVariant; const features: WideString); safecall;
+    function Get_screen: IHTMLScreen; safecall;
+    function Get_Option: IHTMLOptionElementFactory; safecall;
+    procedure focus; safecall;
+    function Get_closed: WordBool; safecall;
+    procedure blur; safecall;
+    procedure scroll(x: Integer; y: Integer); safecall;
+    function Get_clientInformation: IOmNavigator; safecall;
+    function setInterval(const expression: WideString; msec: Integer; var language: OleVariant): Integer; safecall;
+    procedure clearInterval(timerID: Integer); safecall;
+    procedure Set_offscreenBuffering(p: OleVariant); safecall;
+    function Get_offscreenBuffering: OleVariant; safecall;
+    function execScript(const code: WideString; const language: WideString): OleVariant; safecall;
+    function toString: WideString; safecall;
+    procedure scrollBy(x: Integer; y: Integer); safecall;
+    procedure scrollTo(x: Integer; y: Integer); safecall;
+    procedure moveTo(x: Integer; y: Integer); safecall;
+    procedure moveBy(x: Integer; y: Integer); safecall;
+    procedure resizeTo(x: Integer; y: Integer); safecall;
+    procedure resizeBy(x: Integer; y: Integer); safecall;
+    function Get_external: IDispatch; safecall;
+  end;
+
 implementation
 
 { TjsDOMObject }
@@ -347,12 +428,10 @@ implementation
 constructor TjsDOMObject.Create(AApplication: TjsdApplication;
   ACreateCommand: String);
 begin
-  inherited Create(AApplication, ACreateCommand, True);
+  inherited Create(AApplication);
 
-  if FApplication.Exec(FInitialJSCommand, True) = 'null' then
-    Abort
-  else
-    FInitialJSCommand:='';
+  if FApplication.Exec(_JSVar + '=' + ACreateCommand, True) = 'null' then
+    Abort;
 end;
 
 class function TjsDOMObject.GetDOMObjectJsName(ANode: IDispatch): String;
@@ -473,7 +552,7 @@ end;
 
 function TjsHTMLDOMNode.Get_ownerDocument: IDispatch;
 begin
-  Result:=TjsDOMDocument.Create(FApplication, _JSVar+'.ownerDocument');
+  Result:=TjsHTMLDocument.Create(FApplication, _JSVar+'.ownerDocument');
 end;
 
 function TjsHTMLDOMNode.Get_parentNode: IHTMLDOMNode;
@@ -576,557 +655,556 @@ begin
   SetPropertyValue('value', p);
 end;
 
-{ TjsDOMDocument }
+{ TjsHTMLDocument }
 
-procedure TjsDOMDocument.clear;
+procedure TjsHTMLDocument.clear;
 begin
   ExecMethod('clear');
 end;
 
-procedure TjsDOMDocument.close;
+procedure TjsHTMLDocument.close;
 begin
   ExecMethod('close');
 end;
 
-function TjsDOMDocument.createElement(const eTag: WideString): IHTMLElement;
+function TjsHTMLDocument.createElement(const eTag: WideString): IHTMLElement;
 begin
   Result:=TjsHTMLElement.Create(FApplication, _JSVar+'.createElement("'+eTag+'")');
 end;
 
-function TjsDOMDocument.createStyleSheet(const bstrHref: WideString;
+function TjsHTMLDocument.createStyleSheet(const bstrHref: WideString;
   lIndex: Integer): IHTMLStyleSheet;
 begin
 
 end;
 
-function TjsDOMDocument.elementFromPoint(x, y: Integer): IHTMLElement;
+function TjsHTMLDocument.elementFromPoint(x, y: Integer): IHTMLElement;
 begin
   Result:=TjsHTMLElement.Create(FApplication, _JSVar+'.elementFromPoint('+IntToStr(x)+','+IntToStr(y)+')');
 end;
 
-function TjsDOMDocument.execCommand(const cmdID: WideString; showUI: WordBool;
+function TjsHTMLDocument.execCommand(const cmdID: WideString; showUI: WordBool;
   value: OleVariant): WordBool;
 begin
   Result:=StrToBool(LowerCase(
     ExecMethod('execCommand("'+cmdID+'",'+
                             LowerCase(BoolToStr(showUI))+','+
                             ToJSCode(value)+')', True)));
-
 end;
 
-function TjsDOMDocument.execCommandShowHelp(const cmdID: WideString): WordBool;
+function TjsHTMLDocument.execCommandShowHelp(const cmdID: WideString): WordBool;
 begin
-
+  Result:=StrToBool(LowerCase(
+    ExecMethod('execCommandShowHelp("'+cmdID+'")', True)));
 end;
 
-function TjsDOMDocument.Get_activeElement: IHTMLElement;
+function TjsHTMLDocument.Get_activeElement: IHTMLElement;
 begin
-
+  Result:=TjsHTMLElement.Create(FApplication, _JSVar+'.activeElement');
 end;
 
-function TjsDOMDocument.Get_alinkColor: OleVariant;
+function TjsHTMLDocument.Get_alinkColor: OleVariant;
 begin
-
+  GetPropertyValue('alinkColor', Result);
 end;
 
-function TjsDOMDocument.Get_all: IHTMLElementCollection;
+function TjsHTMLDocument.Get_all: IHTMLElementCollection;
 begin
   Result:=TjsHTMLElementCollection.Create(FApplication, _JSVar+'.all');
 end;
 
-function TjsDOMDocument.Get_anchors: IHTMLElementCollection;
+function TjsHTMLDocument.Get_anchors: IHTMLElementCollection;
 begin
   Result:=TjsHTMLElementCollection.Create(FApplication, _JSVar+'.anchors');
 end;
 
-function TjsDOMDocument.Get_applets: IHTMLElementCollection;
+function TjsHTMLDocument.Get_applets: IHTMLElementCollection;
 begin
   Result:=TjsHTMLElementCollection.Create(FApplication, _JSVar+'.applets');
 end;
 
-function TjsDOMDocument.Get_bgColor: OleVariant;
+function TjsHTMLDocument.Get_bgColor: OleVariant;
 begin
   GetPropertyValue('bgColor', Result);
 end;
 
-function TjsDOMDocument.Get_body: IHTMLElement;
+function TjsHTMLDocument.Get_body: IHTMLElement;
 begin
   Result:=TjsHTMLElement.Create(FApplication, _JSVar+'.body');
 end;
 
-function TjsDOMDocument.Get_charset: WideString;
+function TjsHTMLDocument.Get_charset: WideString;
 begin
   GetPropertyValue('charset', Result);
 end;
 
-function TjsDOMDocument.Get_cookie: WideString;
+function TjsHTMLDocument.Get_cookie: WideString;
 begin
   GetPropertyValue('cookie', Result);
 end;
 
-function TjsDOMDocument.Get_defaultCharset: WideString;
+function TjsHTMLDocument.Get_defaultCharset: WideString;
 begin
   GetPropertyValue('defaultCharset', Result);
 end;
 
-function TjsDOMDocument.Get_designMode: WideString;
+function TjsHTMLDocument.Get_designMode: WideString;
 begin
   GetPropertyValue('designMode', Result);
 end;
 
-function TjsDOMDocument.Get_domain: WideString;
+function TjsHTMLDocument.Get_domain: WideString;
 begin
   GetPropertyValue('domain', Result);
 end;
 
-function TjsDOMDocument.Get_embeds: IHTMLElementCollection;
+function TjsHTMLDocument.Get_embeds: IHTMLElementCollection;
 begin
   Result:=TjsHTMLElementCollection.Create(FApplication, _JSVar+'.embeds');
 end;
 
-function TjsDOMDocument.Get_expando: WordBool;
+function TjsHTMLDocument.Get_expando: WordBool;
 begin
   GetPropertyValue('expando', Result);
 end;
 
-function TjsDOMDocument.Get_fgColor: OleVariant;
+function TjsHTMLDocument.Get_fgColor: OleVariant;
 begin
   GetPropertyValue('fgColor', Result);
 end;
 
-function TjsDOMDocument.Get_fileCreatedDate: WideString;
+function TjsHTMLDocument.Get_fileCreatedDate: WideString;
 begin
   GetPropertyValue('fileCreatedDate', Result);
 end;
 
-function TjsDOMDocument.Get_fileModifiedDate: WideString;
+function TjsHTMLDocument.Get_fileModifiedDate: WideString;
 begin
   GetPropertyValue('fileModifiedDate', Result);
 end;
 
-function TjsDOMDocument.Get_fileSize: WideString;
+function TjsHTMLDocument.Get_fileSize: WideString;
 begin
-
+  GetPropertyValue('fileSize', Result);
 end;
 
-function TjsDOMDocument.Get_fileUpdatedDate: WideString;
+function TjsHTMLDocument.Get_fileUpdatedDate: WideString;
 begin
-
+  GetPropertyValue('fileUpdateDate', Result);
 end;
 
-function TjsDOMDocument.Get_forms: IHTMLElementCollection;
+function TjsHTMLDocument.Get_forms: IHTMLElementCollection;
 begin
   Result:=TjsHTMLElementCollection.Create(FApplication, _JSVar+'.forms');
 end;
 
-function TjsDOMDocument.Get_frames: IHTMLFramesCollection2;
+function TjsHTMLDocument.Get_frames: IHTMLFramesCollection2;
 begin
 
 end;
 
-function TjsDOMDocument.Get_images: IHTMLElementCollection;
+function TjsHTMLDocument.Get_images: IHTMLElementCollection;
 begin
   Result:=TjsHTMLElementCollection.Create(FApplication, _JSVar+'.images');
 end;
 
-function TjsDOMDocument.Get_lastModified: WideString;
+function TjsHTMLDocument.Get_lastModified: WideString;
 begin
-
+  GetPropertyValue('lastModified', Result);
 end;
 
-function TjsDOMDocument.Get_linkColor: OleVariant;
+function TjsHTMLDocument.Get_linkColor: OleVariant;
 begin
-
+  GetPropertyValue('linkColor', Result);
 end;
 
-function TjsDOMDocument.Get_links: IHTMLElementCollection;
+function TjsHTMLDocument.Get_links: IHTMLElementCollection;
 begin
   Result:=TjsHTMLElementCollection.Create(FApplication, _JSVar+'.links');
 end;
 
-function TjsDOMDocument.Get_location: IHTMLLocation;
+function TjsHTMLDocument.Get_location: IHTMLLocation;
 begin
 
 end;
 
-function TjsDOMDocument.Get_mimeType: WideString;
+function TjsHTMLDocument.Get_mimeType: WideString;
+begin
+  GetPropertyValue('mimeType', Result);
+end;
+
+function TjsHTMLDocument.Get_nameProp: WideString;
+begin
+  GetPropertyValue('nameProp', Result);
+end;
+
+function TjsHTMLDocument.Get_onafterupdate: OleVariant;
+begin
+  GetPropertyValue('onafterupdate', Result);
+end;
+
+function TjsHTMLDocument.Get_onbeforeupdate: OleVariant;
+begin
+  GetPropertyValue('onbeforeupdate', Result);
+end;
+
+function TjsHTMLDocument.Get_onclick: OleVariant;
+begin
+  GetPropertyValue('onclick', Result);
+end;
+
+function TjsHTMLDocument.Get_ondblclick: OleVariant;
+begin
+  GetPropertyValue('ondblclick', Result);
+end;
+
+function TjsHTMLDocument.Get_ondragstart: OleVariant;
+begin
+  GetPropertyValue('ondragstart', Result);
+end;
+
+function TjsHTMLDocument.Get_onerrorupdate: OleVariant;
+begin
+  GetPropertyValue('onerrorupdate', Result);
+end;
+
+function TjsHTMLDocument.Get_onhelp: OleVariant;
+begin
+  GetPropertyValue('onhelp', Result);
+end;
+
+function TjsHTMLDocument.Get_onkeydown: OleVariant;
+begin
+  GetPropertyValue('onkeydown', Result);
+end;
+
+function TjsHTMLDocument.Get_onkeypress: OleVariant;
+begin
+  GetPropertyValue('onkeypress', Result);
+end;
+
+function TjsHTMLDocument.Get_onkeyup: OleVariant;
+begin
+  GetPropertyValue('onkeyup', Result);
+end;
+
+function TjsHTMLDocument.Get_onmousedown: OleVariant;
+begin
+  GetPropertyValue('onmousedown', Result);
+end;
+
+function TjsHTMLDocument.Get_onmousemove: OleVariant;
+begin
+  GetPropertyValue('onmousemove', Result);
+end;
+
+function TjsHTMLDocument.Get_onmouseout: OleVariant;
+begin
+  GetPropertyValue('onmouseout', Result);
+end;
+
+function TjsHTMLDocument.Get_onmouseover: OleVariant;
+begin
+  GetPropertyValue('onmouseover', Result);
+end;
+
+function TjsHTMLDocument.Get_onmouseup: OleVariant;
+begin
+  GetPropertyValue('onmouseup', Result);
+end;
+
+function TjsHTMLDocument.Get_onreadystatechange: OleVariant;
+begin
+  GetPropertyValue('onreadystatechange', Result);
+end;
+
+function TjsHTMLDocument.Get_onrowenter: OleVariant;
+begin
+  GetPropertyValue('onrowenter', Result);
+end;
+
+function TjsHTMLDocument.Get_onrowexit: OleVariant;
+begin
+  GetPropertyValue('onrowexit', Result);
+end;
+
+function TjsHTMLDocument.Get_onselectstart: OleVariant;
+begin
+  GetPropertyValue('onselectstart', Result);
+end;
+
+function TjsHTMLDocument.Get_parentWindow: IHTMLWindow2;
 begin
 
 end;
 
-function TjsDOMDocument.Get_nameProp: WideString;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onafterupdate: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onbeforeupdate: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onclick: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_ondblclick: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_ondragstart: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onerrorupdate: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onhelp: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onkeydown: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onkeypress: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onkeyup: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onmousedown: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onmousemove: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onmouseout: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onmouseover: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onmouseup: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onreadystatechange: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onrowenter: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onrowexit: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_onselectstart: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.Get_parentWindow: IHTMLWindow2;
-begin
-
-end;
-
-function TjsDOMDocument.Get_plugins: IHTMLElementCollection;
+function TjsHTMLDocument.Get_plugins: IHTMLElementCollection;
 begin
   Result:=TjsHTMLElementCollection.Create(FApplication, _JSVar+'.plugins');
 end;
 
-function TjsDOMDocument.Get_protocol: WideString;
+function TjsHTMLDocument.Get_protocol: WideString;
 begin
-
+  GetPropertyValue('protocol', Result);
 end;
 
-function TjsDOMDocument.Get_readyState: WideString;
+function TjsHTMLDocument.Get_readyState: WideString;
 begin
-
+  GetPropertyValue('readyState', Result);
 end;
 
-function TjsDOMDocument.Get_referrer: WideString;
+function TjsHTMLDocument.Get_referrer: WideString;
 begin
-
+  GetPropertyValue('referrer', Result);
 end;
 
-function TjsDOMDocument.Get_Script: IDispatch;
+function TjsHTMLDocument.Get_Script: IDispatch;
 begin
   Result:=nil;
 end;
 
-function TjsDOMDocument.Get_scripts: IHTMLElementCollection;
+function TjsHTMLDocument.Get_scripts: IHTMLElementCollection;
 begin
   Result:=TjsHTMLElementCollection.Create(FApplication, _JSVar+'.scripts');
 end;
 
-function TjsDOMDocument.Get_security: WideString;
+function TjsHTMLDocument.Get_security: WideString;
+begin
+  GetPropertyValue('security', Result);
+end;
+
+function TjsHTMLDocument.Get_selection: IHTMLSelectionObject;
+begin
+end;
+
+function TjsHTMLDocument.Get_styleSheets: IHTMLStyleSheetsCollection;
 begin
 
 end;
 
-function TjsDOMDocument.Get_selection: IHTMLSelectionObject;
+function TjsHTMLDocument.Get_title: WideString;
 begin
 
 end;
 
-function TjsDOMDocument.Get_styleSheets: IHTMLStyleSheetsCollection;
+function TjsHTMLDocument.Get_url: WideString;
 begin
 
 end;
 
-function TjsDOMDocument.Get_title: WideString;
+function TjsHTMLDocument.Get_vlinkColor: OleVariant;
 begin
 
 end;
 
-function TjsDOMDocument.Get_url: WideString;
-begin
-
-end;
-
-function TjsDOMDocument.Get_vlinkColor: OleVariant;
-begin
-
-end;
-
-function TjsDOMDocument.open(const url: WideString; name, features,
+function TjsHTMLDocument.open(const url: WideString; name, features,
   replace: OleVariant): IDispatch;
 begin
 
 end;
 
-function TjsDOMDocument.queryCommandEnabled(const cmdID: WideString): WordBool;
+function TjsHTMLDocument.queryCommandEnabled(const cmdID: WideString): WordBool;
 begin
 
 end;
 
-function TjsDOMDocument.queryCommandIndeterm(const cmdID: WideString): WordBool;
+function TjsHTMLDocument.queryCommandIndeterm(const cmdID: WideString): WordBool;
 begin
 
 end;
 
-function TjsDOMDocument.queryCommandState(const cmdID: WideString): WordBool;
+function TjsHTMLDocument.queryCommandState(const cmdID: WideString): WordBool;
 begin
 
 end;
 
-function TjsDOMDocument.queryCommandSupported(
+function TjsHTMLDocument.queryCommandSupported(
   const cmdID: WideString): WordBool;
 begin
 
 end;
 
-function TjsDOMDocument.queryCommandText(const cmdID: WideString): WideString;
+function TjsHTMLDocument.queryCommandText(const cmdID: WideString): WideString;
 begin
 
 end;
 
-function TjsDOMDocument.queryCommandValue(const cmdID: WideString): OleVariant;
+function TjsHTMLDocument.queryCommandValue(const cmdID: WideString): OleVariant;
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_alinkColor(p: OleVariant);
+procedure TjsHTMLDocument.Set_alinkColor(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_bgColor(p: OleVariant);
+procedure TjsHTMLDocument.Set_bgColor(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_charset(const p: WideString);
+procedure TjsHTMLDocument.Set_charset(const p: WideString);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_cookie(const p: WideString);
+procedure TjsHTMLDocument.Set_cookie(const p: WideString);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_defaultCharset(const p: WideString);
+procedure TjsHTMLDocument.Set_defaultCharset(const p: WideString);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_designMode(const p: WideString);
+procedure TjsHTMLDocument.Set_designMode(const p: WideString);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_domain(const p: WideString);
+procedure TjsHTMLDocument.Set_domain(const p: WideString);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_expando(p: WordBool);
+procedure TjsHTMLDocument.Set_expando(p: WordBool);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_fgColor(p: OleVariant);
+procedure TjsHTMLDocument.Set_fgColor(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_linkColor(p: OleVariant);
+procedure TjsHTMLDocument.Set_linkColor(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onafterupdate(p: OleVariant);
+procedure TjsHTMLDocument.Set_onafterupdate(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onbeforeupdate(p: OleVariant);
+procedure TjsHTMLDocument.Set_onbeforeupdate(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onclick(p: OleVariant);
+procedure TjsHTMLDocument.Set_onclick(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_ondblclick(p: OleVariant);
+procedure TjsHTMLDocument.Set_ondblclick(p: OleVariant);
+begin
+  FApplication.Exec(_JSVar+'.ondblclick = '+p);
+end;
+
+procedure TjsHTMLDocument.Set_ondragstart(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_ondragstart(p: OleVariant);
+procedure TjsHTMLDocument.Set_onerrorupdate(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onerrorupdate(p: OleVariant);
+procedure TjsHTMLDocument.Set_onhelp(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onhelp(p: OleVariant);
+procedure TjsHTMLDocument.Set_onkeydown(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onkeydown(p: OleVariant);
+procedure TjsHTMLDocument.Set_onkeypress(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onkeypress(p: OleVariant);
+procedure TjsHTMLDocument.Set_onkeyup(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onkeyup(p: OleVariant);
+procedure TjsHTMLDocument.Set_onmousedown(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onmousedown(p: OleVariant);
+procedure TjsHTMLDocument.Set_onmousemove(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onmousemove(p: OleVariant);
+procedure TjsHTMLDocument.Set_onmouseout(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onmouseout(p: OleVariant);
+procedure TjsHTMLDocument.Set_onmouseover(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onmouseover(p: OleVariant);
+procedure TjsHTMLDocument.Set_onmouseup(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onmouseup(p: OleVariant);
+procedure TjsHTMLDocument.Set_onreadystatechange(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onreadystatechange(p: OleVariant);
+procedure TjsHTMLDocument.Set_onrowenter(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onrowenter(p: OleVariant);
+procedure TjsHTMLDocument.Set_onrowexit(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onrowexit(p: OleVariant);
+procedure TjsHTMLDocument.Set_onselectstart(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_onselectstart(p: OleVariant);
+procedure TjsHTMLDocument.Set_title(const p: WideString);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_title(const p: WideString);
+procedure TjsHTMLDocument.Set_url(const p: WideString);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_url(const p: WideString);
+procedure TjsHTMLDocument.Set_vlinkColor(p: OleVariant);
 begin
 
 end;
 
-procedure TjsDOMDocument.Set_vlinkColor(p: OleVariant);
+function TjsHTMLDocument.toString: WideString;
 begin
 
 end;
 
-function TjsDOMDocument.toString: WideString;
+procedure TjsHTMLDocument.write(psarray: PSafeArray);
 begin
 
 end;
 
-procedure TjsDOMDocument.write(psarray: PSafeArray);
-begin
-
-end;
-
-procedure TjsDOMDocument.writeln(psarray: PSafeArray);
+procedure TjsHTMLDocument.writeln(psarray: PSafeArray);
 begin
 
 end;
@@ -1239,7 +1317,7 @@ end;
 
 function TjsHTMLElement.Get_document: IDispatch;
 begin
-
+  Result:=TjsHTMLDocument.Create(FApplication, _JSVar+'.document');
 end;
 
 function TjsHTMLElement.Get_filters: IHTMLFiltersCollection;
@@ -1640,6 +1718,366 @@ begin
 end;
 
 function TjsHTMLElement.toString: WideString;
+begin
+
+end;
+
+{ TjsHTMLFramesCollection }
+
+function TjsHTMLFramesCollection.Get_length: Integer;
+begin
+  GetPropertyValue('length', Result);
+end;
+
+function TjsHTMLFramesCollection.item(const pvarIndex: OleVariant): OleVariant;
+begin
+  Result:=null;
+  //todo: fix this!
+end;
+
+{ TjsHTMLWindow }
+
+procedure TjsHTMLWindow.alert(const message: WideString);
+begin
+
+end;
+
+procedure TjsHTMLWindow.blur;
+begin
+
+end;
+
+procedure TjsHTMLWindow.clearInterval(timerID: Integer);
+begin
+
+end;
+
+procedure TjsHTMLWindow.clearTimeout(timerID: Integer);
+begin
+
+end;
+
+procedure TjsHTMLWindow.close;
+begin
+
+end;
+
+function TjsHTMLWindow.confirm(const message: WideString): WordBool;
+begin
+
+end;
+
+function TjsHTMLWindow.execScript(const code, language: WideString): OleVariant;
+begin
+
+end;
+
+procedure TjsHTMLWindow.focus;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_clientInformation: IOmNavigator;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_closed: WordBool;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_defaultStatus: WideString;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_document: IHTMLDocument2;
+begin
+  Result:=TjsHTMLDocument.Create(FApplication, _JSVar+'.document');
+end;
+
+function TjsHTMLWindow.Get_event: IHTMLEventObj;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_external: IDispatch;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_frames: IHTMLFramesCollection2;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_history: IOmHistory;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_Image: IHTMLImageElementFactory;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_location: IHTMLLocation;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_name: WideString;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_navigator: IOmNavigator;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_offscreenBuffering: OleVariant;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_onbeforeunload: OleVariant;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_onblur: OleVariant;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_onerror: OleVariant;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_onfocus: OleVariant;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_onhelp: OleVariant;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_onload: OleVariant;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_onresize: OleVariant;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_onscroll: OleVariant;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_onunload: OleVariant;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_opener: OleVariant;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_Option: IHTMLOptionElementFactory;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_parent: IHTMLWindow2;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_screen: IHTMLScreen;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_self: IHTMLWindow2;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_status: WideString;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_top: IHTMLWindow2;
+begin
+
+end;
+
+function TjsHTMLWindow.Get_window: IHTMLWindow2;
+begin
+
+end;
+
+function TjsHTMLWindow.Get__newEnum: IUnknown;
+begin
+
+end;
+
+procedure TjsHTMLWindow.moveBy(x, y: Integer);
+begin
+
+end;
+
+procedure TjsHTMLWindow.moveTo(x, y: Integer);
+begin
+
+end;
+
+procedure TjsHTMLWindow.navigate(const url: WideString);
+begin
+
+end;
+
+function TjsHTMLWindow.open(const url, name, features: WideString;
+  replace: WordBool): IHTMLWindow2;
+begin
+
+end;
+
+function TjsHTMLWindow.prompt(const message, defstr: WideString): OleVariant;
+begin
+
+end;
+
+procedure TjsHTMLWindow.resizeBy(x, y: Integer);
+begin
+
+end;
+
+procedure TjsHTMLWindow.resizeTo(x, y: Integer);
+begin
+
+end;
+
+procedure TjsHTMLWindow.scroll(x, y: Integer);
+begin
+
+end;
+
+procedure TjsHTMLWindow.scrollBy(x, y: Integer);
+begin
+
+end;
+
+procedure TjsHTMLWindow.scrollTo(x, y: Integer);
+begin
+
+end;
+
+function TjsHTMLWindow.setInterval(const expression: WideString; msec: Integer;
+  var language: OleVariant): Integer;
+begin
+
+end;
+
+function TjsHTMLWindow.setTimeout(const expression: WideString; msec: Integer;
+  var language: OleVariant): Integer;
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_defaultStatus(const p: WideString);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_name(const p: WideString);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_offscreenBuffering(p: OleVariant);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_onbeforeunload(p: OleVariant);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_onblur(p: OleVariant);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_onerror(p: OleVariant);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_onfocus(p: OleVariant);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_onhelp(p: OleVariant);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_onload(p: OleVariant);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_onresize(p: OleVariant);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_onscroll(p: OleVariant);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_onunload(p: OleVariant);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_opener(p: OleVariant);
+begin
+
+end;
+
+procedure TjsHTMLWindow.Set_status(const p: WideString);
+begin
+
+end;
+
+procedure TjsHTMLWindow.showHelp(const helpURL: WideString; helpArg: OleVariant;
+  const features: WideString);
+begin
+
+end;
+
+function TjsHTMLWindow.showModalDialog(const dialog: WideString; var varArgIn,
+  varOptions: OleVariant): OleVariant;
+begin
+
+end;
+
+function TjsHTMLWindow.toString: WideString;
 begin
 
 end;
