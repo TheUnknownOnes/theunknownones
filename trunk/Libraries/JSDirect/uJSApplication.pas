@@ -7,7 +7,8 @@ uses
   SysUtils,
   StrUtils,
   uJSHelper,
-  uJSDirect;
+  uJSDirect,
+  mshtml;
 
 type
   TjsWindow = class(TjsdObjectEx)
@@ -29,6 +30,7 @@ type
     function GetPageYOffset: Integer;
     procedure SetPageXOffset(const Value: Integer);
     procedure SetPageYOffset(const Value: Integer);
+    function GetDocument: IHTMLDocument;
   public
     procedure AfterConstruction(); override;
     procedure BeforeDestruction(); override;
@@ -67,6 +69,8 @@ type
     property OuterWidth : Integer read GetOuterWidth write SetOuterwidth;
     property PageXOffset : Integer read GetPageXOffset write SetPageXOffset;
     property PageYOffset : Integer read GetPageYOffset write SetPageYOffset;
+
+    property Document : IHTMLDocument read GetDocument;
   end;
 
   TjsApplication = class(TjsdApplication)
@@ -78,6 +82,8 @@ type
   end;
 
 implementation
+
+uses uJSDOM;
 
 { TjsApplication }
 
@@ -137,6 +143,11 @@ end;
 function TjsWindow.GetClosed: Boolean;
 begin
   GetPropertyValue('closed', Result);
+end;
+
+function TjsWindow.GetDocument: IHTMLDocument;
+begin
+  Result:=TjsDOMDocument.Create(FApplication, _JSVar + '.document');
 end;
 
 function TjsWindow.GetInnerHeight: Integer;
