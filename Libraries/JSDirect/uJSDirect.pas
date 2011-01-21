@@ -665,7 +665,7 @@ begin
   cmd := _JSVar + ' = function(' + AParams + ')';
   cmd := cmd + '{' + ABody;
 
-  cmd := cmd + FApplication.FContext.InitialRequest.Param['cResponse'] + '("' + _GUID + '"';
+  cmd := cmd + FApplication.FContext.InitialRequest.Param['cResponse'] + '("O' + _GUID + '"';
 
   sl := TStringList.Create;
   try
