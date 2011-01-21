@@ -400,7 +400,8 @@ begin
     if toolbar then opts.Values['toolbar'] := 'yes';
 
     Result := TjsWindow.Create(FApplication, _JSVar + '.open(' + ToJSString(uri) + ', "",  ' +
-                                                               ToJSString(opts.CommaText) + ')');
+                                                               ToJSString(opts.CommaText) + ')',
+                                                               true);
   finally
     opts.Free;
   end;
@@ -667,7 +668,7 @@ procedure TjsApplication.DoCreated;
 begin
   inherited;
 
-  Window := TjsWindow.Create(Self, 'window');
+  Window := TjsWindow.Create(Self, 'window', true);
 end;
 
 procedure TjsApplication.DoTerminated;
