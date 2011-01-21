@@ -132,8 +132,12 @@ type
   end;
 
   TjsdObjectEx = class(TjsdObject)
+  protected
+    FRefsExisting : Boolean;
   public
-    constructor Create(AApplication : TjsdApplication; ACreateCommand : String); reintroduce; virtual;
+    constructor Create(AApplication : TjsdApplication;
+                       ACreateCommand : String;
+                       ARefsExisting : Boolean); reintroduce; virtual;
   end;
 
 
@@ -907,10 +911,13 @@ end;
 
 { TjsExistingObject }
 
-constructor TjsdObjectEx.Create(AApplication: TjsdApplication;
-  ACreateCommand: String);
+constructor TjsdObjectEx.Create(AApplication : TjsdApplication;
+                       ACreateCommand : String;
+                       ARefsExisting : Boolean);
 begin
   inherited Create(AApplication);
+
+  FRefsExisting := ARefsExisting;
 
   FInitialJSCommand := _JSVar + '=' + ACreateCommand;
 end;

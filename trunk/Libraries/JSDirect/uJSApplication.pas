@@ -34,10 +34,42 @@ type
                                    AURL : TIdURI;
                                    ALineNumber : Integer) of object;
 
+  TjsWindowOnBlurProc = procedure of object;
+  TjsWindowOnFocusProc = procedure of object;
+  TjsWindowOnLoadProc = procedure of object;
+  TjsWindowOnResizeProc = procedure of object;
+  TjsWindowOnScrollProc = procedure of object;
+  TjsWindowOnBeforeUnloadProc = procedure of object;
+  TjsWindowOnUnloadProc = procedure of object;
+
+  TjsFrames = class(TjsdObjectEx)
+  private
+    function GetLength: Integer;
+  public
+    function GetFrame(AIndex : Integer) : TjsWindow;
+    property Length : Integer read GetLength;
+  end;
+
   TjsWindow = class(TjsdObjectEx)
   private
-    FOnErrorFunc : TjsdFunction;
+    FOnErrorFunc,
+    FOnBlurFunc,
+    FOnFocusFunc,
+    FOnLoadFunc,
+    FOnResizeFunc,
+    FOnScrollFunc,
+    FOnBeforeUnloadFunc,
+    FOnUnloadFunc : TjsdFunction;
+
     FOnError: TjsWindowOnErrorProc;
+    FOnBlur : TjsWindowOnBlurProc;
+    FOnFocus : TjsWindowOnFocusProc;
+    FOnLoad : TjsWindowOnLoadProc;
+    FOnResize : TjsWindowOnResizeProc;
+    FOnScroll : TjsWindowOnScrollProc;
+    FOnBeforeUnload : TjsWindowOnBeforeUnloadProc;
+    FOnUnload : TjsWindowOnUnloadProc;
+
     function GetClosed: Boolean;
     function GetInnerHeight: Integer;
     procedure SetInnerHeight(const Value: Integer);
@@ -56,9 +88,24 @@ type
     procedure SetPageXOffset(const Value: Integer);
     procedure SetPageYOffset(const Value: Integer);
     procedure OnErrorFuncHandler(AParams : TjsdFunctionHandlerParams);
+    procedure OnBeforeUnloadFuncHandler(AParams : TjsdFunctionHandlerParams);
+    procedure OnBlurFuncHandler(AParams : TjsdFunctionHandlerParams);
+    procedure OnFocusFuncHandler(AParams : TjsdFunctionHandlerParams);
+    procedure OnLoadFuncHandler(AParams : TjsdFunctionHandlerParams);
+    procedure OnResizeFuncHandler(AParams : TjsdFunctionHandlerParams);
+    procedure OnScrollFuncHandler(AParams : TjsdFunctionHandlerParams);
+    procedure OnUnloadFuncHandler(AParams : TjsdFunctionHandlerParams);
     function GetDocument: IHTMLDocument;
     procedure SetOnError(const Value: TjsWindowOnErrorProc);
+    procedure SetOnBeforeUnload(const Value: TjsWindowOnBeforeUnloadProc);
+    procedure SetOnBlur(const Value: TjsWindowOnBlurProc);
+    procedure SetOnFocus(const Value: TjsWindowOnFocusProc);
+    procedure SetOnLoad(const Value: TjsWindowOnLoadProc);
+    procedure SetOnResize(const Value: TjsWindowOnResizeProc);
+    procedure SetOnScroll(const Value: TjsWindowOnScrollProc);
+    procedure SetOnUnload(const Value: TjsWindowOnUnloadProc);
   public
+
     procedure AfterConstruction(); override;
     procedure BeforeDestruction(); override;
 
@@ -103,7 +150,6 @@ type
     function SetTimeout(AFunction : TjsdFunction; APause : Integer) : TjsWindowTimeout;
     procedure Stop();
 
-
     property Closed : Boolean read GetClosed;
     property Document : IHTMLDocument read GetDocument;
     property InnerHeight : Integer read GetInnerHeight write SetInnerHeight;
@@ -116,35 +162,26 @@ type
     property PageYOffset : Integer read GetPageYOffset write SetPageYOffset;
 
     property OnError : TjsWindowOnErrorProc read FOnError write SetOnError;
+    property OnBlur : TjsWindowOnBlurProc read FOnBlur write SetOnBlur;
+    property OnFocus : TjsWindowOnFocusProc read FOnFocus write SetOnFocus;
+    property OnLoad : TjsWindowOnLoadProc read FOnLoad write SetOnLoad;
+    property OnResize : TjsWindowOnResizeProc read FOnResize write SetOnResize;
+    property OnScroll : TjsWindowOnScrollProc read FOnScroll write SetOnScroll;
+    property OnBeforeUnload : TjsWindowOnBeforeUnloadProc read FOnBeforeUnload write SetOnBeforeUnload;
+    property OnUnload : TjsWindowOnUnloadProc read FOnUnload write SetOnUnload;
   end;
 
   TjsApplication = class(TjsdApplication)
   protected
     Window : TjsWindow;
-  public
-    constructor Create(AContext : TjsdContext); override;
-    destructor Destroy(); override;
+
+    procedure DoCreated(); override;
+    procedure DoTerminated(); override;
   end;
 
 implementation
 
 uses uJSDOM;
-
-{ TjsApplication }
-
-constructor TjsApplication.Create(AContext: TjsdContext);
-begin
-  inherited;
-
-  Window := TjsWindow.Create(Self, 'window');
-end;
-
-
-destructor TjsApplication.Destroy;
-begin
-  Window.Free;
-  inherited;
-end;
 
 { TjsWindow }
 
@@ -172,6 +209,14 @@ end;
 procedure TjsWindow.BeforeDestruction;
 begin
   OnError := nil;
+  OnBlur := nil;
+  OnFocus := nil;
+  OnLoad := nil;
+  OnResize := nil;
+  OnScroll := nil;
+  OnBeforeUnload := nil;
+  OnUnload := nil;
+
   Close;
   inherited;
 end;
@@ -271,6 +316,19 @@ begin
   ExecMethod(Format('moveBy(%d, %d)', [AX, AY]));
 end;
 
+procedure TjsWindow.OnBeforeUnloadFuncHandler(
+  AParams: TjsdFunctionHandlerParams);
+begin
+  if Assigned(FOnBeforeUnload) then
+    FOnBeforeUnload();
+end;
+
+procedure TjsWindow.OnBlurFuncHandler(AParams: TjsdFunctionHandlerParams);
+begin
+  if Assigned(FOnBlur) then
+    FOnBlur();
+end;
+
 procedure TjsWindow.OnErrorFuncHandler(AParams: TjsdFunctionHandlerParams);
 var
   uri : TIdURI;
@@ -284,6 +342,36 @@ begin
       uri.Free;
     end;
   end;
+end;
+
+procedure TjsWindow.OnFocusFuncHandler(AParams: TjsdFunctionHandlerParams);
+begin
+  if Assigned(FOnFocus) then
+    FOnFocus();
+end;
+
+procedure TjsWindow.OnLoadFuncHandler(AParams: TjsdFunctionHandlerParams);
+begin
+  if Assigned(FOnLoad) then
+    FOnLoad();
+end;
+
+procedure TjsWindow.OnResizeFuncHandler(AParams: TjsdFunctionHandlerParams);
+begin
+  if Assigned(FOnResize) then
+    FOnResize();
+end;
+
+procedure TjsWindow.OnScrollFuncHandler(AParams: TjsdFunctionHandlerParams);
+begin
+  if Assigned(FOnScroll) then
+    FOnScroll();
+end;
+
+procedure TjsWindow.OnUnloadFuncHandler(AParams: TjsdFunctionHandlerParams);
+begin
+  if Assigned(FOnUnload) then
+    FOnUnload();
 end;
 
 function TjsWindow.Open(uri: String; width, height, top, left: Integer;
@@ -311,8 +399,7 @@ begin
     if status then opts.Values['status'] := 'yes';
     if toolbar then opts.Values['toolbar'] := 'yes';
 
-    Result := TjsWindow.Create(FApplication, _JSVar + '.open(' + ToJSString(uri) + ', ' +
-                                                               ToJSString(name) + ', ' +
+    Result := TjsWindow.Create(FApplication, _JSVar + '.open(' + ToJSString(uri) + ', "",  ' +
                                                                ToJSString(opts.CommaText) + ')');
   finally
     opts.Free;
@@ -375,10 +462,44 @@ begin
   SetPropertyValue('name', Value);
 end;
 
+procedure TjsWindow.SetOnBeforeUnload(const Value: TjsWindowOnBeforeUnloadProc);
+begin
+  if Assigned(Value) and (not Assigned(FOnBeforeUnload)) then
+  begin
+    FOnBeforeUnloadFunc := TjsdFunction.Create(FApplication, '', '', OnBeforeUnloadFuncHandler);
+    FApplication.Exec(Format('%s.onbeforeunload=%s', [_JSVar, FOnBeforeUnloadFunc._JSVar]));
+  end
+  else
+  if (not Assigned(Value)) and (Assigned(FOnBeforeUnload)) then
+  begin
+    FApplication.Exec(Format('%s.onbeforeunload=null', [_JSVar]));
+    FOnBeforeUnloadFunc.Free;
+    FOnBeforeUnloadFunc := nil;
+  end;
+
+  FOnBeforeUnload := Value;
+end;
+
+procedure TjsWindow.SetOnBlur(const Value: TjsWindowOnBlurProc);
+begin
+  if Assigned(Value) and (not Assigned(FOnBlur)) then
+  begin
+    FOnBlurFunc := TjsdFunction.Create(FApplication, '', '', OnBlurFuncHandler);
+    FApplication.Exec(Format('%s.onblur=%s', [_JSVar, FOnBlurFunc._JSVar]));
+  end
+  else
+  if (not Assigned(Value)) and (Assigned(FOnBlur)) then
+  begin
+    FApplication.Exec(Format('%s.onblur=null', [_JSVar]));
+    FOnBlurFunc.Free;
+    FOnBlurFunc := nil;
+  end;
+
+  FOnBlur := Value;
+end;
+
 procedure TjsWindow.SetOnError(const Value: TjsWindowOnErrorProc);
 begin
-  FOnError := Value;
-
   if Assigned(Value) and (not Assigned(FOnErrorFunc)) then
   begin
     FOnErrorFunc := TjsdFunction.Create(FApplication, 'msg, url, line', 'msg=msg;url=url;line=line', OnErrorFuncHandler);
@@ -391,6 +512,98 @@ begin
     FOnErrorFunc.Free;
     FOnErrorFunc := nil;
   end;
+
+  FOnError := Value;
+end;
+
+procedure TjsWindow.SetOnFocus(const Value: TjsWindowOnFocusProc);
+begin
+  if Assigned(Value) and (not Assigned(FOnFocus)) then
+  begin
+    FOnFocusFunc := TjsdFunction.Create(FApplication, '', '', OnFocusFuncHandler);
+    FApplication.Exec(Format('%s.onfocus=%s', [_JSVar, FOnFocusFunc._JSVar]));
+  end
+  else
+  if (not Assigned(Value)) and (Assigned(FOnFocus)) then
+  begin
+    FApplication.Exec(Format('%s.onfocus=null', [_JSVar]));
+    FOnFocusFunc.Free;
+    FOnFocusFunc := nil;
+  end;
+
+  FOnFocus := Value;
+end;
+
+procedure TjsWindow.SetOnLoad(const Value: TjsWindowOnLoadProc);
+begin
+  if Assigned(Value) and (not Assigned(FOnLoad)) then
+  begin
+    FOnLoadFunc := TjsdFunction.Create(FApplication, '', '', OnLoadFuncHandler);
+    FApplication.Exec(Format('%s.onload=%s', [_JSVar, FOnLoadFunc._JSVar]));
+  end
+  else
+  if (not Assigned(Value)) and (Assigned(FOnLoad)) then
+  begin
+    FApplication.Exec(Format('%s.onload=null', [_JSVar]));
+    FOnLoadFunc.Free;
+    FOnLoadFunc := nil;
+  end;
+
+  FOnLoad := Value;
+end;
+
+procedure TjsWindow.SetOnResize(const Value: TjsWindowOnResizeProc);
+begin
+  if Assigned(Value) and (not Assigned(FOnResize)) then
+  begin
+    FOnResizeFunc := TjsdFunction.Create(FApplication, '', '', OnResizeFuncHandler);
+    FApplication.Exec(Format('%s.onresize=%s', [_JSVar, FOnResizeFunc._JSVar]));
+  end
+  else
+  if (not Assigned(Value)) and (Assigned(FOnResize)) then
+  begin
+    FApplication.Exec(Format('%s.onresize=null', [_JSVar]));
+    FOnResizeFunc.Free;
+    FOnResizeFunc := nil;
+  end;
+
+  FOnResize := Value;
+end;
+
+procedure TjsWindow.SetOnScroll(const Value: TjsWindowOnScrollProc);
+begin
+  if Assigned(Value) and (not Assigned(FOnScroll)) then
+  begin
+    FOnScrollFunc := TjsdFunction.Create(FApplication, '', '', OnScrollFuncHandler);
+    FApplication.Exec(Format('%s.onScroll=%s', [_JSVar, FOnScrollFunc._JSVar]));
+  end
+  else
+  if (not Assigned(Value)) and (Assigned(FOnScroll)) then
+  begin
+    FApplication.Exec(Format('%s.onScroll=null', [_JSVar]));
+    FOnScrollFunc.Free;
+    FOnScrollFunc := nil;
+  end;
+
+  FOnScroll := Value;
+end;
+
+procedure TjsWindow.SetOnUnload(const Value: TjsWindowOnUnloadProc);
+begin
+  if Assigned(Value) and (not Assigned(FOnUnload)) then
+  begin
+    FOnUnloadFunc := TjsdFunction.Create(FApplication, '', '', OnUnloadFuncHandler);
+    FApplication.Exec(Format('%s.onUnload=%s', [_JSVar, FOnUnloadFunc._JSVar]));
+  end
+  else
+  if (not Assigned(Value)) and (Assigned(FOnUnload)) then
+  begin
+    FApplication.Exec(Format('%s.onUnload=null', [_JSVar]));
+    FOnUnloadFunc.Free;
+    FOnUnloadFunc := nil;
+  end;
+
+  FOnUnload := Value;
 end;
 
 procedure TjsWindow.SetOuterHeight(const Value: Integer);
@@ -446,6 +659,33 @@ begin
 
   FInitialJSCommand := Format('%s = %s.setTimeout("%s", %d)', [_JSVar, AWindow._JSVar, AFunction._JSVar, APause]);
   FFinalJSCommand := Format('%s.clearTimeout(%s); %1:s = null', [AWindow._JSVar, _JSVar]);
+end;
+
+{ TjsApplication }
+
+procedure TjsApplication.DoCreated;
+begin
+  inherited;
+
+  Window := TjsWindow.Create(Self, 'window');
+end;
+
+procedure TjsApplication.DoTerminated;
+begin
+  Window.Free;
+  inherited;
+end;
+
+{ TjsFrames }
+
+function TjsFrames.GetFrame(AIndex: Integer): TjsWindow;
+begin
+
+end;
+
+function TjsFrames.GetLength: Integer;
+begin
+  GetPropertyValue('length', Result, 0);
 end;
 
 end.
