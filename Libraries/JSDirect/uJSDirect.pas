@@ -685,6 +685,8 @@ begin
 
   cmd := cmd + ');}';
 
+  FApplication.Exec(cmd);
+
   HandlerProc := AHandlerProc;
 end;
 
