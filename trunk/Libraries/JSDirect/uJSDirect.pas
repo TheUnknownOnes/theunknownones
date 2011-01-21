@@ -29,27 +29,24 @@ type
   TjsdElement = class
   protected
     FApplication : TjsdApplication;
-    FInitialJSCommand : String;
-    FFinalJSCommand : String;
     F_GUID : String;
     F_JSVar : String;
-
-    procedure DoResponse(AData : String); virtual;
   public
     constructor Create(AApplication : TjsdApplication); virtual;
-
-    procedure AfterConstruction; override;
-    procedure BeforeDestruction; override;
 
     property _JSVar : String read F_JSVar;
     property _GUID : String read F_GUID;
   end;
 
+  TjsdResponseType = (rtOk, rtError);
+  TjsdResponseResult = (rrNotResponded, rrResponded, rrRespondedWithError);
+
   TjsdRespondingElement = class(TjsdElement)
   protected
-    FResponded : Boolean;
+    FResponseResult : TjsdResponseResult;
+    FResponseError : String;
 
-    procedure DoResponse(AData : String); override;
+    procedure DoResponse(AData : String; AResponseType : TjsdResponseType); virtual;
   public const
     DefaultWaitForTimeout = 0;
   public
@@ -68,9 +65,10 @@ type
 
   TjsdRespondingCommand = class(TjsdRespondingElement)
   protected
-    procedure DoResponse(AData : String); override;
+    procedure DoResponse(AData : String; AResponseType : TjsdResponseType); override;
   public
     Result : String;
+
     constructor Create(AApplication : TjsdApplication; ACommand : String); reintroduce;
   end;
 
@@ -93,7 +91,7 @@ type
     FReturnParamName : String;
     FReturnParamValue : String;
 
-    procedure DoResponse(AData : String); override;
+    procedure DoResponse(AData : String; AResponseType : TjsdResponseType); override;
   public
     HandlerProc : TjsdFunctionHandlerProc;
 
@@ -103,6 +101,8 @@ type
                        AHandlerProc : TjsdFunctionHandlerProc = nil;
                        ABody : String = ''); reintroduce;
 
+    destructor Destroy(); override;
+
     function WaitFor(AReturnParamName : String;
                      AReturnParamDefault : String = '';
                      ATimeout : Integer = TjsdRespondingElement.DefaultWaitForTimeout) : String;
@@ -111,7 +111,7 @@ type
     ParamDelimiter = '&';
   end;
 
-  TjsdObject = class(TjsdElement)
+  TjsdBaseObject = class(TjsdElement)
   protected
     procedure SetPropertyValue(AProperty : String; AValue : Variant); virtual;
 
@@ -126,12 +126,16 @@ type
     procedure GetPropertyValue(AProperty : String; out AValue : WordBool; ADefault : Boolean = false); overload; virtual;
 
   public
-    constructor Create(AApplication : TjsdApplication); override;
-
     function ExecMethod(AMethod : String; ABlocking : Boolean = false) : String;
   end;
 
-  TjsdObjectEx = class(TjsdObject)
+  TjsdObject = class(TjsdBaseObject)
+  public
+    constructor Create(AApplication : TjsdApplication); override;
+    destructor Destroy(); override;
+  end;
+
+  TjsdObjectEx = class(TjsdBaseObject)
   protected
     FRefsExisting : Boolean;
   public
@@ -158,12 +162,13 @@ type
 
   TjsdaeElementResponse = class(TjsdAppEvent)
   protected
-    FElement : TjsdElement;
+    FElement : TjsdRespondingElement;
     FData : String;
+    FResponseType : TjsdResponseType;
 
     procedure Call(AApplication : TjsdApplication); override;
   public
-    constructor Create(AElement : TjsdElement; AData : String);
+    constructor Create(AElement : TjsdRespondingElement; AData : String; AResponseType : TjsdResponseType);
   end;
 
 
@@ -507,15 +512,26 @@ var
   idx : Integer;
   e : TjsdRespondingElement;
   guid : String;
+  ResponseTypeChar : Char;
+  ResponseType : TjsdResponseType;
 begin
-  if (Length(AMessage) >= 38) and
-     (AMessage[1] = '{') and
-     (AMessage[38] = '}') then
+  if (Length(AMessage) >= 39) and
+     (CharInSet(AMessage[1], ['O', 'E'])) and
+     (AMessage[2] = '{') and
+     (AMessage[39] = '}') then
   begin
-    guid := Copy(AMessage, 1, 38);
-    Delete(AMessage, 1, 38);
+    ResponseTypeChar := AMessage[1];
+    guid := Copy(AMessage, 2, 39);
+    Delete(AMessage, 1, 39);
 
     e := nil;
+
+    case ResponseTypeChar of
+      'O': ResponseType := rtOk;
+      'E' : ResponseType := rtError
+      else
+        ResponseType := rtError;
+    end;
 
     EnterCriticalSection(FElementsLock);
     try
@@ -531,9 +547,9 @@ begin
     if Assigned(e) then
     begin
       if e.Async then
-        e.DoResponse(AMessage)
+        e.DoResponse(AMessage, ResponseType)
       else
-        AddEvent(TjsdaeElementResponse.Create(e, AMessage));
+        AddEvent(TjsdaeElementResponse.Create(e, AMessage, ResponseType));
     end;
 
   end;
@@ -595,28 +611,6 @@ end;
 
 { TjsdElement }
 
-procedure TjsdElement.AfterConstruction;
-begin
-  inherited;
-
-  if FInitialJSCommand <> EmptyStr then
-  begin
-    if FApplication.NeedConnection then
-      FApplication.FContext.SendData(FInitialJSCommand);
-  end;
-end;
-
-procedure TjsdElement.BeforeDestruction;
-begin
-  if Assigned(FApplication.FContext) and
-    (FFinalJSCommand <> EmptyStr) then
-  begin
-    FApplication.FContext.SendData(FFinalJSCommand);
-  end;
-
-  inherited;
-end;
-
 constructor TjsdElement.Create(AApplication : TjsdApplication);
 var
   lGUID : TGUID;
@@ -629,23 +623,19 @@ begin
   F_JSVar := '_' + StringReplace(Copy(_GUID, 2, 36), '-', '', [rfReplaceAll]);
 end;
 
-procedure TjsdElement.DoResponse(AData: String);
-begin
-
-end;
-
 { TjsdaeElementResponse }
 
 procedure TjsdaeElementResponse.Call(AApplication: TjsdApplication);
 begin
-  FElement.DoResponse(FData);
+  FElement.DoResponse(FData, FResponseType);
 end;
 
-constructor TjsdaeElementResponse.Create(AElement: TjsdElement;
-  AData: String);
+constructor TjsdaeElementResponse.Create(AElement: TjsdRespondingElement;
+  AData: String; AResponseType : TjsdResponseType);
 begin
   FElement := AElement;
   FData := AData;
+  FResponseType := AResponseType;
 end;
 
 { TjsdCommand }
@@ -654,7 +644,8 @@ constructor TjsdCommand.Create(AApplication: TjsdApplication; ACommand: String);
 begin
   inherited Create(AApplication);
 
-  FInitialJSCommand := ACommand;
+  if FApplication.NeedConnection then
+    FApplication.FContext.SendData(ACommand);
 end;
 
 { TjsdFunction }
@@ -667,13 +658,14 @@ constructor TjsdFunction.Create(AAplication : TjsdApplication;
 var
   sl : TStringList;
   idx : Integer;
+  cmd : String;
 begin
   inherited Create(AAplication);
 
-  FInitialJSCommand := _JSVar + ' = function(' + AParams + ')';
-  FInitialJSCommand := FInitialJSCommand + '{' + ABody;
+  cmd := _JSVar + ' = function(' + AParams + ')';
+  cmd := cmd + '{' + ABody;
 
-  FInitialJSCommand := FInitialJSCommand + FApplication.FContext.InitialRequest.Param['cResponse'] + '("' + _GUID + '"';
+  cmd := cmd + FApplication.FContext.InitialRequest.Param['cResponse'] + '("' + _GUID + '"';
 
   sl := TStringList.Create;
   try
@@ -684,21 +676,26 @@ begin
     for idx := 0 to sl.Count - 1 do
     begin
       if idx > 0 then
-        FInitialJSCommand := FInitialJSCommand + '+"&"';
-      FInitialJSCommand := FInitialJSCommand + '+"' + sl.Names[idx] + '="+encodeURIComponent(' + sl.ValueFromIndex[idx] + ')';
+        cmd := cmd + '+"&"';
+      cmd := cmd + '+"' + sl.Names[idx] + '="+encodeURIComponent(' + sl.ValueFromIndex[idx] + ')';
     end;
   finally
     sl.Free;
   end;
 
-  FInitialJSCommand := FInitialJSCommand + ');}';
-
-  FFinalJSCommand := _JSVar + '=null';
+  cmd := cmd + ');}';
 
   HandlerProc := AHandlerProc;
 end;
 
-procedure TjsdFunction.DoResponse(AData: String);
+destructor TjsdFunction.Destroy;
+begin
+  FApplication.Exec(_JSVar + '=null');
+
+  inherited;
+end;
+
+procedure TjsdFunction.DoResponse(AData: String; AResponseType : TjsdResponseType);
 var
   Params : TjsdFunctionHandlerParams;
 begin
@@ -769,11 +766,15 @@ begin
   inherited;
 end;
 
-procedure TjsdRespondingElement.DoResponse(AData: String);
+procedure TjsdRespondingElement.DoResponse(AData: String; AResponseType : TjsdResponseType);
 begin
-  inherited;
-
-  FResponded := true;
+  if AResponseType = rtError then
+  begin
+    FResponseError := AData;
+    FResponseResult := rrRespondedWithError;
+  end
+  else
+    FResponseResult := rrResponded;
 end;
 
 function TjsdRespondingElement.WaitFor(ATimeout: Integer) : Boolean;
@@ -786,9 +787,9 @@ begin
   lOldAsync := Async;
   Async := true;
   tm := ATimeout;
-  FResponded := false;
+  FResponseResult := rrNotResponded;
 
-  while (not FApplication.Terminated) and (not FResponded) do
+  while (not FApplication.Terminated) and (FResponseResult = rrNotResponded) do
   begin
     if ATimeout > DefaultWaitForTimeout then
     begin
@@ -800,26 +801,26 @@ begin
   end;
 
   Async := lOldAsync;
-  Result := FResponded;
+
+  case FResponseResult of
+    rrNotResponded: Result := false;
+    rrResponded: Result := true;
+    rrRespondedWithError: raise Exception.Create(FResponseError);
+    else
+      Result := false;
+  end;
+
 end;
 
-{ TjsdObject }
+{ TjsdBaseObject }
 
-constructor TjsdObject.Create(AApplication: TjsdApplication);
-begin
-  inherited;
-
-  FInitialJSCommand := _JSVar + '=new Object';
-  FFinalJSCommand := _JSVar + '=null';
-end;
-
-procedure TjsdObject.GetPropertyValue(AProperty: String; out AValue: Integer;
+procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: Integer;
   ADefault: Integer);
 begin
   AValue := StrToIntDef(GetPropertyValue(AProperty), ADefault);
 end;
 
-procedure TjsdObject.GetPropertyValue(AProperty: String; out AValue: String;
+procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: String;
   ADefault: String; ACheckNullUndefined : Boolean);
 var
   s : String;
@@ -828,12 +829,12 @@ begin
   AValue := IfThen(ACheckNullUndefined and ((s = 'null') or (s = 'undefined')), ADefault, s);
 end;
 
-function TjsdObject.GetPropertyValue(AProperty: String): String;
+function TjsdBaseObject.GetPropertyValue(AProperty: String): String;
 begin
   Result := FApplication.Exec(_JSVar + '.' + AProperty, true);
 end;
 
-function TjsdObject.ExecMethod(AMethod: String; ABlocking: Boolean): String;
+function TjsdBaseObject.ExecMethod(AMethod: String; ABlocking: Boolean): String;
 begin
   if Copy(AMethod, Length(AMethod), 1) <> ')' then
     AMethod := AMethod + '()';
@@ -841,13 +842,13 @@ begin
   Result := FApplication.Exec(_JSVar + '.' + AMethod, ABlocking);
 end;
 
-procedure TjsdObject.GetPropertyValue(AProperty: String; out AValue: Boolean;
+procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: Boolean;
   ADefault: Boolean);
 begin
   AValue := StrToBoolDef(GetPropertyValue(AProperty), ADefault);
 end;
 
-procedure TjsdObject.GetPropertyValue(AProperty: String; out AValue: WideString;
+procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: WideString;
   ADefault: String; ACheckNullUndefined: Boolean);
 var
   s : String;
@@ -856,24 +857,24 @@ begin
   AValue:=s;
 end;
 
-procedure TjsdObject.GetPropertyValue(AProperty: String; out AValue: Double;
+procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: Double;
   ADefault: Double);
 begin
   AValue := StrToFloatDef(GetPropertyValue(AProperty), ADefault);
 end;
 
-procedure TjsdObject.GetPropertyValue(AProperty: String; out AValue: Int64;
+procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: Int64;
   ADefault: Integer);
 begin
   AValue := StrToInt64Def(GetPropertyValue(AProperty), ADefault);
 end;
 
-procedure TjsdObject.SetPropertyValue(AProperty : String; AValue : Variant);
+procedure TjsdBaseObject.SetPropertyValue(AProperty : String; AValue : Variant);
 begin
   FApplication.Exec(_JSVar + '.' + AProperty + '=' + ToJSCode(AValue));
 end;
 
-procedure TjsdObject.GetPropertyValue(AProperty: String; out AValue: WordBool;
+procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: WordBool;
   ADefault: Boolean);
 var
   b : Boolean;
@@ -882,7 +883,7 @@ begin
   AValue:=b;
 end;
 
-procedure TjsdObject.GetPropertyValue(AProperty: String; out AValue: OleVariant;
+procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: OleVariant;
   ADefault: String; ACheckNullUndefined: Boolean);
 var
   s : String;
@@ -898,12 +899,11 @@ constructor TjsdRespondingCommand.Create(AApplication: TjsdApplication;
 begin
   inherited Create(AApplication);
 
-  Result := EmptyStr;
-
-  FInitialJSCommand := _GUID + ACommand;
+  if FApplication.NeedConnection then
+    FApplication.FContext.SendData(_GUID + ACommand);
 end;
 
-procedure TjsdRespondingCommand.DoResponse(AData: String);
+procedure TjsdRespondingCommand.DoResponse(AData: String; AResponseType : TjsdResponseType);
 begin
   Result := AData;
   inherited;
@@ -919,7 +919,23 @@ begin
 
   FRefsExisting := ARefsExisting;
 
-  FInitialJSCommand := _JSVar + '=' + ACreateCommand;
+  FApplication.Exec(_JSVar + '=' + ACreateCommand, true);
+end;
+
+{ TjsdObject }
+
+constructor TjsdObject.Create(AApplication: TjsdApplication);
+begin
+  inherited;
+
+  FApplication.Exec(_JSVar + '=new Object', true);
+end;
+
+destructor TjsdObject.Destroy;
+begin
+  FApplication.Exec(_JSVar + '=null');
+
+  inherited;
 end;
 
 initialization

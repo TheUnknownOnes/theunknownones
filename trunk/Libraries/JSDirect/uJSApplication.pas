@@ -69,6 +69,7 @@ type
     FOnScroll : TjsWindowOnScrollProc;
     FOnBeforeUnload : TjsWindowOnBeforeUnloadProc;
     FOnUnload : TjsWindowOnUnloadProc;
+    FFrames: TjsFrames;
 
     function GetClosed: Boolean;
     function GetInnerHeight: Integer;
@@ -104,7 +105,11 @@ type
     procedure SetOnResize(const Value: TjsWindowOnResizeProc);
     procedure SetOnScroll(const Value: TjsWindowOnScrollProc);
     procedure SetOnUnload(const Value: TjsWindowOnUnloadProc);
+    function GetFrames: TjsFrames;
   public
+    constructor Create(AApplication : TjsdApplication;
+                       ACreateCommand : String;
+                       ARefsExisting : Boolean); override;
 
     procedure AfterConstruction(); override;
     procedure BeforeDestruction(); override;
@@ -152,6 +157,7 @@ type
 
     property Closed : Boolean read GetClosed;
     property Document : IHTMLDocument2 read GetDocument;
+    property Frames : TjsFrames read GetFrames;
     property InnerHeight : Integer read GetInnerHeight write SetInnerHeight;
     property InnerWidth : Integer read GetInnerWidth write SetInnerWidth;
     property LocationBar : Boolean read GetLocationBar write SetLocationBar;
@@ -188,7 +194,9 @@ uses uJSDOM;
 procedure TjsWindow.AfterConstruction;
 begin
   inherited;
-  Name := _JSVar;
+
+  if not FRefsExisting then
+    Name := _JSVar;
 end;
 
 procedure TjsWindow.Alert(AMessage: String);
@@ -217,7 +225,12 @@ begin
   OnBeforeUnload := nil;
   OnUnload := nil;
 
-  Close;
+  if Assigned(FFrames) then
+    FFrames.Free;
+
+  if not FRefsExisting then
+    Close;
+
   inherited;
 end;
 
@@ -241,6 +254,17 @@ begin
   result:=StrToBool(ExecMethod('confirm(' + ToJSString(AMessage) + ')', true));
 end;
 
+constructor TjsWindow.Create(AApplication: TjsdApplication;
+  ACreateCommand: String; ARefsExisting: Boolean);
+begin
+  inherited;
+
+  FInitialJSCommand := '';
+
+  if FApplication.Exec(ACreateCommand, true) = 'undefined' then
+    raise Exception.Create('Could not create window');
+end;
+
 procedure TjsWindow.Focus;
 begin
   ExecMethod('focus');
@@ -259,6 +283,14 @@ end;
 function TjsWindow.GetDocument: IHTMLDocument2;
 begin
   Result:=TjsDOMDocument.Create(FApplication, _JSVar + '.document');
+end;
+
+function TjsWindow.GetFrames: TjsFrames;
+begin
+  if not Assigned(FFrames) then
+    FFrames := TjsFrames.Create(FApplication, _JSVar + '.frames', true);
+
+  Result := FFrames;
 end;
 
 function TjsWindow.GetInnerHeight: Integer;
@@ -681,7 +713,11 @@ end;
 
 function TjsFrames.GetFrame(AIndex: Integer): TjsWindow;
 begin
-
+  try
+    Result := TjsWindow.Create(FApplication, Format('%s[%d]', [_JSVar, AIndex]), true);
+  except
+    Result := nil;
+  end;
 end;
 
 function TjsFrames.GetLength: Integer;
