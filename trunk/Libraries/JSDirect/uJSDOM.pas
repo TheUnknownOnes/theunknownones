@@ -46,6 +46,7 @@ type
     {$ENDREGION}
   public
     class function GetDOMObjectJsName(ANode: IDispatch): String;
+    class function IsPositiveMethodResult(AResult: String): Boolean;
 
     constructor Create(AApplication : TjsdApplication; ACreateCommand : String); reintroduce;
   end;
@@ -420,6 +421,30 @@ type
     function Get_external: IDispatch; safecall;
   end;
 
+  TjsOMNavigator = class(TjsDOMObject, IOmNavigator)
+  protected
+    function Get_appCodeName: WideString; safecall;
+    function Get_appName: WideString; safecall;
+    function Get_appVersion: WideString; safecall;
+    function Get_userAgent: WideString; safecall;
+    function javaEnabled: WordBool; safecall;
+    function taintEnabled: WordBool; safecall;
+    function Get_mimeTypes: IHTMLMimeTypesCollection; safecall;
+    function Get_plugins: IHTMLPluginsCollection; safecall;
+    function Get_cookieEnabled: WordBool; safecall;
+    function Get_opsProfile: IHTMLOpsProfile; safecall;
+    function toString: WideString; safecall;
+    function Get_cpuClass: WideString; safecall;
+    function Get_systemLanguage: WideString; safecall;
+    function Get_browserLanguage: WideString; safecall;
+    function Get_userLanguage: WideString; safecall;
+    function Get_platform: WideString; safecall;
+    function Get_appMinorVersion: WideString; safecall;
+    function Get_connectionSpeed: Integer; safecall;
+    function Get_onLine: WordBool; safecall;
+    function Get_userProfile: IHTMLOpsProfile; safecall;
+  end;
+
 implementation
 
 { TjsDOMObject }
@@ -476,6 +501,11 @@ function TjsDOMObject.Invoke(DispID: Integer; const IID: TGUID;
   ArgErr: Pointer): HResult;
 begin
   Result:=E_NOTIMPL;
+end;
+
+class function TjsDOMObject.IsPositiveMethodResult(AResult: String): Boolean;
+begin
+  Result:=StrToBool(AResult);
 end;
 
 function TjsDOMObject.QueryInterface(const IID: TGUID; out Obj): HResult;
@@ -686,16 +716,16 @@ end;
 function TjsHTMLDocument.execCommand(const cmdID: WideString; showUI: WordBool;
   value: OleVariant): WordBool;
 begin
-  Result:=StrToBool(LowerCase(
-    ExecMethod('execCommand("'+cmdID+'",'+
+  Result:=IsPositiveMethodResult(
+    ExecMethod('execCommand('+ToJSString(cmdID)+','+
                             LowerCase(BoolToStr(showUI))+','+
-                            ToJSCode(value)+')', True)));
+                            ToJSCode(value)+')', True));
 end;
 
 function TjsHTMLDocument.execCommandShowHelp(const cmdID: WideString): WordBool;
 begin
-  Result:=StrToBool(LowerCase(
-    ExecMethod('execCommandShowHelp("'+cmdID+'")', True)));
+  Result:=IsPositiveMethodResult(
+    ExecMethod('execCommandShowHelp('+ToJSString(cmdID)+')', True));
 end;
 
 function TjsHTMLDocument.Get_activeElement: IHTMLElement;
@@ -800,7 +830,7 @@ end;
 
 function TjsHTMLDocument.Get_frames: IHTMLFramesCollection2;
 begin
-
+  Result:=TjsHTMLFramesCollection.Create(FApplication, _JSVar+'.frames');
 end;
 
 function TjsHTMLDocument.Get_images: IHTMLElementCollection;
@@ -1739,12 +1769,12 @@ end;
 
 procedure TjsHTMLWindow.alert(const message: WideString);
 begin
-
+  ExecMethod('alert('+ToJSString(message)+')', True);
 end;
 
 procedure TjsHTMLWindow.blur;
 begin
-
+  ExecMethod('blur');
 end;
 
 procedure TjsHTMLWindow.clearInterval(timerID: Integer);
@@ -1759,37 +1789,37 @@ end;
 
 procedure TjsHTMLWindow.close;
 begin
-
+  ExecMethod('close');
 end;
 
 function TjsHTMLWindow.confirm(const message: WideString): WordBool;
 begin
-
+  Result:=IsPositiveMethodResult(ExecMethod('confirm('+ToJSString(message)+')',True));
 end;
 
 function TjsHTMLWindow.execScript(const code, language: WideString): OleVariant;
 begin
-
+  ExecMethod('execScript('+ToJSString(code)+','+ToJSString(language)+')');
 end;
 
 procedure TjsHTMLWindow.focus;
 begin
-
+  ExecMethod('focus');
 end;
 
 function TjsHTMLWindow.Get_clientInformation: IOmNavigator;
 begin
-
+  Result:=TjsOMNavigator.Create(FApplication, _JSVar+'.clientInformation');
 end;
 
 function TjsHTMLWindow.Get_closed: WordBool;
 begin
-
+  GetPropertyValue('closed', Result);
 end;
 
 function TjsHTMLWindow.Get_defaultStatus: WideString;
 begin
-
+  GetPropertyValue('defaultStatus', Result);
 end;
 
 function TjsHTMLWindow.Get_document: IHTMLDocument2;
@@ -1799,17 +1829,17 @@ end;
 
 function TjsHTMLWindow.Get_event: IHTMLEventObj;
 begin
-
+  //todo: IHTMLEventObj
 end;
 
 function TjsHTMLWindow.Get_external: IDispatch;
 begin
-
+  //todo: window get external?
 end;
 
 function TjsHTMLWindow.Get_frames: IHTMLFramesCollection2;
 begin
-
+  Result:=TjsHTMLFramesCollection.Create(FApplication, _JSVar+'.frames');
 end;
 
 function TjsHTMLWindow.Get_history: IOmHistory;
@@ -1829,7 +1859,7 @@ end;
 
 function TjsHTMLWindow.Get_name: WideString;
 begin
-
+  GetPropertyValue('name', Result);
 end;
 
 function TjsHTMLWindow.Get_navigator: IOmNavigator;
@@ -1839,97 +1869,98 @@ end;
 
 function TjsHTMLWindow.Get_offscreenBuffering: OleVariant;
 begin
-
+  GetPropertyValue('offscreenBuffering', Result);
 end;
 
 function TjsHTMLWindow.Get_onbeforeunload: OleVariant;
 begin
-
+  GetPropertyValue('onbeforeunload', Result);
 end;
 
 function TjsHTMLWindow.Get_onblur: OleVariant;
 begin
-
+  GetPropertyValue('onblur', Result);
 end;
 
 function TjsHTMLWindow.Get_onerror: OleVariant;
 begin
-
+  GetPropertyValue('onerror', Result);
 end;
 
 function TjsHTMLWindow.Get_onfocus: OleVariant;
 begin
+  GetPropertyValue('onfocus', Result);
 
 end;
 
 function TjsHTMLWindow.Get_onhelp: OleVariant;
 begin
-
+  GetPropertyValue('onhelp', Result);
 end;
 
 function TjsHTMLWindow.Get_onload: OleVariant;
 begin
-
+  GetPropertyValue('onload', Result);
 end;
 
 function TjsHTMLWindow.Get_onresize: OleVariant;
 begin
-
+  GetPropertyValue('onresize', Result);
 end;
 
 function TjsHTMLWindow.Get_onscroll: OleVariant;
 begin
-
+  GetPropertyValue('onscroll', Result);
 end;
 
 function TjsHTMLWindow.Get_onunload: OleVariant;
 begin
-
+  GetPropertyValue('onunload', Result);
 end;
 
 function TjsHTMLWindow.Get_opener: OleVariant;
 begin
-
+  GetPropertyValue('opener', Result);
 end;
 
 function TjsHTMLWindow.Get_Option: IHTMLOptionElementFactory;
 begin
-
+  //todo: IHTMLOptionElementFactory;
 end;
 
 function TjsHTMLWindow.Get_parent: IHTMLWindow2;
 begin
-
+  Result:=TjsHTMLWindow.Create(FApplication, _JSVar+'.parent');
 end;
 
 function TjsHTMLWindow.Get_screen: IHTMLScreen;
 begin
-
+  //Todo: IHTMLScreen
 end;
 
 function TjsHTMLWindow.Get_self: IHTMLWindow2;
 begin
-
+  Result:=self; //;-) minimize network traffic
 end;
 
 function TjsHTMLWindow.Get_status: WideString;
 begin
-
+  GetPropertyValue('status', Result);
 end;
 
 function TjsHTMLWindow.Get_top: IHTMLWindow2;
 begin
-
+  Result:=TjsHTMLWindow.Create(FApplication, _JSVar+'.top');
 end;
 
 function TjsHTMLWindow.Get_window: IHTMLWindow2;
 begin
-
+  Result:=TjsHTMLWindow.Create(FApplication, _JSVar+'.window');
 end;
 
 function TjsHTMLWindow.Get__newEnum: IUnknown;
 begin
-
+  Result:=Nil;
 end;
 
 procedure TjsHTMLWindow.moveBy(x, y: Integer);
@@ -2080,6 +2111,108 @@ end;
 function TjsHTMLWindow.toString: WideString;
 begin
 
+end;
+
+{ TjsOMNavigator }
+
+function TjsOMNavigator.Get_appCodeName: WideString;
+begin
+  GetPropertyValue('appCodeName', Result);
+end;
+
+function TjsOMNavigator.Get_appMinorVersion: WideString;
+begin
+  GetPropertyValue('appMinorVersion', Result);
+end;
+
+function TjsOMNavigator.Get_appName: WideString;
+begin
+  GetPropertyValue('appName', Result);
+end;
+
+function TjsOMNavigator.Get_appVersion: WideString;
+begin
+  GetPropertyValue('appVersion', Result);
+end;
+
+function TjsOMNavigator.Get_browserLanguage: WideString;
+begin
+  GetPropertyValue('browserLanguage', Result);
+end;
+
+function TjsOMNavigator.Get_connectionSpeed: Integer;
+begin
+  GetPropertyValue('connectionSpeed', Result);
+end;
+
+function TjsOMNavigator.Get_cookieEnabled: WordBool;
+begin
+  GetPropertyValue('cookieEnabled', Result);
+end;
+
+function TjsOMNavigator.Get_cpuClass: WideString;
+begin
+  GetPropertyValue('cpuClass', Result);
+end;
+
+function TjsOMNavigator.Get_mimeTypes: IHTMLMimeTypesCollection;
+begin
+  //todo: Mimetypes collection
+end;
+
+function TjsOMNavigator.Get_onLine: WordBool;
+begin
+  GetPropertyValue('onLine', Result);
+end;
+
+function TjsOMNavigator.Get_opsProfile: IHTMLOpsProfile;
+begin
+  //todo: OpsProfile
+end;
+
+function TjsOMNavigator.Get_platform: WideString;
+begin
+  GetPropertyValue('platform', Result);
+end;
+
+function TjsOMNavigator.Get_plugins: IHTMLPluginsCollection;
+begin
+  //todo: htmlpluginscolllection
+end;
+
+function TjsOMNavigator.Get_systemLanguage: WideString;
+begin
+  GetPropertyValue('systemLanguage', Result);
+end;
+
+function TjsOMNavigator.Get_userAgent: WideString;
+begin
+  GetPropertyValue('userAgent', Result);
+end;
+
+function TjsOMNavigator.Get_userLanguage: WideString;
+begin
+  GetPropertyValue('userLanguage', Result);
+end;
+
+function TjsOMNavigator.Get_userProfile: IHTMLOpsProfile;
+begin
+  //todo: opsProfile
+end;
+
+function TjsOMNavigator.javaEnabled: WordBool;
+begin
+  GetPropertyValue('javaEnabled', Result);
+end;
+
+function TjsOMNavigator.taintEnabled: WordBool;
+begin
+  GetPropertyValue('taintEnabled', Result);
+end;
+
+function TjsOMNavigator.toString: WideString;
+begin
+  Result:=ExecMethod('toString', True);
 end;
 
 end.
