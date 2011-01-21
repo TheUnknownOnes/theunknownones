@@ -179,8 +179,6 @@ type
     procedure AddElement(AElement : TjsdRespondingElement);
     procedure DeleteElement(AElement : TjsdElement);
 
-    procedure NeedConnection; //blocks, until connection is established
-
     procedure ProcessIncomingMessage(AMessage : String); virtual; //called from jsdContext
 
     procedure DoDisconnected; virtual;
@@ -194,6 +192,8 @@ type
   public
     constructor Create(AContext : TjsdContext); reintroduce; virtual;
     destructor Destroy(); override;
+
+    function NeedConnection : Boolean; //blocks, until connection is established; returns true if connection can be used
 
     function Exec(ACommand : String; ABlocking : Boolean = false) : String;
     property GUID : String read FGUID;
@@ -487,10 +487,12 @@ begin
   Result := SecondsBetween(FInactiveSince, Now) > 300;
 end;
 
-procedure TjsdApplication.NeedConnection;
+function TjsdApplication.NeedConnection : Boolean;
 begin
   while (not Terminated) and (not Assigned(FContext)) do
     Sleep(100);
+
+  Result := (not Terminated) and Assigned(FContext);
 end;
 
 procedure TjsdApplication.ProcessIncomingMessage(AMessage: String);
@@ -592,8 +594,8 @@ begin
 
   if FInitialJSCommand <> EmptyStr then
   begin
-    FApplication.NeedConnection;
-    FApplication.FContext.SendData(FInitialJSCommand);
+    if FApplication.NeedConnection then
+      FApplication.FContext.SendData(FInitialJSCommand);
   end;
 end;
 
@@ -645,8 +647,7 @@ constructor TjsdCommand.Create(AApplication: TjsdApplication; ACommand: String);
 begin
   inherited Create(AApplication);
 
-  AApplication.NeedConnection;
-  AApplication.FContext.SendData(ACommand);
+  FInitialJSCommand := ACommand;
 end;
 
 { TjsdFunction }
@@ -865,8 +866,7 @@ begin
 
   Result := EmptyStr;
 
-  FApplication.NeedConnection;
-  FApplication.FContext.SendData(_GUID + ACommand);
+  FInitialJSCommand := _GUID + ACommand;
 end;
 
 procedure TjsdRespondingCommand.DoResponse(AData: String);
