@@ -521,7 +521,7 @@ begin
      (AMessage[39] = '}') then
   begin
     ResponseTypeChar := AMessage[1];
-    guid := Copy(AMessage, 2, 39);
+    guid := Copy(AMessage, 2, 38);
     Delete(AMessage, 1, 39);
 
     e := nil;
