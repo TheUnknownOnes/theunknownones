@@ -117,10 +117,13 @@ type
 
     function GetPropertyValue(AProperty : String) : String; overload;
     procedure GetPropertyValue(AProperty : String; out AValue : String; ADefault : String = ''; ACheckNullUndefined : Boolean = true); overload; virtual;
+    procedure GetPropertyValue(AProperty : String; out AValue : WideString; ADefault : String = ''; ACheckNullUndefined : Boolean = true); overload; virtual;
+    procedure GetPropertyValue(AProperty : String; out AValue : OleVariant; ADefault : String = ''; ACheckNullUndefined : Boolean = true); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Integer; ADefault : Integer = 0); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Int64; ADefault : Integer = 0); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Double; ADefault : Double = 0); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Boolean; ADefault : Boolean = false); overload; virtual;
+    procedure GetPropertyValue(AProperty : String; out AValue : WordBool; ADefault : Boolean = false); overload; virtual;
 
   public
     constructor Create(AApplication : TjsdApplication); override;
@@ -840,6 +843,15 @@ begin
   AValue := StrToBoolDef(GetPropertyValue(AProperty), ADefault);
 end;
 
+procedure TjsdObject.GetPropertyValue(AProperty: String; out AValue: WideString;
+  ADefault: String; ACheckNullUndefined: Boolean);
+var
+  s : String;
+begin
+  GetPropertyValue(AProperty, s, ADefault, ACheckNullUndefined);
+  AValue:=s;
+end;
+
 procedure TjsdObject.GetPropertyValue(AProperty: String; out AValue: Double;
   ADefault: Double);
 begin
@@ -855,6 +867,24 @@ end;
 procedure TjsdObject.SetPropertyValue(AProperty : String; AValue : Variant);
 begin
   FApplication.Exec(_JSVar + '.' + AProperty + '=' + ToJSCode(AValue));
+end;
+
+procedure TjsdObject.GetPropertyValue(AProperty: String; out AValue: WordBool;
+  ADefault: Boolean);
+var
+  b : Boolean;
+begin
+  GetPropertyValue(AProperty, b, ADefault);
+  AValue:=b;
+end;
+
+procedure TjsdObject.GetPropertyValue(AProperty: String; out AValue: OleVariant;
+  ADefault: String; ACheckNullUndefined: Boolean);
+var
+  s : String;
+begin
+  GetPropertyValue(AProperty, s, ADefault, ACheckNullUndefined);
+  AValue:=s;
 end;
 
 { TjsdRespondingCommand }
