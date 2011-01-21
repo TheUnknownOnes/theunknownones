@@ -8,11 +8,36 @@ uses
   StrUtils,
   uJSHelper,
   uJSDirect,
+  IdUri,
   mshtml;
 
 type
+  TjsWindow = class;
+
+  TjsWindowInterval = class(TjsdObject)
+  public
+    constructor Create(AApplication : TjsdApplication;
+                       AWindow : TjsWindow;
+                       AFunction : TjsdFunction;
+                       APause : Integer); reintroduce;
+  end;
+
+  TjsWindowTimeout = class(TjsdObject)
+  public
+    constructor Create(AApplication : TjsdApplication;
+                       AWindow : TjsWindow;
+                       AFunction : TjsdFunction;
+                       APause : Integer); reintroduce;
+  end;
+
+  TjsWindowOnErrorProc = procedure(AMessage : String;
+                                   AURL : TIdURI;
+                                   ALineNumber : Integer) of object;
+
   TjsWindow = class(TjsdObjectEx)
   private
+    FOnErrorFunc : TjsdFunction;
+    FOnError: TjsWindowOnErrorProc;
     function GetClosed: Boolean;
     function GetInnerHeight: Integer;
     procedure SetInnerHeight(const Value: Integer);
@@ -30,7 +55,9 @@ type
     function GetPageYOffset: Integer;
     procedure SetPageXOffset(const Value: Integer);
     procedure SetPageYOffset(const Value: Integer);
+    procedure OnErrorFuncHandler(AParams : TjsdFunctionHandlerParams);
     function GetDocument: IHTMLDocument;
+    procedure SetOnError(const Value: TjsWindowOnErrorProc);
   public
     procedure AfterConstruction(); override;
     procedure BeforeDestruction(); override;
@@ -55,12 +82,30 @@ type
                   ) : TjsWindow;
 
     procedure Alert(AMessage : String);
+    function AToB(ABase64 : String) : String;
     procedure Back();
     procedure Blur();
+    function BtoA(AData : String) : String; //returns Base64
     procedure Close();
     function Confirm(AMessage : String): Boolean;
+    procedure Focus();
+    procedure Forward();
+    procedure Home();
+    procedure MoveBy(AX, AY : Integer);
+    procedure MoveTo(AX, AY : Integer);
+    procedure Print();
+    function Prompt(APrompt : String; ADefault : String = '') : String;
+    procedure ResizeBy(AX, AY : Integer);
+    procedure ResizeTo(AX, AY : Integer);
+    procedure ScrollBy(AX, AY : Integer);
+    procedure ScrollTo(AX, AY : Integer);
+    function SetInterval(AFunction : TjsdFunction; APause : Integer) : TjsWindowInterval;
+    function SetTimeout(AFunction : TjsdFunction; APause : Integer) : TjsWindowTimeout;
+    procedure Stop();
+
 
     property Closed : Boolean read GetClosed;
+    property Document : IHTMLDocument read GetDocument;
     property InnerHeight : Integer read GetInnerHeight write SetInnerHeight;
     property InnerWidth : Integer read GetInnerWidth write SetInnerWidth;
     property LocationBar : Boolean read GetLocationBar write SetLocationBar;
@@ -70,7 +115,7 @@ type
     property PageXOffset : Integer read GetPageXOffset write SetPageXOffset;
     property PageYOffset : Integer read GetPageYOffset write SetPageYOffset;
 
-    property Document : IHTMLDocument read GetDocument;
+    property OnError : TjsWindowOnErrorProc read FOnError write SetOnError;
   end;
 
   TjsApplication = class(TjsdApplication)
@@ -114,6 +159,11 @@ begin
   ExecMethod('alert('+ToJSString(AMessage)+')', true);
 end;
 
+function TjsWindow.AToB(ABase64: String): String;
+begin
+  Result := ExecMethod('atob(' + ToJSString(ABase64) +')', true);
+end;
+
 procedure TjsWindow.Back;
 begin
   ExecMethod('back', true);
@@ -121,6 +171,7 @@ end;
 
 procedure TjsWindow.BeforeDestruction;
 begin
+  OnError := nil;
   Close;
   inherited;
 end;
@@ -128,6 +179,11 @@ end;
 procedure TjsWindow.Blur;
 begin
   ExecMethod('blur');
+end;
+
+function TjsWindow.BtoA(AData: String): String;
+begin
+  Result := ExecMethod('btoa(' + ToJSString(AData) + ')', true);
 end;
 
 procedure TjsWindow.Close;
@@ -138,6 +194,16 @@ end;
 function TjsWindow.Confirm(AMessage: String): Boolean;
 begin
   result:=StrToBool(ExecMethod('confirm(' + ToJSString(AMessage) + ')', true));
+end;
+
+procedure TjsWindow.Focus;
+begin
+  ExecMethod('focus');
+end;
+
+procedure TjsWindow.Forward;
+begin
+  ExecMethod('forward');
 end;
 
 function TjsWindow.GetClosed: Boolean;
@@ -190,6 +256,36 @@ begin
   GetPropertyValue('pageYOffset', Result);
 end;
 
+procedure TjsWindow.Home;
+begin
+  ExecMethod('home');
+end;
+
+procedure TjsWindow.MoveBy(AX, AY: Integer);
+begin
+  ExecMethod(Format('moveBy(%d, %d)', [AX, AY]));
+end;
+
+procedure TjsWindow.MoveTo(AX, AY: Integer);
+begin
+  ExecMethod(Format('moveBy(%d, %d)', [AX, AY]));
+end;
+
+procedure TjsWindow.OnErrorFuncHandler(AParams: TjsdFunctionHandlerParams);
+var
+  uri : TIdURI;
+begin
+  if Assigned(FOnError) then
+  begin
+    uri := TIdURI.Create(AParams.Values['url']);
+    try
+      FOnError(AParams.Values['msg'], uri, StrToIntDef(AParams.Values['line'], 0));
+    finally
+      uri.Free;
+    end;
+  end;
+end;
+
 function TjsWindow.Open(uri: String; width, height, top, left: Integer;
   dependent, hotkeys: Boolean; innerHeight, innerWidth: Integer; location,
   menubar, resizable: Boolean; screenX, screenY: Integer; scrollbars, status,
@@ -223,6 +319,36 @@ begin
   end;
 end;
 
+procedure TjsWindow.Print;
+begin
+  ExecMethod('print', true);
+end;
+
+function TjsWindow.Prompt(APrompt, ADefault: String): String;
+begin
+  Result := ExecMethod(Format('prompt(%s, %s)', [ToJSString(APrompt), ToJSString(ADefault)]), true);
+end;
+
+procedure TjsWindow.ResizeBy(AX, AY: Integer);
+begin
+  ExecMethod(Format('resizeBy(%d, %d)', [AX, AY]));
+end;
+
+procedure TjsWindow.ResizeTo(AX, AY: Integer);
+begin
+  ExecMethod(Format('resizeTo(%d, %d)', [AX, AY]));
+end;
+
+procedure TjsWindow.ScrollBy(AX, AY: Integer);
+begin
+  ExecMethod(Format('scrollBy(%d, %d)', [AX, AY]));
+end;
+
+procedure TjsWindow.ScrollTo(AX, AY: Integer);
+begin
+  ExecMethod(Format('scrollTo(%d, %d)', [AX, AY]));
+end;
+
 procedure TjsWindow.SetInnerHeight(const Value: Integer);
 begin
   SetPropertyValue('innerHeight', Value);
@@ -233,6 +359,12 @@ begin
   SetPropertyValue('innerWidth', Value);
 end;
 
+function TjsWindow.SetInterval(AFunction: TjsdFunction;
+  APause: Integer): TjsWindowInterval;
+begin
+  Result := TjsWindowInterval.Create(FApplication, Self, AFunction, APause);
+end;
+
 procedure TjsWindow.SetLocationBar(const Value: Boolean);
 begin
   SetPropertyValue('locationbar', Value);
@@ -241,6 +373,24 @@ end;
 procedure TjsWindow.SetName(const Value: String);
 begin
   SetPropertyValue('name', Value);
+end;
+
+procedure TjsWindow.SetOnError(const Value: TjsWindowOnErrorProc);
+begin
+  FOnError := Value;
+
+  if Assigned(Value) and (not Assigned(FOnErrorFunc)) then
+  begin
+    FOnErrorFunc := TjsdFunction.Create(FApplication, 'msg, url, line', 'msg=msg;url=url;line=line', OnErrorFuncHandler);
+    FApplication.Exec(Format('%s.onerror=%s', [_JSVar, FOnErrorFunc._JSVar]));
+  end
+  else
+  if (not Assigned(Value)) and (Assigned(FOnErrorFunc)) then
+  begin
+    FApplication.Exec(Format('%s.onerror=null', [_JSVar]));
+    FOnErrorFunc.Free;
+    FOnErrorFunc := nil;
+  end;
 end;
 
 procedure TjsWindow.SetOuterHeight(const Value: Integer);
@@ -261,6 +411,41 @@ end;
 procedure TjsWindow.SetPageYOffset(const Value: Integer);
 begin
   SetPropertyValue('pageYOffset', Value);
+end;
+
+function TjsWindow.SetTimeout(AFunction: TjsdFunction;
+  APause: Integer): TjsWindowTimeout;
+begin
+  Result := TjsWindowTimeout.Create(FApplication, Self, AFunction, APause);
+end;
+
+procedure TjsWindow.Stop;
+begin
+  ExecMethod('stop');
+end;
+
+{ TjsWindowInterval }
+
+constructor TjsWindowInterval.Create(AApplication : TjsdApplication;
+                               AWindow : TjsWindow;
+                               AFunction : TjsdFunction;
+                               APause : Integer);
+begin
+  inherited Create(AApplication);
+
+  FInitialJSCommand := Format('%s = %s.setInterval("%s()", %d)', [_JSVar, AWindow._JSVar, AFunction._JSVar, APause]);
+  FFinalJSCommand := Format('%s.clearInterval(%s); %1:s = null', [AWindow._JSVar, _JSVar]);
+end;
+
+{ TjsWindowTimeout }
+
+constructor TjsWindowTimeout.Create(AApplication: TjsdApplication; AWindow: TjsWindow;
+  AFunction: TjsdFunction; APause: Integer);
+begin
+  inherited Create(AApplication);
+
+  FInitialJSCommand := Format('%s = %s.setTimeout("%s", %d)', [_JSVar, AWindow._JSVar, AFunction._JSVar, APause]);
+  FFinalJSCommand := Format('%s.clearTimeout(%s); %1:s = null', [AWindow._JSVar, _JSVar]);
 end;
 
 end.
