@@ -92,8 +92,17 @@ TUOWebSocket.prototype = {
                     eval(evt.data);
                 }
                 else {
+                    prefix="O";
                     /* we found a GUID ... now it's time to get an answer */
-                   this.wrapper.send(guidmatch[0]+eval(evt.data.substr(38, evt.data.length)));
+                    try {
+                        result=eval(evt.data.substr(38, evt.data.length));
+                    }
+                    catch(error) {
+                        result=error.toString();
+                        prefix="E";
+                    }
+
+                   this.wrapper.send(prefix+guidmatch[0]+result);
                 }
             }
             this.internalWebSocket.onerror = function(evt) {
@@ -114,7 +123,7 @@ TUOWebSocket.prototype = {
             }
         }
         else {
-            this.logError('already in connection state '+this.readyState()+' '+this.readyStateText());
+            TUOWebSocketDebug.logError('already in connection state '+this.readyState()+' '+this.readyStateText());
         }
     }
 }
@@ -131,4 +140,5 @@ TUOWebSocket.prototype = {
  *                      assigned to.
  *                      Please refer for sourcecode of server for it's usage.
  */
-appTUOWebSocket = new TUOWebSocket('10.1.8.2',2680,'myGroovyApp','appTUOWebSocket');
+appTUOWebSocket_Marco = new TUOWebSocket('10.1.8.5',2680,'myGroovyApp','appTUOWebSocket_Marco');
+appTUOWebSocket_Benny = new TUOWebSocket('10.1.8.2',2680,'myGroovyApp','appTUOWebSocket_Benny');
