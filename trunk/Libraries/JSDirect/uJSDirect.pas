@@ -96,8 +96,7 @@ type
     HandlerProc : TjsdFunctionHandlerProc;
 
     constructor Create(AAplication : TjsdApplication;
-                       AParams : String; //'P1,P2,P3'
-                       AResponseParams : String; //'RetVal1=P1;RetVal2=MyVar'
+                       AResponseParams : String; //'RetVal1=arguments[0];RetVal2=MyVar'
                        AHandlerProc : TjsdFunctionHandlerProc = nil;
                        ABody : String = ''); reintroduce;
 
@@ -653,7 +652,6 @@ end;
 { TjsdFunction }
 
 constructor TjsdFunction.Create(AAplication : TjsdApplication;
-                               AParams : String;
                                AResponseParams : String;
                                AHandlerProc : TjsdFunctionHandlerProc = nil;
                                ABody : String = '');
@@ -664,7 +662,7 @@ var
 begin
   inherited Create(AAplication);
 
-  cmd := _JSVar + ' = function(' + AParams + ')';
+  cmd := _JSVar + ' = function()';
   cmd := cmd + '{' + ABody;
 
   cmd := cmd + FApplication.FContext.InitialRequest.Param['cResponse'] + '("O' + _GUID + '"';
