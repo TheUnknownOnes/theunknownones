@@ -113,15 +113,17 @@ type
 
   TjsdBaseObject = class(TjsdElement)
   protected
-    procedure SetPropertyValue(AProperty : String; AValue : Variant); virtual;
+    procedure SetPropertyValue(AProperty : String; AValue : Variant; AValueIsJSCode: Boolean = False); virtual;
 
     function GetPropertyValue(AProperty : String) : String; overload;
     procedure GetPropertyValue(AProperty : String; out AValue : String; ADefault : String = ''; ACheckNullUndefined : Boolean = true); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : WideString; ADefault : String = ''; ACheckNullUndefined : Boolean = true); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : OleVariant; ADefault : String = ''; ACheckNullUndefined : Boolean = true); overload; virtual;
+    procedure GetPropertyValue(AProperty : String; out AValue : Smallint; ADefault : Integer = 0); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Integer; ADefault : Integer = 0); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Int64; ADefault : Integer = 0); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Double; ADefault : Double = 0); overload; virtual;
+    procedure GetPropertyValue(AProperty : String; out AValue : Single; ADefault : Double = 0); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Boolean; ADefault : Boolean = false); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : WordBool; ADefault : Boolean = false); overload; virtual;
 
@@ -871,9 +873,16 @@ begin
   AValue := StrToInt64Def(GetPropertyValue(AProperty), ADefault);
 end;
 
-procedure TjsdBaseObject.SetPropertyValue(AProperty : String; AValue : Variant);
+procedure TjsdBaseObject.SetPropertyValue(AProperty : String; AValue : Variant; AValueIsJSCode: Boolean);
+var
+  Value: String;
 begin
-  FApplication.Exec(_JSVar + '.' + AProperty + '=' + ToJSCode(AValue));
+  if AValueIsJSCode then
+    Value:=AValue
+  else
+    Value:=ToJSCode(AValue);
+
+  FApplication.Exec(_JSVar + '.' + AProperty + '=' + Value);
 end;
 
 procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: WordBool;
@@ -883,6 +892,24 @@ var
 begin
   GetPropertyValue(AProperty, b, ADefault);
   AValue:=b;
+end;
+
+procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: Single;
+  ADefault: Double);
+var
+  db : Double;
+begin
+  GetPropertyValue(AProperty, db, ADefault);
+  AValue:=db;
+end;
+
+procedure TjsdBaseObject.GetPropertyValue(AProperty: String;
+  out AValue: Smallint; ADefault: Integer);
+var
+  i : INteger;
+begin
+  GetPropertyValue(AProperty, i, ADefault);
+  AValue:=i;
 end;
 
 procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: OleVariant;
