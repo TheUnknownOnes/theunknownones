@@ -64,7 +64,7 @@ type
   end;
 
 function ToJSString(AString : String) : String;
-function ToJSCode(AValue : Variant) : String;
+function ToJSCode(AValue : Variant) : String; overload;
 
 implementation
 
@@ -80,6 +80,9 @@ begin
 end;
 
 function ToJSCode(AValue : Variant) : String;
+var
+  dim, idx : Integer;
+
 begin
   case VarType(AValue) of
     varInteger, varSmallint, varShortInt, varByte, varWord, varLongWord, varInt64:
@@ -96,6 +99,22 @@ begin
     varUString:
       Result := ToJSString(AValue);
     {$ENDIF}
+    varArray or varVariant :
+      begin
+        Result:='';
+        for dim := 1 to VarArrayDimCount(AValue) do
+        begin
+          Result:=Result+'[';
+          for idx := VarArrayLowBound(AValue, dim) to VarArrayHighBound(AValue, dim) do
+          begin
+            if idx>VarArrayLowBound(AValue, dim) then
+              Result:=Result+',';
+
+            Result:=Result+ToJSCode(VarArrayGet(AValue, [idx]));
+          end;
+          Result:=Result+']';
+        end;
+      end;
     else
       Result := ToJSString(VarToStrDef(AValue, ''));
   end;
