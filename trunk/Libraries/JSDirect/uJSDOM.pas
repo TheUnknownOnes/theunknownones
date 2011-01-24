@@ -1,5 +1,17 @@
 unit uJSDOM;
 
+(*
+ * This is a "simple demonstration" what you can do with jsDirect.
+ * ujsDOM is a wrapper for "all" native built in JavaScript objects.
+ * As you can guess these are not ALL! objects ... but we opted for the most
+ * important ones (in our opinion)
+ * The classes were built largely automatically ... so there may be this or that
+ * method or property that does not work. Also we chose mshtml as a base.
+ * THIS IS COMPLETELY WRONG :-D we know that, since IE does not support WebSocket.
+ * If you have a complete interface list of the Firefox/Chromium DOM ... just
+ * give us a hint or implement it yourself.
+ *)
+
 interface
 
 uses
@@ -1970,7 +1982,7 @@ end;
 function TjsHTMLDocument.open(const url: WideString; name, features,
   replace: OleVariant): IDispatch;
 begin
-  Result:=TjsHTMLDocument.Create(FApplication, _JSVar+'.open('+ToJSCode(url)+','+ToJSCode(name)+','+ToJSCode(features)+','+ToJSCode(replace));
+  Result:=TjsHTMLDocument.Create(FApplication, _JSVar+'.open('+ToJSCode(url)+','+ToJSCode(name)+','+ToJSCode(features)+','+ToJSCode(replace)+')');
 end;
 
 function TjsHTMLDocument.queryCommandEnabled(const cmdID: WideString): WordBool;
