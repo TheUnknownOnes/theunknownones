@@ -9,20 +9,19 @@ uses
   uJSHelper,
   uJSDirect,
   IdUri,
-  mshtml;
+  mshtml,
+  uJSDom;
 
 type
   TjsApplication = class(TjsdApplication)
   protected
-    Window : IHTMLWindow2;
-
     procedure DoCreated(); override;
     procedure DoTerminated(); override;
+  public
+    Window : IjsHTMLWindow;
   end;
 
 implementation
-
-uses uJSDOM;
 
 { TjsApplication }
 

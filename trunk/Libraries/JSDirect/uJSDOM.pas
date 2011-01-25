@@ -31,6 +31,20 @@ type
   ['{5B6E31D8-D9F0-4D5F-B036-351D81BD8761}']
     function get_JSVar: String;
     function get_GUID: String;
+
+    procedure SetPropertyValue(AProperty : String; AValue : Variant; AValueIsJSCode: Boolean = False);
+
+    function GetPropertyValue(AProperty : String) : String; overload;
+    procedure GetPropertyValue(AProperty : String; out AValue : String; ADefault : String = ''; ACheckNullUndefined : Boolean = true); overload;
+    procedure GetPropertyValue(AProperty : String; out AValue : WideString; ADefault : String = ''; ACheckNullUndefined : Boolean = true); overload;
+    procedure GetPropertyValue(AProperty : String; out AValue : OleVariant; ADefault : String = ''; ACheckNullUndefined : Boolean = true); overload;
+    procedure GetPropertyValue(AProperty : String; out AValue : Smallint; ADefault : Integer = 0); overload;
+    procedure GetPropertyValue(AProperty : String; out AValue : Integer; ADefault : Integer = 0); overload;
+    procedure GetPropertyValue(AProperty : String; out AValue : Int64; ADefault : Integer = 0); overload;
+    procedure GetPropertyValue(AProperty : String; out AValue : Double; ADefault : Double = 0); overload;
+    procedure GetPropertyValue(AProperty : String; out AValue : Single; ADefault : Double = 0); overload;
+    procedure GetPropertyValue(AProperty : String; out AValue : Boolean; ADefault : Boolean = false); overload;
+    procedure GetPropertyValue(AProperty : String; out AValue : WordBool; ADefault : Boolean = false); overload;
   end;
 
   IjsDOMCollection = interface
@@ -39,6 +53,16 @@ type
     function Get__newEnum: IUnknown; safecall;
     function item(name: OleVariant; index: OleVariant): IDispatch; overload; safecall;
     function item(const name: OleVariant): IDispatch; overload; safecall;
+  end;
+
+  IjsHTMLWindow = interface(IHTMLWindow2)
+  ['{C05709A2-21A1-4F87-A513-C70C6396BD7B}']
+  end;
+
+  IjsHTMLDocument = interface(IHTMLDocument2)
+  ['{A72CFCB2-A2B0-462D-B7E4-D3F42692DE30}']
+    procedure jsAddCSSStyleSheet(aHref: String);
+    procedure jsAddJavaScript(aHref: String);
   end;
 
   TjsDOMObject = class(TjsdBaseObject, IDispatch, IjsElement)
@@ -68,7 +92,7 @@ type
     class function GetDOMObjectJsName(ANode: IDispatch): String;
     class function IsPositiveMethodResult(AResult: String): Boolean;
 
-    constructor Create(AApplication : TjsdApplication; ACreateCommand : String); reintroduce;
+    constructor Create(AApplication : TjsdApplication; ACreateCommand : String); reintroduce; virtual;
   end;
 
   TjsDOMObjectClass = class of TjsDOMObject;
@@ -156,7 +180,7 @@ type
   end;
 
   TjsHTMLElement = class(TjsHTMLDOMNode,IHTMLElement,IHTMLElement2,IHTMLElement3,IHTMLElement4)
-  private
+  protected
     function addBehavior(const bstrUrl: WideString; var pvarFactory: OleVariant): Integer; safecall;
     function applyElement(const apply: IHTMLElement; const where: WideString): IHTMLElement; safecall;
     function attachEvent(const event: WideString; const pdisp: IDispatch): WordBool; safecall;
@@ -1134,9 +1158,12 @@ type
     procedure Set_search(const p: WideString); safecall;
   end;
 
-  TjsHTMLDocument = class(TjsHTMLDOMNode, IHTMLDocument2)
-  protected
-    function Get_Script: IDispatch; safecall;
+  TjsHTMLDocument = class(TjsHTMLDOMNode, IjsHTMLDocument, IHTMLDocument2, IHTMLDocument3, IHTMLDocument4, IHTMLDocument5)
+  private
+    {$REGION 'IjsHTMLDocument'}
+    procedure jsAddCSSStyleSheet(aHref: String);
+    procedure jsAddJavaScript(aSrc: String);
+    {$ENDREGION}
 
     {$REGION 'IHTMLDocument2'}
     function Get_all: IHTMLElementCollection; safecall;
@@ -1248,6 +1275,90 @@ type
     function toString: WideString; safecall;
     function createStyleSheet(const bstrHref: WideString; lIndex: Integer): IHTMLStyleSheet; safecall;
     {$ENDREGION}
+
+    {$REGION 'IHTMLDocument3'}
+    procedure releaseCapture; safecall;
+    procedure recalc(fForce: WordBool); safecall;
+    function createTextNode(const text: WideString): IHTMLDOMNode; safecall;
+    function Get_documentElement: IHTMLElement; safecall;
+    function Get_uniqueID: WideString; safecall;
+    function attachEvent(const event: WideString; const pdisp: IDispatch): WordBool; safecall;
+    procedure detachEvent(const event: WideString; const pdisp: IDispatch); safecall;
+    procedure Set_onrowsdelete(p: OleVariant); safecall;
+    function Get_onrowsdelete: OleVariant; safecall;
+    procedure Set_onrowsinserted(p: OleVariant); safecall;
+    function Get_onrowsinserted: OleVariant; safecall;
+    procedure Set_oncellchange(p: OleVariant); safecall;
+    function Get_oncellchange: OleVariant; safecall;
+    procedure Set_ondatasetchanged(p: OleVariant); safecall;
+    function Get_ondatasetchanged: OleVariant; safecall;
+    procedure Set_ondataavailable(p: OleVariant); safecall;
+    function Get_ondataavailable: OleVariant; safecall;
+    procedure Set_ondatasetcomplete(p: OleVariant); safecall;
+    function Get_ondatasetcomplete: OleVariant; safecall;
+    procedure Set_onpropertychange(p: OleVariant); safecall;
+    function Get_onpropertychange: OleVariant; safecall;
+    procedure Set_dir(const p: WideString); safecall;
+    function Get_dir: WideString; safecall;
+    procedure Set_oncontextmenu(p: OleVariant); safecall;
+    function Get_oncontextmenu: OleVariant; safecall;
+    procedure Set_onstop(p: OleVariant); safecall;
+    function Get_onstop: OleVariant; safecall;
+    function createDocumentFragment: IHTMLDocument2; safecall;
+    function Get_parentDocument: IHTMLDocument2; safecall;
+    procedure Set_enableDownload(p: WordBool); safecall;
+    function Get_enableDownload: WordBool; safecall;
+    procedure Set_baseUrl(const p: WideString); safecall;
+    function Get_baseUrl: WideString; safecall;
+    procedure Set_inheritStyleSheets(p: WordBool); safecall;
+    function Get_inheritStyleSheets: WordBool; safecall;
+    procedure Set_onbeforeeditfocus(p: OleVariant); safecall;
+    function Get_onbeforeeditfocus: OleVariant; safecall;
+    function getElementsByName(const v: WideString): IHTMLElementCollection; safecall;
+    function getElementById(const v: WideString): IHTMLElement; safecall;
+    function getElementsByTagName(const v: WideString): IHTMLElementCollection; safecall;
+    {$ENDREGION}
+
+    {$REGION 'IHTMLDocument4'}
+    procedure focus; safecall;
+    function hasFocus: WordBool; safecall;
+    procedure Set_onselectionchange(p: OleVariant); safecall;
+    function Get_onselectionchange: OleVariant; safecall;
+    function Get_namespaces: IDispatch; safecall;
+    function createDocumentFromUrl(const bstrUrl: WideString; const bstrOptions: WideString): IHTMLDocument2; safecall;
+    procedure Set_media(const p: WideString); safecall;
+    function Get_media: WideString; safecall;
+    function CreateEventObject(var pvarEventObject: OleVariant): IHTMLEventObj; safecall;
+    function FireEvent(const bstrEventName: WideString; var pvarEventObject: OleVariant): WordBool; safecall;
+    function createRenderStyle(const v: WideString): IHTMLRenderStyle; safecall;
+    procedure Set_oncontrolselect(p: OleVariant); safecall;
+    function Get_oncontrolselect: OleVariant; safecall;
+    function Get_URLUnencoded: WideString; safecall;
+    {$ENDREGION}
+
+    {$REGION 'IHTMLDocument5'}
+    procedure Set_onmousewheel(p: OleVariant); safecall;
+    function Get_onmousewheel: OleVariant; safecall;
+    function Get_doctype: IHTMLDOMNode; safecall;
+    function Get_implementation_: IHTMLDOMImplementation; safecall;
+    function createAttribute(const bstrattrName: WideString): IHTMLDOMAttribute; safecall;
+    function createComment(const bstrdata: WideString): IHTMLDOMNode; safecall;
+    procedure Set_onfocusin(p: OleVariant); safecall;
+    function Get_onfocusin: OleVariant; safecall;
+    procedure Set_onfocusout(p: OleVariant); safecall;
+    function Get_onfocusout: OleVariant; safecall;
+    procedure Set_onactivate(p: OleVariant); safecall;
+    function Get_onactivate: OleVariant; safecall;
+    procedure Set_ondeactivate(p: OleVariant); safecall;
+    function Get_ondeactivate: OleVariant; safecall;
+    procedure Set_onbeforeactivate(p: OleVariant); safecall;
+    function Get_onbeforeactivate: OleVariant; safecall;
+    procedure Set_onbeforedeactivate(p: OleVariant); safecall;
+    function Get_onbeforedeactivate: OleVariant; safecall;
+    function Get_compatMode: WideString; safecall;
+    {$ENDREGION}
+
+    function Get_Script: IDispatch; safecall;
   end;
 
   TjsHTMLOptionElement = class(TjsDOMObject,IHTMLOptionElement,IHTMLOptionElement3)
@@ -1277,7 +1388,7 @@ type
     function item(const pvarIndex: OleVariant): OleVariant; safecall;
   end;
 
-  TjsHTMLWindow = class(TjsHTMLFramesCollection, IHTMLWindow2)
+  TjsHTMLWindow = class(TjsHTMLFramesCollection, IjsHTMLWindow, IHTMLWindow2)
   protected
     function Get_frames: IHTMLFramesCollection2; safecall;
     procedure Set_defaultStatus(const p: WideString); safecall;
@@ -1789,6 +1900,11 @@ begin
   Result:=TjsHTMLElementCollection.Create(FApplication, _JSVar+'.images', TjsHTMLElement);
 end;
 
+function TjsHTMLDocument.Get_implementation_: IHTMLDOMImplementation;
+begin
+  Result:=nil;
+end;
+
 function TjsHTMLDocument.Get_lastModified: WideString;
 begin
   GetPropertyValue('lastModified', Result);
@@ -2046,6 +2162,11 @@ begin
   SetPropertyValue('designMode', p);
 end;
 
+procedure TjsHTMLDocument.Set_dir(const p: WideString);
+begin
+  SetPropertyValue('dir', p);
+end;
+
 procedure TjsHTMLDocument.Set_domain(const p: WideString);
 begin
   SetPropertyValue('designMode', p);
@@ -2064,6 +2185,11 @@ end;
 procedure TjsHTMLDocument.Set_linkColor(p: OleVariant);
 begin
   SetPropertyValue('linkColor', p);
+end;
+
+procedure TjsHTMLDocument.Set_media(const p: WideString);
+begin
+  SetPropertyValue('media', p);
 end;
 
 procedure TjsHTMLDocument.Set_onafterupdate(p: OleVariant);
@@ -2202,6 +2328,377 @@ begin
   ExecMethod('write('+ToJSCode(v)+')');
 end;
 
+function TjsHTMLDocument.attachEvent(const event: WideString; const pdisp: IDispatch): WordBool; safecall;
+begin
+  Result:=IsPositiveMethodResult(ExecMethod('attachEvent('+ToJSCode(event)+','+ToJSCode(pdisp)+')', True));
+end;
+
+function TjsHTMLDocument.createAttribute(const bstrattrName: WideString): IHTMLDOMAttribute; safecall;
+begin
+  Result:=TjsHTMLDOMAttribute.Create(FApplication, _JSVar+'.createAttribute('+ToJSCode(bstrattrName)+')');
+end;
+
+function TjsHTMLDocument.createComment(const bstrdata: WideString): IHTMLDOMNode; safecall;
+begin
+  Result:=TjsHTMLDOMNode.Create(FApplication,_JSVar+'.createComment('+ToJSCode(bstrdata)+')');
+end;
+
+function TjsHTMLDocument.createDocumentFragment: IHTMLDocument2; safecall;
+begin
+  Result:=TjsHTMLDocument.Create(FApplication, _JSVar+'.createDocumentFragment('+')');
+end;
+
+function TjsHTMLDocument.createDocumentFromUrl(const bstrUrl: WideString; const bstrOptions: WideString): IHTMLDocument2; safecall;
+begin
+  Result:=TjsHTMLDocument.Create(FApplication, _JSVar+'.createDocumentFromUrl('+ToJSCode(bstrUrl)+','+ToJSCode(bstrOptions)+')');
+end;
+
+function TjsHTMLDocument.CreateEventObject(var pvarEventObject: OleVariant): IHTMLEventObj; safecall;
+begin
+  Result:=nil;
+end;
+
+function TjsHTMLDocument.createRenderStyle(const v: WideString): IHTMLRenderStyle; safecall;
+begin
+  Result:=nil;
+end;
+
+function TjsHTMLDocument.createTextNode(const text: WideString): IHTMLDOMNode; safecall;
+begin
+  Result:=TjsHTMLDOMNode.Create(FApplication, _JSVar+'.createTextNode('+ToJSCode(text)+')');
+end;
+
+procedure TjsHTMLDocument.detachEvent(const event: WideString;
+  const pdisp: IDispatch);
+begin
+end;
+
+function TjsHTMLDocument.FireEvent(const bstrEventName: WideString; var pvarEventObject: OleVariant): WordBool; safecall;
+begin
+  Result:=False;
+end;
+
+procedure TjsHTMLDocument.focus;
+begin
+  ExecMethod('focus');
+end;
+
+function TjsHTMLDocument.Get_baseUrl: WideString; safecall;
+begin
+  GetPropertyValue('baseUrl', Result)
+end;
+
+function TjsHTMLDocument.Get_compatMode: WideString; safecall;
+begin
+  GetPropertyValue('compatMode', Result)
+end;
+
+function TjsHTMLDocument.Get_dir: WideString; safecall;
+begin
+  GetPropertyValue('dir', Result)
+end;
+
+function TjsHTMLDocument.Get_doctype: IHTMLDOMNode;
+begin
+  Result:=TjsHTMLDOMNode.Create(FApplication, _JSVar+'.doctype');
+end;
+
+function TjsHTMLDocument.Get_documentElement: IHTMLElement; safecall;
+begin
+  Result:=TjsHTMLElement.Create(FApplication, _JSVar+'.documentElement');
+end;
+
+function TjsHTMLDocument.Get_enableDownload: WordBool; safecall;
+begin
+  GetPropertyValue('enableDownload', Result)
+end;
+
+function TjsHTMLDocument.Get_inheritStyleSheets: WordBool; safecall;
+begin
+  GetPropertyValue('inheritStyleSheets', Result)
+end;
+
+function TjsHTMLDocument.Get_media: WideString; safecall;
+begin
+  GetPropertyValue('media', Result)
+end;
+
+function TjsHTMLDocument.Get_namespaces: IDispatch; safecall;
+begin
+  Result:=nil;
+end;
+
+function TjsHTMLDocument.Get_onactivate: OleVariant; safecall;
+begin
+  GetPropertyValue('onactivate', Result)
+end;
+
+function TjsHTMLDocument.Get_onbeforeactivate: OleVariant; safecall;
+begin
+  GetPropertyValue('onbeforeactivate', Result)
+end;
+
+function TjsHTMLDocument.Get_onbeforedeactivate: OleVariant; safecall;
+begin
+  GetPropertyValue('onbeforedeactivate', Result)
+end;
+
+function TjsHTMLDocument.Get_onbeforeeditfocus: OleVariant; safecall;
+begin
+  GetPropertyValue('onbeforeeditfocus', Result)
+end;
+
+function TjsHTMLDocument.Get_oncellchange: OleVariant; safecall;
+begin
+  GetPropertyValue('oncellchange', Result)
+end;
+
+function TjsHTMLDocument.Get_oncontextmenu: OleVariant; safecall;
+begin
+  GetPropertyValue('oncontextmenu', Result)
+end;
+
+function TjsHTMLDocument.Get_oncontrolselect: OleVariant; safecall;
+begin
+  GetPropertyValue('oncontrolselect', Result)
+end;
+
+function TjsHTMLDocument.Get_ondataavailable: OleVariant; safecall;
+begin
+  GetPropertyValue('ondataavailable', Result)
+end;
+
+function TjsHTMLDocument.Get_ondatasetchanged: OleVariant; safecall;
+begin
+  GetPropertyValue('ondatasetchanged', Result)
+end;
+
+function TjsHTMLDocument.Get_ondatasetcomplete: OleVariant; safecall;
+begin
+  GetPropertyValue('ondatasetcomplete', Result)
+end;
+
+function TjsHTMLDocument.Get_ondeactivate: OleVariant; safecall;
+begin
+  GetPropertyValue('ondeactivate', Result)
+end;
+
+function TjsHTMLDocument.Get_onfocusin: OleVariant; safecall;
+begin
+  GetPropertyValue('onfocusin', Result)
+end;
+
+function TjsHTMLDocument.Get_onfocusout: OleVariant; safecall;
+begin
+  GetPropertyValue('onfocusout', Result)
+end;
+
+function TjsHTMLDocument.Get_onmousewheel: OleVariant; safecall;
+begin
+  GetPropertyValue('onmousewheel', Result)
+end;
+
+function TjsHTMLDocument.Get_onpropertychange: OleVariant; safecall;
+begin
+  GetPropertyValue('onpropertychange', Result)
+end;
+
+function TjsHTMLDocument.Get_onrowsdelete: OleVariant; safecall;
+begin
+  GetPropertyValue('onrowsdelete', Result)
+end;
+
+function TjsHTMLDocument.Get_onrowsinserted: OleVariant; safecall;
+begin
+  GetPropertyValue('onrowsinserted', Result)
+end;
+
+function TjsHTMLDocument.Get_onselectionchange: OleVariant; safecall;
+begin
+  GetPropertyValue('onselectionchange', Result)
+end;
+
+function TjsHTMLDocument.Get_onstop: OleVariant; safecall;
+begin
+  GetPropertyValue('onstop', Result)
+end;
+
+function TjsHTMLDocument.Get_parentDocument: IHTMLDocument2; safecall;
+begin
+  Result:=TjsHTMLDocument.Create(FApplication, _JSVar+'.parentDocument');
+end;
+
+function TjsHTMLDocument.Get_uniqueID: WideString; safecall;
+begin
+  GetPropertyValue('uniqueID', Result)
+end;
+
+function TjsHTMLDocument.Get_URLUnencoded: WideString; safecall;
+begin
+  GetPropertyValue('URLUnencoded', Result)
+end;
+
+function TjsHTMLDocument.getElementById(const v: WideString): IHTMLElement; safecall;
+begin
+  Result:=TjsHTMLElement.Create(FApplication, _JSVar+'.getElementById('+ToJSCode(v)+')');
+end;
+
+function TjsHTMLDocument.getElementsByName(const v: WideString): IHTMLElementCollection; safecall;
+begin
+  Result:=TjsHTMLElementCollection.Create(FApplication, _JSVar+'.getElementsByName('+ToJSCode(v)+')',TjsHTMLElement);
+end;
+
+function TjsHTMLDocument.getElementsByTagName(const v: WideString): IHTMLElementCollection; safecall;
+begin
+  Result:=TjsHTMLElementCollection.Create(FApplication, _JSVar+'.getElementsByTagName('+ToJSCode(v)+')',TjsHTMLElement);
+end;
+
+function TjsHTMLDocument.hasFocus: WordBool; safecall;
+begin
+  Result:=IsPositiveMethodResult(ExecMethod('hasFocus('+')'));
+end;
+
+procedure TjsHTMLDocument.jsAddJavaScript(aSrc: String);
+var
+  newScript: IHTMLElement;
+begin
+  newScript:=createElement('script');
+  newScript.setAttribute('type', 'text/javascript', 0);
+  newScript.setAttribute('src', aSrc, 0);
+  (getElementsByTagName('head').item(null,0) as IHTMLDOMNode).appendChild((newScript as IHTMLDOMNode));
+end;
+
+procedure TjsHTMLDocument.jsAddCSSStyleSheet(aHref: String);
+var
+  newSS: IHTMLElement;
+begin
+  newSS:=createElement('link');
+  newSS.setAttribute('rel', 'stylesheet', 0);
+  newSS.setAttribute('type', 'text/css', 0);
+  newSS.setAttribute('href', aHref, 0);
+  (getElementsByTagName('head').item(null,0) as IHTMLDOMNode).appendChild((newSS as IHTMLDOMNode));
+end;
+
+procedure TjsHTMLDocument.recalc(fForce: WordBool); safecall;
+begin
+  ExecMethod('recalc('+ToJSCode(fForce)+')');
+end;
+
+procedure TjsHTMLDocument.releaseCapture; safecall;
+begin
+  ExecMethod('releaseCapture('+')');
+end;
+
+procedure TjsHTMLDocument.Set_baseUrl(const p: WideString); safecall;
+begin
+  SetPropertyValue('baseUrl', p);
+end;
+
+procedure TjsHTMLDocument.Set_enableDownload(p: WordBool); safecall;
+begin
+  SetPropertyValue('enableDownload', p);
+end;
+
+procedure TjsHTMLDocument.Set_inheritStyleSheets(p: WordBool); safecall;
+begin
+  SetPropertyValue('inheritStyleSheets', p);
+end;
+
+procedure TjsHTMLDocument.Set_onactivate(p: OleVariant); safecall;
+begin
+  SetPropertyValue('onactivate', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_onbeforeactivate(p: OleVariant); safecall;
+begin
+  SetPropertyValue('onbeforeactivate', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_onbeforedeactivate(p: OleVariant); safecall;
+begin
+  SetPropertyValue('onbeforedeactivate', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_onbeforeeditfocus(p: OleVariant); safecall;
+begin
+  SetPropertyValue('onbeforeeditfocus', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_oncellchange(p: OleVariant); safecall;
+begin
+  SetPropertyValue('oncellchange', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_oncontextmenu(p: OleVariant); safecall;
+begin
+  SetPropertyValue('oncontextmenu', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_oncontrolselect(p: OleVariant); safecall;
+begin
+  SetPropertyValue('oncontrolselect', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_ondataavailable(p: OleVariant); safecall;
+begin
+  SetPropertyValue('ondataavailable', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_ondatasetchanged(p: OleVariant); safecall;
+begin
+  SetPropertyValue('ondatasetchanged', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_ondatasetcomplete(p: OleVariant); safecall;
+begin
+  SetPropertyValue('ondatasetcomplete', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_ondeactivate(p: OleVariant); safecall;
+begin
+  SetPropertyValue('ondeactivate', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_onfocusin(p: OleVariant); safecall;
+begin
+  SetPropertyValue('onfocusin', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_onfocusout(p: OleVariant); safecall;
+begin
+  SetPropertyValue('onfocusout', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_onmousewheel(p: OleVariant); safecall;
+begin
+  SetPropertyValue('onmousewheel', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_onpropertychange(p: OleVariant); safecall;
+begin
+  SetPropertyValue('onpropertychange', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_onrowsdelete(p: OleVariant); safecall;
+begin
+  SetPropertyValue('onrowsdelete', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_onrowsinserted(p: OleVariant); safecall;
+begin
+  SetPropertyValue('onrowsinserted', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_onselectionchange(p: OleVariant); safecall;
+begin
+  SetPropertyValue('onselectionchange', p, True);
+end;
+
+procedure TjsHTMLDocument.Set_onstop(p: OleVariant); safecall;
+begin
+  SetPropertyValue('onstop', p, True);
+end;
+
 { TjsHTMLAttributeCollection }
 
 function TjsHTMLAttributeCollection.getNamedItem(
@@ -2279,7 +2776,7 @@ end;
 
 function TjsHTMLElement.Get_document: IDispatch;
 begin
-  Result:=TjsHTMLDocument.Create(FApplication, _JSVar+'.document');
+  Result:=TjsHTMLDocument.Create(FApplication, _JSVar+'.ownerDocument');
 end;
 
 function TjsHTMLElement.Get_filters: IHTMLFiltersCollection;
