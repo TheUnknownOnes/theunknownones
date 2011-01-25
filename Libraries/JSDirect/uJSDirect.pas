@@ -200,8 +200,6 @@ type
     procedure DoCreated(); virtual;
     procedure DoTerminated(); virtual;
     function HasTimeout : Boolean; virtual;
-
-
   public
     constructor Create(AContext : TjsdContext); reintroduce; virtual;
     destructor Destroy(); override;
@@ -663,7 +661,7 @@ begin
   inherited Create(AAplication);
 
   cmd := _JSVar + ' = function()';
-  cmd := cmd + '{' + ABody;
+  cmd := cmd + '{' + ABody + ' ';
 
   cmd := cmd + FApplication.FContext.InitialRequest.Param['cResponse'] + '("O' + _GUID + '"';
 

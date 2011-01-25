@@ -1,0 +1,21 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html> 
+    <head> 
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+ 
+        <!-- You have to use the following script to define the TUO WebSocket Class --> 
+        <script type="text/javascript" src="../../TUOWebSocket.js"></script>
+        
+        <!-- create a javascript object instance of our class -->
+        <script type="text/javascript">
+            appTWS = new TUOWebSocket('127.0.0.1',2680,'TWSDemoSimple','appTWS');
+        </script>
+        
+        <title>TUOWebSocket Simple Demo</title>
+  </head> 
+  <body> 
+      <center> 
+        <button onclick="appTWS.login();">Click here to let the fun begin ;-)</button>
+      </center> 
+  </body> 
+</html>
