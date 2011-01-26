@@ -4,7 +4,9 @@ uses
   uMainApp in 'uMainApp.pas',
   uJSDirect,
   Windows,
-  uJSXMLDOM in '..\..\uJSXMLDOM.pas';
+  uJSXMLDOM in '..\..\uJSXMLDOM.pas',
+  uJSHTMLDOM2 in '..\..\uJSHTMLDOM2.pas',
+  htmldom2 in '..\..\htmldom2.pas';
 
 {$R *.res}
 

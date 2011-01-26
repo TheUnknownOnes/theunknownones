@@ -41,6 +41,8 @@
 			</DelphiCompile>
 			<DCCReference Include="uMainApp.pas"/>
 			<DCCReference Include="..\..\uJSXMLDOM.pas"/>
+			<DCCReference Include="..\..\uJSHTMLDOM2.pas"/>
+			<DCCReference Include="..\..\htmldom2.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
