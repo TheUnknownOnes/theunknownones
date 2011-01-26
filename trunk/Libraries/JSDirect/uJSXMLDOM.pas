@@ -16,6 +16,8 @@ type
     function get_GUID: String;
     function get_ClassOfImplementingObject: TjsDOMObjectClass;
 
+    function ConvertTo(AClass: TjsDOMObjectClass): TjsDOMObject;
+
     procedure SetPropertyValue(AProperty : String; AValue : Variant; AValueIsJSCode: Boolean = False);
 
     function GetPropertyValue(AProperty : String) : String; overload;
@@ -32,7 +34,7 @@ type
   end;
 
   TjsDOMObject = class(TjsdBaseObject, IInterface, IDispatch, IjsElement)
-  private
+  protected
     FRefCount: Integer;
   protected
     {$REGION 'IjsElement'}
@@ -64,10 +66,11 @@ type
     function ExecMethod(AMethod : String; AObjectClass: TjsDOMObjectClass) : IInterface; overload;
 
     constructor Create(AApplication : TjsdApplication; ACreateCommand : String); reintroduce;
+    function ConvertTo(AClass: TjsDOMObjectClass): TjsDOMObject;
   end;
 
   TjsDOMImplementation = class(TjsDOMObject,IDOMImplementation)
-  private
+  protected
     function hasFeature(const feature, version: DOMString): WordBool;
     function createDocumentType(const qualifiedName, publicId,           { DOM Level 2 }
       systemId: DOMString): IDOMDocumentType; safecall;
@@ -76,13 +79,13 @@ type
   end;
 
   TjsDOMNodeList = class(TjsDOMObject,IDOMNodeList)
-  private
+  protected
     function get_item(index: Integer): IDOMNode; safecall;
     function get_length: Integer; safecall;
   end;
 
   TjsDOMNamedNodeMap = class(TjsDOMObject,IDOMNamedNodeMap)
-  private
+  protected
     function get_item(index: Integer): IDOMNode; safecall;
     function get_length: Integer; safecall;
     function getNamedItem(const name: DOMString): IDOMNode; safecall;
@@ -94,7 +97,7 @@ type
   end;
 
   TjsDOMNode = class(TjsDOMObject,IDOMNode)
-  private
+  protected
     function appendChild(const newChild: IDOMNode): IDOMNode; safecall;
     function cloneNode(deep: WordBool): IDOMNode; safecall;
     function get_attributes: IDOMNamedNodeMap; safecall;
@@ -121,7 +124,7 @@ type
   end;
 
   TjsDOMCharacterData = class(TjsDOMNode,IDOMCharacterData)
-  private
+  protected
     function get_data: DOMString; safecall;
     function get_length: Integer; safecall;
     function substringData(offset, count: Integer): DOMString; safecall;
@@ -133,7 +136,7 @@ type
   end;
 
   TjsDOMAttr = class(TjsDOMNode,IDOMAttr)
-  private
+  protected
     function get_name: DOMString; safecall;
     function get_ownerElement: IDOMElement; safecall;
     function get_specified: WordBool; safecall;
@@ -142,7 +145,7 @@ type
   end;
 
   TjsDOMElement = class(TjsDOMNode,IDOMElement)
-  private
+  protected
     function get_tagName: DOMString; safecall;
     function getAttribute(const name: DOMString): DOMString; safecall;
     function getAttributeNode(const name: DOMString): IDOMAttr; safecall;
@@ -162,20 +165,20 @@ type
   end;
 
   TjsDOMText = class(TjsDOMCharacterData,IDOMText)
-  private
+  protected
     function splitText(offset: Integer): IDOMText; safecall;
   end;
 
   TjsDOMComment = class(TjsDOMCharacterData,IDOMComment)
-  private
+  protected
   end;
 
   TjsDOMCDATASection = class(TjsDOMText,IDOMCDATASection)
-  private
+  protected
   end;
 
   TjsDOMDocumentType = class(TjsDOMNode,IDOMDocumentType)
-  private
+  protected
     function get_entities: IDOMNamedNodeMap; safecall;
     function get_internalSubset: DOMString; safecall;
     function get_name: DOMString; safecall;
@@ -185,35 +188,35 @@ type
   end;
 
   TjsDOMNotation = class(TjsDOMNode,IDOMNotation)
-  private
+  protected
     function get_publicId: DOMString; safecall;
     function get_systemId: DOMString; safecall;
   end;
 
   TjsDOMEntity = class(TjsDOMNode,IDOMEntity)
-  private
+  protected
     function get_notationName: DOMString; safecall;
     function get_publicId: DOMString; safecall;
     function get_systemId: DOMString; safecall;
   end;
 
   TjsDOMEntityReference = class(TjsDOMNode,IDOMEntityReference)
-  private
+  protected
   end;
 
   TjsDOMProcessingInstruction = class(TjsDOMNode,IDOMProcessingInstruction)
-  private
+  protected
     function get_data: DOMString; safecall;
     function get_target: DOMString; safecall;
     procedure set_data(const value: DOMString); safecall;
   end;
 
   TjsDOMDocumentFragment = class(TjsDOMNode,IDOMDocumentFragment)
-  private
+  protected
   end;
 
   TjsDOMDocument = class(TjsDOMNode,IDOMDocument)
-  private
+  protected
     function createAttribute(const name: DOMString): IDOMAttr; safecall;
     function createAttributeNS(const namespaceURI, { DOM Level 2 } qualifiedName: DOMString): IDOMAttr; safecall;
     function createCDATASection(const data: DOMString): IDOMCDATASection; safecall;
@@ -235,7 +238,7 @@ type
   end;
 
   TjsDOMNodeEx = class(TjsDOMNode,IDOMNodeEx)
-  private
+  protected
     function get_text: DOMString; safecall;
     function get_xml: DOMString; safecall;
     procedure set_text(const Value: DOMString); safecall;
@@ -244,13 +247,13 @@ type
   end;
 
   TjsDOMNodeSelect = class(TjsDOMObject,IDOMNodeSelect)
-  private
+  protected
     function selectNode(const nodePath: WideString): IDOMNode; safecall;
     function selectNodes(const nodePath: WideString): IDOMNodeList; safecall;
   end;
 
   TjsDOMXSLProcessor = class(TjsDOMObject,IDOMXSLProcessor)
-  private
+  protected
     function Get_input: OleVariant; safecall;
     function Get_output: OleVariant; safecall;
     function Get_stylesheet: IDOMNode; safecall;
@@ -279,6 +282,11 @@ begin
 end;
 
 { TjsDOMObject }
+
+function TjsDOMObject.ConvertTo(AClass: TjsDOMObjectClass): TjsDOMObject;
+begin
+  Result:=AClass.Create(FApplication, Self._JSVar);
+end;
 
 constructor TjsDOMObject.Create(AApplication: TjsdApplication;
   ACreateCommand: String);

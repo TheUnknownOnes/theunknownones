@@ -9,8 +9,8 @@ uses
   uJSHelper,
   uJSDirect,
   IdUri,
-  mshtml,
-  uJSDom;
+  uJSXMLDOM,
+  uJSHTMLDOM2;
 
 type
   TjsApplication = class(TjsdApplication)
@@ -18,7 +18,7 @@ type
     procedure DoCreated(); override;
     procedure DoTerminated(); override;
   public
-    Window : IjsHTMLWindow;
+    //Window : IjsHTMLWindow;
   end;
 
 implementation
@@ -29,7 +29,7 @@ procedure TjsApplication.DoCreated;
 begin
   inherited;
 
-  Window := TjsHTMLWindow.Create(Self, 'window');
+ // Window := TjsHTMLWindow.Create(Self, 'window');
 end;
 
 procedure TjsApplication.DoTerminated;
