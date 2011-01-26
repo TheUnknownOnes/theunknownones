@@ -40,6 +40,7 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="uMainApp.pas"/>
+			<DCCReference Include="..\..\uJSXMLDOM.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
