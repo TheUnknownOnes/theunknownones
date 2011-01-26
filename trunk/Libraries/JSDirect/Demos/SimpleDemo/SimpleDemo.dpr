@@ -2,12 +2,15 @@ program SimpleDemo;
 
 uses
   uMainApp in 'uMainApp.pas',
-  uJSDirect, Windows;
+  uJSDirect,
+  Windows,
+  uJSXMLDOM in '..\..\uJSXMLDOM.pas';
 
 {$R *.res}
 
 var
   jsdServer : TjsdServer;
+
 
 begin
   RegisterJSDApplication('TWSDemoSimple', TmyApp);

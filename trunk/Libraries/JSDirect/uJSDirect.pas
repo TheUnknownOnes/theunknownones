@@ -120,6 +120,7 @@ type
     procedure GetPropertyValue(AProperty : String; out AValue : OleVariant; ADefault : String = ''; ACheckNullUndefined : Boolean = true); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Smallint; ADefault : Integer = 0); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Integer; ADefault : Integer = 0); overload; virtual;
+    procedure GetPropertyValue(AProperty : String; out AValue : Word; ADefault : Word = 0); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Int64; ADefault : Integer = 0); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Double; ADefault : Double = 0); overload; virtual;
     procedure GetPropertyValue(AProperty : String; out AValue : Single; ADefault : Double = 0); overload; virtual;
@@ -888,6 +889,15 @@ var
 begin
   GetPropertyValue(AProperty, b, ADefault);
   AValue:=b;
+end;
+
+procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: Word;
+  ADefault: Word);
+var
+  i : INteger;
+begin
+  GetPropertyValue(AProperty, i, ADefault);
+  AValue:=i;
 end;
 
 procedure TjsdBaseObject.GetPropertyValue(AProperty: String; out AValue: Single;
