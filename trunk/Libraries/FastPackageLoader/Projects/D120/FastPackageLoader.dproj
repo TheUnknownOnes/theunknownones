@@ -1,7 +1,7 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{2DD322DF-7A0D-4FEA-8C00-F639E2DAAF25}</ProjectGuid>
-			<MainSource>WebSocket.dpk</MainSource>
+			<ProjectGuid>{1C3A7BEE-2388-488C-AC0B-34EFBB45AABC}</ProjectGuid>
+			<MainSource>FastPackageLoader.dpk</MainSource>
 			<ProjectVersion>12.0</ProjectVersion>
 			<Config Condition="'$(Config)'==''">Debug</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
@@ -21,13 +21,12 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DesignOnlyPackage>false</DesignOnlyPackage>
-			<DllSuffix>_D120</DllSuffix>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\FastPackageLoader_D120.bpl</DCC_DependencyCheckOutputName>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\WebSocket_D120.bpl</DCC_DependencyCheckOutputName>
-			<GenDll>true</GenDll>
-			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
-			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DllSuffix>_D120</DllSuffix>
 			<GenPackage>true</GenPackage>
+			<GenDll>true</GenDll>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_Platform>x86</DCC_Platform>
 		</PropertyGroup>
@@ -41,16 +40,11 @@
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="WebSocket.dpk">
+			<DelphiCompile Include="FastPackageLoader.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="vcl.dcp"/>
-			<DCCReference Include="RegExp_D120R.dcp"/>
-			<DCCReference Include="IndySystem.dcp"/>
-			<DCCReference Include="IndyCore.dcp"/>
-			<DCCReference Include="IndyProtocols.dcp"/>
-			<DCCReference Include="..\..\uWebsocketServer.pas"/>
+			<DCCReference Include="..\..\uFastPackageLoader.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -70,7 +64,7 @@
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">WebSocket.dpk</Source>
+						<Source Name="MainSource">FastPackageLoader.dpk</Source>
 					</Source>
 					<Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>

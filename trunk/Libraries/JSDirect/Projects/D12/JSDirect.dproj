@@ -46,6 +46,12 @@
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="RTTIHelper_D120R.dcp"/>
+			<DCCReference Include="vcl.dcp"/>
+			<DCCReference Include="RegExp_D120R.dcp"/>
+			<DCCReference Include="IndySystem.dcp"/>
+			<DCCReference Include="IndyCore.dcp"/>
+			<DCCReference Include="IndyProtocols.dcp"/>
+			<DCCReference Include="WebSocket.dcp"/>
 			<DCCReference Include="..\..\uJSDirect.pas"/>
 			<DCCReference Include="..\..\uJSHelper.pas"/>
 			<BuildConfiguration Include="Basis">

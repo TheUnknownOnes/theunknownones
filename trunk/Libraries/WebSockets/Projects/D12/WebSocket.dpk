@@ -30,7 +30,8 @@ requires
   vcl,
   RegExp_D120R,
   IndySystem,
-  IndyCore;
+  IndyCore,
+  IndyProtocols;
 
 contains
   uWebsocketServer in '..\..\uWebsocketServer.pas';
