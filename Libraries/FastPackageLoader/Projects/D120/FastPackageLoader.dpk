@@ -1,4 +1,4 @@
-package JSDirect;
+package FastPackageLoader;
 
 {$R *.res}
 {$ALIGN 8}
@@ -23,20 +23,12 @@ package JSDirect;
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
 {$LIBSUFFIX '_D120'}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 
 requires
-  rtl,
-  RTTIHelper_D120R,
-  vcl,
-  RegExp_D120R,
-  IndySystem,
-  IndyCore,
-  IndyProtocols,
-  WebSocket;
+  rtl;
 
 contains
-  uJSDirect in '..\..\uJSDirect.pas',
-  uJSHelper in '..\..\uJSHelper.pas';
+  uFastPackageLoader in '..\..\uFastPackageLoader.pas';
 
 end.
