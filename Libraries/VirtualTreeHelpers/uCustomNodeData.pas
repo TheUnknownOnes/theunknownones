@@ -3,7 +3,7 @@ unit uCustomNodeData;
 interface
 
 uses
-  VirtualTrees;
+  VirtualTrees, Classes;
 
 type
   TCustomNodeData = class
