@@ -40,6 +40,8 @@ type
 
     procedure RunSearch; overload;
     procedure RunSearch(AText : String); overload;
+    function TestNode(const ANode: PVirtualNode): Boolean; overload;
+    function TestNode(const ANode: PVirtualNode; AText : String): Boolean; overload;
   published
     property OnAfterSearch : TOnAfterSearchEvent read FOnAfterSearch write FOnAfterSearch;
     property VST : TVirtualStringTree read FTree write FTree;
@@ -221,5 +223,26 @@ begin
       AttachToEdit(FEdit);
   end;
 end;
+
+function TVSTSearchEdit.TestNode(const ANode: PVirtualNode): Boolean;
+begin
+  Result:=Assigned(FEdit) and TestNode(ANode, FEdit.Text);
+end;
+
+function TVSTSearchEdit.TestNode(const ANode: PVirtualNode;
+  AText: String): Boolean;
+var
+  Words : TStringList;
+begin
+  Result:=False;
+  if not Assigned(FTree) then exit;
+
+  Words:=TStringList.Create;
+  Words.Delimiter:=#32;
+  Words.DelimitedText:=AText;
+  Result:=NodeMatches(ANode, Words);
+  Words.Free;
+end;
+
 
 end.
