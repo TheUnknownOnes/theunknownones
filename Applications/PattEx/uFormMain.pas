@@ -133,6 +133,7 @@ begin
 
     ini := TIniFile.Create(dlgLoad.FileName);
     TVExpressions.BeginUpdate;
+    BeginUpdate;
     sl := TStringList.Create;
     BeginUpdate;
     try
@@ -162,6 +163,7 @@ begin
 
     finally
       TVExpressions.EndUpdate;
+      EndUpdate;
       EndUpdate;
       sl.Free;
       ini.Free;

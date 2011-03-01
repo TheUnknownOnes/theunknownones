@@ -1,5 +1,4 @@
 {-----------------------------------------------------------------------------
- Project: GroupListView_D100R
  Purpose: Wraps the Windows functions for groups in listviews
  Created: 22.05.2008 14:37:20
  
