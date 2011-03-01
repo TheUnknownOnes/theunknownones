@@ -22,7 +22,7 @@ uses
 type
   TCustomSettingsLinkVST = class(TCustomSettingsComponentLink)
   protected
-    FSaveVSTOptions : array[0..10] of Boolean;
+    FSaveVSTOptions : array[0..11] of Boolean;
 
     function GetTree: TVirtualStringTree;
     procedure SetTree(const Value: TVirtualStringTree);
@@ -48,6 +48,8 @@ type
     property SaveColumnVisible : Boolean index 8 read GetSaveVSTOption write SetSaveVSTOption default true;
     property SaveColumnAutoSpring : Boolean index 9 read GetSaveVSTOption write SetSaveVSTOption default true;
     property SaveColumnFixed : Boolean index 10 read GetSaveVSTOption write SetSaveVSTOption default true;
+
+    property SaveColumnTitle : Boolean index 11 read GetSaveVSTOption write SetSaveVSTOption default false;
   end;
 
 
@@ -75,6 +77,7 @@ type
     property SaveColumnVisible;
     property SaveColumnAutoSpring;
     property SaveColumnFixed;
+    property SaveColumnTitle;
   end;
 
 
@@ -100,6 +103,8 @@ begin
 
   for idx := Low(FSaveVSTOptions) to High(FSaveVSTOptions) do
     FSaveVSTOptions[idx] := true;
+
+  FSaveVSTOptions[11]:=false; // no auto title saving
 end;
 
 procedure TCustomSettingsLinkVST.DoApplySettings(const ARootSetting : TSettingName);
@@ -207,6 +212,9 @@ begin
 
         if SaveColumnFixed then
           SetColumnOption(coFixed, 'Fixed');
+
+        if SaveColumnTitle then
+          Col.Text:=Settings.GetValue(SettingsPath + 'Text', Col.Text);
       end;
 
 
@@ -276,7 +284,10 @@ begin
 
       if SaveColumnFixed then
         DoWriteColumnOption(coFixed, 'Fixed');
-    end;    
+
+      if SaveColumnTitle then
+          Settings.SetValue(SettingsPath + 'Text', Col.Text);
+    end;
   end;
 end;
 
@@ -294,7 +305,7 @@ end;
 procedure TCustomSettingsLinkVST.SetSaveVSTOption(const Index: Integer;
   const Value: Boolean);
 begin
-  FSaveVSTOptions[Index] := Value;                                    
+  FSaveVSTOptions[Index] := Value;
 end;
 
 procedure TCustomSettingsLinkVST.SetTree(const Value: TVirtualStringTree);
