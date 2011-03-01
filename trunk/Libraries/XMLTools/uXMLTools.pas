@@ -51,6 +51,18 @@ type
     function ValueExists(const Section, Ident: string): Boolean; override;
   end;
 
+  TXMLNodeListEnumerator = class
+  private
+    FIndex: Integer;
+    FXMLNodeList: IXMLDOMNodeList;
+  public
+    constructor Create(AXMLNodeList: IXMLDOMNodeList);
+    function GetCurrent: IXMLDOMNode;
+    function MoveNext: Boolean;
+    function GetEnumerator: TXMLNodeListEnumerator;
+    property Current: IXMLDOMNode read GetCurrent;
+  end;
+
   function XGetXMLNodeByPath(const ADocument : IXMLDOMDocument; APath : WideString) : IXMLDOMNode;
   procedure XAddAttribute(const ANode : IXMLDOMNode; AName, AValue : WideString); overload;
   procedure XAddAttribute(const ANode : IXMLDOMNode; AName: WideString; AValue : OleVariant); overload;
@@ -475,6 +487,32 @@ end;
 procedure TXMLIni.WriteTime(const Section, Name: string; Value: TDateTime);
 begin
   inherited;
+end;
+
+{ TXMLNodeListEnumerator }
+
+constructor TXMLNodeListEnumerator.Create(AXMLNodeList: IXMLDOMNodeList);
+begin
+  inherited Create;
+  FXMLNodeList:=AXMLNodeList;
+  FIndex:=-1;
+end;
+
+function TXMLNodeListEnumerator.GetCurrent: IXMLDOMNode;
+begin
+  Result:=FXMLNodeList.item[FIndex];
+end;
+
+function TXMLNodeListEnumerator.GetEnumerator: TXMLNodeListEnumerator;
+begin
+  Result:=Self;
+end;
+
+function TXMLNodeListEnumerator.MoveNext: Boolean;
+begin
+  Result := FIndex < FXMLNodeList.length - 1;
+  if Result then
+    Inc(FIndex);
 end;
 
 end.
