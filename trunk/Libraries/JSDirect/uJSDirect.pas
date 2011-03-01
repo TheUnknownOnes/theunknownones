@@ -98,7 +98,8 @@ type
     constructor Create(AAplication : TjsdApplication;
                        AResponseParams : String; //'RetVal1=arguments[0];RetVal2=MyVar'
                        AHandlerProc : TjsdFunctionHandlerProc = nil;
-                       ABody : String = ''); reintroduce;
+                       ABody : String = '';
+                       AJSVar : String = ''); reintroduce;
 
     destructor Destroy(); override;
 
@@ -209,6 +210,8 @@ type
 
     function Exec(ACommand : String; ABlocking : Boolean = false) : String;
     property GUID : String read FGUID;
+
+    property Terminated;
   end;
 
 
@@ -653,13 +656,17 @@ end;
 constructor TjsdFunction.Create(AAplication : TjsdApplication;
                                AResponseParams : String;
                                AHandlerProc : TjsdFunctionHandlerProc = nil;
-                               ABody : String = '');
+                               ABody : String = '';
+                               AJSVar : String = '');
 var
   sl : TStringList;
   idx : Integer;
   cmd : String;
 begin
   inherited Create(AAplication);
+
+  if AJSVar <> '' then
+    F_JSVar := AJSVar;
 
   cmd := _JSVar + ' = function()';
   cmd := cmd + '{' + ABody + ' ';

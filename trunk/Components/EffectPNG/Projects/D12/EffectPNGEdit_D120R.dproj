@@ -58,7 +58,6 @@
 			<DCCReference Include="DirectX9_D12.dcp"/>
 			<DCCReference Include="EffectPNG_D120R.dcp"/>
 			<DCCReference Include="..\..\uEffectPNGEdit.pas"/>
-			<DCCReference Include="PNGSupport_D120.dcp"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
