@@ -8,7 +8,8 @@ uses
   SysUtils, Classes, uPSRuntime, uPSDebugger, uPSUtils, uPSCompiler,
   StrUtils, DateUtils, Windows, DB, IBDatabase, IBCustomDataSet, IBQuery,
   uPSC_std, uPSR_std, uPSC_controls, uPSR_controls, uPSC_DB, uPSR_DB,
-  uPSC_Classes, uPSR_Classes, uPSC_Graphics, uPSR_Graphics;
+  uPSC_Classes, uPSR_Classes, uPSC_Graphics, uPSR_Graphics,
+  uPSC_dateutils, upsr_dateutils, uSysTools;
 
 type
   TfbpLogProc = procedure(ALog : String) of object;
@@ -128,6 +129,25 @@ function _MoveFile(AOldName : String; ANewName : String) : Boolean;
 begin
   Result := MoveFileW(PWideChar(WideString(AOldName)), PWideChar(WideString(ANewName)));
 end;
+
+function _GetFileTime(FileName: string) : TDateTime;
+begin
+  if not FileAge(FileName, Result) then
+    Result := 0;
+end;
+
+function _GetFileSize(FileName: string) : Int64;
+var
+  fh : Integer;
+  hdw : Cardinal;
+begin
+  fh := FileOpen(FileName, fmOpenRead or fmShareDenyNone);
+  try
+    Result := GetFileSize(fh, @hdw) + hdw;
+  finally
+    FileClose(fh);
+  end;
+end;
 {$ENDREGION}
 
 {$REGION 'TIBTransaction'}
@@ -226,6 +246,8 @@ begin
   RIRegister_DB(FRuntimeClassImporter);
   RIRegister_Classes(FRuntimeClassImporter, true);
   RIRegister_Graphics(FRuntimeClassImporter, true);
+  RegisterDateTimeLibrary_R(FExec);
+
 
   {$REGION 'TIBTransaction'}
   with FRuntimeClassImporter.Add(TIBTransaction) do
@@ -293,35 +315,42 @@ begin
   FExec.RegisterDelphiFunction(@Format, 'Format', cdRegister);
   {$ENDREGION}
 
+  {$REGION 'DateUtils'}
+  FExec.RegisterDelphiFunction(@DateTimeToStr, 'DateTimeToStr', cdRegister);
+  FExec.RegisterDelphiFunction(@TimeToStr, 'TimeToStr', cdRegister);
+  {$ENDREGION}
+
   {$REGION 'Files'}
   FExec.RegisterDelphiFunction(@_CopyFile, 'CopyFile', cdRegister);
   FExec.RegisterDelphiFunction(@_MoveFile, 'MoveFile', cdRegister);
 
+  FExec.RegisterDelphiFunction(@FileExists, 'FileExists', cdRegister);
+  FExec.RegisterDelphiFunction(@IncludeTrailingPathDelimiter, 'IncludeTrailingPathDelimiter', cdRegister);
+  FExec.RegisterDelphiFunction(@ExcludeTrailingPathDelimiter, 'ExcludeTrailingPathDelimiter', cdRegister);
+  FExec.RegisterDelphiFunction(@DirectoryExists, 'DirectoryExists', cdRegister);
+  FExec.RegisterDelphiFunction(@ForceDirectories, 'ForceDirectories', cdRegister);
 
-    FCompiler.AddDelphiFunction('function FileExists(const FileName: string): Boolean');
-    FCompiler.AddDelphiFunction('function IncludeTrailingPathDelimiter(const S: string): string');
-    FCompiler.AddDelphiFunction('function ExcludeTrailingPathDelimiter(const S: string): string;');
-    FCompiler.AddDelphiFunction('function DirectoryExists(const Directory: string): Boolean');
-    FCompiler.AddDelphiFunction('function ForceDirectories(Dir: string): Boolean');
+  FExec.RegisterDelphiFunction(@FindFirst, 'FindFirst', cdRegister);
+  FExec.RegisterDelphiFunction(@FindNext, 'FindNext', cdRegister);
+  FExec.RegisterDelphiFunction(@FindClose, 'FindClose', cdRegister);
 
-    Fcompiler.AddDelphiFunction('function FindFirst(const Path: string; Attr: Integer; var F: TSearchRec): Integer');
-    FCompiler.AddDelphiFunction('function FindNext(var F: TSearchRec): Integer');
-    FCompiler.AddDelphiFunction('procedure FindClose(var F: TSearchRec)');
+  FExec.RegisterDelphiFunction(@DeleteFile, 'DeleteFile', cdRegister);
+  FExec.RegisterDelphiFunction(@RenameFile, 'RenameFile', cdRegister);
+  FExec.RegisterDelphiFunction(@ChangeFileExt, 'ChangeFileExt', cdRegister);
+  FExec.RegisterDelphiFunction(@ChangeFilePath, 'ChangeFilePath', cdRegister);
+  FExec.RegisterDelphiFunction(@ExtractFilePath, 'ExtractFilePath', cdRegister);
+  FExec.RegisterDelphiFunction(@ExtractFileDir, 'ExtractFileDir', cdRegister);
+  FExec.RegisterDelphiFunction(@ExtractFileDrive, 'ExtractFileDrive', cdRegister);
+  FExec.RegisterDelphiFunction(@ExtractFileName, 'ExtractFileName', cdRegister);
+  FExec.RegisterDelphiFunction(@ExtractFileExt, 'ExtractFileExt', cdRegister);
+  FExec.RegisterDelphiFunction(@GetCurrentDir, 'GetCurrentDir', cdRegister);
+  FExec.RegisterDelphiFunction(@SetCurrentDir, 'SetCurrentDir', cdRegister);
+  FExec.RegisterDelphiFunction(@CreateDir, 'CreateDir', cdRegister);
+  FExec.RegisterDelphiFunction(@RemoveDir, 'RemoveDir', cdRegister);
+  FExec.RegisterDelphiFunction(@_GetFileTime, 'GetFileTime', cdRegister);
+  FExec.RegisterDelphiFunction(@_GetFileSize, 'GetFileSize', cdRegister);
 
-    FCompiler.AddDelphiFunction('function DeleteFile(const FileName: string): Boolean');
-    FCompiler.AddDelphiFunction('function RenameFile(const OldName, NewName: string): Boolean');
-    FCompiler.AddDelphiFunction('function ChangeFileExt(const FileName, Extension: string): string');
-    FCompiler.AddDelphiFunction('function ChangeFilePath(const FileName, Path: string): string');
-    FCompiler.AddDelphiFunction('function ExtractFilePath(const FileName: string): string');
-    FCompiler.AddDelphiFunction('function ExtractFileDir(const FileName: string): string');
-    FCompiler.AddDelphiFunction('function ExtractFileDrive(const FileName: string): string');
-    FCompiler.AddDelphiFunction('function ExtractFileName(const FileName: string): string');
-    FCompiler.AddDelphiFunction('function ExtractFileExt(const FileName: string): string');
-    FCompiler.AddDelphiFunction('function GetCurrentDir: string');
-    FCompiler.AddDelphiFunction('function SetCurrentDir(const Dir: string): Boolean');
-    FCompiler.AddDelphiFunction('function CreateDir(const Dir: string): Boolean');
-    FCompiler.AddDelphiFunction('function RemoveDir(const Dir: string): Boolean');
-    FCompiler.AddDelphiFunction('function FileAge(const FileName: string; out FileDateTime: TDateTime): Boolean');
+
   {$ENDREGION}
 end;
 
@@ -390,6 +419,7 @@ begin
     SIRegister_DB(FCompiler);
     SIRegister_Classes(FCompiler, true);
     SIRegister_Graphics(FCompiler, true);
+    RegisterDateTimeLibrary_C(FCompiler);
 
     {$REGION 'TIBTransaction'}
     with FCompiler.AddClass(FCompiler.FindClass('TComponent'), TIBTransaction) do
@@ -460,6 +490,11 @@ begin
     FCompiler.AddDelphiFunction('procedure Open');
     {$ENDREGION}
 
+    {$REGION 'DateUtils'}
+    FCompiler.AddDelphiFunction('function DateTimeToStr(const DateTime: TDateTime): string');
+    FCompiler.AddDelphiFunction('function TimeToStr(const DateTime: TDateTime): string');
+    {$ENDREGION}
+
     {$REGION 'Strings'}
     FCompiler.AddDelphiFunction('function Format(const Format: string; const Args: array of const) : String');
     {$ENDREGION}
@@ -496,10 +531,8 @@ begin
     FCompiler.AddDelphiFunction('function SetCurrentDir(const Dir: string): Boolean');
     FCompiler.AddDelphiFunction('function CreateDir(const Dir: string): Boolean');
     FCompiler.AddDelphiFunction('function RemoveDir(const Dir: string): Boolean');
-    FCompiler.AddDelphiFunction('function FileAge(const FileName: string; out FileDateTime: TDateTime): Boolean');
-
-
-    //FCompiler.AddDelphiFunction('')
+    FCompiler.AddDelphiFunction('function GetFileTime(FileName: string) : TDateTime');
+    FCompiler.AddDelphiFunction('function GetFileSize(FileName: string) : Int64');
     {$ENDREGION}
   end
   else
