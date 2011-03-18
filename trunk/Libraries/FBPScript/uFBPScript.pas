@@ -7,10 +7,9 @@ interface
 uses
   SysUtils, Classes, uPSRuntime, uPSDebugger, uPSUtils, uPSCompiler,
   StrUtils, DateUtils, Windows, UIB, UibLib,
-  uPSC_std, uPSR_std, uPSC_controls, uPSR_controls,
-  uPSC_Classes, uPSR_Classes, uPSC_Graphics, uPSR_Graphics,
-  uPSC_dateutils, upsr_dateutils, uSysTools
-  {$IFDEF FBP_USE_TEXTSTREAM},TextStream{$ENDIF};
+   uPSC_controls, uPSR_controls,
+   uPSC_Graphics, uPSR_Graphics,
+  uPSC_dateutils, upsr_dateutils, uSysTools;
 
 type
   TfbpLogProc = procedure(ALog : String) of object;
@@ -86,7 +85,8 @@ type
 
 implementation
 
-uses uPS_UIB, uPS_CSV, uPS_DateUtils, uPS_SysUtils, uPS_Utils, uPS_Windows;
+uses uPS_UIB, uPS_CSV, uPS_DateUtils, uPS_SysUtils, uPS_Helpers, uPS_Windows,
+  uPS_Classes, uPS_System, uPS_Types;
 
 var
   FScriptList : TThreadList;
@@ -192,13 +192,15 @@ end;
 
 procedure TFBPScript.DoBeforeExecLoad;
 begin
-  RIRegister_Std(FRuntimeClassImporter);
+  PS_Register_Types_R(FExec, FRuntimeClassImporter);
+  PS_Register_System_R(FExec, FRuntimeClassImporter);
+  PS_Register_Windows_R(FExec, FRuntimeClassImporter);
+  PS_Register_Classes_R(FExec, FRuntimeClassImporter);
+
   RIRegister_Controls(FRuntimeClassImporter);
-  RIRegister_Classes(FRuntimeClassImporter, true);
   RIRegister_Graphics(FRuntimeClassImporter, true);
   RegisterDateTimeLibrary_R(FExec);
 
-  PS_Register_Windows_R(FExec, FRuntimeClassImporter);
   PS_Register_SysUtils_R(FExec, FRuntimeClassImporter);
   PS_Register_DateUtils_R(FExec, FRuntimeClassImporter);
   PS_Register_UIB_R(FExec, FRuntimeClassImporter);
@@ -278,9 +280,11 @@ begin
   begin
     Result := true;
 
-    SIRegister_Std(FCompiler);
+    PS_Register_Types_C(FCompiler);
+    PS_Register_System_C(FCompiler);
+    PS_Register_Classes_C(FCompiler);
+
     SIRegister_Controls(FCompiler);
-    SIRegister_Classes(FCompiler, true);
     SIRegister_Graphics(FCompiler, true);
     RegisterDateTimeLibrary_C(FCompiler);
 
