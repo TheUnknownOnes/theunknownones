@@ -119,8 +119,53 @@ procedure TSQLResult_AliasName_R(Self: TSQLResult; var T: String; I : Word); beg
 procedure TSQLResult_ByNameIsNullable_R(Self: TSQLResult; var T: Boolean; S : String); begin T := Self.ByNameIsNullable[S]; end;
 procedure TSQLResult_ByNameAsTime_R(Self: TSQLResult; var T: Cardinal; S : String); begin T := Self.ByNameAsTime[S]; end;
 procedure TSQLResult_Values_R(Self: TSQLResult; var T: Variant; S : String); begin T := Self.Values[S]; end;
+procedure TSQLResult_AsStream_R(Self: TSQLResult; var T: TStream; I : Word);
+begin
+  T := TMemoryStream.Create;
+  try Self.ReadBlob(i, T);
+  except t.Free; raise; end;
+end;
+procedure TSQLResult_ByNameAsStream_R(Self: TSQLResult; var T: TStream; S : String);
+begin
+  T := TMemoryStream.Create;
+  try Self.ReadBlob(s, T);
+  except t.Free; raise; end;
+end;
+
+procedure TSQLParams_Values_R(Self: TSQLParams; var T: Variant; S : String); begin T := Self.Values[S]; end;
+procedure TSQLParams_FieldName_R(Self: TSQLParams; var T: String; I : Word); begin T := Self.FieldName[I]; end;
+procedure TSQLParams_ParamCount_R(Self: TSQLParams; var T: Word); begin T := Self.ParamCount; end;
+procedure TSQLParams_MaxSQLLen_R(Self: TSQLParams; var T: Smallint; I : Word); begin T := Self.MaxSqlLen[I]; end;
 
 procedure TUIBStatement_Fields_R(Self: TUIBStatement; var T: TSQLResult); begin T := Self.Fields; end;
+procedure TUIBStatement_Params_R(Self: TUIBStatement; var T: TSQLParams); begin T := Self.Params; end;
+procedure TUIBStatement_CursorName_R(Self: TUIBStatement; var T: String); begin T := Self.CursorName; end;
+procedure TUIBStatement_CurrentState_R(Self: TUIBStatement; var T: TQueryState); begin T := Self.CurrentState; end;
+procedure TUIBStatement_EOF_R(Self: TUIBStatement; var T: Boolean); begin T := Self.Eof; end;
+procedure TUIBStatement_BOF_R(Self: TUIBStatement; var T: Boolean); begin T := Self.Bof; end;
+procedure TUIBStatement_ParseParams_R(Self: TUIBStatement; var T: Boolean); begin T := Self.ParseParams; end;
+procedure TUIBStatement_ParseParams_W(Self: TUIBStatement; const T: Boolean); begin Self.ParseParams := T; end;
+procedure TUIBStatement_Plan_R(Self: TUIBStatement; var T: String); begin T := Self.Plan; end;
+procedure TUIBStatement_StatementType_R(Self: TUIBStatement; var T: TUIBStatementType); begin T := Self.StatementType; end;
+procedure TUIBStatement_RowsAffected_R(Self: TUIBStatement; var T: Cardinal); begin T := Self.RowsAffected; end;
+procedure TUIBStatement_ParamAsStream_W(Self: TUIBStatement; const T: TStream; I : Word); begin Self.ParamsSetBlob(I, T); end;
+procedure TUIBStatement_ParamByNameAsStream_W(Self: TUIBStatement; const T: TStream; S : String); begin Self.ParamsSetBlob(S, T); end;
+procedure TUIBStatement_SQL_R(Self: TUIBStatement; var T: TStrings); begin T := Self.SQL; end;
+procedure TUIBStatement_SQL_W(Self: TUIBStatement; const T: TStrings); begin Self.SQL := T; end;
+procedure TUIBStatement_Transaction_R(Self: TUIBStatement; var T: TUIBTransaction); begin T := Self.Transaction; end;
+procedure TUIBStatement_Transaction_W(Self: TUIBStatement; const T: TUIBTransaction); begin Self.Transaction := T; end;
+procedure TUIBStatement_Database_R(Self: TUIBStatement; var T: TUIBDataBase); begin T := Self.DataBase; end;
+procedure TUIBStatement_Database_W(Self: TUIBStatement; const T: TUIBDataBase); begin Self.DataBase := T; end;
+procedure TUIBStatement_CachedFetch_R(Self: TUIBStatement; var T: Boolean); begin T := Self.CachedFetch; end;
+procedure TUIBStatement_CachedFetch_W(Self: TUIBStatement; const T: Boolean); begin Self.CachedFetch := T; end;
+procedure TUIBStatement_FetchBlobs_R(Self: TUIBStatement; var T: Boolean); begin T := Self.FetchBlobs; end;
+procedure TUIBStatement_FetchBlobs_W(Self: TUIBStatement; const T: Boolean); begin Self.FetchBlobs := T; end;
+procedure TUIBStatement_BufferChunks_R(Self: TUIBStatement; var T: Cardinal); begin T := Self.BufferChunks; end;
+procedure TUIBStatement_BufferChunks_W(Self: TUIBStatement; const T: Cardinal); begin Self.BufferChunks := T; end;
+procedure TUIBStatement_ParsedSQL_R(Self: TUIBStatement; var T: String); begin T := Self.ParsedSQL; end;
+
+procedure TUIBQuery_QuickScript_R(Self: TUIBQuery; var T: Boolean); begin T := Self.QuickScript; end;
+procedure TUIBQuery_QuickScript_W(Self: TUIBQuery; const T: Boolean); begin Self.QuickScript := T; end;
 
 procedure PS_Register_UIB_C(ACompiler : TPSPascalCompiler);
 var
@@ -130,13 +175,16 @@ var
   pscTUIBTransaction,
   pscTSQLDA,
   pscTSQLResult,
-  pscTUIBQuery : TPSCompileTimeClass;
+  pscTUIBQuery,
+  pscTSQLParams : TPSCompileTimeClass;
 begin
   RegisterEnum(ACompiler, TypeInfo(TCharacterSet));
   RegisterEnum(ACompiler, TypeInfo(TEndTransMode));
   RegisterEnum(ACompiler, TypeInfo(TTransParam));
   ACompiler.AddTypeS('TTransParams', 'set of TTransParam');
   RegisterEnum(ACompiler, TypeInfo(TUIBFieldType));
+  RegisterEnum(ACompiler, TypeInfo(TQueryState));
+  RegisterEnum(ACompiler, TypeInfo(TUIBStatementType));
 
   ACompiler.AddDelphiFunction('function StrToCharacterSet(const CharacterSet: String): TCharacterSet;');
 
@@ -188,6 +236,8 @@ begin
   pscTSQLDA := ACompiler.AddClass(ACompiler.FindClass('TObject'), TSQLDA);
   with pscTSQLDA do
   begin
+    RegisterMethod('constructor Create(ACharacterSet: TCharacterSet); virtual;');
+    RegisterMethod('procedure CheckRange(const Index: Word); virtual;');
     RegisterMethod('function GetFieldIndex(const name: AnsiString): Word; virtual;');
     RegisterMethod('function TryGetFieldIndex(const name: AnsiString; out index: Word): Boolean; virtual;');
     RegisterProperty('IsBlob', 'Boolean Word', iptR);
@@ -230,6 +280,7 @@ begin
   pscTSQLResult := ACompiler.AddClass(pscTSQLDA, TSQLResult);
   with pscTSQLResult do
   begin
+    RegisterMethod('constructor Create(Charset: TCharacterSet; Fields: SmallInt; CachedFetch, FetchBlobs: boolean; BufferChunks: Cardinal); reintroduce;');
     RegisterMethod('procedure ClearRecords; virtual;');
     RegisterMethod('procedure GetRecord(const Index : Integer); virtual;');
     RegisterMethod('procedure SaveToStream(Stream: TStream); virtual;');
@@ -242,8 +293,25 @@ begin
     RegisterProperty('AliasName', 'String Word', iptR);
     RegisterProperty('ByNameIsNullable', 'Boolean String', iptR);
     RegisterProperty('ByNameAsTime', 'Cardinal String', iptR);
+    RegisterProperty('AsStream', 'TStream Word', iptR);
+    RegisterProperty('ByNameAsStream', 'TStream String', iptR);
     RegisterProperty('Values', 'Variant String', iptR);
     SetDefaultPropery('Values');
+  end;
+
+  pscTSQLParams := ACompiler.AddClass(pscTSQLDA, TSQLParams);
+  with pscTSQLParams do
+  begin
+    RegisterMethod('constructor Create(Charset: TCharacterSet); override;');
+    RegisterMethod('procedure Clear; virtual;');
+    RegisterMethod('function Parse(const SQL: string): string; virtual;');
+    RegisterMethod('function TryGetFieldIndex(const name: AnsiString; out Index: Word): Boolean; override;');
+    RegisterMethod('function GetFieldIndex(const name: AnsiString): Word; override;');
+    RegisterProperty('Values', 'Variant String', iptR);
+    SetDefaultPropery('Values');
+    RegisterProperty('FieldName', 'String Word', iptR);
+    RegisterProperty('ParamCount', 'Word', iptR);
+    RegisterProperty('MaxSQLLen', 'Smallint Word', iptR);
   end;
 
   pscTUIBStatement := ACompiler.AddClass(pscTUIBComponent, TUIBStatement);
@@ -265,11 +333,30 @@ begin
     RegisterMethod('function ParamBlobSize(const Index: Word): Cardinal;');
     RegisterMethod('procedure AffectedRows(out SelectedRows, InsertedRows, UpdatedRows, DeletedRows: Cardinal);');
     RegisterProperty('Fields', 'TSQLResult', iptR);
+    RegisterProperty('Params', 'TSQLParams', iptR);
+    RegisterProperty('CursorName', 'String', iptR);
+    RegisterProperty('CurrentState', 'TQueryState', iptR);
+    RegisterProperty('EOF', 'Boolean', iptR);
+    RegisterProperty('BOF', 'Boolean', iptR);
+    RegisterProperty('ParseParams', 'Boolean', iptRW);
+    RegisterProperty('Plan', 'String', iptR);
+    RegisterProperty('StatementType', 'TUIBStatementType', iptR);
+    RegisterProperty('RowsAffected', 'Cardinal', iptR);
+    RegisterProperty('ParamAsStream', 'TStream Word', iptW);
+    RegisterProperty('ParamByNameAsStream', 'TStream String', iptW);
+    RegisterProperty('SQL', 'TStrings', iptRW);
+    RegisterProperty('Transaction', 'TUIBTransaction', iptRW);
+    RegisterProperty('Database', 'TUIBDatabase', iptRW);
+    RegisterProperty('CachedFetch', 'Boolean', iptRW);
+    RegisterProperty('FetchBlobs', 'Boolean', iptRW);
+    RegisterProperty('BufferChunks', 'Cardinal', iptRW);
+    RegisterProperty('ParsedSQL', 'String', iptR);
   end;
 
   pscTUIBQuery := ACompiler.AddClass(pscTUIBStatement, TUIBQuery);
   with pscTUIBQuery do
   begin
+    RegisterProperty('QuickScript', 'Boolean', iptRW);
   end;
 end;
 
@@ -319,6 +406,8 @@ begin
 
   with ARCi.Add(TSQLDA) do
   begin
+    RegisterVirtualConstructor(@TSQLDa.Create, 'Create');
+    RegisterVirtualMethod(@TSQLDa.CheckRange, 'CheckRange');
     RegisterVirtualMethod(@TSQLDA.GetFieldIndex, 'GetFieldIndex');
     RegisterVirtualMethod(@TSQLDA.TryGetFieldIndex, 'TryGetFieldIndex');
     RegisterPropertyHelper(@TSQLDA_IsBlob_R, nil, 'IsBlob');
@@ -361,11 +450,13 @@ begin
 
   with arci.Add(TSQLResult) do
   begin
+    RegisterConstructor(@TSQLResult.Create, 'Create');
     RegisterVirtualMethod(@TSQLResult.ClearRecords, 'ClearRecords');
     RegisterVirtualMethod(@TSQLResult.GetRecord, 'GetRecord');
     RegisterVirtualMethod(@TSQLResult.SaveToStream, 'SaveToStream');
     RegisterVirtualMethod(@TSQLResult.LoadFromStream, 'LoadFromStream');
     RegisterVirtualMethod(@TSQLResult.Next, 'Next');
+
     RegisterVirtualMethod(@TSQLResult.GetBlobSize, 'GetBlobSize');
     RegisterPropertyHelper(@TSQLResult_SqlName_R, nil, 'SqlName');
     RegisterPropertyHelper(@TSQLResult_RelName_R, nil, 'RelName');
@@ -374,6 +465,21 @@ begin
     RegisterPropertyHelper(@TSQLResult_ByNameIsNullable_R, nil, 'ByNameIsNullable');
     RegisterPropertyHelper(@TSQLResult_ByNameAsTime_R, nil, 'ByNameAsTime');
     RegisterPropertyHelper(@TSQLResult_Values_R, nil, 'Values');
+    RegisterPropertyHelper(@TSQLResult_AsStream_R, nil, 'AsStream');
+    RegisterPropertyHelper(@TSQLResult_ByNameAsStream_R, nil, 'ByNameAsStream');
+  end;
+
+  with ARCi.Add(TSQLParams) do
+  begin
+    RegisterVirtualConstructor(@TSQLParams.Create, 'Create');
+    RegisterVirtualMethod(@TSQLParams.Clear, 'Clear');
+    RegisterVirtualMethod(@TSQLParams.Parse, 'Parse');
+    RegisterVirtualMethod(@TSQLPArams.TryGetFieldIndex, 'TryGetFieldIndex');
+    RegisterVirtualMethod(@TSQLPArams.GetFieldIndex, 'GetFieldIndex');
+    RegisterPropertyHelper(@TSQLParams_Values_R, nil, 'Values');
+    RegisterPropertyHelper(@TSQLParams_FieldName_R, nil, 'FieldName');
+    RegisterPropertyHelper(@TSQLParams_ParamCount_R, nil, 'ParamCount');
+    RegisterPropertyHelper(@TSQLParams_MaxSQLLen_R, nil, 'MaxSQLLen');
   end;
 
   with ARCi.Add(TUIBStatement) do
@@ -393,6 +499,25 @@ begin
     RegisterMethod(@TUIBStatement.FieldBlobSize, 'FieldBlobSize');
     RegisterMethod(@TUIBStatement.ParamBlobSize, 'ParamBlobSize');
     RegisterMethod(@TUIBStatement.AffectedRows, 'AffectedRows');
+    RegisterPropertyHelper(@TUIBStatement_Fields_R, nil, 'Fields');
+    RegisterPropertyHelper(@TUIBStatement_Params_R, nil, 'Params');
+    RegisterPropertyHelper(@TUIBStatement_CursorName_R, nil, 'CursorName');
+    RegisterPropertyHelper(@TUIBStatement_CurrentState_R, nil, 'QueryState');
+    RegisterPropertyHelper(@TUIBStatement_EOF_R, nil, 'EOF');
+    RegisterPropertyHelper(@TUIBStatement_BOF_R, nil, 'BOF');
+    RegisterPropertyHelper(@TUIBStatement_ParseParams_R, @TUIBStatement_ParseParams_W, 'ParseParams');
+    RegisterPropertyHelper(@TUIBStatement_Plan_R, nil, 'Plan');
+    RegisterPropertyHelper(@TUIBStatement_StatementType_R, nil, 'StatementType');
+    RegisterPropertyHelper(@TUIBStatement_RowsAffected_R, nil, 'RowsAffected');
+    RegisterPropertyHelper(nil, @TUIBStatement_ParamAsStream_W, 'ParamAsStream');
+    RegisterPropertyHelper(nil, @TUIBStatement_ParamByNameAsStream_W, 'ParamByNameAsStream');
+    RegisterPropertyHelper(@TUIBStatement_SQL_R, @TUIBStatement_SQL_W, 'SQL');
+    RegisterPropertyHelper(@TUIBStatement_Transaction_R, @TUIBStatement_Transaction_W, 'Transaction');
+    RegisterPropertyHelper(@TUIBStatement_Database_R, @TUIBStatement_Database_W, 'Database');
+    RegisterPropertyHelper(@TUIBStatement_CachedFetch_R, @TUIBStatement_CachedFetch_W, 'CachedFetch');
+    RegisterPropertyHelper(@TUIBStatement_FetchBlobs_R, @TUIBStatement_FetchBlobs_W, 'FetchBlobs');
+    RegisterPropertyHelper(@TUIBStatement_BufferChunks_R, @TUIBStatement_BufferChunks_W, 'BufferChunks');
+    RegisterPropertyHelper(@TUIBStatement_ParsedSQL_R, nil, 'ParsedSQL');
   end;
 
   with ARCi.Add(TUIBQuery) do
