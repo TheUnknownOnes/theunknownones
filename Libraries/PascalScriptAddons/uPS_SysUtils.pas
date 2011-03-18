@@ -34,6 +34,15 @@ end;
 
 procedure PS_Register_SysUtils_C(ACompiler : TPSPascalCompiler);
 begin
+  ACompiler.AddConstantN('fmOpenRead', 'Integer').Value.ts32 := fmOpenRead;
+  ACompiler.AddConstantN('fmOpenWrite', 'Integer').Value.ts32 := fmOpenWrite;
+  ACompiler.AddConstantN('fmOpenReadWrite', 'Integer').Value.ts32 := fmOpenReadWrite;
+  ACompiler.AddConstantN('fmShareCompat', 'Integer').Value.ts32 := fmShareCompat;
+  ACompiler.AddConstantN('fmShareExclusive', 'Integer').Value.ts32 := fmShareExclusive;
+  ACompiler.AddConstantN('fmShareDenyWrite', 'Integer').Value.ts32 := fmShareDenyWrite;
+  ACompiler.AddConstantN('fmShareDenyRead', 'Integer').Value.ts32 := fmShareDenyRead;
+  ACompiler.AddConstantN('fmShareDenyNone', 'Integer').Value.ts32 := fmShareDenyNone;
+
   ACompiler.AddDelphiFunction('function FileExists(const FileName: string): Boolean');
   ACompiler.AddDelphiFunction('function IncludeTrailingPathDelimiter(const S: string): string');
   ACompiler.AddDelphiFunction('function ExcludeTrailingPathDelimiter(const S: string): string;');

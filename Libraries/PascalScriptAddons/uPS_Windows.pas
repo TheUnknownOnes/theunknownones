@@ -30,6 +30,7 @@ begin
   ACompiler.AddConstantN('MAX_PATH', 'Integer').SetInt(260);
   ACompiler.AddTypeS('TFileTime', 'record dwLowDateTime: DWORD; dwHighDateTime: DWORD; end;');
 
+
   ACompiler.AddDelphiFunction('procedure Sleep(AMilliseconds : Cardinal)');
 
   ACompiler.AddDelphiFunction('function CopyFile(AOldName : String; ANewName : String; AFailIfExists : Boolean) : Boolean');

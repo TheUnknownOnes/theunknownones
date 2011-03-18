@@ -14,7 +14,7 @@ procedure PS_Register_UIB_R(AExec : TPSExec; ARCi : TPSRuntimeClassImporter);
 
 implementation
 
-uses uPS_Utils;
+uses uPS_Helpers;
 
 function _StrToCharacterSet(const CharacterSet: String): TCharacterSet;
 begin
@@ -88,6 +88,8 @@ procedure TSQLDA_AsTime_R(Self: TSQLDA; var T: Cardinal; I : Word); begin T := S
 procedure TSQLDA_AsTime_W(Self: TSQLDA; const T: Cardinal; I : Word); begin Self.AsTime[I] := T; end;
 procedure TSQLDA_AsVariant_R(Self: TSQLDA; var T: Variant; I : Word); begin T := Self.AsVariant[I]; end;
 procedure TSQLDA_AsVariant_W(Self: TSQLDA; const T: Variant; I : Word); begin Self.AsVariant[I] := T; end;
+procedure TSQLDA_AsCurrency_R(Self: TSQLDA; var T: Currency; I : Word); begin T := Self.AsCurrency[I]; end;
+procedure TSQLDA_AsCurrency_W(Self: TSQLDA; const T: Currency; I : Word); begin Self.AsCurrency[I] := T; end;
 procedure TSQLDA_ByNameIsBlob_R(Self: TSQLDA; var T: Boolean; S : String); begin T := Self.ByNameIsBlob[S]; end;
 procedure TSQLDA_ByNameIsBlobText_R(Self: TSQLDA; var T: Boolean; S : String); begin T := Self.ByNameIsBlobText[S]; end;
 procedure TSQLDA_ByNameIsNull_R(Self: TSQLDA; var T: Boolean; S : String); begin T := Self.ByNameIsNull[S]; end;
@@ -111,6 +113,8 @@ procedure TSQLDA_ByNameAsBoolean_R(Self: TSQLDA; var T: Boolean; S : String); be
 procedure TSQLDA_ByNameAsBoolean_W(Self: TSQLDA; const T: Boolean; S : String); begin Self.ByNameAsBoolean[S] := T; end;
 procedure TSQLDA_ByNameAsDate_R(Self: TSQLDA; var T: Integer; S : String); begin T := Self.ByNameAsDate[S]; end;
 procedure TSQLDA_ByNameAsDate_W(Self: TSQLDA; const T: Integer; S : String); begin Self.ByNameAsDate[S] := T; end;
+procedure TSQLDA_ByNameAsCurrency_R(Self: TSQLDA; var T: Currency; S : String); begin T := Self.ByNameAsCurrency[S]; end;
+procedure TSQLDA_ByNameAsCurrency_W(Self: TSQLDA; const T: Currency; S : String); begin Self.ByNameAsCurrency[S] := T; end;
 
 procedure TSQLResult_SqlName_R(Self: TSQLResult; var T: String; I : Word); begin T := Self.SqlName[I]; end;
 procedure TSQLResult_RelName_R(Self: TSQLResult; var T: String; I : Word); begin T := Self.RelName[I]; end;
@@ -262,6 +266,7 @@ begin
     RegisterProperty('AsDate', 'Integer Word', iptRW);
     RegisterProperty('AsTime', 'Cardinal Word', iptRW);
     RegisterProperty('AsVariant', 'Variant Word', iptRW);
+    RegisterProperty('AsCurrency', 'Currency Word', iptRW);
     RegisterProperty('ByNameIsBlob', 'Boolean String', iptRW);
     RegisterProperty('ByNameIsBlobText', 'Boolean String', iptRW);
     RegisterProperty('ByNameIsNull', 'Boolean String', iptRW);
@@ -275,6 +280,7 @@ begin
     RegisterProperty('ByNameAsDateTime', 'TDateTime String', iptRW);
     RegisterProperty('ByNameAsBoolean', 'Boolean String', iptRW);
     RegisterProperty('ByNameAsDate', 'Integer String', iptRW);
+    RegisterProperty('ByNameAsCurrency', 'Currency String', iptRW);
   end;
 
   pscTSQLResult := ACompiler.AddClass(pscTSQLDA, TSQLResult);
@@ -433,6 +439,7 @@ begin
     RegisterPropertyHelper(@TSQLDA_AsDate_R, @TSQLDA_AsDate_W, 'AsDate');
     RegisterPropertyHelper(@TSQLDA_AsTime_R, @TSQLDA_AsTime_W, 'AsTime');
     RegisterPropertyHelper(@TSQLDA_AsVariant_R, @TSQLDA_AsVariant_W, 'AsVariant');
+    RegisterPropertyHelper(@TSQLDA_AsCurrency_R, @TSQLDA_AsCurrency_W, 'AsCurrency');
     RegisterPropertyHelper(@TSQLDA_ByNameIsBlob_R, nil, 'ByNameIsBlob');
     RegisterPropertyHelper(@TSQLDA_ByNameIsBlobText_R, nil, 'ByNameIsBlobText');
     RegisterPropertyHelper(@TSQLDA_ByNameIsNull_R, nil, 'ByNameIsNull');
@@ -446,6 +453,7 @@ begin
     RegisterPropertyHelper(@TSQLDA_ByNameAsDateTime_R, @TSQLDA_ByNameAsDateTime_W, 'ByNameAsDateTime');
     RegisterPropertyHelper(@TSQLDA_ByNameAsBoolean_R, @TSQLDA_ByNameAsBoolean_W, 'ByNameAsBoolean');
     RegisterPropertyHelper(@TSQLDA_ByNameAsDate_R, @TSQLDA_ByNameAsDate_W, 'ByNameAsDate');
+    RegisterPropertyHelper(@TSQLDA_ByNameAsCurrency_R, @TSQLDA_ByNameAsCurrency_W, 'ByNameAsCurrency');
   end;
 
   with arci.Add(TSQLResult) do
