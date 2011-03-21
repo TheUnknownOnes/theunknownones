@@ -27,9 +27,15 @@ begin
 
   ACompiler.AddDelphiFunction('function EncodeDateTime(const AYear, AMonth, ADay, AHour, AMinute, ASecond, AMilliSecond: Word): TDateTime;');
   ACompiler.AddDelphiFunction('procedure DecodeDateTime(const AValue: TDateTime; out AYear, AMonth, ADay, AHour, AMinute, ASecond, AMilliSecond: Word); ');
+
+  ACompiler.AddDelphiFunction('function FormatDateTime(AFormat : String; ADateTime : TDateTime) : String');
 end;
 
 procedure PS_Register_DateUtils_R(AExec : TPSExec; ARCi : TPSRuntimeClassImporter);
+type
+  TFConstStringTDateTimeString = function(const s1 : String; dt1 : TDatetime) : String;
+var
+  FConstStringTDateTimeString : TFConstStringTDateTimeString;
 begin
   AExec.RegisterDelphiFunction(@IncYear, 'IncYear', cdRegister);
   // function IncMonth is in SysUtils
@@ -42,6 +48,9 @@ begin
 
   AExec.RegisterDelphiFunction(@EncodeDateTime, 'EncodeDateTime', cdRegister);
   AExec.RegisterDelphiFunction(@DecodeDateTime, 'DecodeDateTime', cdRegister);
+
+  FConstStringTDateTimeString := FormatDateTime;
+  AExec.RegisterDelphiFunction(@FConstStringTDateTimeString, 'FormatDateTime', cdRegister);
 end;
 
 end.

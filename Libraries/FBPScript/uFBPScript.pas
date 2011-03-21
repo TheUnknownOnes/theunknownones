@@ -7,9 +7,7 @@ interface
 uses
   SysUtils, Classes, uPSRuntime, uPSDebugger, uPSUtils, uPSCompiler,
   StrUtils, DateUtils, Windows, UIB, UibLib,
-   uPSC_controls, uPSR_controls,
-   uPSC_Graphics, uPSR_Graphics,
-  uPSC_dateutils, upsr_dateutils, uSysTools;
+  uSysTools;
 
 type
   TfbpLogProc = procedure(ALog : String) of object;
@@ -85,8 +83,7 @@ type
 
 implementation
 
-uses uPS_UIB, uPS_CSV, uPS_DateUtils, uPS_SysUtils, uPS_Helpers, uPS_Windows,
-  uPS_Classes, uPS_System, uPS_Types;
+uses uPS_All;
 
 var
   FScriptList : TThreadList;
@@ -192,20 +189,7 @@ end;
 
 procedure TFBPScript.DoBeforeExecLoad;
 begin
-  PS_Register_Types_R(FExec, FRuntimeClassImporter);
-  PS_Register_System_R(FExec, FRuntimeClassImporter);
-  PS_Register_Windows_R(FExec, FRuntimeClassImporter);
-  PS_Register_Classes_R(FExec, FRuntimeClassImporter);
-
-  RIRegister_Controls(FRuntimeClassImporter);
-  RIRegister_Graphics(FRuntimeClassImporter, true);
-  RegisterDateTimeLibrary_R(FExec);
-
-  PS_Register_SysUtils_R(FExec, FRuntimeClassImporter);
-  PS_Register_DateUtils_R(FExec, FRuntimeClassImporter);
-  PS_Register_UIB_R(FExec, FRuntimeClassImporter);
-  PS_Register_CSV_R(FExec, FRuntimeClassImporter);
-
+  PS_Register_All_R(FExec, FRuntimeClassImporter);
 
   FExec.RegisterDelphiMethod(Self, @TFBPScript.Log, 'Log', cdRegister);
 
@@ -280,24 +264,10 @@ begin
   begin
     Result := true;
 
-    PS_Register_Types_C(FCompiler);
-    PS_Register_System_C(FCompiler);
-    PS_Register_Classes_C(FCompiler);
-
-    SIRegister_Controls(FCompiler);
-    SIRegister_Graphics(FCompiler, true);
-    RegisterDateTimeLibrary_C(FCompiler);
-
-    PS_Register_Windows_C(FCompiler);
-    PS_Register_SysUtils_C(FCompiler);
-    PS_Register_DateUtils_C(FCompiler);
-    PS_Register_UIB_C(FCompiler);
-    PS_Register_CSV_C(FCompiler);
+    PS_Register_All_C(FCompiler);
 
 
     FCompiler.AddDelphiFunction('procedure Log(ALog : String)');
-
-
 
     FCompiler.AddDelphiFunction('procedure Query(ASQL : String)');
     FCompiler.AddDelphiFunction('procedure Next');
