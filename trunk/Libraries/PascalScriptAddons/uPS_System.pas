@@ -4,7 +4,8 @@ interface
 
 uses
   uPSCompiler,
-  uPSRuntime;
+  uPSRuntime,
+  uPSUtils;
 
 procedure PS_Register_System_C(ACompiler : TPSPascalCompiler);
 procedure PS_Register_System_R(AExec : TPSExec; ARCi : TPSRuntimeClassImporter);
@@ -15,6 +16,11 @@ procedure PS_Register_System_C(ACompiler : TPSPascalCompiler);
 var
   pscTObject : TPSCompileTimeClass;
 begin
+  ACompiler.AddTypeCopyN('TDateTime', 'Double');
+  ACompiler.AddTypeCopyN('TDate', 'TDateTime');
+  ACompiler.AddTypeCopyN('TTime', 'TDateTime');
+  ACompiler.AddTypeCopyN('THandle', 'LongWord');
+
   pscTObject := ACompiler.AddClass(nil, TObject);
   with pscTObject do
   begin
