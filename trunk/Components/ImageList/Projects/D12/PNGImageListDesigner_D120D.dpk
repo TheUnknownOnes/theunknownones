@@ -34,8 +34,7 @@ requires
   vclx,
   PNGUtils_D120R,
   xmlrtl,
-  vclactnband,
-  DirectX9_D12;
+  vclactnband;
 
 contains
   uPNGImageList_Designers in '..\..\Design\uPNGImageList_Designers.pas',

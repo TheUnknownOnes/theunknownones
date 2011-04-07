@@ -21,7 +21,7 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DesignOnlyPackage>true</DesignOnlyPackage>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\GroupListView_D120D.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\GroupListView_D120D.bpl</DCC_DependencyCheckOutputName>
 			<DCC_Description>GroupListView - Design</DCC_Description>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>

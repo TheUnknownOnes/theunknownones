@@ -29,7 +29,6 @@ package EffectPNG_D120R;
 requires
   rtl,
   vcl,
-  DirectX9_D12,
   GDIPlus120,
   vclimg;
 

@@ -25,7 +25,7 @@
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
 			<GenPackage>true</GenPackage>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\EffectPNGEdit_D120R.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\EffectPNGEdit_D120R.bpl</DCC_DependencyCheckOutputName>
 			<DCC_Platform>x86</DCC_Platform>
 			<DCC_Description>EffectPNGEdit - Runtime</DCC_Description>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
@@ -54,9 +54,8 @@
 			<DCCReference Include="GDIPlus120.dcp"/>
 			<DCCReference Include="vclx.dcp"/>
 			<DCCReference Include="dbrtl.dcp"/>
-			<DCCReference Include="SearchEdit_D120R.dcp"/>
-			<DCCReference Include="DirectX9_D12.dcp"/>
 			<DCCReference Include="EffectPNG_D120R.dcp"/>
+			<DCCReference Include="SearchEdit_D120R.dcp"/>
 			<DCCReference Include="..\..\uEffectPNGEdit.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
