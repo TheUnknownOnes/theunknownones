@@ -34,8 +34,7 @@ requires
   vclx,
   vcldb,
   dbrtl,
-  GDIPlus120,
-  DirectX9_D12;
+  GDIPlus120;
 
 contains
   uVirtualActionTree in '..\..\uVirtualActionTree.pas';

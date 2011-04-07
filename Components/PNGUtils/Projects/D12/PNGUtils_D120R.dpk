@@ -30,7 +30,6 @@ requires
   rtl,
   vcl,
   GDIPlus120,
-  DirectX9_D12,
   vclimg;
 
 contains

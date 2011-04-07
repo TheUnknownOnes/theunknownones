@@ -23,7 +23,7 @@
 			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<DllSuffix>_D120</DllSuffix>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\TaskbarList_D120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\TaskbarList_D120.bpl</DCC_DependencyCheckOutputName>
 			<GenDll>true</GenDll>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
@@ -107,7 +107,8 @@
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
 					<Excluded_Packages>
-						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\frxZintBarcode120.bpl">(Unbenannt)</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dcloffice2k120.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dclofficexp120.bpl">Microsoft Office XP Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
 					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>

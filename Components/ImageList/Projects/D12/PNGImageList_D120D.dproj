@@ -26,7 +26,7 @@
 			<GenPackage>true</GenPackage>
 			<DCC_E>false</DCC_E>
 			<DCC_Platform>x86</DCC_Platform>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\PNGImageList_D120D.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\PNGImageList_D120D.bpl</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_S>false</DCC_S>
 			<GenDll>true</GenDll>

@@ -32,9 +32,8 @@ requires
   GDIPlus120,
   vclx,
   dbrtl,
-  SearchEdit_D120R,
-  DirectX9_D12,
-  EffectPNG_D120R;
+  EffectPNG_D120R,
+  SearchEdit_D120R;
 
 contains
   uEffectPNGEdit in '..\..\uEffectPNGEdit.pas';

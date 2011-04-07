@@ -25,7 +25,7 @@
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
 			<GenPackage>true</GenPackage>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\EffectPNG_D120R.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\EffectPNG_D120R.bpl</DCC_DependencyCheckOutputName>
 			<DCC_Platform>x86</DCC_Platform>
 			<DCC_Description>EffectPNG D100 - Runtime</DCC_Description>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
@@ -51,13 +51,10 @@
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
-			<DCCReference Include="DirectX9_D12.dcp"/>
 			<DCCReference Include="GDIPlus120.dcp"/>
 			<DCCReference Include="vclimg.dcp"/>
 			<DCCReference Include="..\..\uEffectPNG.pas"/>
 			<DCCReference Include="..\..\uEffectPNGHelper.pas"/>
-			<DCCReference Include="GDIPlus100.dcp"/>
-			<DCCReference Include="PNGSupport_D120.dcp"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
