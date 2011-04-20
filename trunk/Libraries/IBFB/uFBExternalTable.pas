@@ -56,40 +56,26 @@ implementation
 { TfbetRecord }
 
 procedure TfbetRecord.CheckPos(ANextSize: Cardinal; AIsChar: Boolean);
-//This funtion is a copy from Henrique Netzka (http://www.ibphoenix.com/main.nfs?a=ibphoenix&s=1191401661:63&page=ibp_native_external)
-var
-  LPos : Cardinal;
 begin
-  LPos := Position;
-  if AIsChar then
-    exit;
-
-  if (LPos and 3) <> 0 then
+  if (Position mod 4) <> 0 then
   begin
-    if ((LPos + ANextSize) and 3) <> 0 then
+    if (((Position + ANextSize) mod 4) <> 0) then
     begin
-      if ANextSize >= 4 then
+      if (ANextSize >= 4) then
       begin
         if (not AIsChar) and ((ANextSize = 4) or ((ANextSize and 7) = 0)) then
         begin
-          while (LPos and 3) <> 0 do
-          begin
+          while (Position mod 4) <> 0 do
             Inc(FPos);
-            Inc(LPos);
-          end;
         end
         else
         begin
-          while (LPos and 1) <> 0 do
-          begin
+          while (Position mod 2) <> 0 do
             Inc(FPos);
-            Inc(LPos);
-          end;
         end;
       end;
     end;
   end;
-
 end;
 
 constructor TfbetRecord.Create(ABufferSize: Cardinal);
@@ -180,7 +166,6 @@ end;
 procedure TfbetRecord.WriteInteger(AValue: Integer);
 begin
   CheckPos(4);
-
   CopyMemory(FPos, @AValue, 4);
   Inc(FPos, 4);
 end;
