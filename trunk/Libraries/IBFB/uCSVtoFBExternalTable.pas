@@ -56,7 +56,7 @@ begin
     fbe.Config.Values['ExternalFileAccess'] := 'Full';
     fbe.Active := true;
 
-    DB.UserName := 'SYSDBA'; DB.PassWord := 'SANDALE';
+    DB.UserName := 'SYSDBA';
     DB.LibraryName := fbe.LibraryName;
     DB.DatabaseName := IntToStr(GetCurrentThreadId) + '.fdb';
     if FileExists(Db.DatabaseName) then
