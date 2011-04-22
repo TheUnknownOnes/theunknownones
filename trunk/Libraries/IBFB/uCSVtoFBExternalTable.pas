@@ -7,6 +7,22 @@
 unit uCSVtoFBExternalTable;
 
 
+{Example:
+var
+  c : TCSVtoFBExternalTable;
+  MyDir : String;
+begin
+  MyDir := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName));
+
+  c := TCSVtoFBExternalTable.Create;
+  c.CSV_Delimiter := ';';
+  c.CSV_QuoteChar := '"';
+  c.Table_FieldDef := 'id integer, category_id integer, title varchar(50), actor varchar(50), price float, special smallint';
+  c.Convert(mydir + 'rawdata.csv',
+            mydir + 'test.ext');
+  c.Free;
+end;
+}
 
 interface
 
