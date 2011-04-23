@@ -1466,9 +1466,10 @@ var
   Writer        : IOTAEditWriter;
   sl            : TStrings;
   i             : Integer;
-  FileName      : String;
+  FileName      : AnsiString;
 
-  Buffer        : Array [0..1000] of char;
+  Buffer        : Array [0..1000] of AnsiChar;
+  BufPos        : Integer;
   RegExp        : TRegExpr;
   insertPos     : Integer;
   perso         : String;
@@ -1495,26 +1496,33 @@ begin
     if ActiveProject.GetModuleFileCount>0 then
       Editor := (ActiveProject.GetModuleFileEditor(0) as IOTASourceEditor);
 
-    sl:=TStringList.Create;
 
     if ActiveProject.Personality='Delphi.Personality' then
     begin
+      sl:=TStringList.Create;
       Reader:=Editor.CreateReader;
-      Reader.GetText(0,@Buffer,SizeOf(Buffer));
-      sl.Text:=Buffer;
       RegExp:=TRegExpr.Create;
       RegExp.ModifierI:=True;
       RegExp.Expression:='(package|library|program) \w+;';
       insertPos:=0;
       try
+        BufPos := 0;
+        while Reader.GetText(BufPos, @Buffer, SizeOf(Buffer))>0 do
+        begin
+          sl.text:=sl.Text+Buffer;
+          Inc(BufPos, SizeOf(Buffer));
+        end;
+
         for i:=0 to sl.Count-1 do
         begin
-          inc(insertPos,Length(sl[i]));
+          inc(insertPos,Length(sl[i])+2);
+
           if RegExp.Exec(sl[i]) then
           begin
             Writer:=Editor.CreateUndoableWriter;
-            Writer.CopyTo(insertPos);
-            Writer.Insert(PAnsiChar(#13#10#13#10'{$R '''+FileName+'''}'));
+            Writer.CopyTo(insertPos-2);
+            Writer.Insert(PAnsiChar(#13#10'{$R '''+FileName+'''}'#13#10));
+            break;
           end
         end;
 
