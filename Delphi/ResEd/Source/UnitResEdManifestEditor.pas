@@ -43,7 +43,7 @@ var
   xml: IXMLDOMDocument2;
   Node : IXMLDOMNode;
   ss : TStringStream;
-  manifest : String;
+  manifest : AnsiString;
 begin
   xml:=CreateOleObject('MSXML2.DOMDocument.4.0') as IXMLDOMDocument2;
   xml.setProperty('NewParser', true);
