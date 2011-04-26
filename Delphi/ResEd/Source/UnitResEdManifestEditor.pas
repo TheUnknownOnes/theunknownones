@@ -22,6 +22,8 @@ type
     btnOk: TButton;
     cbUIA: TCheckBox;
     cbREL: TComboBox;
+    cbWin7Compatibility: TCheckBox;
+    cbDPIAware: TCheckBox;
   private
     FResourceElement: TResourceElement;
     { Private-Deklarationen }
@@ -42,6 +44,7 @@ procedure TFormResEdManifestEditor.EditManifestResource;
 var
   xml: IXMLDOMDocument2;
   Node : IXMLDOMNode;
+  aNode : IXMLDOMNode;
   ss : TStringStream;
   manifest : AnsiString;
 begin
@@ -58,7 +61,9 @@ begin
   ss.Free;
 
   xml.setProperty('SelectionNamespaces', 'xmlns:a="urn:schemas-microsoft-com:asm.v1" '+
-                                         'xmlns:b="urn:schemas-microsoft-com:asm.v3"');
+                                         'xmlns:b="urn:schemas-microsoft-com:asm.v3" '+
+                                         'xmlns:c="urn:schemas-microsoft-com:compatibility.v1" '+
+                                         'xmlns:d="http://schemas.microsoft.com/SMI/2005/WindowsSettings" ');
 
   Node:=xml.selectSingleNode('/a:assembly/a:description');
   if Assigned(Node) then
@@ -68,13 +73,20 @@ begin
   if Assigned(Node) then
     Self.edAppName.Text:=Node.text;
 
-  Node:=xml.selectSingleNode('//b:trustInfo/b:security/b:requestedPrivileges/b:requestedExecutionLevel/@level');
+  Node:=xml.selectSingleNode('/a:assembly/b:trustInfo/b:security/b:requestedPrivileges/b:requestedExecutionLevel/@level');
   if Assigned(Node) then
     Self.cbREL.ItemIndex:=Self.cbREL.Items.IndexOf(Node.text);
 
-  Node:=xml.selectSingleNode('//b:trustInfo/b:security/b:requestedPrivileges/b:requestedExecutionLevel/@uiAccess');
+  Node:=xml.selectSingleNode('/a:assembly/b:trustInfo/b:security/b:requestedPrivileges/b:requestedExecutionLevel/@uiAccess');
   if Assigned(Node) then
     Self.cbUIA.Checked:=AnsiSameText(Node.text,'True');
+
+  Node:=xml.selectSingleNode('/a:assembly/c:compatibility/c:application/c:supportedOS[@Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}"]');
+  Self.cbWin7Compatibility.Checked:=Assigned(Node);
+
+  Node:=xml.selectSingleNode('/a:assembly/b:application/b:windowsSettings/d:dpiAware');
+  if Assigned(Node) then
+    Self.cbDPIAware.Checked:=AnsiSameText(Node.text, 'True');
 
   if self.ShowModal = mrOk then
   begin
@@ -86,13 +98,70 @@ begin
     if Assigned(Node) then
       Node.text:=Self.edAppName.Text;
 
-    Node:=xml.selectSingleNode('//b:trustInfo/b:security/b:requestedPrivileges/b:requestedExecutionLevel/@level');
+    Node:=xml.selectSingleNode('/a:assembly/b:trustInfo/b:security/b:requestedPrivileges/b:requestedExecutionLevel/@level');
     if Assigned(Node) then
       Node.text:=Self.cbREL.Text;
 
-    Node:=xml.selectSingleNode('//b:trustInfo/b:security/b:requestedPrivileges/b:requestedExecutionLevel/@uiAccess');
+    Node:=xml.selectSingleNode('/a:assembly/b:trustInfo/b:security/b:requestedPrivileges/b:requestedExecutionLevel/@uiAccess');
     if Assigned(Node) then
       Node.text:=IfThen(Self.cbUIA.Checked,'True','False');
+
+    {$REGION 'Win7Comp'}
+    Node:=xml.selectSingleNode('/a:assembly/c:compatibility/c:application/c:supportedOS[@Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}"]');
+    if cbWin7Compatibility.Checked and (not Assigned(Node)) then
+    begin
+      Node:=xml.selectSingleNode('/a:assembly/c:compatibility');
+      if not Assigned(Node) then
+      begin
+        Node:=xml.selectSingleNode('/a:assembly');
+
+        Node:=Node.appendChild(xml.createNode('element','compatibility','urn:schemas-microsoft-com:compatibility.v1'));
+      end;
+
+      if Node.selectSingleNode('c:application')=nil then
+      begin
+        Node:=Node.appendChild(xml.createNode('element','application','urn:schemas-microsoft-com:compatibility.v1'));
+      end
+      else
+      begin
+        Node:=Node.selectSingleNode('c:application');
+      end;
+
+      Node:=Node.appendChild(xml.createNode('element','supportedOS','urn:schemas-microsoft-com:compatibility.v1'));
+      aNode:=xml.createAttribute('Id');
+      aNode.nodeValue:='{35138b9a-5d96-4fbd-8e2d-a2440225f93a}';
+      Node.attributes.setNamedItem(aNode);
+    end
+    else
+    if (not cbWin7Compatibility.Checked) and Assigned(Node) then
+      Node.parentNode.removeChild(Node);
+    {$ENDREGION}
+
+    {$REGION 'dpiAware'}
+    Node:=xml.selectSingleNode('/a:assembly/b:application/b:windowsSettings/d:dpiAware');
+    if not Assigned(Node) then
+    begin
+      Node:=xml.selectSingleNode('/a:assembly/b:application');
+      if not Assigned(Node) then
+      begin
+        Node:=xml.selectSingleNode('/a:assembly');
+
+        Node:=Node.appendChild(xml.createNode('element','application','urn:schemas-microsoft-com:asm.v3'));
+      end;
+
+      if Node.selectSingleNode('b:windowsSettings')=nil then
+      begin
+        Node:=Node.appendChild(xml.createNode('element','windowsSettings','urn:schemas-microsoft-com:asm.v3'));
+      end
+      else
+      begin
+        Node:=Node.selectSingleNode('b:windowsSettings');
+      end;
+
+      Node:=Node.appendChild(xml.createNode('element','dpiAware','http://schemas.microsoft.com/SMI/2005/WindowsSettings'));
+    end;
+    Node.text:=IfThen(Self.cbDPIAware.Checked,'true','false');
+    {$ENDREGION}
 
     manifest:=xml.xml;
     RD.Data.Clear;

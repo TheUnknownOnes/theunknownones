@@ -3,7 +3,7 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'FormResEdManifestEditor'
-  ClientHeight = 209
+  ClientHeight = 265
   ClientWidth = 600
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -71,8 +71,8 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
     TabOrder = 1
   end
   object btnOk: TButton
-    Left = 484
-    Top = 167
+    Left = 489
+    Top = 223
     Width = 98
     Height = 33
     Margins.Left = 4
@@ -113,5 +113,29 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
       'asInvoker'
       'highestAvailable'
       'requireAdministrator')
+  end
+  object cbWin7Compatibility: TCheckBox
+    Left = 188
+    Top = 162
+    Width = 263
+    Height = 22
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Caption = 'Application is Windows 7 compatible'
+    TabOrder = 5
+  end
+  object cbDPIAware: TCheckBox
+    Left = 188
+    Top = 186
+    Width = 263
+    Height = 22
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Caption = 'Application is dpi aware'
+    TabOrder = 6
   end
 end
