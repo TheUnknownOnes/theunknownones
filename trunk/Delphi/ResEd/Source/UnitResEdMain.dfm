@@ -3,12 +3,12 @@ object FormWizardResEd: TFormWizardResEd
   Top = 377
   BorderWidth = 3
   Caption = 'ResEd (Project Resources)'
-  ClientHeight = 250
-  ClientWidth = 340
+  ClientHeight = 327
+  ClientWidth = 445
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -14
   Font.Name = 'Tahoma'
   Font.Style = []
   Icon.Data = {
@@ -46,8 +46,8 @@ object FormWizardResEd: TFormWizardResEd
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  PixelsPerInch = 96
-  TextHeight = 13
+  PixelsPerInch = 120
+  TextHeight = 17
   object PopupEditor: TPopupMenu
     OnPopup = PopupEditorPopup
     Left = 104

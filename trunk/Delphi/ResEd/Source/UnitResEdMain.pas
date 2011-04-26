@@ -567,17 +567,16 @@ var
   Editor  : IOTAEditor;
   RegExpr : TRegExpr;
   RegExpr2: TRegExpr;
+  slresult: TStringList;
 
   prjFile : TStrings;
 
-  function AnalyzeFile(FileName : String):String;
+  procedure AnalyzeFile(FileName : String; AResult: TStrings);
   var
     ResFileNam : String;
     FilePath     : String;
     tmpResult    : String;
   begin
-    Result:='';
-
     if trim(FileName)<>'' then
     begin
       try
@@ -605,13 +604,21 @@ var
           FilePath:=ExtractFilePath(FileName)+FilePath;
         if not DirectoryExists(FilePath) then
           FilePath:=ExtractFilePath(FileName);
-        Result:=Result+FilePath+ResFileNam+#13#10;
+
+        if FilePath+ResFileNam<>EmptyStr then
+        begin
+          AResult.Add(FilePath+ResFileNam);
+        end;
+
       until RegExpr.ExecNext = False;
     end;
   end;
 
 begin
   prjFile:=TStringList.Create;
+  slresult:=TStringList.Create;
+  slresult.Sorted:=true;
+  slresult.Duplicates:=dupIgnore;
 
   RegExpr:=TRegExpr.Create;
   RegExpr2:=TRegExpr.Create;
@@ -628,32 +635,36 @@ begin
   for i := 0 to Project.GetModuleFileCount - 1 do
   begin
     Editor := Project.GetModuleFileEditor(i);
-    Result := Result+AnalyzeFile(Editor.FileName);
+    AnalyzeFile(Editor.FileName, slresult);
   end;
 
   for i:= 0 to (Project.GetModuleCount - 1) do
   begin
-
     ModInfo := Project.GetModule(i);
     
     if (AnsiSameText(FileType, 'resx')) then
     begin
       if (AnsiSameText(ExtractFileExt(ModInfo.FileName),'.resx')) then
-        Result:= Result+ModInfo.FileName+#13#10;
+       slresult.Add(ModInfo.FileName);
     end
     else
     if (AnsiSameText(FileType, 'res')) then
     begin
       if (AnsiSameText(ExtractFileExt(ModInfo.FileName),'.res')) then
-        Result:= Result+ModInfo.FileName+#13#10
+      begin
+        slresult.Add(ModInfo.FileName);
+      end
       else
         if AnsiSameText(ExtractFileExt(ModInfo.FileName),'.pas') or
            AnsiSameText(ExtractFileExt(ModInfo.FileName),'.inc') then
-          Result := Result+AnalyzeFile(ModInfo.FileName);
+          AnalyzeFile(ModInfo.FileName, slresult);
     end;
   end;
 
+  Result:=slresult.Text;
+
   prjFile.Free;
+  slresult.Free;
 
   RegExpr.Free;
   RegExpr2.Free;
@@ -729,7 +740,7 @@ end;
 procedure TFormWizardResEd.LoadResources;
 var
   ActiveProject : IOTAProject;
-  Resources     : TStrings;
+  Resources     : TStringList;
   NodeData      : PNodeData;
   NodeResFile   : PVirtualNode;
   i, j          : integer;
