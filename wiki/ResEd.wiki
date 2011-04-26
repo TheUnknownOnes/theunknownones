@@ -3,7 +3,7 @@
 
 === What is ResEd ===
 
-ResEd is an expert for Delphi 2005, 2006, 2007, 2009 and 2010.
+ResEd is an expert for Delphi 2005, 2006, 2007, 2009, 2010 and XE.
 
 This expert is designed for editing the resource files (.res; .resx) that are linked to the active project. It will automatically search for all occurrences of {$R xyz.res} lines and will open/create resourcefiles for them. The expert registers itself in the menubar of Delphi under View.
 
