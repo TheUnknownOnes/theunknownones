@@ -46,7 +46,6 @@
 			<DelphiCompile Include="ResEd120.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="abc.res"/>
 			<DCCReference Include="designide.dcp"/>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
@@ -93,9 +92,6 @@
 			<DCCReference Include="VirtualTree\ResEdVirtualTrees.pas"/>
 			<DCCReference Include="VirtualTree\ResEdVTAccessibility.pas"/>
 			<DCCReference Include="VirtualTree\ResEdVTAccessibilityFactory.pas"/>
-			<DCCReference Include="abc.res">
-				<BuildOrder>33</BuildOrder>
-			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
