@@ -55,6 +55,7 @@ contains
   uWinNT in '..\..\uWinNT.pas',
   wm_helper in '..\..\wm_helper.pas',
   uVirtualEarth in '..\..\uVirtualEarth.pas',
-  uRDPHash in '..\..\uRDPHash.pas';
+  uRDPHash in '..\..\uRDPHash.pas',
+  uLevenshtein in '..\..\uLevenshtein.pas';
 
 end.
