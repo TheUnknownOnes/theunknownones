@@ -27,7 +27,7 @@
 			<GenPackage>true</GenPackage>
 			<DCC_Platform>x86</DCC_Platform>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\CommonTools_D120R.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\CommonTools_D120R.bpl</DCC_DependencyCheckOutputName>
 			<DCC_E>false</DCC_E>
 			<DCC_S>false</DCC_S>
 			<GenDll>true</GenDll>
@@ -76,6 +76,7 @@
 			<DCCReference Include="..\..\wm_helper.pas"/>
 			<DCCReference Include="..\..\uVirtualEarth.pas"/>
 			<DCCReference Include="..\..\uRDPHash.pas"/>
+			<DCCReference Include="..\..\uLevenshtein.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
