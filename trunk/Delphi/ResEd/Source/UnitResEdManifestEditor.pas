@@ -67,11 +67,11 @@ begin
 
   Node:=xml.selectSingleNode('/a:assembly/a:description');
   if Assigned(Node) then
-    Self.edAppDesc.Text:=Node.text;
+    Self.edAppDesc.Text:=UTF8ToString(Node.text);
 
   Node:=xml.selectSingleNode('/a:assembly/a:assemblyIdentity/@name');
   if Assigned(Node) then
-    Self.edAppName.Text:=Node.text;
+    Self.edAppName.Text:=UTF8ToString(Node.text);
 
   Node:=xml.selectSingleNode('/a:assembly/b:trustInfo/b:security/b:requestedPrivileges/b:requestedExecutionLevel/@level');
   if Assigned(Node) then
@@ -92,11 +92,11 @@ begin
   begin
     Node:=xml.selectSingleNode('/a:assembly/a:description');
     if Assigned(Node) then
-      Node.text:=Self.edAppDesc.Text;
+      Node.text:=UTF8EncodeToShortString(Self.edAppDesc.Text);
 
     Node:=xml.selectSingleNode('/a:assembly/a:assemblyIdentity/@name');
     if Assigned(Node) then
-      Node.text:=Self.edAppName.Text;
+      Node.text:=UTF8EncodeToShortString(Self.edAppName.Text);
 
     Node:=xml.selectSingleNode('/a:assembly/b:trustInfo/b:security/b:requestedPrivileges/b:requestedExecutionLevel/@level');
     if Assigned(Node) then
