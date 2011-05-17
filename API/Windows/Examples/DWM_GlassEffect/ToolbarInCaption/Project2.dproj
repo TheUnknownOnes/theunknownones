@@ -1,7 +1,7 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{B09A40B1-2ECF-4AB2-AC58-3E1AE516D4B9}</ProjectGuid>
-			<MainSource>frxZintBarcode.dpk</MainSource>
+			<ProjectGuid>{46733B0E-95DB-4A17-A5CC-882E5A3A511F}</ProjectGuid>
+			<MainSource>Project2.dpr</MainSource>
 			<Config Condition="'$(Config)'==''">Debug</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<ProjectVersion>12.0</ProjectVersion>
@@ -20,15 +20,20 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DllSuffix>120</DllSuffix>
-			<DesignOnlyPackage>false</DesignOnlyPackage>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\frxZintBarcode120.bpl</DCC_DependencyCheckOutputName>
-			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
-			<GenDll>true</GenDll>
-			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
-			<GenPackage>true</GenPackage>
+			<DCC_DependencyCheckOutputName>Project2.exe</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DCC_MapFile>3</DCC_MapFile>
+			<DCC_UnitSearchPath>C:\Users\MaWarm\Documents\Projects\TUO\Components\EffectPNG;C:\Users\MaWarm\Documents\Projects\TUO\Libraries\PNGSupport;C:\users\MaWarm\Documents\Projects\Komponenten\Graphic\gdiplus\pas\D10;C:\users\MaWarm\Documents\Projects\Komponenten\Graphic\DSPACK\src\DirectX9;C:\users\MaWarm\Documents\Projects\Jedi\jwapi\Win32API;C:\Users\MaWarm\Documents\Projects\TUO\Libraries\DWMHelper;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
 			<DCC_Platform>x86</DCC_Platform>
+			<DCC_K>false</DCC_K>
+			<DCC_N>true</DCC_N>
+			<DCC_S>false</DCC_S>
+			<DCC_F>false</DCC_F>
+			<DCC_UsePackage>vcl;rtl;JediApi_StaticRelease;vclx;dbrtl;vcldb;dwmhelper;adortl;dbxcds;dbexpress;vclib;ibxpress;indy;dsnap;bdertl;teeui;teedb;tee;vcldbx;dsnapcon;vclactnband;ConsoleTools_D100R;EffectPNGEdit_D100R;PNGSupport_D100;DirectX9_D10;GDIPlus100;EffectPNGImage_D100R;EffectPNGImageList_D100R;EffectPNGToolbar_D100R;GDIPlus100D;GroupListView_D100R;ImageListProvider_D100D;ImageListProvider_D100R;PNGImageList_D100D;PNGUtils_D100R;PNGImageList_D100R;xmlrtl;PSBuzz_D100R;SearchEdit_D100D;SearchEdit_D100R;RegExp_D100R;XMLTools_D100R;Settings_D100R;Settings_VirtualTrees_D100R;SPPVirtualTrees_D100D;SPPVirtualTrees_D100R;VirtualTreesD10;tdbf_d10d;tdbf_d10r;VirtualActionTree_D100R;Wiimote_D100R;TntUnicodeVcl;TUOScript100;eltreeD10;SPPComponents100;qrpt100;JvStdCtrlsD10R;JvCoreD10R;Jcl;frx10;frxADO10;frxBDE10;frxDB10;frxDBX10;frxe10;frxFib10;FIBPlus2006;frxIBX10;frxTee10;fs10;fsADO10;fsBDE10;fsDB10;fsIBX10;fsTee10;QRExports100;FlexCelXLS100;FlexCel100;RxCtl100;VclSmp;FIBDBMidas2006;PCheck100;SQLClientDataset100;XPMenu100;DBIni100;Rechte100;JclVcl;JvSystemD10R;SingleSignOn100;CommonTools_D100R;JvCryptD10R;Etikettendruck_D100;xtrafil100;JvCustomD10R;JvCtrlsD10R;ImageTypes100;CheckCombo100;HotKeyManager_D100;QRAngledLabel100;BarcodeHelper_D100;Drucker_D100;EffectPNG_D100R;RichViewEditor_D100;RVPkg2006;madBasic_;madDisAsm_;madExcept_;JvAppFrmD10R;JvBandsD10R;JvDBD10R;JvDlgsD10R;JvBDED10R;JvCmpD10R;JvDockingD10R;JvDotNetCtrlsD10R;JvEDID10R;JvGlobusD10R;JvHMID10R;JvInterpreterD10R;JvJansD10R;JvManagedThreadsD10R;JvMMD10R;JvNetD10R;JvPageCompsD10R;JvPluginD10R;JvPrintPreviewD10R;JvRuntimeDesignD10R;JvTimeFrameworkD10R;JvValidatorsD10R;JvWizardD10R;JvXPCtrlsD10R;vclie;inet;inetdbbde;inetdbxpress;NPipe_D100</DCC_UsePackage>
+			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+			<DCC_E>false</DCC_E>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -40,13 +45,12 @@
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="frxZintBarcode.dpk">
+			<DelphiCompile Include="Project2.dpr">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="frx12.dcp"/>
-			<DCCReference Include="ZintBarcode.dcp"/>
-			<DCCReference Include="..\..\ufrxZintBarcode.pas"/>
+			<DCCReference Include="Unit3.pas">
+				<Form>Form1</Form>
+			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -62,11 +66,11 @@
 		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
 		<ProjectExtensions>
 			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
-			<Borland.ProjectType>Package</Borland.ProjectType>
+			<Borland.ProjectType/>
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">frxZintBarcode.dpk</Source>
+						<Source Name="MainSource">Project2.dpr</Source>
 					</Source>
 					<Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
@@ -74,7 +78,7 @@
 						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
 					</Parameters>
 					<VersionInfo>
-						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
 						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">0</VersionInfo>
@@ -100,6 +104,9 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
+					<Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\MaWarm\Documents\Borland Studio-Projekte\Bpl\qrpt100.bpl">QuickReport Runtime Package</Excluded_Packages>
+					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
