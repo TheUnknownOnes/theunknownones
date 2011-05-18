@@ -67,9 +67,10 @@ begin
 
   // calculate the edit distance
   T := LenStr2 + 1;
+
   GetMem(D, T * SizeOf(Integer));
 
-  for I := 0 to T do
+  for I := 0 to T-1 do
     D[I] := I;
 
   S1 := pStr1;
