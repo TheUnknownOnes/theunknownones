@@ -1,5 +1,13 @@
 library levenshtein;
 
+{
+DECLARE EXTERNAL FUNCTION levenshtein_1000
+    varchar(1000) null,
+    varchar(1000) null
+    RETURNS double precision by value
+    ENTRY_POINT 'levenshtein' MODULE_NAME 'levenshtein';
+}
+
 {$mode objfpc}{$H+}
 
 uses
