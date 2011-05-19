@@ -64,7 +64,7 @@ function ParamIsNull(AParam : PParamDsc) : Boolean;
 begin
   Result := (AParam = nil) or
             (AParam^.dsc_address = nil) or
-            (AParam.dsc_flags and DSC_null > 0);
+            (AParam^.dsc_flags and DSC_null > 0);
 end;
 
 function NewParamDsc : PParamDSC;

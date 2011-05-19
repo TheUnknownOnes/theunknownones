@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="9"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <MainUnitHasCreateFormStatements Value="False"/>
+        <MainUnitHasTitleStatement Value="False"/>
+      </Flags>
+      <MainUnit Value="0"/>
+      <ResourceType Value="res"/>
+      <UseXPManifest Value="True"/>
+      <Icon Value="0"/>
+      <ActiveWindowIndexAtStart Value="0"/>
+    </General>
+    <i18n>
+      <EnableI18N LFM="False"/>
+    </i18n>
+    <VersionInfo>
+      <StringTable ProductVersion=""/>
+    </VersionInfo>
+    <BuildModes Count="1" Active="Default">
+      <Item1 Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IncludeFileFilter Value="*.(pas|pp|inc|lfm|lpr|lrs|lpi|lpk|sh|xml)"/>
+      <ExcludeFileFilter Value="*.(bak|ppu|o|so);*~;backup"/>
+    </PublishOptions>
+    <RunParams>
+      <local>
+        <FormatVersion Value="1"/>
+      </local>
+    </RunParams>
+    <Units Count="4">
+      <Unit0>
+        <Filename Value="levenshtein.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="levenshtein"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="0"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="46"/>
+        <CursorPos X="71" Y="77"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="..\..\Libs\TUO\Libraries\IBFB\uFBParamDescription.pas"/>
+        <UnitName Value="uFBParamDescription"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="5"/>
+        <CursorPos X="12" Y="21"/>
+        <UsageCount Value="10"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="..\..\Libs\TUO\Libraries\CommonTools\uLevenshtein.pas"/>
+        <UnitName Value="uLevenshtein"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="52"/>
+        <CursorPos X="13" Y="74"/>
+        <UsageCount Value="10"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\..\Libs\TUO\Libraries\IBFB\uIB2007.pas"/>
+        <UnitName Value="uIB2007"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="579"/>
+        <CursorPos X="20" Y="601"/>
+        <UsageCount Value="10"/>
+      </Unit3>
+    </Units>
+    <JumpHistory Count="25" HistoryIndex="24">
+      <Position1>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="7" Column="22" TopLine="1"/>
+      </Position1>
+      <Position2>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="7" Column="7" TopLine="1"/>
+      </Position2>
+      <Position3>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="65" Column="63" TopLine="24"/>
+      </Position3>
+      <Position4>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="69" Column="9" TopLine="38"/>
+      </Position4>
+      <Position5>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="8" Column="13" TopLine="1"/>
+      </Position5>
+      <Position6>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="77" Column="21" TopLine="41"/>
+      </Position6>
+      <Position7>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="78" Column="12" TopLine="42"/>
+      </Position7>
+      <Position8>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="91" Column="15" TopLine="47"/>
+      </Position8>
+      <Position9>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="71" Column="15" TopLine="52"/>
+      </Position9>
+      <Position10>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="87" Column="17" TopLine="52"/>
+      </Position10>
+      <Position11>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="94" Column="36" TopLine="60"/>
+      </Position11>
+      <Position12>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="73" Column="32" TopLine="60"/>
+      </Position12>
+      <Position13>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="94" Column="40" TopLine="60"/>
+      </Position13>
+      <Position14>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="89" Column="31" TopLine="63"/>
+      </Position14>
+      <Position15>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="91" Column="17" TopLine="65"/>
+      </Position15>
+      <Position16>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="69" Column="15" TopLine="53"/>
+      </Position16>
+      <Position17>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="73" Column="19" TopLine="59"/>
+      </Position17>
+      <Position18>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="80" Column="64" TopLine="55"/>
+      </Position18>
+      <Position19>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="77" Column="27" TopLine="52"/>
+      </Position19>
+      <Position20>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="86" Column="20" TopLine="76"/>
+      </Position20>
+      <Position21>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="91" Column="22" TopLine="61"/>
+      </Position21>
+      <Position22>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="86" Column="45" TopLine="61"/>
+      </Position22>
+      <Position23>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="80" Column="46" TopLine="61"/>
+      </Position23>
+      <Position24>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="7" Column="23" TopLine="1"/>
+      </Position24>
+      <Position25>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="72" Column="1" TopLine="46"/>
+      </Position25>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="9"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="levenshtein"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="..\IBFB"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <CodeGeneration>
+      <TargetCPU Value="x86_64"/>
+      <TargetOS Value="win64"/>
+    </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <UseLineInfoUnit Value="False"/>
+        <StripSymbols Value="True"/>
+      </Debugging>
+      <Options>
+        <ExecutableType Value="Library"/>
+      </Options>
+    </Linking>
+    <Other>
+      <CompilerMessages>
+        <UseMsgFile Value="True"/>
+      </CompilerMessages>
+      <CompilerPath Value="$(CompPath)"/>
+    </Other>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>
