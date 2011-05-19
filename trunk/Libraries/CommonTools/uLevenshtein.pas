@@ -92,10 +92,8 @@ begin
     Inc(S1);
   end;
   Result := D[LenStr2];
-  FreeMem(D);
+  FreeMem(D, T * SizeOf(Integer));
 end;
-
-
 
 function StringSimilarityRatio(const Str1, Str2: String; IgnoreCase: Boolean): Double;
 var

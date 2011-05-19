@@ -1,0 +1,48 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{11A8D9D8-6B3E-4BC6-9671-F0EE4B3B9BDD}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="SuggestEdit.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="VirtualTreeSuggestEdit.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="SuggestEdit">
+			<MSBuild Projects="SuggestEdit.dproj"/>
+		</Target>
+		<Target Name="SuggestEdit:Clean">
+			<MSBuild Targets="Clean" Projects="SuggestEdit.dproj"/>
+		</Target>
+		<Target Name="SuggestEdit:Make">
+			<MSBuild Targets="Make" Projects="SuggestEdit.dproj"/>
+		</Target>
+		<Target Name="VirtualTreeSuggestEdit">
+			<MSBuild Projects="VirtualTreeSuggestEdit.dproj"/>
+		</Target>
+		<Target Name="VirtualTreeSuggestEdit:Clean">
+			<MSBuild Targets="Clean" Projects="VirtualTreeSuggestEdit.dproj"/>
+		</Target>
+		<Target Name="VirtualTreeSuggestEdit:Make">
+			<MSBuild Targets="Make" Projects="VirtualTreeSuggestEdit.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="SuggestEdit;VirtualTreeSuggestEdit"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="SuggestEdit:Clean;VirtualTreeSuggestEdit:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="SuggestEdit:Make;VirtualTreeSuggestEdit:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>
