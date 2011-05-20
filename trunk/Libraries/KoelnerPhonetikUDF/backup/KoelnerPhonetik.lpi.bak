@@ -42,12 +42,12 @@
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
-        <CursorPos X="14" Y="12"/>
+        <CursorPos X="72" Y="34"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit0>
     </Units>
-    <JumpHistory Count="21" HistoryIndex="20">
+    <JumpHistory Count="22" HistoryIndex="21">
       <Position1>
         <Filename Value="KoelnerPhonetik.lpr"/>
         <Caret Line="12" Column="11" TopLine="1"/>
@@ -132,6 +132,10 @@
         <Filename Value="KoelnerPhonetik.lpr"/>
         <Caret Line="177" Column="15" TopLine="172"/>
       </Position21>
+      <Position22>
+        <Filename Value="KoelnerPhonetik.lpr"/>
+        <Caret Line="210" Column="57" TopLine="175"/>
+      </Position22>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -142,7 +146,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="C:\Users\MaWarm\Documents\Projects\TUO\trunk\Libraries\IBFB\"/>
+      <OtherUnitFiles Value="..\IBFB"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
@@ -158,12 +162,6 @@
     </Other>
   </CompilerOptions>
   <Debugging>
-    <BreakPoints Count="1">
-      <Item1>
-        <Source Value="KoelnerPhonetik.lpr"/>
-        <Line Value="31"/>
-      </Item1>
-    </BreakPoints>
     <Exceptions Count="3">
       <Item1>
         <Name Value="EAbort"/>
