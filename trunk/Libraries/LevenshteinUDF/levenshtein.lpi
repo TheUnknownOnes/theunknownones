@@ -33,7 +33,7 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <Units Count="4">
+    <Units Count="5">
       <Unit0>
         <Filename Value="levenshtein.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -41,8 +41,8 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="46"/>
-        <CursorPos X="71" Y="77"/>
+        <TopLine Value="56"/>
+        <CursorPos X="53" Y="8"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -70,8 +70,16 @@
         <CursorPos X="20" Y="601"/>
         <UsageCount Value="10"/>
       </Unit3>
+      <Unit4>
+        <Filename Value="..\IBFB\uIB2007.pas"/>
+        <UnitName Value="uIB2007"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="18" Y="1"/>
+        <UsageCount Value="10"/>
+      </Unit4>
     </Units>
-    <JumpHistory Count="25" HistoryIndex="24">
+    <JumpHistory Count="26" HistoryIndex="25">
       <Position1>
         <Filename Value="levenshtein.lpr"/>
         <Caret Line="7" Column="22" TopLine="1"/>
@@ -172,6 +180,10 @@
         <Filename Value="levenshtein.lpr"/>
         <Caret Line="72" Column="1" TopLine="46"/>
       </Position25>
+      <Position26>
+        <Filename Value="levenshtein.lpr"/>
+        <Caret Line="84" Column="5" TopLine="54"/>
+      </Position26>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

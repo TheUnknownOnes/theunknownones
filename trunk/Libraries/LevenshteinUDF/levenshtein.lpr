@@ -2,10 +2,10 @@ library levenshtein;
 
 {
 DECLARE EXTERNAL FUNCTION levenshtein_1000
-    varchar(1000) null,
-    varchar(1000) null
-    RETURNS double precision by value
-    ENTRY_POINT 'levenshtein' MODULE_NAME 'levenshtein';
+varchar(1000) null,
+varchar(1000) null
+RETURNS double precision
+ENTRY_POINT 'levenshtein' MODULE_NAME 'levenshtein';
 }
 
 {$mode objfpc}{$H+}
@@ -13,6 +13,7 @@ DECLARE EXTERNAL FUNCTION levenshtein_1000
 uses
   Classes,
   uFBParamDescription,
+  uIB2007,
   Math;
 
 {$R *.res}
@@ -76,16 +77,17 @@ begin
   Move(AParam^.vary_string, Result[1], AParam^.vary_length);
 end;
 
-function levenshtein(AString1, AString2 : PParamVary) : Double; export; cdecl;
+function levenshtein(AString1, AString2 : PParamVary) : PDouble; export; cdecl;
 begin
   if (Assigned(AString1)) and
      (Assigned(AString2)) then
   begin
-    Result := _Levenshtein(VarcharParamToString(AString1), VarcharParamToString(AString2));
+    Result := ib_util_malloc(SizeOf(Double));
+    Result^ := _Levenshtein(VarcharParamToString(AString1), VarcharParamToString(AString2));
   end
   else
   begin
-    Result := 0;
+    Result := nil;
   end;
 end;
 
