@@ -21,6 +21,8 @@ type
     procedure SetSuggestBoxHeight(const Value: Integer);
     procedure SetThreshold(const Value: Integer);
     procedure SetWordList(const Value: TStrings);
+    function GetSuggestMethod: TSuggestMethod;
+    procedure SetSuggestMethod(const Value: TSuggestMethod);
   protected
     procedure PrepareEditControl; override;
     function GetEditText: UnicodeString; override;
@@ -35,6 +37,7 @@ type
     property WordList: TStrings read GetWordList write SetWordList;
     property DisplaySimilarity: Boolean read GetDisplaySimilarity write SetDisplaySimilarity;
     property SuggestBoxHeight: Integer read GetSuggestBoxHeight write SetSuggestBoxHeight;
+    property SuggestMethod: TSuggestMethod read GetSuggestMethod write SetSuggestMethod;
   end;
 
 implementation
@@ -79,6 +82,11 @@ begin
   Result:=SuggestEditControl.SuggestBoxHeight;
 end;
 
+function TSuggestEditLink.GetSuggestMethod: TSuggestMethod;
+begin
+  Result:=SuggestEditControl.SuggestMethod;
+end;
+
 function TSuggestEditLink.GetThreshold: Integer;
 begin
   Result:=SuggestEditControl.Threshold;
@@ -113,6 +121,11 @@ end;
 procedure TSuggestEditLink.SetSuggestBoxHeight(const Value: Integer);
 begin
   SuggestEditControl.SuggestBoxHeight :=Value;
+end;
+
+procedure TSuggestEditLink.SetSuggestMethod(const Value: TSuggestMethod);
+begin
+  SuggestEditControl.SuggestMethod:=Value;
 end;
 
 procedure TSuggestEditLink.SetThreshold(const Value: Integer);

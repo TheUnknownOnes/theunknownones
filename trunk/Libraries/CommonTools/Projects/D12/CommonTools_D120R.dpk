@@ -56,6 +56,7 @@ contains
   wm_helper in '..\..\wm_helper.pas',
   uVirtualEarth in '..\..\uVirtualEarth.pas',
   uRDPHash in '..\..\uRDPHash.pas',
-  uLevenshtein in '..\..\uLevenshtein.pas';
+  uLevenshtein in '..\..\uLevenshtein.pas',
+  uKoelnerPhonetik in '..\..\uKoelnerPhonetik.pas';
 
 end.

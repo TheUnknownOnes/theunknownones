@@ -4,9 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  StdCtrls, Themes, Types, uLevenshtein, Math, ComCtrls;
+  StdCtrls, Themes, Types, uLevenshtein, Math, ComCtrls, uKoelnerPhonetik;
 
 type
+  TSuggestMethod = (smDamerauLevenshtein, smKoelnerPhonetik);
+
   TSuggestEdit = class;
 
   TFormEditSuggest = class;
@@ -54,11 +56,13 @@ type
     FCS : TRTLCriticalSection;
     FDisplaySimilarity: Boolean;
     FSuggestBoxHeight: Integer;
+    FSuggestMethod: TSuggestMethod;
     procedure SetIgnoreCase(const Value: Boolean);
     procedure SetThreshold(const Value: Integer);
     function GetWordList: TStrings;
     procedure SetWordList(const Value: TStrings);
     function GetTestWord: String;
+    procedure SetSuggestMethod(const Value: TSuggestMethod);
   protected
     procedure Change; override;
     procedure DoExit; override;
@@ -74,6 +78,7 @@ type
     property WordList: TStrings read GetWordList write SetWordList;
     property DisplaySimilarity: Boolean read FDisplaySimilarity write FDisplaySimilarity;
     property SuggestBoxHeight: Integer read FSuggestBoxHeight write FSuggestBoxHeight;
+    property SuggestMethod: TSuggestMethod read FSuggestMethod write SetSuggestMethod;
   end;
 
 
@@ -134,7 +139,11 @@ begin
       for i := 0 to myWordList.Count - 1 do
       begin
         checkWord:=trim(myWordList[i]);
-        Ratio:=Round(100 * uLevenshtein.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
+
+        case FFormEditSuggest.FEdit.FSuggestMethod of
+          smDamerauLevenshtein: Ratio:=Round(100 * uLevenshtein.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
+          smKoelnerPhonetik: Ratio:=IfThen(uKoelnerPhonetik.SoundsSimilar(myTestWord, checkWord), 100, 0);
+        end;
 
         if (Ratio>myTheshold) then
         begin
@@ -317,6 +326,7 @@ begin
   FThreshold:=80;
   FIgnoreCase:=True;
   FDisplaySimilarity:=False;
+  FSuggestMethod:=smDamerauLevenshtein;
 
   InitializeCriticalSection(FCS);
 end;
@@ -371,6 +381,12 @@ end;
 procedure TSuggestEdit.SetIgnoreCase(const Value: Boolean);
 begin
   FIgnoreCase:=Value;
+end;
+
+procedure TSuggestEdit.SetSuggestMethod(const Value: TSuggestMethod);
+begin
+  FSuggestMethod:=Value;
+  Change;
 end;
 
 procedure TSuggestEdit.SetThreshold(const Value: Integer);
