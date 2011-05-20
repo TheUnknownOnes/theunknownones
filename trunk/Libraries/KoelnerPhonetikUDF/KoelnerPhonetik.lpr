@@ -178,31 +178,16 @@ begin
 end;
 
 function kphonetikcont(AString1, AString2 : PParamVary) : PInteger; export; cdecl;
-var
-  i : Integer;
-  sl: TStringList;
-  testWord : String;
 begin
   if (Assigned(AString1)) and
      (Assigned(AString2)) then
   begin
     Result := ib_util_malloc(SizeOf(Integer));
-    Result^ := 0;
 
-    sl:=TStringList.Create;
-    sl.Text:=StringReplace(VarcharParamToString(AString1), ' ', #13#10, [rfReplaceAll]);
-    testWord:=VarcharParamToString(AString2);
-
-    for i:=0 to sl.Count-1 do
-    begin
-      if _KoelnerKey(sl[i])=_KoelnerKey(testWord) then
-      begin
-        Result^ := 1;
-        break;
-      end;
-    end;
-
-    sl.Free;
+    if Pos(_KoelnerKey(VarcharParamToString(AString2)),_KoelnerKey(VarcharParamToString(AString1)))>0 then
+      Result^ := 1
+    else
+      Result^ := 0;
   end
   else
   begin
