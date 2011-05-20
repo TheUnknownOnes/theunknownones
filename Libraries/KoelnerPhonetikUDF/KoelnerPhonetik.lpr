@@ -2,10 +2,16 @@ library KoelnerPhonetik;
 
 {
 DECLARE EXTERNAL FUNCTION koelnerphonetikequals
-varchar(1000) null,
-varchar(1000) null
+varchar(32676) null,
+varchar(32676) null
 RETURNS integer
-ENTRY_POINT 'koelnerphonetikequals' MODULE_NAME 'koelnerphonetik';
+ENTRY_POINT 'kphonetikeq' MODULE_NAME 'koelnerphonetik';
+
+DECLARE EXTERNAL FUNCTION koelnerphonetikcontains
+varchar(32676) null,
+varchar(32676) null
+RETURNS integer
+ENTRY_POINT 'kphonetikcont' MODULE_NAME 'koelnerphonetik';
 }
 
 
@@ -171,8 +177,41 @@ begin
   end;
 end;
 
+function kphonetikcont(AString1, AString2 : PParamVary) : PInteger; export; cdecl;
+var
+  i : Integer;
+  sl: TStringList;
+  testWord : String;
+begin
+  if (Assigned(AString1)) and
+     (Assigned(AString2)) then
+  begin
+    Result := ib_util_malloc(SizeOf(Integer));
+    Result^ := 0;
+
+    sl:=TStringList.Create;
+    sl.Text:=StringReplace(VarcharParamToString(AString1), ' ', #13#10, [rfReplaceAll]);
+    testWord:=VarcharParamToString(AString2);
+
+    for i:=0 to sl.Count-1 do
+    begin
+      if _KoelnerKey(sl[i])=_KoelnerKey(testWord) then
+      begin
+        Result^ := 1;
+        break;
+      end;
+    end;
+
+    sl.Free;
+  end
+  else
+  begin
+    Result := nil;
+  end;
+end;
+
 exports
-  kphonetikeq;
+  kphonetikeq, kphonetikcont;
 
 begin
   IsMultiThread := true;

@@ -41,13 +41,13 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="144"/>
-        <CursorPos X="14" Y="175"/>
+        <TopLine Value="182"/>
+        <CursorPos X="13" Y="205"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit0>
     </Units>
-    <JumpHistory Count="17" HistoryIndex="16">
+    <JumpHistory Count="21" HistoryIndex="20">
       <Position1>
         <Filename Value="KoelnerPhonetik.lpr"/>
         <Caret Line="12" Column="11" TopLine="1"/>
@@ -58,64 +58,80 @@
       </Position2>
       <Position3>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="7" Column="6" TopLine="100"/>
+        <Caret Line="3" Column="14" TopLine="1"/>
       </Position3>
       <Position4>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="3" Column="14" TopLine="1"/>
+        <Caret Line="17" Column="24" TopLine="1"/>
       </Position4>
       <Position5>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="17" Column="24" TopLine="1"/>
+        <Caret Line="3" Column="15" TopLine="1"/>
       </Position5>
       <Position6>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="3" Column="15" TopLine="1"/>
+        <Caret Line="17" Column="71" TopLine="1"/>
       </Position6>
       <Position7>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="17" Column="71" TopLine="1"/>
+        <Caret Line="26" Column="50" TopLine="8"/>
       </Position7>
       <Position8>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="26" Column="50" TopLine="8"/>
+        <Caret Line="32" Column="22" TopLine="14"/>
       </Position8>
       <Position9>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="32" Column="22" TopLine="14"/>
+        <Caret Line="7" Column="12" TopLine="2"/>
       </Position9>
       <Position10>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="7" Column="12" TopLine="2"/>
+        <Caret Line="6" Column="14" TopLine="1"/>
       </Position10>
       <Position11>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="6" Column="14" TopLine="1"/>
+        <Caret Line="12" Column="59" TopLine="1"/>
       </Position11>
       <Position12>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="12" Column="59" TopLine="1"/>
+        <Caret Line="7" Column="12" TopLine="1"/>
       </Position12>
       <Position13>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="7" Column="12" TopLine="1"/>
+        <Caret Line="33" Column="58" TopLine="15"/>
       </Position13>
       <Position14>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="33" Column="58" TopLine="15"/>
+        <Caret Line="12" Column="1" TopLine="1"/>
       </Position14>
       <Position15>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="12" Column="1" TopLine="1"/>
+        <Caret Line="147" Column="68" TopLine="131"/>
       </Position15>
       <Position16>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="147" Column="68" TopLine="131"/>
+        <Caret Line="162" Column="24" TopLine="129"/>
       </Position16>
       <Position17>
         <Filename Value="KoelnerPhonetik.lpr"/>
-        <Caret Line="162" Column="24" TopLine="129"/>
+        <Caret Line="196" Column="9" TopLine="169"/>
       </Position17>
+      <Position18>
+        <Filename Value="KoelnerPhonetik.lpr"/>
+        <Caret Line="186" Column="18" TopLine="168"/>
+      </Position18>
+      <Position19>
+        <Filename Value="KoelnerPhonetik.lpr"/>
+        <Caret Line="17" Column="12" TopLine="3"/>
+      </Position19>
+      <Position20>
+        <Filename Value="KoelnerPhonetik.lpr"/>
+        <Caret Line="187" Column="86" TopLine="169"/>
+      </Position20>
+      <Position21>
+        <Filename Value="KoelnerPhonetik.lpr"/>
+        <Caret Line="177" Column="15" TopLine="172"/>
+      </Position21>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -145,7 +161,7 @@
     <BreakPoints Count="1">
       <Item1>
         <Source Value="KoelnerPhonetik.lpr"/>
-        <Line Value="25"/>
+        <Line Value="31"/>
       </Item1>
     </BreakPoints>
     <Exceptions Count="3">
