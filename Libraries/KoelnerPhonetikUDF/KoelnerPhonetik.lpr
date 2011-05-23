@@ -4,13 +4,13 @@ library KoelnerPhonetik;
 DECLARE EXTERNAL FUNCTION koelnerphonetikequals
 varchar(32676) null,
 varchar(32676) null
-RETURNS integer
+RETURNS integer FREE_IT
 ENTRY_POINT 'kphonetikeq' MODULE_NAME 'koelnerphonetik';
 
 DECLARE EXTERNAL FUNCTION koelnerphonetikcontains
 varchar(32676) null,
 varchar(32676) null
-RETURNS integer
+RETURNS integer FREE_IT
 ENTRY_POINT 'kphonetikcont' MODULE_NAME 'koelnerphonetik';
 }
 

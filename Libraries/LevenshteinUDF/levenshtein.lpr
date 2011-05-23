@@ -4,7 +4,7 @@ library levenshtein;
 DECLARE EXTERNAL FUNCTION levenshtein_1000
 varchar(1000) null,
 varchar(1000) null
-RETURNS double precision
+RETURNS double precision FREE_IT
 ENTRY_POINT 'levenshtein' MODULE_NAME 'levenshtein';
 }
 
