@@ -4,10 +4,15 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  StdCtrls, Themes, Types, uLevenshtein, Math, ComCtrls, uKoelnerPhonetik;
+  StdCtrls, Themes, Types, uLevenshtein, Math, ComCtrls, uKoelnerPhonetik,
+  uSoundEx, uMetaphone, uDoubleMetaphone;
 
 type
-  TSuggestMethod = (smDamerauLevenshtein, smKoelnerPhonetik);
+  TSuggestMethod = (smDamerauLevenshtein,
+                    smKoelnerPhonetik,
+                    smSoundEx,
+                    smMetaphone,
+                    smDoubleMetaphone);
 
   TSuggestEdit = class;
 
@@ -142,7 +147,34 @@ begin
 
         case FFormEditSuggest.FEdit.FSuggestMethod of
           smDamerauLevenshtein: Ratio:=Round(100 * uLevenshtein.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
-          smKoelnerPhonetik: Ratio:=IfThen(uKoelnerPhonetik.SoundsSimilar(myTestWord, checkWord), 100, 0);
+          smKoelnerPhonetik:
+             begin
+               if AnsiSameText(myTestWord, checkWord) then
+                 Ratio:=100
+               else
+                 Ratio:=IfThen(uKoelnerPhonetik.SoundsSimilar(myTestWord, checkWord), 99, 0);
+             end;
+          smSoundEx:
+             begin
+               if AnsiSameText(myTestWord, checkWord) then
+                 Ratio:=100
+               else
+                 Ratio:=IfThen(uSoundEx.SoundsSimilar(myTestWord, checkWord), 99, 0);
+             end;
+          smMetaphone:
+             begin
+               if AnsiSameText(myTestWord, checkWord) then
+                 Ratio:=100
+               else
+                 Ratio:=IfThen(uMetaphone.SoundsSimilar(myTestWord, checkWord), 99, 0);
+             end;
+          smDoubleMetaphone:
+             begin
+               if AnsiSameText(myTestWord, checkWord) then
+                 Ratio:=100
+               else
+                 Ratio:=IfThen(uDoubleMetaphone.SoundsSimilar(myTestWord, checkWord), 99, 0);
+             end;
         end;
 
         if (Ratio>myTheshold) then
