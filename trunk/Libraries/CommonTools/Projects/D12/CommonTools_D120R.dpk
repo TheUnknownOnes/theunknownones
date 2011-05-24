@@ -57,6 +57,8 @@ contains
   uVirtualEarth in '..\..\uVirtualEarth.pas',
   uRDPHash in '..\..\uRDPHash.pas',
   uLevenshtein in '..\..\uLevenshtein.pas',
-  uKoelnerPhonetik in '..\..\uKoelnerPhonetik.pas';
+  uKoelnerPhonetik in '..\..\uKoelnerPhonetik.pas',
+  uSoundEx in '..\..\uSoundEx.pas',
+  uDoubleMetaphone in '..\..\uDoubleMetaphone.pas';
 
 end.

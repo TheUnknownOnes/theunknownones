@@ -78,6 +78,8 @@
 			<DCCReference Include="..\..\uRDPHash.pas"/>
 			<DCCReference Include="..\..\uLevenshtein.pas"/>
 			<DCCReference Include="..\..\uKoelnerPhonetik.pas"/>
+			<DCCReference Include="..\..\uSoundEx.pas"/>
+			<DCCReference Include="..\..\uDoubleMetaphone.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
