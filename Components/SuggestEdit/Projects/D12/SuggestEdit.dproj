@@ -43,6 +43,7 @@
 			<DelphiCompile Include="SuggestEdit.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
+			<DCCReference Include="Bitmaps.res"/>
 			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="CommonTools_D120R.dcp"/>
