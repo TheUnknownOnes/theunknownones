@@ -59,6 +59,7 @@ contains
   uLevenshtein in '..\..\uLevenshtein.pas',
   uKoelnerPhonetik in '..\..\uKoelnerPhonetik.pas',
   uSoundEx in '..\..\uSoundEx.pas',
-  uDoubleMetaphone in '..\..\uDoubleMetaphone.pas';
+  uDoubleMetaphone in '..\..\uDoubleMetaphone.pas',
+  uFuzzyMatching in '..\..\uFuzzyMatching.pas';
 
 end.

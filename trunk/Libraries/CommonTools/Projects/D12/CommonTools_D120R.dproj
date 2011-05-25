@@ -80,6 +80,7 @@
 			<DCCReference Include="..\..\uKoelnerPhonetik.pas"/>
 			<DCCReference Include="..\..\uSoundEx.pas"/>
 			<DCCReference Include="..\..\uDoubleMetaphone.pas"/>
+			<DCCReference Include="..\..\uFuzzyMatching.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
