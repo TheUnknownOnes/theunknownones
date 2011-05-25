@@ -1,5 +1,5 @@
 ######## The dwywbdbu-license ########
- (do want you want but don't blame us)
+ (do what you want, but don't blame us)
 
 
 This license allows you to do everything (copy, modify, include, ...) with the
