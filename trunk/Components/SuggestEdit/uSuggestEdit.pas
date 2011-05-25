@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   StdCtrls, Themes, Types, uLevenshtein, Math, ComCtrls, uKoelnerPhonetik,
-  uSoundEx, uMetaphone, uDoubleMetaphone, uFuzzyMatching;
+  uSoundEx, uMetaphone, uDoubleMetaphone, uFuzzyMatching, Buttons;
 
 type
   TSuggestMethod = (smDamerauLevenshtein,
@@ -63,6 +63,7 @@ type
     FDisplaySimilarity: Boolean;
     FSuggestBoxHeight: Integer;
     FSuggestMethod: TSuggestMethod;
+    FButton : TSpeedButton;
     procedure SetIgnoreCase(const Value: Boolean);
     procedure SetThreshold(const Value: Integer);
     function GetWordList: TStrings;
@@ -87,7 +88,6 @@ type
     property SuggestMethod: TSuggestMethod read FSuggestMethod write SetSuggestMethod;
   end;
 
-
   procedure Register;
 
 implementation
@@ -106,7 +106,6 @@ begin
 
   FFormEditSuggest:= AFormEditSuggest;
   FResults:=TStringList.Create;
-
 end;
 
 destructor TThreadEditSuggest.Destroy;
@@ -351,6 +350,8 @@ begin
 end;
 
 constructor TSuggestEdit.Create(AOwner: TComponent);
+var
+  bmp: TBitmap;
 begin
   inherited;
   FFormEditSuggest:=TFormEditSuggest.Create(self);
@@ -361,6 +362,16 @@ begin
   FIgnoreCase:=True;
   FDisplaySimilarity:=False;
   FSuggestMethod:=smDamerauLevenshtein;
+
+  FButton:=TSpeedButton.Create(self);
+  FButton.Parent:=Self;
+  FButton.Align:=alRight;
+  FButton.Width:=FButton.Height;
+  FButton.Flat:=True;
+  bmp:=TBitmap.Create;
+  bmp.LoadFromResourceName(HInstance,'OPTIONS');
+  FButton.Glyph:=bmp;
+  bmp.Free;
 
   InitializeCriticalSection(FCS);
 end;

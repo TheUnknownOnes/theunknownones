@@ -25,6 +25,9 @@ package SuggestEdit;
 {$LIBSUFFIX '_D120'}
 {$IMPLICITBUILD ON}
 
+
+{$R 'Bitmaps.res'}
+
 requires
   vcl,
   rtl,
