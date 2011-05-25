@@ -63,7 +63,6 @@ type
     FDisplaySimilarity: Boolean;
     FSuggestBoxHeight: Integer;
     FSuggestMethod: TSuggestMethod;
-    FButton : TSpeedButton;
     procedure SetIgnoreCase(const Value: Boolean);
     procedure SetThreshold(const Value: Integer);
     function GetWordList: TStrings;
@@ -350,8 +349,6 @@ begin
 end;
 
 constructor TSuggestEdit.Create(AOwner: TComponent);
-var
-  bmp: TBitmap;
 begin
   inherited;
   FFormEditSuggest:=TFormEditSuggest.Create(self);
@@ -362,16 +359,6 @@ begin
   FIgnoreCase:=True;
   FDisplaySimilarity:=False;
   FSuggestMethod:=smDamerauLevenshtein;
-
-  FButton:=TSpeedButton.Create(self);
-  FButton.Parent:=Self;
-  FButton.Align:=alRight;
-  FButton.Width:=FButton.Height;
-  FButton.Flat:=True;
-  bmp:=TBitmap.Create;
-  bmp.LoadFromResourceName(HInstance,'OPTIONS');
-  FButton.Glyph:=bmp;
-  bmp.Free;
 
   InitializeCriticalSection(FCS);
 end;
