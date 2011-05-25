@@ -5,14 +5,15 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   StdCtrls, Themes, Types, uLevenshtein, Math, ComCtrls, uKoelnerPhonetik,
-  uSoundEx, uMetaphone, uDoubleMetaphone;
+  uSoundEx, uMetaphone, uDoubleMetaphone, uFuzzyMatching;
 
 type
   TSuggestMethod = (smDamerauLevenshtein,
                     smKoelnerPhonetik,
                     smSoundEx,
                     smMetaphone,
-                    smDoubleMetaphone);
+                    smDoubleMetaphone,
+                    smFuzzyLogic);
 
   TSuggestEdit = class;
 
@@ -147,6 +148,7 @@ begin
 
         case FFormEditSuggest.FEdit.FSuggestMethod of
           smDamerauLevenshtein: Ratio:=Round(100 * uLevenshtein.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
+          smFuzzyLogic: Ratio:=Round(100 * uFuzzyMatching.StringSimilarityRatio(myTestWord, checkWord));
           smKoelnerPhonetik:
              begin
                if AnsiSameText(myTestWord, checkWord) then

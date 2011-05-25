@@ -1,5 +1,15 @@
 ﻿unit uDoubleMetaphone;
 
+{
+  This unit implements a "sounds like" algorithm developed
+  by Lawrence Philips which he published in the June, 2000 issue
+  of C/C++ Users Journal.  Double Metaphone is an improved
+  version of Philips' original Metaphone algorithm.
+
+  There still may be some bugs or have any suggestions, you are
+  invited to inform us @ theunknownones.net
+}
+
 interface
 
 type
@@ -14,7 +24,7 @@ function SoundsSimilar(const AStr1, AStr2: String): Boolean;
 implementation
 
 uses
-  SysUtils;
+  SysUtils, uSysTools;
 
 function SoundsSimilar(const AStr1, AStr2: String): Boolean;
 var
@@ -54,34 +64,38 @@ var
 	strnext1 : Char;
 	strprev1 : Char;
 	SlavoGermanic : Boolean;
+  s : String;
 begin
+  // this is not in the original version but it clears out all "unwanted" german characters
+  s:=MultipleStringReplace(UpperCase(AStr), ['Ä','Ö','Ü','ß'],['AE','OE','UE','SS'],[rfReplaceAll]);
+
 	SlavoGermanic	:= False;
   primary 		:= '';
 	secondary 	:= '';
 	current 		:= 1;
-	len		  := length(Astr);
+	len		  := length(s);
 	last	 	    :=  len;
 
-	original 		:= UpperCase(Trim(Astr))+' ';
+	original 		:= Trim(s)+' ';
 
-	if Pos('CZ',original) + POS('WITZ',original) <> 0 then
+	if Pos('W',original) + Pos('K',original) + Pos('CZ',original) + POS('WITZ',original) <> 0 then
 		SlavoGermanic := True;
 
-	//-- skip this at beginning of word
+	//skip this at beginning of word
   if StringInStrings(Copy(original, 1, 2),['GN','KN','PN','WR','PS']) then
 	 	current := current + 1;
 
-	//-- Initial 'X' is pronounced 'Z' e.g. 'Xavier'
+	//Initial 'X' is pronounced 'Z' e.g. 'Xavier'
 	if copy(original, 1, 1) = 'X' then
 	begin
-		primary := primary + 'S';//-- 'Z' maps to 'S'
+		primary := primary + 'S';//'Z' maps to 'S'
 		secondary := secondary + 'S';
 		current := current + 1;
 	end;
 
-	if CharInSet(copy(original, 1, 1)[1], ['A', 'E', 'I', 'O', 'U', 'Y']) then
+	if StringInStrings(copy(original, 1, 1), ['A', 'E', 'I', 'O', 'U', 'Y']) then
 	begin
-		primary := primary + 'A';  //-- all init vowels now map to 'A'
+		primary := primary + 'A';  // all init vowels now map to 'A'
 		secondary := secondary + 'A';
 		current := current + 1;
 	end;
@@ -97,7 +111,7 @@ begin
 		if CharInSet(strcur1,  ['A', 'E', 'I', 'O', 'U', 'Y', ' ', '''', '-']) then
 			current := current + 1
 		else
-		if strcur1 = 'B' then   // -- '-mb', e.g. 'dumb', already skipped over ...
+		if strcur1 = 'B' then   //  '-mb', e.g. 'dumb', already skipped over ...
 		begin
 			primary := primary + 'P';
 			secondary := secondary + 'P';
@@ -108,7 +122,7 @@ begin
 				current := current + 1;
 		end
 		else
-		if strcur1 = 'ß' then
+		if strcur1 = 'Ç' then
 		begin
 			primary := primary + 'S';
 			secondary := secondary + 'S';
@@ -119,14 +133,14 @@ begin
 		begin
 			if strnext1 = 'H' then
 			begin
-				if copy(original, current, 4) = 'CHIA' then	// -- italian 'chianti'
+				if copy(original, current, 4) = 'CHIA' then	//  italian 'chianti'
 				begin
 					primary := primary + 'K';
 					secondary := secondary + 'K';
 				end
 				else
 				begin
-					if (current > 1)   //-- find 'michael'
+					if (current > 1)   //find 'michael'
 						and (copy(original, current, 4) = 'CHAE') then
 					begin
 						 primary := primary + 'K';
@@ -134,7 +148,7 @@ begin
 					end
 					else
 					begin
-            if (current = 1) //		-- greek roots e.g. 'chemistry', 'chorus'
+            if (current = 1) //		 greek roots e.g. 'chemistry', 'chorus'
 							and (
                    StringInStrings(copy(original, current + 1, 5),['HARAC','HARIS'])
 								or StringInStrings(copy(original, current + 1, 3),['HOR','HYM','HIA','HEM'])
@@ -146,15 +160,15 @@ begin
 						end
 						else
 						begin
-							if 	(	StringInStrings(copy(original, 1, 4), ['VAN ', 'VON '])	//-- germanic, greek, or otherwise 'ch' for 'kh' sound
+							if 	(	StringInStrings(copy(original, 1, 4), ['VAN ', 'VON '])	// germanic, greek, or otherwise 'ch' for 'kh' sound
 									or (copy(original, 1, 3) = 'SCH'
 								)
-								or StringInStrings( copy(original, current - 2, 6) , ['ORCHES', 'ARCHIT', 'ORCHID']) //	-- 'architect' but not 'arch', orchestra', 'orchid'
+								or StringInStrings( copy(original, current - 2, 6) , ['ORCHES', 'ARCHIT', 'ORCHID']) //	 'architect' but not 'arch', orchestra', 'orchid'
 								or StringInStrings(copy(original, current + 2, 1) , ['T', 'S'])
 								or 	(	CharInSet(strprev1,['A','O','U','E'])
 											or (current = 1)
 										)
-									and CharInSet(copy(original, current + 2, 1)[1],['L','R','N','M','B','H','F','V','W',' ']) //	-- e.g. 'wachtler', 'weschsler', but not 'tichner'
+									and StringInStrings(copy(original, current + 2, 1),['L','R','N','M','B','H','F','V','W',' ']) //	 e.g. 'wachtler', 'weschsler', but not 'tichner'
 								) then
 							begin
 								primary := primary + 'K';
@@ -164,7 +178,7 @@ begin
 							begin
 								if (current > 1) then
 								begin
-									if copy(original, 1, 2) = 'MC' then //-- e.g. 'McHugh'
+									if copy(original, 1, 2) = 'MC' then // e.g. 'McHugh'
 									begin
 										primary := primary + 'K';
 										secondary := secondary + 'K';
@@ -185,18 +199,18 @@ begin
 					end
 				end;
 				current := current + 2;
-			end //--ch logic
+			end //ch logic
 			else
 			begin
-				if (strnext1 = 'C') //	-- double 'C', but not McClellan'
+				if (strnext1 = 'C') //	 double 'C', but not McClellan'
 					and not((current = 1)
 							and (copy(original, 1, 1) = 'M')
 						) then
 				begin
-					if StringInStrings(copy(original, current + 2, 1), ['I','E','H'])	//-- 'bellocchio' but not 'bacchus'
+					if StringInStrings(copy(original, current + 2, 1), ['I','E','H'])	// 'bellocchio' but not 'bacchus'
 						and (copy(original, current + 2, 2) <> 'HU') then
 					begin
-						if (	(current = 2)	//-- 'accident', 'accede', 'succeed'
+						if (	(current = 2)	// 'accident', 'accede', 'succeed'
 								and (strprev1 = 'A')
 							)
 							or StringInStrings(copy(original, current - 1, 5), ['UCCEE', 'UCCES']) then
@@ -205,16 +219,16 @@ begin
 							secondary := secondary + 'KS';
 						end
 						else
-						begin	//-- 'bacci', 'bertucci', other italian
+						begin	// 'bacci', 'bertucci', other italian
 							primary := primary + 'X';
 							secondary := secondary + 'X';
-							//-- e.g. 'focaccia' if copy(original, current, 4) := 'CCIA'
+							// e.g. 'focaccia' if copy(original, current, 4) := 'CCIA'
 						end;
 						current := current + 3;
 					end
 					else
 					begin
-						primary := primary + 'K'; //	-- Pierce's rule
+						primary := primary + 'K'; //	 Pierce's rule
 						secondary := secondary + 'K';
 						current := current + 2;
 					end
@@ -231,7 +245,7 @@ begin
 					begin
 						if CharInSet(strnext1 ,  ['I','E','Y']) then
 						begin
-							if StringInStrings(copy(original, current, 3), ['CIO','CIE','CIA'])	then //-- italian vs. english
+							if StringInStrings(copy(original, current, 3), ['CIO','CIE','CIA'])	then // italian vs. english
 							begin
 								primary := primary + 'S';
 								secondary := secondary + 'X';
@@ -245,7 +259,7 @@ begin
 						end
 						else
 						begin
-							if (strnext1 = 'Z') //	-- e.g. 'czerny'
+							if (strnext1 = 'Z') //	 e.g. 'czerny'
 								and (copy(original, current -2, 4) <> 'WICZ') then
 							begin
 								primary := primary + 'S';
@@ -254,7 +268,7 @@ begin
 							end
 							else
 							begin
-								if (current > 2)  // -- various gremanic
+								if (current > 2)  //  various gremanic
 									and not StringInStrings(copy(original, current - 2,1) , ['A', 'E', 'I', 'O', 'U', 'Y'])
 									and (copy(original, current - 1, 3) = 'ACH')
 									and ((copy(original, current + 2, 1) <> 'I')
@@ -269,7 +283,7 @@ begin
 								end
 								else
 								begin
-									if (current = 1) //-- special case 'caesar'
+									if (current = 1) // special case 'caesar'
 										and (copy(original, current, 6) = 'CAESAR') then
 									begin
 										primary := primary + 'S';
@@ -277,11 +291,11 @@ begin
 										current := current + 2;
 									end
 									else
-									begin	//-- final else
+									begin	// final else
 										primary := primary + 'K';
 										secondary := secondary + 'K';
 
-										if StringInStrings(copy(original, current + 1, 2) , [' C',' Q',' G']) then //	-- name sent in 'mac caffrey', 'mac gregor'
+										if StringInStrings(copy(original, current + 1, 2) , [' C',' Q',' G']) then //	 name sent in 'mac caffrey', 'mac gregor'
 											current := current + 3
 										else
 										 	current := current + 1;
@@ -301,13 +315,13 @@ begin
 			begin
 				if StringInStrings(copy(original, current + 2, 1) , ['I','E','Y']) then
 				begin
-					primary := primary + 'J'; //	-- e.g. 'edge'
+					primary := primary + 'J'; //	 e.g. 'edge'
 					secondary := secondary + 'J';
 					current := current + 3;
 				end
 				else
 				begin
-					primary := primary + 'TK'; //	-- e.g. 'edgar'
+					primary := primary + 'TK'; //	 e.g. 'edgar'
 					secondary := secondary + 'TK';
 					current := current + 2;
 				end
@@ -354,17 +368,17 @@ begin
 				else
 				begin
 
-					if 	not(	((current > 2) //	-- Parker's rule (with some further refinements) - e.g. 'hugh'
+					if 	not(	((current > 2) //	 Parker's rule (with some further refinements) - e.g. 'hugh'
 								and StringInStrings(copy(original, current - 2, 1) , ['B','H','D'])
-							)	//-- e.g. 'bough'
+							)	// e.g. 'bough'
 							or ((current > 3)
 								and StringInStrings(copy(original, current - 3, 1), ['B','H','D'])
-							)	//-- e.g. 'broughton'
+							)	// e.g. 'broughton'
 							or ((current > 4)
 								and StringInStrings(copy(original, current - 4, 1), ['B','H'])
 						)	) then
 					begin
-						if (current > 3)	//	-- e.g. 'laugh', 'McLaughlin', 'cough', 'gough', 'rough', 'tough'
+						if (current > 3)	//	 e.g. 'laugh', 'McLaughlin', 'cough', 'gough', 'rough', 'tough'
 							and (strprev1 = 'U')
 							and StringInStrings(copy(original, current - 3, 1) ,['C','G','L','R','T']) then
 						begin
@@ -383,7 +397,7 @@ begin
 							begin
 								if (current < 4) then
 								begin
-									if (current = 1) then //	-- 'ghislane', 'ghiradelli'
+									if (current = 1) then //	 'ghislane', 'ghiradelli'
 									begin
 										if (copy(original, current + 2, 1) = 'I') then
 										begin
@@ -416,7 +430,7 @@ begin
 					end
 					else
 					begin
-						//-- not e.g. 'cagney'
+						// not e.g. 'cagney'
 						if (copy(original, current + 2, 2) = 'EY')
 							and (strnext1 <> 'Y')
 							and not SlavoGermanic then
@@ -434,7 +448,7 @@ begin
 				end
 				else
 				begin
-					if (copy(original, current + 1, 2) = 'LI') //	-- 'tagliaro'
+					if (copy(original, current + 1, 2) = 'LI') //	 'tagliaro'
 						and not SlavoGermanic then
 					begin
 						primary := primary + 'KL';
@@ -443,7 +457,7 @@ begin
 					end
 					else
 					begin
-						if (current = 1) //		-- -ges-, -gep-, -gel- at beginning
+						if (current = 1) //		 -ges-, -gep-, -gel- at beginning
 							and ((strnext1 = 'Y')
 								or StringInStrings(copy(original, current + 1, 2) , ['ES','EP','EB','EL','EY','IB','IL','IN','IE', 'EI','ER'])
 							) then
@@ -454,7 +468,7 @@ begin
 						end
 						else
 						begin
-							if ((copy(original, current + 1, 2) = 'ER') //	-- -ger-, -gy-
+							if ((copy(original, current + 1, 2) = 'ER') //	 -ger-, -gy-
 								or (strnext1 = 'Y')
 								)
 							 	and not StringInStrings(copy(original, 1, 6) ,['DANGER','RANGER','MANGER'])
@@ -467,10 +481,10 @@ begin
 							end
 							else
 							begin
-								if CharInSet(strnext1, ['E','I','Y'])	//-- italian e.g. 'biaggi'
+								if CharInSet(strnext1, ['E','I','Y'])	// italian e.g. 'biaggi'
 									or StringInStrings(copy(original, current -1, 4), ['AGGI','OGGI']) then
 								begin
-									if (StringInStrings(copy(original, 1, 4), ['VAN ', 'VON '])  //	-- obvious germanic
+									if (StringInStrings(copy(original, 1, 4), ['VAN ', 'VON '])  //	 obvious germanic
 										or (copy(original, 1, 3) = 'SCH')
 										)
 										or (copy(original, current + 1, 2) = 'ET') then
@@ -480,7 +494,7 @@ begin
 									end
 									else
 									begin
-										//-- always soft if french ending
+										// always soft if french ending
 										if copy(original, current + 1, 4) = 'IER ' then
 										begin
 											primary := primary + 'J';
@@ -495,7 +509,7 @@ begin
 									current := current + 2;
 								end
 								else
-								begin //	-- other options exausted call it k sound
+								begin //	 other options exausted call it k sound
 									primary := primary + 'K';
 									secondary := secondary + 'K';
 									if (strnext1 = 'G') then
@@ -513,7 +527,7 @@ begin
 
 		if strcur1 = 'H' then
 		begin
-			if ((current = 1) // 	-- only keep if first & before vowel or btw. 2 vowels
+			if ((current = 1) // 	 only keep if first & before vowel or btw. 2 vowels
 					or CharInSet(strprev1, ['A', 'E', 'I', 'O', 'U', 'Y'])
 				)
 				and  CharInSet(strnext1, ['A', 'E', 'I', 'O', 'U', 'Y']) then
@@ -529,7 +543,7 @@ begin
 
 		if strcur1 = 'J' then
 		begin
-			if (copy(original, current, 4) = 'JOSE') //	-- obvious spanish, 'jose', 'san jacinto'
+			if (copy(original, current, 4) = 'JOSE') //	 obvious spanish, 'jose', 'san jacinto'
 				or (copy(original, 1, 4) = 'SAN ') then
 			begin
 				if ((current = 1)
@@ -552,13 +566,13 @@ begin
 			begin
 				if current = 1 then
 				begin
-					primary := primary + 'J'; // -- Yankelovich/Jankelowicz
+					primary := primary + 'J'; //  Yankelovich/Jankelowicz
 					secondary := secondary + 'A';
 					current := current + 1;
 				end
 				else
 				begin
-					if CharInSet(strprev1, ['A', 'E', 'I', 'O', 'U', 'Y']) // -- spanish pron. of .e.g. 'bajador'
+					if CharInSet(strprev1, ['A', 'E', 'I', 'O', 'U', 'Y']) //  spanish pron. of .e.g. 'bajador'
 						and not SlavoGermanic
 						and CharInSet(strnext1, ['A','O']) then
 					begin
@@ -585,7 +599,7 @@ begin
 							end
 							else
 							begin
-								if (strnext1 = 'J') then //-- it could happen
+								if (strnext1 = 'J') then // it could happen
 									current := current + 2
 								else
 									current := current + 1
@@ -613,7 +627,7 @@ begin
 		begin
 			if (strnext1 = 'L') then
 			begin
-				if ((current = (len - 3) ) //	-- spanish e.g. 'cabrillo', 'gallegos'
+				if ((current = (len - 3) ) //	 spanish e.g. 'cabrillo', 'gallegos'
 					and StringInStrings(copy(original, current - 1, 4) , ['ILLO','ILLA','ALLE'])
 					)
 					or ((StringInStrings(copy(original, last - 1, 2), ['AS','OS'])
@@ -621,7 +635,7 @@ begin
 						)
 						and (copy(original, current - 1, 4) = 'ALLE')
 					) then
-					primary := primary + 'L' //	--Alternate is silent
+					primary := primary + 'L' //	Alternate is silent
 				else
 				begin
 					primary := primary + 'L';
@@ -646,7 +660,7 @@ begin
 			if (copy(original, current - 1, 3) = 'UMB')
 					and ((current + 1 = last)
 						or (copy(original, current + 2, 2) = 'ER')
-					)  //	-- 'dumb', 'thumb'
+					)  //	 'dumb', 'thumb'
 				or (strnext1 = 'M') then
 				current := current + 2
 			else
@@ -676,7 +690,7 @@ begin
 			end
 			else
 			begin
-		//	-- also account for 'campbell' and 'raspberry'
+		//	 also account for 'campbell' and 'raspberry'
 				if CharInSet(strnext1, ['P','B']) then
 					current := current + 2
 				else
@@ -703,11 +717,11 @@ begin
 
 		if strcur1 = 'R' then
 		begin
-			if (current = last) //	-- french e.g. 'rogier', but exclude 'hochmeier'
+			if (current = last) //	 french e.g. 'rogier', but exclude 'hochmeier'
 				and not SlavoGermanic
 				and (copy(original, current - 2, 2) = 'IE')
 				and not StringInStrings(copy(original, current - 4, 2) , ['ME','MA']) then
-				secondary := secondary + 'R'// --primary := primary + ''
+				secondary := secondary + 'R'// primary := primary + ''
 			else
 			begin
 				primary := primary + 'R';
@@ -716,7 +730,7 @@ begin
 
 			if (strnext1 = 'R') then
 			begin
-				if copy(original, current, 3) = 'RRI' then // --alternate Kerrigan, Corrigan
+				if copy(original, current, 3) = 'RRI' then // alternate Kerrigan, Corrigan
 					secondary := secondary + 'R';
 
 				current := current + 2;
@@ -728,13 +742,13 @@ begin
 
 		if strcur1 = 'S' then
 		begin
-			if StringInStrings(copy(original, current - 1, 3), ['ISL','YSL']) then //-- special cases 'island', 'isle', 'carlisle', 'carlysle'
-				current := current + 1 //	--silent s
+			if StringInStrings(copy(original, current - 1, 3), ['ISL','YSL']) then // special cases 'island', 'isle', 'carlisle', 'carlysle'
+				current := current + 1 //	silent s
 			else
 			begin
 				if copy(original, current, 2) = 'SH' then
 				begin
-//					-- germanic
+//					 germanic
 					if StringInSTrings(copy(original, current + 1, 4), ['HEIM','HOEK','HOLM','HOLZ']) then
 					begin
 						primary := primary + 'S';
@@ -754,7 +768,7 @@ begin
 
 
 
-//					-- italian & armenian
+//					 italian & armenian
 					if StringInStrings( copy(original, current, 3) , ['SIO','SIA'])
 						or (copy(original, current, 4) = 'SIAN') then
 					begin
@@ -773,8 +787,8 @@ begin
 					end
 					else
 					begin
-						if ((current = 1)			 //		-- german & anglicisations, e.g. 'smith' match 'schmidt', 'snider' match 'schneider'
-								and charInSet(strnext1, ['M','N','L','W']) //	-- also, -sz- in slavic language altho in hungarian it is pronounced 's'
+						if ((current = 1)			 //		 german & anglicisations, e.g. 'smith' match 'schmidt', 'snider' match 'schneider'
+								and charInSet(strnext1, ['M','N','L','W']) //	 also, -sz- in slavic language altho in hungarian it is pronounced 's'
 							)
 							or (strnext1 = 'Z') then
 						begin
@@ -790,11 +804,11 @@ begin
 						begin
 							if copy(original, current, 2) = 'SC' then
 							begin
-								if copy(original, current + 2, 1) = 'H' then //	-- Schlesinger's rule
+								if copy(original, current + 2, 1) = 'H' then //	 Schlesinger's rule
 								begin
-									if StringInStrings(copy(original, current + 3, 2), ['OO','ER','EN','UY','ED','EM']) then//	-- dutch origin, e.g. 'school', 'schooner'
+									if StringInStrings(copy(original, current + 3, 2), ['OO','ER','EN','UY','ED','EM']) then//	 dutch origin, e.g. 'school', 'schooner'
 									begin
-										if StringInStrings(copy(original, current + 3, 2), ['ER','EN']) then//	-- 'schermerhorn', 'schenker'
+										if StringInStrings(copy(original, current + 3, 2), ['ER','EN']) then//	 'schermerhorn', 'schenker'
 										begin
 											primary := primary + 'X';
 											secondary := secondary + 'SK';
@@ -842,7 +856,7 @@ begin
 							end
 							else
 							begin
-								if (current = 1)		//-- special case 'sugar-'
+								if (current = 1)		// special case 'sugar-'
 									and (copy(original, current, 5) = 'SUGAR') then
 								begin
 									primary := primary + 'X';
@@ -851,9 +865,9 @@ begin
 								end
 								else
 								begin
-									if (current = last) 	//-- french e.g. 'resnais', 'artois'
+									if (current = last) 	// french e.g. 'resnais', 'artois'
 										and StringInStrings(copy(original, current - 2, 2) , ['AI','OI']) then
-										secondary := secondary + 'S' //--primary := primary + ''
+										secondary := secondary + 'S' //primary := primary + ''
 									else
 									begin
 										primary := primary + 'S';
@@ -892,7 +906,7 @@ begin
 					if (copy(original, current, 2) = 'TH')
 						or (copy(original, current, 3) = 'TTH') then
 					begin
-						if StringInStrings(copy(original, current + 2, 2), ['OM','AM'])	//-- special case 'thomas', 'thames' or germanic
+						if StringInStrings(copy(original, current + 2, 2), ['OM','AM'])	// special case 'thomas', 'thames' or germanic
 							or StringInStrings(copy(original, 1, 4), ['VAN ','VON '])
 							or (copy(original, 1, 3) = 'SCH') then
 						begin
@@ -937,7 +951,7 @@ begin
 
 		if strcur1 = 'W' then
 		begin
-		 //	-- can also be in middle of word
+		 //	 can also be in middle of word
 			if copy(original, current, 2) = 'WR' then
 			begin
 				primary := primary + 'R';
@@ -950,7 +964,7 @@ begin
 						or (copy(original, current, 2) = 'WH')
 					) then
 				begin
-					if CharInSet(strnext1, ['A', 'E', 'I', 'O', 'U', 'Y']) then //	-- Wasserman should match Vasserman
+					if CharInSet(strnext1, ['A', 'E', 'I', 'O', 'U', 'Y']) then //	 Wasserman should match Vasserman
 					begin
 						primary := primary + 'A';
 						secondary := secondary + 'F';
@@ -958,36 +972,36 @@ begin
 					end
 					else
 					begin
-						primary := primary + 'A'; //	-- need Uomo to match Womo
+						primary := primary + 'A'; //	 need Uomo to match Womo
 						secondary := secondary + 'A';
 						current := current + 1;
 					end
 				end
 				else
-					if ((current = last) //-- Arnow should match Arnoff
+					if ((current = last) // Arnow should match Arnoff
 							and CharInSet(strprev1, ['A', 'E', 'I', 'O', 'U', 'Y'])
 						)
 					 	or StringInStrings(copy(original, current - 1, 5), ['EWSKI','EWSKY','OWSKI','OWSKY'])
 					 	or (copy(original, 0, 3) = 'SCH') then
 					begin
-						secondary := secondary + 'F'; //	--primary := primary + ''
+						secondary := secondary + 'F'; //	primary := primary + ''
 						current := current + 1;
 					end
 					else
-						if StringInStrings(copy(original, current, 4), ['WICZ','WITZ']) then // -- polish e.g. 'filipowicz'
+						if StringInStrings(copy(original, current, 4), ['WICZ','WITZ']) then //  polish e.g. 'filipowicz'
 						begin
 							primary := primary + 'TS';
 							secondary := secondary + 'FX';
 							current := current + 4;
 						end
 						else
-							current := current + 1; //	-- else skip it
+							current := current + 1; //	 else skip it
 		end
 		else
 
 		if strcur1 = 'X' then
 		begin
-			if not ((current = last) //	-- french e.g. breaux
+			if not ((current = last) //	 french e.g. breaux
 				and (StringInStrings(copy(original, current - 3, 3), ['IAU', 'EAU'])
 				 	or StringInStrings(copy(original, current - 2, 2), ['AU', 'OU'])
 				)
@@ -995,7 +1009,7 @@ begin
 			begin
 				primary := primary + 'KS';
 				secondary := secondary + 'KS';
-			end; //	--else skip it
+			end; //	else skip it
 
 			if CharInSet(strnext1, ['C','X']) then
 				current := current + 2
@@ -1014,7 +1028,7 @@ begin
 			end
 			else
 			begin
-				if (strnext1 = 'H') then//-- chinese pinyin e.g. 'zhao'
+				if (strnext1 = 'H') then  // chinese pinyin e.g. 'zhao'
 				begin
 					primary := primary + 'J';
 					secondary := secondary + 'J';
