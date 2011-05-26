@@ -3,7 +3,7 @@
 
 = Introduction =
 
-This package was designed as a place where TUO stores "all" the different string similarity routines around. 
+This package was designed as a place where TUO stores "all" the different string similarity routines around. To see how these routines work internally you are invited to read the code ;-) or look up at wikipedia :-D
 
 = Details =
 
