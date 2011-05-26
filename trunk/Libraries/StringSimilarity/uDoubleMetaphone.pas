@@ -24,7 +24,7 @@ function SoundsSimilar(const AStr1, AStr2: String): Boolean;
 implementation
 
 uses
-  SysUtils, uSysTools;
+  SysUtils;
 
 function SoundsSimilar(const AStr1, AStr2: String): Boolean;
 var
@@ -67,7 +67,11 @@ var
   s : String;
 begin
   // this is not in the original version but it clears out all "unwanted" german characters
-  s:=MultipleStringReplace(UpperCase(AStr), ['Ä','Ö','Ü','ß'],['AE','OE','UE','SS'],[rfReplaceAll]);
+  s:=StringReplace(UpperCase(AStr), 'Ä','AE',[rfReplaceAll]);
+  s:=StringReplace(UpperCase(AStr), 'Ö','OE',[rfReplaceAll]);
+  s:=StringReplace(UpperCase(AStr), 'Ü','UE',[rfReplaceAll]);
+  s:=StringReplace(UpperCase(AStr), 'ß','SS',[rfReplaceAll]);
+
 
 	SlavoGermanic	:= False;
   primary 		:= '';

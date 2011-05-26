@@ -1,0 +1,43 @@
+package StringSimilarity;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$LIBSUFFIX '_D120'}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl;
+
+contains
+  uNeedlemanWunch in '..\..\uNeedlemanWunch.pas',
+  uDiceSimilarity in '..\..\uDiceSimilarity.pas',
+  uDoubleMetaphone in '..\..\uDoubleMetaphone.pas',
+  uFuzzyMatching in '..\..\uFuzzyMatching.pas',
+  uJaroWinkler in '..\..\uJaroWinkler.pas',
+  uKoelnerPhonetik in '..\..\uKoelnerPhonetik.pas',
+  uLevenshtein in '..\..\uLevenshtein.pas',
+  uMetaphone in '..\..\uMetaphone.pas',
+  uSoundEx in '..\..\uSoundEx.pas',
+  uSmithWatermanGotoh in '..\..\uSmithWatermanGotoh.pas';
+
+end.
