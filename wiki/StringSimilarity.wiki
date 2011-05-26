@@ -1,5 +1,5 @@
 #summary Delphi package to hold string similarity routines
-#labels stringsimilarity,fuzzysearch,fuzzystring
+#labels stringsimilarity,fuzzysearch,fuzzystring,Featured,phonetic,phoneticsearch,stringcomparison
 
 = Introduction =
 
