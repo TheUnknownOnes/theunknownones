@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   StdCtrls, Themes, Types, uLevenshtein, Math, ComCtrls, uKoelnerPhonetik,
-  uSoundEx, uMetaphone, uDoubleMetaphone, uFuzzyMatching, Buttons;
+  uSoundEx, uMetaphone, uDoubleMetaphone, uFuzzyMatching, Buttons,
+  uDiceSimilarity, uJaroWinkler, uNeedlemanWunch, uSmithWatermanGotoh;
 
 type
   TSuggestMethod = (smDamerauLevenshtein,
@@ -13,7 +14,11 @@ type
                     smSoundEx,
                     smMetaphone,
                     smDoubleMetaphone,
-                    smFuzzyLogic);
+                    smNGram,
+                    smDice,
+                    smJaroWinkler,
+                    smNeedlemanWunch,
+                    smSmithWatermanGotoh);
 
   TSuggestEdit = class;
 
@@ -146,7 +151,11 @@ begin
 
         case FFormEditSuggest.FEdit.FSuggestMethod of
           smDamerauLevenshtein: Ratio:=Round(100 * uLevenshtein.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
-          smFuzzyLogic: Ratio:=Round(100 * uFuzzyMatching.StringSimilarityRatio(myTestWord, checkWord));
+          smNeedlemanWunch: Ratio:=Round(100 * uNeedlemanWunch.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
+          smSmithWatermanGotoh: Ratio:=Round(100 * uSmithWatermanGotoh.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
+          smNGram: Ratio:=Round(100 * uFuzzyMatching.StringSimilarityRatio(myTestWord, checkWord));
+          smDice: Ratio:=Round(100 * uDiceSimilarity.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
+          smJaroWinkler: Ratio:=Round(100 * uJaroWinkler.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
           smKoelnerPhonetik:
              begin
                if AnsiSameText(myTestWord, checkWord) then

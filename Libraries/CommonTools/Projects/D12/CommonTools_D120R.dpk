@@ -55,11 +55,6 @@ contains
   uWinNT in '..\..\uWinNT.pas',
   wm_helper in '..\..\wm_helper.pas',
   uVirtualEarth in '..\..\uVirtualEarth.pas',
-  uRDPHash in '..\..\uRDPHash.pas',
-  uLevenshtein in '..\..\uLevenshtein.pas',
-  uKoelnerPhonetik in '..\..\uKoelnerPhonetik.pas',
-  uSoundEx in '..\..\uSoundEx.pas',
-  uDoubleMetaphone in '..\..\uDoubleMetaphone.pas',
-  uFuzzyMatching in '..\..\uFuzzyMatching.pas';
+  uRDPHash in '..\..\uRDPHash.pas';
 
 end.

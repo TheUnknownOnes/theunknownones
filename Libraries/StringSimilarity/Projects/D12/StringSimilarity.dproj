@@ -1,7 +1,7 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{1889684D-C8AF-4725-B13E-8BC1CDCF007C}</ProjectGuid>
-			<MainSource>SuggestEdit.dpk</MainSource>
+			<ProjectGuid>{D6B7FADD-31E1-43AB-80D5-8F1764F1E35B}</ProjectGuid>
+			<MainSource>StringSimilarity.dpk</MainSource>
 			<ProjectVersion>12.0</ProjectVersion>
 			<Config Condition="'$(Config)'==''">Debug</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
@@ -21,7 +21,7 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DesignOnlyPackage>false</DesignOnlyPackage>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\SuggestEdit_D120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\StringSimilarity_D120.bpl</DCC_DependencyCheckOutputName>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DllSuffix>_D120</DllSuffix>
 			<GenPackage>true</GenPackage>
@@ -40,17 +40,20 @@
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="SuggestEdit.dpk">
+			<DelphiCompile Include="StringSimilarity.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="Bitmaps.res"/>
-			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="StringSimilarity.dcp"/>
-			<DCCReference Include="..\..\uSuggestEdit.pas">
-				<Form>FormEditSuggest</Form>
-			</DCCReference>
-			<DCCReference Include="Bitmaps.res"/>
+			<DCCReference Include="..\..\uNeedlemanWunch.pas"/>
+			<DCCReference Include="..\..\uDiceSimilarity.pas"/>
+			<DCCReference Include="..\..\uDoubleMetaphone.pas"/>
+			<DCCReference Include="..\..\uFuzzyMatching.pas"/>
+			<DCCReference Include="..\..\uJaroWinkler.pas"/>
+			<DCCReference Include="..\..\uKoelnerPhonetik.pas"/>
+			<DCCReference Include="..\..\uLevenshtein.pas"/>
+			<DCCReference Include="..\..\uMetaphone.pas"/>
+			<DCCReference Include="..\..\uSoundEx.pas"/>
+			<DCCReference Include="..\..\uSmithWatermanGotoh.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -70,7 +73,7 @@
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">SuggestEdit.dpk</Source>
+						<Source Name="MainSource">StringSimilarity.dpk</Source>
 					</Source>
 					<Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
@@ -106,9 +109,6 @@
 					</VersionInfoKeys>
 					<Excluded_Packages>
 						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\frxZintBarcode120.bpl">(Unbenannt)</Excluded_Packages>
-						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\chrometab.bpl">Datei C:\Users\Public\Documents\RAD Studio\6.0\Bpl\chrometab.bpl nicht gefunden</Excluded_Packages>
-						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\ChromeFrame.bpl">Datei C:\Users\Public\Documents\RAD Studio\6.0\Bpl\ChromeFrame.bpl nicht gefunden</Excluded_Packages>
-						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\zCube_D120.bpl">Datei C:\Users\Public\Documents\RAD Studio\6.0\Bpl\zCube_D120.bpl nicht gefunden</Excluded_Packages>
 					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>

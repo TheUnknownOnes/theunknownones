@@ -1,6 +1,7 @@
 package SuggestEdit;
 
 {$R *.res}
+{$R 'Bitmaps.res'}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
@@ -25,13 +26,10 @@ package SuggestEdit;
 {$LIBSUFFIX '_D120'}
 {$IMPLICITBUILD ON}
 
-
-{$R 'Bitmaps.res'}
-
 requires
   vcl,
   rtl,
-  CommonTools_D120R;
+  StringSimilarity;
 
 contains
   uSuggestEdit in '..\..\uSuggestEdit.pas' {FormEditSuggest};

@@ -8,18 +8,9 @@ function StringSimilarityRatio(const Str1, Str2: String; IgnoreCase: Boolean): D
 implementation
 
 uses
-  SysUtils;
+  SysUtils, Math;
 
 function DamerauLevenshteinDistance(const Str1, Str2: String): Integer;
-  function Min(const A, B, C: Integer): Integer; inline;
-  begin
-    Result := A;
-    if B < A then
-      Result := B;
-    if C < Result then
-      Result := C;
-  end;
-
 var
   LenStr1, LenStr2: Integer;
   I, J, T, Cost, PrevCost: Integer;
@@ -84,7 +75,7 @@ begin
       if (S1^ = S2^) or ((I > 1) and (J > 1) and (S1^ = (S2 - 1)^) and (S2^ = (S1 - 1)^)) then
         Cost := PrevCost
       else
-        Cost := 1 + min(Cost, PrevCost, D[J]);
+        Cost := 1 + MinIntValue([Cost, PrevCost, D[J]]);
       PrevCost := D[J];
       D[J] := Cost;
       Inc(S2);
@@ -108,7 +99,7 @@ begin
   if MaxLen <> 0 then
   begin
     if IgnoreCase then
-      Distance := DamerauLevenshteinDistance(LowerCase(Str1), LowerCase(Str2))
+      Distance := DamerauLevenshteinDistance(AnsiUpperCase(Str1), AnsiUpperCase(Str2))
     else
       Distance := DamerauLevenshteinDistance(Str1, Str2);
     Result := Result - (Distance / MaxLen);
