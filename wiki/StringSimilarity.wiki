@@ -35,6 +35,7 @@ uNeedlemanWunch in '..\..\uNeedlemanWunch.pas',
   * uKoelnerPhonetik.pas
   * uLevenshtein.pas
   * uSmithWatermanGotoh.pas
+  * uMongeElkan.pas
 
 The appropriate routine returns a double value between 0 and 1:
 
