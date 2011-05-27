@@ -240,6 +240,9 @@ var
   pt : TPoint;
   s : String;
 begin
+  if not Assigned(FEdit.Parent) then
+    Exit;
+
   if not Visible then
   begin
     pt.X:=FEdit.Left;
