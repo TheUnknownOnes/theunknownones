@@ -54,6 +54,7 @@
 			<DCCReference Include="..\..\uMetaphone.pas"/>
 			<DCCReference Include="..\..\uSoundEx.pas"/>
 			<DCCReference Include="..\..\uSmithWatermanGotoh.pas"/>
+			<DCCReference Include="..\..\uMongeElkan.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

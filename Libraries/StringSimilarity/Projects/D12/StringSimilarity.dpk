@@ -38,6 +38,7 @@ contains
   uLevenshtein in '..\..\uLevenshtein.pas',
   uMetaphone in '..\..\uMetaphone.pas',
   uSoundEx in '..\..\uSoundEx.pas',
-  uSmithWatermanGotoh in '..\..\uSmithWatermanGotoh.pas';
+  uSmithWatermanGotoh in '..\..\uSmithWatermanGotoh.pas',
+  uMongeElkan in '..\..\uMongeElkan.pas';
 
 end.

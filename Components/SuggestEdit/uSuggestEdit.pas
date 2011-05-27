@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   StdCtrls, Themes, Types, uLevenshtein, Math, ComCtrls, uKoelnerPhonetik,
-  uSoundEx, uMetaphone, uDoubleMetaphone, uFuzzyMatching, Buttons,
+  uSoundEx, uMetaphone, uDoubleMetaphone, uFuzzyMatching, Buttons, uMongeElkan,
   uDiceSimilarity, uJaroWinkler, uNeedlemanWunch, uSmithWatermanGotoh;
 
 type
@@ -18,7 +18,8 @@ type
                     smDice,
                     smJaroWinkler,
                     smNeedlemanWunch,
-                    smSmithWatermanGotoh);
+                    smSmithWatermanGotoh,
+                    smMongeElkan);
 
   TSuggestEdit = class;
 
@@ -153,6 +154,7 @@ begin
           smDamerauLevenshtein: Ratio:=Round(100 * uLevenshtein.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
           smNeedlemanWunch: Ratio:=Round(100 * uNeedlemanWunch.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
           smSmithWatermanGotoh: Ratio:=Round(100 * uSmithWatermanGotoh.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
+          smMongeElkan: Ratio:=Round(100 * uMongeElkan.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
           smNGram: Ratio:=Round(100 * uFuzzyMatching.StringSimilarityRatio(myTestWord, checkWord));
           smDice: Ratio:=Round(100 * uDiceSimilarity.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
           smJaroWinkler: Ratio:=Round(100 * uJaroWinkler.StringSimilarityRatio(myTestWord, checkWord, myIgnoreCase));
@@ -229,7 +231,7 @@ begin
     end;
   end;
 
-  if (countRlt100=0) and (countReq100=1) then
+  if ((countRlt100=0) and (countReq100=1)) then
     FFormEditSuggest.DeactivateSuggestBox;
 end;
 
