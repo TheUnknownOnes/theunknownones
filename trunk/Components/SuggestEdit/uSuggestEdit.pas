@@ -19,7 +19,8 @@ type
                     smJaroWinkler,
                     smNeedlemanWunch,
                     smSmithWatermanGotoh,
-                    smMongeElkan);
+                    smMongeElkan,
+                    smTest);
 
   TSuggestEdit = class;
 
