@@ -152,6 +152,7 @@ begin
   FDefaultQuery := TUIBQuery.Create(FDefaultDatabase);
   FDefaultQuery.Database := FDefaultDatabase;
   FDefaultQuery.Transaction := FDefaultTransaction;
+  FDefaultQuery.FetchBlobs := true;
 
   FCurrentQuery := DefaultQuery;
 end;
