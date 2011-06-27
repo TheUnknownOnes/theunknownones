@@ -32,8 +32,34 @@ begin
   end;
 end;
 
+function TEncoding_Default : TEncoding;
+begin Result := TEncoding.Default end;
+
+function TEncoding_Ascii : TEncoding;
+begin Result := TEncoding.ASCII end;
+
+function TEncoding_Unicode : TEncoding;
+begin Result := TEncoding.Unicode end;
+
+function TEncoding_BigEndianUnicode : TEncoding;
+begin Result := TEncoding.BigEndianUnicode end;
+
+function TEncoding_UTF7 : TEncoding;
+begin Result := TEncoding.UTF7 end;
+
+function TEncoding_UTF8 : TEncoding;
+begin Result := TEncoding.UTF8 end;
+
+function TEncoding_GetEncoding(ACodePage : Integer) : TEncoding;
+begin Result := TEncoding.GetEncoding(ACodePage); end;
+
+
 procedure PS_Register_SysUtils_C(ACompiler : TPSPascalCompiler);
+var
+  pscTEncoding : TPSCompileTimeClass;
 begin
+  ACompiler.AddTypeS('TBytes', 'array of Byte');
+
   ACompiler.AddConstantN('fmOpenRead', 'Integer').Value.ts32 := fmOpenRead;
   ACompiler.AddConstantN('fmOpenWrite', 'Integer').Value.ts32 := fmOpenWrite;
   ACompiler.AddConstantN('fmOpenReadWrite', 'Integer').Value.ts32 := fmOpenReadWrite;
@@ -81,6 +107,20 @@ begin
   ACompiler.AddDelphiFunction('function DateTimeToStr(const DateTime: TDateTime): string');
   ACompiler.AddDelphiFunction('function TimeToStr(const DateTime: TDateTime): string');
   ACompiler.AddDelphiFunction('function IncMonth(const DateTime: TDateTime; NumberOfMonths: Integer): TDateTime;');
+
+  ACompiler.AddDelphiFunction('function Now: TDateTime;');
+  ACompiler.AddDelphiFunction('function Date: TDateTime;');
+  ACompiler.AddDelphiFunction('function Time: TDateTime;');
+
+  pscTEncoding := ACompiler.AddClass(ACompiler.FindClass('TObject'), TEncoding);
+
+  ACompiler.AddDelphiFunction('function TEncoding_Default : TEncoding;');
+  ACompiler.AddDelphiFunction('function TEncoding_ASCII : TEncoding;');
+  ACompiler.AddDelphiFunction('function TEncoding_Unicode : TEncoding;');
+  ACompiler.AddDelphiFunction('function TEncoding_BigEndianUnicode : TEncoding;');
+  ACompiler.AddDelphiFunction('function TEncoding_UTF7 : TEncoding;');
+  ACompiler.AddDelphiFunction('function TEncoding_UTF8 : TEncoding;');
+  ACompiler.AddDelphiFunction('function TEncoding_GetEncoding : TEncoding');
 end;
 
 procedure PS_Register_SysUtils_R(AExec : TPSExec; ARCi : TPSRuntimeClassImporter);
@@ -129,6 +169,18 @@ begin
   AExec.RegisterDelphiFunction(@_GetFileSize, 'GetFileSize', cdRegister);
 
   AExec.RegisterDelphiFunction(@IncMonth, 'IncMonth', cdRegister);
+
+  AExec.RegisterDelphiFunction(@Now, 'Now', cdRegister);
+  AExec.RegisterDelphiFunction(@Date, 'Date', cdRegister);
+  AExec.RegisterDelphiFunction(@Time, 'Time', cdRegister);
+
+  AExec.RegisterDelphiFunction(@TEncoding_Default, 'TEncoding_Default', cdRegister);
+  AExec.RegisterDelphiFunction(@TEncoding_ASCII, 'TEncoding_ASCII', cdRegister);
+  AExec.RegisterDelphiFunction(@TEncoding_Unicode, 'TEncoding_Unicode', cdRegister);
+  AExec.RegisterDelphiFunction(@TEncoding_BigEndianUnicode, 'TEncoding_BigEndianUnicode', cdRegister);
+  AExec.RegisterDelphiFunction(@TEncoding_UTF7, 'TEncoding_UTF7', cdRegister);
+  AExec.RegisterDelphiFunction(@TEncoding_UTF8, 'TEncoding_UTF8', cdRegister);
+  AExec.RegisterDelphiFunction(@TEncoding_GetEncoding, 'TEncoding_GetEncoding', cdRegister);
 end;
 
 end.
