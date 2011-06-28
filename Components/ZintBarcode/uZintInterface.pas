@@ -1,4 +1,4 @@
-{----------------------------------------------------------------------------- 
+{-----------------------------------------------------------------------------
  Purpose: Useful classes and components to work with the zint library
  Created: 03.12.2009 14:29:10
 
@@ -29,7 +29,7 @@ type
     fgcolour : array[0..9] of AnsiChar;
     bgcolour : array[0..9] of AnsiChar;
     outfile : array [0..255] of AnsiChar;
-    scale : Single;
+    scale : double;
     option_1 : Integer;
     option_2 : Integer;
     option_3 : Integer;
@@ -39,7 +39,7 @@ type
     rows : Integer;
     width : Integer;
     primary : array [0..127] of AnsiChar;
-    encoded_data : array[0..177] of array[0..142] of AnsiChar;
+    encoded_data : array[0..177] of array[0..177] of AnsiChar;
     row_height : array[0..177] of Integer; // Largest symbol is 177x177 QR Code
     errtxt : array[0..99] of AnsiChar;
     bitmap : PAnsiChar;
@@ -142,13 +142,13 @@ const
   BARCODE_CODEONE = 141;
   BARCODE_GRIDMATRIX = 142;
 
-type
-  TZOutputOptions = (
-    NONE = 0,
-    BARCODE_NO_ASCII	= 1,
-    BARCODE_BIND		= 2,
-    BARCODE_BOX		= 4);
+  BARCODE_NO_ASCII	= 1;
+  BARCODE_BIND		= 2;
+  BARCODE_BOX		= 4;
+  READER_INIT = 16;
+  SMALL_TEXT = 32;
 
+type
   TZInputMode = (
     DATA_MODE	= 0,
     UNICODE_MODE	= 1,
@@ -187,6 +187,7 @@ var
   myp : PRGBTriple;
   row : Integer;
   rowwidth : Integer;
+  fs : TFileStream;
 begin
   ABitmap.PixelFormat := pf24bit;
   ABitmap.SetSize(ASymbol.bitmap_width, ASymbol.bitmap_height);

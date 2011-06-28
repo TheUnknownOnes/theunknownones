@@ -107,6 +107,13 @@ type
     tBARCODE_CODEONE,
     tBARCODE_GRIDMATRIX);
 
+  TZBOutputOption = (tBARCODE_NO_ASCII,
+                     tBARCODE_BIND,
+                     tBARCODE_BOX,
+                     tREADER_INIT,
+                     tSMALL_TEXT);
+  TZBOutputOptions = set of TZBOutputOption;
+
   TZintBarcode = class(TPersistent)
   private
     FSymbol : PZSymbol;
@@ -133,8 +140,8 @@ type
     procedure SetHeight(const Value: Integer);
     function GetBorderWidth: Integer;
     procedure SetBorderWidth(const Value: Integer);
-    function GetOutputOptions: TZOutputOptions;
-    procedure SetOutputOptions(const Value: TZOutputOptions);
+    function GetOutputOptions: TZBOutputOptions;
+    procedure SetOutputOptions(const Value: TZBOutputOptions);
     function GetColor(const Index: Integer): TColor;
     procedure SetColor(const Index: Integer; const Value: TColor);
     function GetOption(const Index: Integer): Integer;
@@ -165,7 +172,7 @@ type
     property Scale : Single read FScale write SetScale stored true;
     property Height : Integer read GetHeight write SetHeight;
     property BorderWidth : Integer read GetBorderWidth write SetBorderWidth;
-    property OutputOptions : TZOutputOptions read GetOutputOptions write SetOutputOptions;
+    property OutputOptions : TZBOutputOptions read GetOutputOptions write SetOutputOptions;
     property FGColor : TColor index 0 read GetColor write SetColor;
     property BGColor : TColor index 1 read GetColor write SetColor;
     property Option1 : Integer index 1 read GetOption write SetOption;
@@ -433,9 +440,20 @@ begin
   end;
 end;
 
-function TZintBarcode.GetOutputOptions: TZOutputOptions;
+function TZintBarcode.GetOutputOptions: TZBOutputOptions;
 begin
-  Result := TZOutputOptions(FSymbol.output_options);
+  Result := [];
+
+  if FSymbol.output_options and BARCODE_NO_ASCII = BARCODE_NO_ASCII then
+    Include(Result, tBARCODE_NO_ASCII);
+  if FSymbol.output_options and BARCODE_BIND = BARCODE_BIND then
+    Include(Result, tBARCODE_BIND);
+  if FSymbol.output_options and BARCODE_BOX = BARCODE_BOX then
+    Include(Result, tBARCODE_BOX);
+  if FSymbol.output_options and READER_INIT = READER_INIT then
+    Include(Result, tREADER_INIT);
+  if FSymbol.output_options and SMALL_TEXT = SMALL_TEXT then
+    Include(Result, tSMALL_TEXT);
 end;
 
 function TZintBarcode.GetPrimary: String;
@@ -589,9 +607,22 @@ begin
   end;
 end;
 
-procedure TZintBarcode.SetOutputOptions(const Value: TZOutputOptions);
+procedure TZintBarcode.SetOutputOptions(const Value: TZBOutputOptions);
 begin
-  FSymbol.output_options := Integer(Value);
+  FSymbol.output_options := 0;
+
+  if tBARCODE_NO_ASCII in Value then
+    FSymbol.output_options := FSymbol.output_options or BARCODE_NO_ASCII;
+  if tBARCODE_BIND in Value then
+    FSymbol.output_options := FSymbol.output_options or BARCODE_BIND;
+  if tBARCODE_BOX in Value then
+    FSymbol.output_options := FSymbol.output_options or BARCODE_BOX;
+  if tREADER_INIT in Value then
+    FSymbol.output_options := FSymbol.output_options or READER_INIT;
+  if tSMALL_TEXT in Value then
+    FSymbol.output_options := FSymbol.output_options or SMALL_TEXT;
+
+  Changed;
 end;
 
 procedure TZintBarcode.SetPrimary(const Value: String);

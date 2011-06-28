@@ -35,13 +35,13 @@ type
     function GetBorderWidth: Integer;
     function GetColor(const Index: Integer): TColor;
     function GetOption(const Index: Integer): Integer;
-    function GetOutputOptions: TZOutputOptions;
+    function GetOutputOptions: TZBOutputOptions;
     function GetPrimary: String;
     function GetType: TZBType;
     procedure SetBorderWidth(const Value: Integer);
     procedure SetColor(const Index: Integer; const Value: TColor);
     procedure SetOption(const Index, Value: Integer);
-    procedure SetOutputOptions(const Value: TZOutputOptions);
+    procedure SetOutputOptions(const Value: TZBOutputOptions);
     procedure SetPrimary(const Value: String);
     procedure SetRotation(const Value: TZBRotation);
     procedure SetType(const Value: TZBType);
@@ -63,7 +63,7 @@ type
     property DataFormat: TfrxZintBarcodeDataFormat read FDataFormat write SetDataFormat;
     property Data: String read GetData write SetData;
     property BorderWidth : Integer read GetBorderWidth write SetBorderWidth;
-    property OutputOptions : TZOutputOptions read GetOutputOptions write SetOutputOptions;
+    property OutputOptions : TZBOutputOptions read GetOutputOptions write SetOutputOptions;
     property FGColor : TColor index 0 read GetColor write SetColor;
     property BGColor : TColor index 1 read GetColor write SetColor;
     property Option1 : Integer index 1 read GetOption write SetOption;
@@ -175,7 +175,7 @@ begin
   end;
 end;
 
-function TfrxZintBarcode.GetOutputOptions: TZOutputOptions;
+function TfrxZintBarcode.GetOutputOptions: TZBOutputOptions;
 begin
   Result:=FBarcode.OutputOptions;
 end;
@@ -259,7 +259,7 @@ begin
   end;
 end;
 
-procedure TfrxZintBarcode.SetOutputOptions(const Value: TZOutputOptions);
+procedure TfrxZintBarcode.SetOutputOptions(const Value: TZBOutputOptions);
 begin
   FBarcode.OutputOptions:=Value;
 end;
