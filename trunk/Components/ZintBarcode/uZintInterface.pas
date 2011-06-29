@@ -187,7 +187,6 @@ var
   myp : PRGBTriple;
   row : Integer;
   rowwidth : Integer;
-  fs : TFileStream;
 begin
   ABitmap.PixelFormat := pf24bit;
   ABitmap.SetSize(ASymbol.bitmap_width, ASymbol.bitmap_height);
