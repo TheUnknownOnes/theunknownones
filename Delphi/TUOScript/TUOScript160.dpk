@@ -26,13 +26,12 @@ package TUOScript160;
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'TUOScript for Delphi XE2'}
-{$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
+  vcl,
   rtl,
-  designide,
-  vcl;
+  designide;
 
 contains
   TUOScript in 'TUOScript.pas';

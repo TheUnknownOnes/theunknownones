@@ -20,8 +20,7 @@ unit TUOScript;
 interface
 
 uses
-  Classes, SysUtils, StrUtils, ToolsAPI, CodeTemplateAPI,
-  {$IFDEF VER230}VCL.Dialogs{$ELSE}Dialogs{$ENDIF};
+  Classes, SysUtils, StrUtils, ToolsAPI, CodeTemplateAPI, Dialogs;
 
 type
   TTUOScriptParams = TStrings;
