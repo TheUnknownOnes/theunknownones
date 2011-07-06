@@ -59,6 +59,7 @@ type
     function GetDatabaseName: String; override;
     function GetLoginPrompt: Boolean; override;
     function GetParams: TStrings; override;
+    function CreateDatabase: TUIBDatabase; virtual; abstract;
   public
     constructor Create(AOwner: TComponent); override;
     class function GetDescription: String; override;
@@ -67,6 +68,8 @@ type
   end;
 
   TfrxUIBDatabase = class(TfrxCustomUIBDatabase)
+  protected
+    function CreateDatabase: TUIBDatabase; override;
   published
     property DatabaseName;
     property LoginPrompt;
@@ -216,7 +219,7 @@ end;
 constructor TfrxCustomUIBDatabase.Create(AOwner: TComponent);
 begin
   inherited;
-  FDatabase := TUIBDatabase.Create(nil);
+  FDatabase := CreateDatabase;
   Component := FDatabase;
 end;
 
@@ -612,6 +615,13 @@ var
 {$IFDEF UIB_IMAGES}
 , UIBDatabaseBmp, UIBTransactionBmp, UIBQueryBmp
 {$ENDIF}: TBitmap;
+
+{ TfrxUIBDatabase }
+
+function TfrxUIBDatabase.CreateDatabase: TUIBDatabase;
+begin
+  Result:=TUIBDataBase.Create(nil);
+end;
 
 initialization
   { Load UIB Components Images from resources }

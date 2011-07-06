@@ -97,7 +97,7 @@ package ResEd150;
 {$DEFINE HaveGIFImage}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD OFF}
 
 requires
   designide,
