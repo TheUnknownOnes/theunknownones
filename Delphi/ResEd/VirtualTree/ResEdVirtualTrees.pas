@@ -2557,7 +2557,7 @@ type
     procedure SetVerticalAlignment(Node: PVirtualNode; Value: Byte);
     procedure SetVisible(Node: PVirtualNode; Value: Boolean);
     procedure SetVisiblePath(Node: PVirtualNode; Value: Boolean);
-    procedure StaticBackground(Source: TBitmap; Target: TCanvas; Offset: TPoint; R: TRect);
+    procedure StaticBackground(Source: TBitmap; Target: TCanvas; AOffset: TPoint; R: TRect);
     procedure StopTimer(ID: Integer);
     procedure TileBackground(Source: TBitmap; Target: TCanvas; Offset: TPoint; R: TRect);
     function ToggleCallback(Step, StepSize: Integer; Data: Pointer): Boolean;
@@ -4428,7 +4428,7 @@ type
   end;
 
 var
-  ClipboardDescriptions: array [1..CF_MAX - 1] of TClipboardFormatEntry = (
+  ClipboardDescriptions: array [1..16] of TClipboardFormatEntry = (
     (ID: CF_TEXT; Description: 'Plain text'), // Do not localize
     (ID: CF_BITMAP; Description: 'Windows bitmap'), // Do not localize
     (ID: CF_METAFILEPICT; Description: 'Windows metafile'), // Do not localize
@@ -16763,7 +16763,7 @@ end;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-procedure TBaseVirtualTree.StaticBackground(Source: TBitmap; Target: TCanvas; Offset: TPoint; R: TRect);
+procedure TBaseVirtualTree.StaticBackground(Source: TBitmap; Target: TCanvas; AOffset: TPoint; R: TRect);
 
 // Draws the given source graphic so that it stays static in the given rectangle which is relative to the target bitmap.
 // The graphic is aligned so that it always starts at the upper left corner of the target canvas.
@@ -16786,7 +16786,7 @@ begin
   PicRect := Rect(FBackgroundOffsetX, FBackgroundOffsetY, FBackgroundOffsetX + Source.Width, FBackgroundOffsetY + Source.Height);
 
   // Area to be draw in relation to client viewscreen.
-  AreaRect := Rect(Offset.X + R.Left, Offset.Y + R.Top, Offset.X + R.Right, Offset.Y + R.Bottom);
+  AreaRect := Rect(AOffset.X + R.Left, AOffset.Y + R.Top, AOffset.X + R.Right, AOffset.Y + R.Bottom);
 
   // If picture falls in AreaRect, return intersection (DrawRect).
   if IntersectRect(DrawRect, PicRect, AreaRect) then
@@ -16796,16 +16796,16 @@ begin
     begin
       // Leave transparent area as destination unchanged (DST), copy non-transparent areas to canvas (SRCCOPY).
       with DrawRect do
-        MaskBlt(Target.Handle, Left - Offset.X, Top - Offset.Y, (Right - Offset.X) - (Left - Offset.X),
-          (Bottom - Offset.Y) - (Top - Offset.Y), Source.Canvas.Handle, Left - PicRect.Left, DrawRect.Top - PicRect.Top,
+        MaskBlt(Target.Handle, Left - AOffset.X, Top - AOffset.Y, (Right - AOffset.X) - (Left - AOffset.X),
+          (Bottom - AOffset.Y) - (Top - AOffset.Y), Source.Canvas.Handle, Left - PicRect.Left, DrawRect.Top - PicRect.Top,
           Source.MaskHandle, Left - PicRect.Left, Top - PicRect.Top, MakeROP4(DST, SRCCOPY));
     end
     else
     begin
       // copy image to destination
       with DrawRect do
-        BitBlt(Target.Handle, Left - Offset.X, Top - Offset.Y, (Right - Offset.X) - (Left - Offset.X),
-          (Bottom - Offset.Y) - (Top - Offset.Y) + R.Top, Source.Canvas.Handle, Left - PicRect.Left, DrawRect.Top - PicRect.Top,
+        BitBlt(Target.Handle, Left - AOffset.X, Top - AOffset.Y, (Right - AOffset.X) - (Left - AOffset.X),
+          (Bottom - AOffset.Y) - (Top - AOffset.Y) + R.Top, Source.Canvas.Handle, Left - PicRect.Left, DrawRect.Top - PicRect.Top,
           SRCCOPY);
     end;
   end;
@@ -17039,7 +17039,7 @@ var
   ShiftState: Integer;
   P: TPoint;
   Formats: TFormatArray;
-
+  r : Integer;
 begin
   with Message, DragRec^ do
   begin
@@ -17076,7 +17076,8 @@ begin
 
             // Allowed drop effects are simulated for VCL dd.
             Result := DROPEFFECT_MOVE or DROPEFFECT_COPY;
-            DragOver(S, ShiftState, TDragState(DragMessage), Pos, Result);
+            DragOver(S, ShiftState, TDragState(DragMessage), Pos, r);
+            Result:=r;
             FLastVCLDragTarget := FDropTargetNode;
             FVCLDragEffect := Result;
             if (DragMessage = dmDragLeave) and Assigned(FDropTargetNode) then
@@ -33270,7 +33271,7 @@ procedure TStringEditLink.SetBounds(R: TRect);
 // Sets the outer bounds of the edit control and the actual edit area in the control.
 
 var
-  Offset: Integer;
+  lOffset: Integer;
 
 begin
   if not FStopping then
@@ -33296,10 +33297,10 @@ begin
       // We have to take out the two pixel border of the edit control as well as a one pixel "edit border" the
       // control leaves around the (selected) text.
       R := FEdit.ClientRect;
-      Offset := 2;
+      lOffset := 2;
       if tsUseThemes in FTree.FStates then
-        Inc(Offset);
-      InflateRect(R, -FTree.FTextMargin + Offset, Offset);
+        Inc(lOffset);
+      InflateRect(R, -FTree.FTextMargin + lOffset, lOffset);
       if not (vsMultiline in FNode.States) then
         OffsetRect(R, 0, FTextBounds.Top - FEdit.Top);
 

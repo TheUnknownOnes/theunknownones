@@ -1,4 +1,4 @@
-package TUOScript150;
+package TUOScript160;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -12,12 +12,12 @@ package TUOScript150;
 {$LOCALSYMBOLS ON}
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
-{$OPTIMIZATION OFF}
+{$OPTIMIZATION ON}
 {$OVERFLOWCHECKS OFF}
 {$RANGECHECKS OFF}
 {$REFERENCEINFO ON}
 {$SAFEDIVIDE OFF}
-{$STACKFRAMES ON}
+{$STACKFRAMES OFF}
 {$TYPEDADDRESS OFF}
 {$VARSTRINGCHECKS ON}
 {$WRITEABLECONST OFF}
@@ -31,7 +31,8 @@ package TUOScript150;
 
 requires
   rtl,
-  designide;
+  designide,
+  vcl;
 
 contains
   TUOScript in 'TUOScript.pas';
