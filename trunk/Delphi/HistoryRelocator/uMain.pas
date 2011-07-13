@@ -48,30 +48,25 @@ var
   HistoryRelocator : THistoryRelocator;
 
 const
-{$IFDEF VER180}
-  RTL_BPL_Filename = 'RTL110.bpl';
-  COREIDE_BPL_Filename = 'coreide110.bpl';
-{$ENDIF}
-{$IFDEF VER185}
-  RTL_BPL_Filename = 'RTL110.bpl';
-  COREIDE_BPL_Filename = 'coreide110.bpl';
-{$ENDIF}
-{$IFDEF VER200}
-  RTL_BPL_Filename = 'RTL120.bpl';
-  COREIDE_BPL_Filename = 'coreide120.bpl';
-{$ENDIF}
-{$IFDEF VER210}
-  RTL_BPL_Filename = 'RTL140.bpl';
-  COREIDE_BPL_Filename = 'coreide140.bpl';
-{$ENDIF}
-{$IFDEF VER220}
-  RTL_BPL_Filename = 'RTL150.bpl';
-  COREIDE_BPL_Filename = 'coreide150.bpl';
-{$ENDIF}
-{$IFDEF VER230}
+{$IF Defined(VER230)}
   RTL_BPL_Filename = 'RTL160.bpl';
   COREIDE_BPL_Filename = 'coreide160.bpl';
-{$ENDIF}
+{$ELSEIF Defined(VER220)}
+  RTL_BPL_Filename = 'RTL150.bpl';     
+  COREIDE_BPL_Filename = 'coreide150.bpl';
+{$ELSEIF Defined(VER210)}
+  RTL_BPL_Filename = 'RTL140.bpl';
+  COREIDE_BPL_Filename = 'coreide140.bpl';
+{$ELSEIF Defined(VER200)}
+  RTL_BPL_Filename = 'RTL120.bpl';
+  COREIDE_BPL_Filename = 'coreide120.bpl';
+{$ELSEIF Defined(VER185)}
+  RTL_BPL_Filename = 'RTL110.bpl';
+  COREIDE_BPL_Filename = 'coreide110.bpl';
+{$ELSEIF Defined(VER180)}
+  RTL_BPL_Filename = 'RTL100.bpl';
+  COREIDE_BPL_Filename = 'coreide100.bpl';     
+{$IFEND}
 
 implementation
 
@@ -81,17 +76,28 @@ var
   _OrigCreateFileW: function(lpFileName: PWideChar; dwDesiredAccess, dwShareMode: DWORD;
                              lpSecurityAttributes: PSecurityAttributes; dwCreationDisposition, dwFlagsAndAttributes: DWORD;
                              hTemplateFile: THandle): THandle; stdcall;
+_OrigCreateFileA : function(lpFileName: PAnsiChar; dwDesiredAccess, dwShareMode: DWORD;
+                             lpSecurityAttributes: PSecurityAttributes; dwCreationDisposition, dwFlagsAndAttributes: DWORD;
+                             hTemplateFile: THandle): THandle; stdcall;
 
   _OrigMoveFileW: function(lpExistingFileName, lpNewFileName: PWideChar): BOOL; stdcall;
+  _OrigMoveFileA : function(lpExistingFileName, lpNewFileName: PAnsiChar): BOOL; stdcall;
 
-  _OrigFindFirstFileW : function(lpFileName: PWideChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
+  _OrigFindFirstFileW_RTL : function(lpFileName: PWideChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
+  _OrigFindFirstFileW_CoreIDE : function(lpFileName: PWideChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
+  _OrigFindFirstFileA_RTL : function(lpFileName: PAnsiChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
+  _OrigFindFirstFileA_CoreIDE : function(lpFileName: PAnsiChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
 
   _OrigGetFileSecurityW : function(lpFileName: PWideChar; RequestedInformation: SECURITY_INFORMATION;
                                    pSecurityDescriptor: PSecurityDescriptor; nLength: DWORD; var lpnLengthNeeded: DWORD): BOOL; stdcall;
+  _OrigGetFileSecurityA : function(lpFileName: PAnsiChar; RequestedInformation: SECURITY_INFORMATION;
+                                   pSecurityDescriptor: PSecurityDescriptor; nLength: DWORD; var lpnLengthNeeded: DWORD): BOOL; stdcall;
 
   _OrigGetFileAttributesW : function(lpFileName: PWideChar): DWORD; stdcall;
+  _OrigGetFileAttributesA : function(lpFileName: PAnsiChar): DWORD; stdcall;
 
   _OrigCreateDirectoryW : function (lpPathName: PWideChar; lpSecurityAttributes: PSecurityAttributes): BOOL; stdcall;
+  _OrigCreateDirectoryA : function (lpPathName: PAnsiChar; lpSecurityAttributes: PSecurityAttributes): BOOL; stdcall;
 
 
 function _NewCreateFileW(lpFileName: PWideChar; dwDesiredAccess, dwShareMode: DWORD;
@@ -104,14 +110,44 @@ begin
                              dwFlagsAndAttributes, hTemplateFile);
 end;
 
+function _NewCreateFileA(lpFileName: PAnsiChar; dwDesiredAccess, dwShareMode: DWORD;
+                        lpSecurityAttributes: PSecurityAttributes; dwCreationDisposition, dwFlagsAndAttributes: DWORD;
+                        hTemplateFile: THandle): THandle; stdcall;
+
+begin
+  Result := _OrigCreateFileA(PAnsiChar(AnsiString(HistoryRelocator.RelocatePath(lpFileName))), dwDesiredAccess, dwShareMode,
+                             lpSecurityAttributes, dwCreationDisposition,
+                             dwFlagsAndAttributes, hTemplateFile);
+end;
+
 function _NewMoveFileW(lpExistingFileName, lpNewFileName: PWideChar): BOOL; stdcall;
 begin
   Result := _OrigMoveFileW(lpExistingFileName, PWideChar(WideString(HistoryRelocator.RelocatePath(lpNewFileName))));
 end;
 
-function _NewFindFirstFileW(lpFileName: PWideChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
+function _NewMoveFileA(lpExistingFileName, lpNewFileName: PAnsiChar): BOOL; stdcall;
 begin
-  Result := _OrigFindFirstFileW(PWideChar(WideString(HistoryRelocator.RelocatePath(lpFileName))), lpFindFileData);
+  Result := _OrigMoveFileA(lpExistingFileName, PAnsiChar(AnsiString(HistoryRelocator.RelocatePath(lpNewFileName))));
+end;
+
+function _NewFindFirstFileW_RTL(lpFileName: PWideChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
+begin
+  Result := _OrigFindFirstFileW_RTL(PWideChar(WideString(HistoryRelocator.RelocatePath(lpFileName))), lpFindFileData);
+end;
+
+function _NewFindFirstFileW_CoreIDE(lpFileName: PWideChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
+begin
+  Result := _OrigFindFirstFileW_CoreIDE(PWideChar(WideString(HistoryRelocator.RelocatePath(lpFileName))), lpFindFileData);
+end;
+
+function _NewFindFirstFileA_RTL(lpFileName: PAnsiChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
+begin
+  Result := _OrigFindFirstFileA_RTL(PAnsiChar(AnsiString(HistoryRelocator.RelocatePath(lpFileName))), lpFindFileData);
+end;
+
+function _NewFindFirstFileA_CoreIDE(lpFileName: PAnsiChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
+begin
+  Result := _OrigFindFirstFileA_CoreIDE(PAnsiChar(AnsiString(HistoryRelocator.RelocatePath(lpFileName))), lpFindFileData);
 end;
 
 function _NewGetFileSecurityW(lpFileName: PWideChar; RequestedInformation: SECURITY_INFORMATION;
@@ -120,14 +156,30 @@ begin
   Result := _OrigGetFileSecurityW(PWideChar(WideString(HistoryRelocator.RelocatePath(lpFileName))), RequestedInformation, pSecurityDescriptor, nLength, lpnLengthNeeded);
 end;
 
+function _NewGetFileSecurityA(lpFileName: PAnsiChar; RequestedInformation: SECURITY_INFORMATION;
+  pSecurityDescriptor: PSecurityDescriptor; nLength: DWORD; var lpnLengthNeeded: DWORD): BOOL; stdcall;
+begin
+  Result := _OrigGetFileSecurityA(PAnsiChar(AnsiString(HistoryRelocator.RelocatePath(lpFileName))), RequestedInformation, pSecurityDescriptor, nLength, lpnLengthNeeded);
+end;
+
 function _NewGetFileAttributesW(lpFileName: PWideChar): DWORD; stdcall;
 begin
   Result := _OrigGetFileAttributesW(PWideChar(WideString(HistoryRelocator.RelocatePath(lpFileName))));
 end;
 
+function _NewGetFileAttributesA(lpFileName: PAnsiChar): DWORD; stdcall;
+begin
+  Result := _OrigGetFileAttributesA(PAnsiChar(AnsiString(HistoryRelocator.RelocatePath(lpFileName))));
+end;
+
 function _NewCreateDirectoryW(lpPathName: PWideChar; lpSecurityAttributes: PSecurityAttributes): BOOL; stdcall;
 begin
   Result := _OrigCreateDirectoryW(PWideChar(WideString(HistoryRelocator.RelocatePath(lpPathName))), lpSecurityAttributes);
+end;
+
+function _NewCreateDirectoryA(lpPathName: PAnsiChar; lpSecurityAttributes: PSecurityAttributes): BOOL; stdcall;
+begin
+  Result := _OrigCreateDirectoryA(PAnsiChar(AnsiString(HistoryRelocator.RelocatePath(lpPathName))), lpSecurityAttributes);
 end;
 
 { THistoryRelocator }
@@ -143,11 +195,24 @@ begin
 
 
   HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'CreateFileW', @_NewCreateFileW, @_OrigCreateFileW);
+  HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'CreateFileA', @_NewCreateFileA, @_OrigCreateFileA);
+
   HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'MoveFileW', @_NewMoveFileW, @_OrigMoveFileW);
-  HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'FindFirstFileW', @_NewFindFirstFileW, @_OrigFindFirstFileW);
+  HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'MoveFileA', @_NewMoveFileA, @_OrigMoveFileA);
+
+  HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'FindFirstFileW', @_NewFindFirstFileW_RTL, @_OrigFindFirstFileW_RTL);
+  HookImport(FCOREIDE_BPL_Handle, 'kernel32.dll', 'FindFirstFileW', @_NewFindFirstFileW_COREIDE, @_OrigFindFirstFileW_CoreIDE);
+  HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'FindFirstFileA', @_NewFindFirstFileA_RTL, @_OrigFindFirstFileA_RTL);
+  HookImport(FCOREIDE_BPL_Handle, 'kernel32.dll', 'FindFirstFileA', @_NewFindFirstFileA_COREIDE, @_OrigFindFirstFileA_CoreIDE);
+
   //HookImport(FCOREIDE_BPL_Handle, 'advapi32.dll', 'GetFileSecurityW', @_NewGetFileSecurityW, @_OrigGetFileSecurityW);
+  HookImport(FCOREIDE_BPL_Handle, 'advapi32.dll', 'GetFileSecurityA', @_NewGetFileSecurityA, @_OrigGetFileSecurityA);
+
   HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'GetFileAttributesW', @_NewGetFileAttributesW, @_OrigGetFileAttributesW);
+  HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'GetFileAttributesA', @_NewGetFileAttributesA, @_OrigGetFileAttributesA);
+
   HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'CreateDirectoryW', @_NewCreateDirectoryW, @_OrigCreateDirectoryW);
+  HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'CreateDirectoryA', @_NewCreateDirectoryA, @_OrigCreateDirectoryA);
 
 
   FConfigMenu := TMenuItem.Create(self);
@@ -155,7 +220,6 @@ begin
   FConfigMenu.OnClick := DoConfig;
 
   GetTUOCommon.ToolsMenuItem.Add(FConfigMenu);
-
 end;
 
 destructor THistoryRelocator.Destroy;
@@ -163,11 +227,24 @@ begin
   SaveSettings;
 
   UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'CreateFileW', @_NewCreateFileW, @_OrigCreateFileW);
+  UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'CreateFileA', @_NewCreateFileA, @_OrigCreateFileA);
+
   UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'MoveFileW', @_NewMoveFileW, @_OrigMoveFileW);
-  UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'FindFirstFileW', @_NewFindFirstFileW, @_OrigFindFirstFileW);
- // UnHookImport(FCOREIDE_BPL_Handle, 'advapi32.dll', 'GetFileSecurityW', @_NewGetFileSecurityW, @_OrigGetFileSecurityW);
+  UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'MoveFileA', @_NewMoveFileA, @_OrigMoveFileA);
+
+  UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'FindFirstFileW', @_NewFindFirstFileW_RTL, @_OrigFindFirstFileW_RTL);
+  UnHookImport(FCOREIDE_BPL_Handle, 'kernel32.dll', 'FindFirstFileW', @_NewFindFirstFileW_COREIDE, @_OrigFindFirstFileW_CoreIDE);
+  UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'FindFirstFileA', @_NewFindFirstFileA_RTL, @_OrigFindFirstFileA_RTL);
+  UnHookImport(FCOREIDE_BPL_Handle, 'kernel32.dll', 'FindFirstFileA', @_NewFindFirstFileA_CoreIDE, @_OrigFindFirstFileA_CoreIDE);
+
+  //UnHookImport(FCOREIDE_BPL_Handle, 'advapi32.dll', 'GetFileSecurityW', @_NewGetFileSecurityW, @_OrigGetFileSecurityW);
+  UnHookImport(FCOREIDE_BPL_Handle, 'advapi32.dll', 'GetFileSecurityA', @_NewGetFileSecurityA, @_OrigGetFileSecurityA);
+
   UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'GetFileAttributesW', @_NewGetFileAttributesW, @_OrigGetFileAttributesW);
+  UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'GetFileAttributesA', @_NewGetFileAttributesA, @_OrigGetFileAttributesA);
+
   UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'CreateDirectoryW', @_NewCreateDirectoryW, @_OrigCreateDirectoryW);
+  UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'CreateDirectoryA', @_NewCreateDirectoryA, @_OrigCreateDirectoryA);
 
   inherited;
 end;
