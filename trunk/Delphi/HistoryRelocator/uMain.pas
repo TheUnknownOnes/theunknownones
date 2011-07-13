@@ -17,7 +17,6 @@ uses
   Registry,
   StrUtils,
   ImageHlp,
-  Dialogs,
   uHookTools;
 
 type
