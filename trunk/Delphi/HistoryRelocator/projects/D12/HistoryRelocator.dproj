@@ -106,9 +106,9 @@
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
 					<Excluded_Packages>
-						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\SynEdit_D2009.bpl">SynEdit component suite</Excluded_Packages>
-						<Excluded_Packages Name="$(BDS)\bin\dcloffice2k120.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
-						<Excluded_Packages Name="$(BDS)\bin\dclofficexp120.bpl">Microsoft Office XP Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\SynEdit_D2009.bpl">Datei C:\Users\Public\Documents\RAD Studio\6.0\Bpl\SynEdit_D2009.bpl nicht gefunden</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dcloffice2k120.bpl">Datei c:\program files (x86)\codegear\rad studio\6.0\bin\dcloffice2k120.bpl nicht gefunden</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dclofficexp120.bpl">Datei c:\program files (x86)\codegear\rad studio\6.0\bin\dclofficexp120.bpl nicht gefunden</Excluded_Packages>
 					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>
