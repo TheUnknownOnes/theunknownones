@@ -48,6 +48,14 @@ var
   HistoryRelocator : THistoryRelocator;
 
 const
+{$IFDEF VER180}
+  RTL_BPL_Filename = 'RTL110.bpl';
+  COREIDE_BPL_Filename = 'coreide110.bpl';
+{$ENDIF}
+{$IFDEF VER185}
+  RTL_BPL_Filename = 'RTL110.bpl';
+  COREIDE_BPL_Filename = 'coreide110.bpl';
+{$ENDIF}
 {$IFDEF VER200}
   RTL_BPL_Filename = 'RTL120.bpl';
   COREIDE_BPL_Filename = 'coreide120.bpl';
