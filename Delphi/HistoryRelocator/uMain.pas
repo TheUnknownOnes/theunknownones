@@ -22,6 +22,7 @@ uses
 type
   THistoryRelocator = class(TComponent)
   private
+    FInactive : Boolean;
     FRTL_BPL_Handle: Cardinal;
     FConfigMenu : TMenuItem;
     FHistoryPath : String;
@@ -188,6 +189,8 @@ constructor THistoryRelocator.Create(AOwner: TComponent);
 begin
   inherited;
 
+  FInactive := false;
+
   LoadSettings;
 
   FRTL_BPL_Handle := GetModuleHandle(RTL_BPL_Filename);
@@ -281,10 +284,12 @@ function THistoryRelocator.RelocatePath(APath: String) : String;
 const
   HistFolder = '__history';
   HistFileExt = '.~*~';
-
+var
+  dir : String;
 begin
   Result := APath;
   if HistoryPath = '' then exit;
+  if FInactive then exit;
   if not ContainsText(APath, HistFolder) then exit;
 
   if APath[2] = ':' then
@@ -292,7 +297,15 @@ begin
 
   Result := HistoryPath + APath;
 
-  MakeSureDirectoryPathExists(PAnsiChar(AnsiString(ExtractFilePath(Result))));
+  FInactive := true;
+  try
+    dir := ExtractFilePath(Result);
+    if not DirectoryExists(dir) then
+      MakeSureDirectoryPathExists(PAnsiChar(AnsiString(dir)));
+  finally
+    FInactive := false;
+  end;
+
 end;
 
 
