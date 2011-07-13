@@ -17,6 +17,7 @@ uses
   Registry,
   StrUtils,
   ImageHlp,
+  Dialogs,
   uHookTools;
 
 type
@@ -105,7 +106,7 @@ function _NewCreateFileW(lpFileName: PWideChar; dwDesiredAccess, dwShareMode: DW
                         hTemplateFile: THandle): THandle; stdcall;
 
 begin
-  Result := _OrigCreateFileW(PWideChar(WideString(HistoryRelocator.RelocatePath(lpFileName))), dwDesiredAccess, dwShareMode,
+  Result := _OrigCreateFileW(StringToOleStr(HistoryRelocator.RelocatePath(lpFileName)), dwDesiredAccess, dwShareMode,
                              lpSecurityAttributes, dwCreationDisposition,
                              dwFlagsAndAttributes, hTemplateFile);
 end;
@@ -122,7 +123,7 @@ end;
 
 function _NewMoveFileW(lpExistingFileName, lpNewFileName: PWideChar): BOOL; stdcall;
 begin
-  Result := _OrigMoveFileW(lpExistingFileName, PWideChar(WideString(HistoryRelocator.RelocatePath(lpNewFileName))));
+  Result := _OrigMoveFileW(lpExistingFileName, StringToOleStr(HistoryRelocator.RelocatePath(lpNewFileName)));
 end;
 
 function _NewMoveFileA(lpExistingFileName, lpNewFileName: PAnsiChar): BOOL; stdcall;
@@ -132,12 +133,12 @@ end;
 
 function _NewFindFirstFileW_RTL(lpFileName: PWideChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
 begin
-  Result := _OrigFindFirstFileW_RTL(PWideChar(WideString(HistoryRelocator.RelocatePath(lpFileName))), lpFindFileData);
+  Result := _OrigFindFirstFileW_RTL(StringToOleStr(HistoryRelocator.RelocatePath(lpFileName)), lpFindFileData);
 end;
 
 function _NewFindFirstFileW_CoreIDE(lpFileName: PWideChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
 begin
-  Result := _OrigFindFirstFileW_CoreIDE(PWideChar(WideString(HistoryRelocator.RelocatePath(lpFileName))), lpFindFileData);
+  Result := _OrigFindFirstFileW_CoreIDE(StringToOleStr(HistoryRelocator.RelocatePath(lpFileName)), lpFindFileData);
 end;
 
 function _NewFindFirstFileA_RTL(lpFileName: PAnsiChar; var lpFindFileData: TWIN32FindDataW): THandle; stdcall;
@@ -153,7 +154,7 @@ end;
 function _NewGetFileSecurityW(lpFileName: PWideChar; RequestedInformation: SECURITY_INFORMATION;
   pSecurityDescriptor: PSecurityDescriptor; nLength: DWORD; var lpnLengthNeeded: DWORD): BOOL; stdcall;
 begin
-  Result := _OrigGetFileSecurityW(PWideChar(WideString(HistoryRelocator.RelocatePath(lpFileName))), RequestedInformation, pSecurityDescriptor, nLength, lpnLengthNeeded);
+  Result := _OrigGetFileSecurityW(StringToOleStr(HistoryRelocator.RelocatePath(lpFileName)), RequestedInformation, pSecurityDescriptor, nLength, lpnLengthNeeded);
 end;
 
 function _NewGetFileSecurityA(lpFileName: PAnsiChar; RequestedInformation: SECURITY_INFORMATION;
@@ -164,7 +165,7 @@ end;
 
 function _NewGetFileAttributesW(lpFileName: PWideChar): DWORD; stdcall;
 begin
-  Result := _OrigGetFileAttributesW(PWideChar(WideString(HistoryRelocator.RelocatePath(lpFileName))));
+  Result := _OrigGetFileAttributesW(StringToOleStr(HistoryRelocator.RelocatePath(lpFileName)));
 end;
 
 function _NewGetFileAttributesA(lpFileName: PAnsiChar): DWORD; stdcall;
@@ -205,7 +206,7 @@ begin
   HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'FindFirstFileA', @_NewFindFirstFileA_RTL, @_OrigFindFirstFileA_RTL);
   HookImport(FCOREIDE_BPL_Handle, 'kernel32.dll', 'FindFirstFileA', @_NewFindFirstFileA_COREIDE, @_OrigFindFirstFileA_CoreIDE);
 
-  //HookImport(FCOREIDE_BPL_Handle, 'advapi32.dll', 'GetFileSecurityW', @_NewGetFileSecurityW, @_OrigGetFileSecurityW);
+  HookImport(FCOREIDE_BPL_Handle, 'advapi32.dll', 'GetFileSecurityW', @_NewGetFileSecurityW, @_OrigGetFileSecurityW);
   HookImport(FCOREIDE_BPL_Handle, 'advapi32.dll', 'GetFileSecurityA', @_NewGetFileSecurityA, @_OrigGetFileSecurityA);
 
   HookImport(FRTL_BPL_Handle, 'kernel32.dll', 'GetFileAttributesW', @_NewGetFileAttributesW, @_OrigGetFileAttributesW);
@@ -237,7 +238,7 @@ begin
   UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'FindFirstFileA', @_NewFindFirstFileA_RTL, @_OrigFindFirstFileA_RTL);
   UnHookImport(FCOREIDE_BPL_Handle, 'kernel32.dll', 'FindFirstFileA', @_NewFindFirstFileA_CoreIDE, @_OrigFindFirstFileA_CoreIDE);
 
-  //UnHookImport(FCOREIDE_BPL_Handle, 'advapi32.dll', 'GetFileSecurityW', @_NewGetFileSecurityW, @_OrigGetFileSecurityW);
+  UnHookImport(FCOREIDE_BPL_Handle, 'advapi32.dll', 'GetFileSecurityW', @_NewGetFileSecurityW, @_OrigGetFileSecurityW);
   UnHookImport(FCOREIDE_BPL_Handle, 'advapi32.dll', 'GetFileSecurityA', @_NewGetFileSecurityA, @_OrigGetFileSecurityA);
 
   UnHookImport(FRTL_BPL_Handle, 'kernel32.dll', 'GetFileAttributesW', @_NewGetFileAttributesW, @_OrigGetFileAttributesW);
@@ -288,7 +289,7 @@ begin
   if not ContainsText(APath, HistFolder) then exit;
 
   if APath[2] = ':' then
-    APath := Copy(APath, 3, Length(APath));
+    APath := Copy(APath, 4, Length(APath));
 
   Result := HistoryPath + APath;
 
