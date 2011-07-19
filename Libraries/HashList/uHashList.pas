@@ -25,26 +25,26 @@ type
   private
     function GetValue(AKey: String): String;
     procedure SetValue(AKey: String; const Value: String);
-    procedure SetCapacity(const Value: Cardinal);
+    procedure SetCapacity(const Value: Integer);
     function GetExists(AKey: String): Boolean;
     function GetData(AKey: String): TObject;
     procedure SetData(AKey: String; const Value: TObject);
   protected
-    FCount : Cardinal;
-    FCapacity : Cardinal;
+    FCount : Integer;
+    FCapacity : Integer;
     FList : TStringHashEntryList;
     FMaxFillRatio : Single;
-    FMaxFillCount : Cardinal;
-    FMaxFillMultiplier : Cardinal;
+    FMaxFillCount : Integer;
+    FMaxFillResizeFactor : Integer;
 
-    function Hash(const AKey : String) : Cardinal;
-    function Index(const AKey : String) : Cardinal;
+    function Hash(const AKey : String) : Integer;
+    function Index(const AKey : String) : Integer;
 
     function CreateEntry(const AKey : String) : PStringHashEntry;
     function GetEntry(const AKey : String) : PStringHashEntry; overload;
-    function GetEntry(const AKey : String; out AIndex : Cardinal) : PStringHashEntry; overload;
+    function GetEntry(const AKey : String; out AIndex : Integer) : PStringHashEntry; overload;
     procedure DeleteEntry(const AKey : String); overload;
-    procedure DeleteEntry(AEntry : PStringHashEntry; AIndex : Cardinal; var AList : TStringHashEntryList); overload;
+    procedure DeleteEntry(AEntry : PStringHashEntry; AIndex : Integer; var AList : TStringHashEntryList); overload;
   public
     constructor Create(); virtual;
     destructor Destroy; override;
@@ -52,12 +52,14 @@ type
     procedure Clear;
     procedure Delete(AKey : String);
 
-    property Count : Cardinal read FCount;
+    property Count : Integer read FCount;
 
-    property Capacity : Cardinal read FCapacity write SetCapacity;
+    property Capacity : Integer read FCapacity write SetCapacity;
     property Value[AKey : String] : String read GetValue write SetValue; default;
     property Data[AKey : String] : TObject read GetData write SetData;
     property Exists[AKey : String] : Boolean read GetExists;
+    property MaxFillRatio : Single read FMaxFillRatio write FMaxFillRatio;
+    property MaxFillResizeFactor : Integer read FMaxFillResizeFactor write FMaxFillResizeFactor;
   end;
 
 implementation
@@ -80,15 +82,15 @@ end;
 constructor TStringHashList.Create();
 begin
   FCount := 0;
-  FMaxFillRatio := 0.75;
-  FMaxFillMultiplier := 2;
+  FMaxFillRatio := 0.65;
+  FMaxFillResizeFactor := 2;
 
   Capacity := 1000;
 end;
 
 function TStringHashList.CreateEntry(const AKey: String): PStringHashEntry;
 var
-  idx : Cardinal;
+  idx : Integer;
 begin
   idx := Index(AKey);
 
@@ -97,16 +99,15 @@ begin
   Result^.Next := FList[idx];
   Result^.Data := nil;
   FList[idx] := Result;
-
   Inc(FCount);
 
   if FCount > FMaxFillCount then
-    Capacity := Capacity * FMaxFillMultiplier;
+    Capacity := Capacity * FMaxFillResizeFactor;
 end;
 
 procedure TStringHashList.DeleteEntry(const AKey: String);
 var
-  idx : Cardinal;
+  idx : Integer;
   entry : PStringHashEntry;
 begin
   entry := GetEntry(AKey, idx);
@@ -122,7 +123,7 @@ begin
   DeleteEntry(AKey);
 end;
 
-procedure TStringHashList.DeleteEntry(AEntry: PStringHashEntry; AIndex : Cardinal; var AList : TStringHashEntryList);
+procedure TStringHashList.DeleteEntry(AEntry: PStringHashEntry; AIndex : Integer; var AList : TStringHashEntryList);
 var
   prev,
   entry,
@@ -162,7 +163,7 @@ end;
 
 function TStringHashList.GetEntry(const AKey: String): PStringHashEntry;
 var
-  idx : Cardinal;
+  idx : Integer;
 begin
   Result := GetEntry(AKey, idx);
 end;
@@ -179,12 +180,13 @@ begin
 end;
 
 function TStringHashList.GetEntry(const AKey: String;
-  out AIndex: Cardinal): PStringHashEntry;
+  out AIndex: Integer): PStringHashEntry;
 begin
   AIndex := Index(AKey);
   Result := FList[AIndex];
 
-  while Assigned(Result) and (Result^.Key <> AKey) do
+  while Assigned(Result) and
+        (Result^.Key <> AKey) do
     Result := Result^.Next;
 end;
 
@@ -204,7 +206,7 @@ begin
     Result := EmptyStr;
 end;
 
-function TStringHashList.Hash(const AKey : String): Cardinal;
+function TStringHashList.Hash(const AKey : String): Integer;
 var
   i, x: Integer;
 begin
@@ -219,15 +221,15 @@ begin
   end;
 end;
 
-function TStringHashList.Index(const AKey: String): Cardinal;
+function TStringHashList.Index(const AKey: String): Integer;
 begin
   Result := Hash(AKey) mod FCapacity;
 end;
 
-procedure TStringHashList.SetCapacity(const Value: Cardinal);
+procedure TStringHashList.SetCapacity(const Value: Integer);
 var
   oldList : TStringHashEntryList;
-  idx : Cardinal;
+  idx : Integer;
   entry,
   newentry : PStringHashEntry;
 begin
@@ -240,20 +242,17 @@ begin
   FMaxFillCount := Trunc(FMaxFillRatio * FCapacity);
   FCount := 0;
 
-  if Length(oldList) > 0 then
+  for idx := Low(oldList) to High(oldList) do
   begin
-    for idx := Low(oldList) to High(oldList) do
+    while Assigned(oldList[idx]) do
     begin
-      while Assigned(oldList[idx]) do
-      begin
-        entry := oldList[idx];
+      entry := oldList[idx];
 
-        newentry := CreateEntry(entry^.Key);
-        newentry^.Value := entry^.Value;
-        newentry^.Data := entry^.Data;
+      newentry := CreateEntry(entry^.Key);
+      newentry^.Value := entry^.Value;
+      newentry^.Data := entry^.Data;
 
-        DeleteEntry(oldList[idx], idx, oldList);
-      end;
+      DeleteEntry(oldList[idx], idx, oldList);
     end;
   end;
 
