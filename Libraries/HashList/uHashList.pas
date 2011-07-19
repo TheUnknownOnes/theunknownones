@@ -9,7 +9,7 @@ unit uHashList;
 interface
 
 uses
-  Sysutils;
+  Sysutils, Windows;
 
 type
   PStringHashEntry = ^TStringHashEntry;
@@ -37,8 +37,8 @@ type
     FMaxFillCount : Integer;
     FMaxFillResizeFactor : Integer;
 
-    function Hash(const AKey : String) : Integer;
-    function Index(const AKey : String) : Integer;
+    function Hash(const AKey : String) : Cardinal;
+    function Index(const AKey : String) : Cardinal;
 
     function CreateEntry(const AKey : String) : PStringHashEntry;
     function GetEntry(const AKey : String) : PStringHashEntry; overload;
@@ -51,6 +51,8 @@ type
 
     procedure Clear;
     procedure Delete(AKey : String);
+    procedure Add(AKey, AValue : String);
+    procedure AddObject(AKey : String; AObject : TObject);
 
     property Count : Integer read FCount;
 
@@ -65,6 +67,16 @@ type
 implementation
 
 { THashList }
+
+procedure TStringHashList.Add(AKey, AValue: String);
+begin
+  Self[AKey] := AValue;
+end;
+
+procedure TStringHashList.AddObject(AKey: String; AObject: TObject);
+begin
+  Self.Data[AKey] := AObject;
+end;
 
 procedure TStringHashList.Clear;
 var
@@ -206,7 +218,7 @@ begin
     Result := EmptyStr;
 end;
 
-function TStringHashList.Hash(const AKey : String): Integer;
+function TStringHashList.Hash(const AKey : String): Cardinal;
 var
   i, x: Integer;
 begin
@@ -221,7 +233,7 @@ begin
   end;
 end;
 
-function TStringHashList.Index(const AKey: String): Integer;
+function TStringHashList.Index(const AKey: String): Cardinal;
 begin
   Result := Hash(AKey) mod FCapacity;
 end;
