@@ -9,26 +9,19 @@ unit uHashList;
 interface
 
 uses
-  Sysutils, Windows;
+  Sysutils, Windows, Classes;
 
 type
   PStringHashEntry = ^TStringHashEntry;
   TStringHashEntry = record
     Key : String;
     Value : String;
-    Data : TObject;
+    _Object : TObject;
     Next : PStringHashEntry;
   end;
   TStringHashEntryList = array of PStringHashEntry;
 
-  TStringHashList = class
-  private
-    function GetValue(AKey: String): String;
-    procedure SetValue(AKey: String; const Value: String);
-    procedure SetCapacity(const Value: Integer);
-    function GetExists(AKey: String): Boolean;
-    function GetData(AKey: String): TObject;
-    procedure SetData(AKey: String; const Value: TObject);
+  TStringHashList = class(TPersistent)
   protected
     FCount : Integer;
     FCapacity : Integer;
@@ -45,6 +38,15 @@ type
     function GetEntry(const AKey : String; out AIndex : Integer) : PStringHashEntry; overload;
     procedure DeleteEntry(const AKey : String); overload;
     procedure DeleteEntry(AEntry : PStringHashEntry; AIndex : Integer; var AList : TStringHashEntryList); overload;
+
+    function GetValues(AKey: String): String;
+    procedure SetValues(AKey: String; const Value: String);
+    procedure SetCapacity(const Value: Integer);
+    function GetExists(AKey: String): Boolean;
+    function GetObjects(AKey: String): TObject;
+    procedure SetObjects(AKey: String; const Value: TObject);
+
+    procedure AssignTo(Dest: TPersistent); override;
   public
     constructor Create(); virtual;
     destructor Destroy; override;
@@ -54,11 +56,13 @@ type
     procedure Add(AKey, AValue : String);
     procedure AddObject(AKey : String; AObject : TObject);
 
+    procedure Assign(Source: TPersistent); override;
+
     property Count : Integer read FCount;
 
     property Capacity : Integer read FCapacity write SetCapacity;
-    property Value[AKey : String] : String read GetValue write SetValue; default;
-    property Data[AKey : String] : TObject read GetData write SetData;
+    property Values[AKey : String] : String read GetValues write SetValues; default;
+    property Objects[AKey : String] : TObject read GetObjects write SetObjects;
     property Exists[AKey : String] : Boolean read GetExists;
     property MaxFillRatio : Single read FMaxFillRatio write FMaxFillRatio;
     property MaxFillResizeFactor : Integer read FMaxFillResizeFactor write FMaxFillResizeFactor;
@@ -75,7 +79,67 @@ end;
 
 procedure TStringHashList.AddObject(AKey: String; AObject: TObject);
 begin
-  Self.Data[AKey] := AObject;
+  Self.Objects[AKey] := AObject;
+end;
+
+procedure TStringHashList.Assign(Source: TPersistent);
+var
+  s : TStrings;
+  idx : Integer;
+  entry : PStringHashEntry;
+  key : String;
+begin
+  if Source is TStrings then
+  begin
+    s := TStrings(Source);
+    Clear;
+    Capacity := s.Count;
+
+    for idx := 0 to s.Count - 1 do
+    begin
+      key := s.Names[idx];
+      entry := GetEntry(key);
+
+      if not Assigned(entry) then
+        entry := CreateEntry(key);
+
+      entry^.Value := s.ValueFromIndex[idx];
+      entry^._Object := s.Objects[idx];
+    end;
+  end
+  else
+    inherited;
+end;
+
+procedure TStringHashList.AssignTo(Dest: TPersistent);
+var
+  s : TStrings;
+  entry : PStringHashEntry;
+  idx : Integer;
+begin
+  if Dest is TStrings then
+  begin
+    s := TStrings(Dest);
+    s.BeginUpdate;
+    try
+      s.Clear;
+
+      for idx := Low(FList) to High(FList) do
+      begin
+        entry := FList[idx];
+        while Assigned(entry) do
+        begin
+          s.AddObject(entry^.Key + s.NameValueSeparator + entry^.Value, entry^._Object);
+          entry := entry^.Next;
+        end;
+      end;
+
+    finally
+      s.EndUpdate;
+    end;
+  end
+  else
+    inherited;
 end;
 
 procedure TStringHashList.Clear;
@@ -109,7 +173,7 @@ begin
   New(Result);
   Result^.Key := AKey;
   Result^.Next := FList[idx];
-  Result^.Data := nil;
+  Result^._Object := nil;
   FList[idx] := Result;
   Inc(FCount);
 
@@ -180,13 +244,13 @@ begin
   Result := GetEntry(AKey, idx);
 end;
 
-function TStringHashList.GetData(AKey: String): TObject;
+function TStringHashList.GetObjects(AKey: String): TObject;
 var
   entry : PStringHashEntry;
 begin
   entry := GetEntry(AKey);
   if Assigned(entry) then
-    Result := entry^.Data
+    Result := entry^._Object
   else
     Result := nil;
 end;
@@ -207,7 +271,7 @@ begin
   Result := Assigned(GetEntry(AKey));
 end;
 
-function TStringHashList.GetValue(AKey: String): String;
+function TStringHashList.GetValues(AKey: String): String;
 var
   entry : PStringHashEntry;
 begin
@@ -262,7 +326,7 @@ begin
 
       newentry := CreateEntry(entry^.Key);
       newentry^.Value := entry^.Value;
-      newentry^.Data := entry^.Data;
+      newentry^._Object := entry^._Object;
 
       DeleteEntry(oldList[idx], idx, oldList);
     end;
@@ -271,19 +335,19 @@ begin
 end;
 
 
-procedure TStringHashList.SetData(AKey: String; const Value: TObject);
+procedure TStringHashList.SetObjects(AKey: String; const Value: TObject);
 var
   Entry : PStringHashEntry;
 begin
   Entry := GetEntry(AKey);
 
   if Assigned(Entry) then
-    Entry^.Data := Value
+    Entry^._Object := Value
   else
-    CreateEntry(AKey)^.Data := Value;
+    CreateEntry(AKey)^._Object := Value;
 end;
 
-procedure TStringHashList.SetValue(AKey: String; const Value: String);
+procedure TStringHashList.SetValues(AKey: String; const Value: String);
 var
   Entry : PStringHashEntry;
 begin
