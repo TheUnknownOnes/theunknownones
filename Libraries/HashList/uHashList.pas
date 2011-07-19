@@ -29,13 +29,15 @@ type
     FMaxFillRatio : Single;
     FMaxFillCount : Integer;
     FMaxFillResizeFactor : Integer;
+    FCaseSensitive: Boolean;
 
-    function Hash(const AKey : String) : Cardinal;
+    function CaseKey(AKey : String) : String; inline;
+    function Hash(AKey : String) : Cardinal;
     function Index(const AKey : String) : Cardinal;
 
     function CreateEntry(const AKey : String) : PStringHashEntry;
     function GetEntry(const AKey : String) : PStringHashEntry; overload;
-    function GetEntry(const AKey : String; out AIndex : Integer) : PStringHashEntry; overload;
+    function GetEntry(AKey : String; out AIndex : Integer) : PStringHashEntry; overload;
     procedure DeleteEntry(const AKey : String); overload;
     procedure DeleteEntry(AEntry : PStringHashEntry; AIndex : Integer; var AList : TStringHashEntryList); overload;
 
@@ -60,6 +62,7 @@ type
 
     property Count : Integer read FCount;
 
+    property CaseSensitive : Boolean read FCaseSensitive write FCaseSensitive;
     property Capacity : Integer read FCapacity write SetCapacity;
     property Values[AKey : String] : String read GetValues write SetValues; default;
     property Objects[AKey : String] : TObject read GetObjects write SetObjects;
@@ -142,6 +145,14 @@ begin
     inherited;
 end;
 
+function TStringHashList.CaseKey(AKey: String): String;
+begin
+  if FCaseSensitive then
+    Result := AKey
+  else
+    Result := LowerCase(AKey);
+end;
+
 procedure TStringHashList.Clear;
 var
   idx : Integer;
@@ -160,6 +171,7 @@ begin
   FCount := 0;
   FMaxFillRatio := 0.65;
   FMaxFillResizeFactor := 2;
+  FCaseSensitive := true;
 
   Capacity := 1000;
 end;
@@ -171,7 +183,7 @@ begin
   idx := Index(AKey);
 
   New(Result);
-  Result^.Key := AKey;
+  Result^.Key := CaseKey(AKey);
   Result^.Next := FList[idx];
   Result^._Object := nil;
   FList[idx] := Result;
@@ -255,11 +267,12 @@ begin
     Result := nil;
 end;
 
-function TStringHashList.GetEntry(const AKey: String;
+function TStringHashList.GetEntry(AKey: String;
   out AIndex: Integer): PStringHashEntry;
 begin
   AIndex := Index(AKey);
   Result := FList[AIndex];
+  AKey := CaseKey(AKey);
 
   while Assigned(Result) and
         (Result^.Key <> AKey) do
@@ -282,10 +295,12 @@ begin
     Result := EmptyStr;
 end;
 
-function TStringHashList.Hash(const AKey : String): Cardinal;
+function TStringHashList.Hash(AKey : String): Cardinal;
 var
   i, x: Integer;
 begin
+  AKey := CaseKey(AKey);
+
   Result := 0;
   for i := 1 to Length(AKey) do
   begin
