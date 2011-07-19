@@ -65,7 +65,7 @@ type
 
   
 
-  TDeskBand = class(TComObject, IDeskBand, IPersist, IPersistStream,
+  TDeskBand = class(TComObject, IDeskBand, IDeskBand2, IPersist, IPersistStream,
                     IPersistStreamInit, IObjectWithSite, IContextMenu, IInputObject)
   private
     FDeskBandFormClass : TDeskBandFormClass;
@@ -83,6 +83,12 @@ type
     OrigWndProc : TWndMethod;
 
     procedure WndProc(var Msg : TMessage);
+
+    function CanRenderComposited(var pfCanRenderComposited: BOOL): HRESULT; stdcall;
+
+    function SetCompositionState(fCompositionEnabled: BOOL): HRESULT; stdcall;
+
+    function GetCompositionState(var pfCompositionEnabled: BOOL): HRESULT; stdcall;
 
     procedure CreateDeskBandForm;
     procedure HookDeskBandForm;
@@ -271,6 +277,13 @@ end;
 
 { TDeskBand }
 
+function TDeskBand.CanRenderComposited(
+  var pfCanRenderComposited: BOOL): HRESULT;
+begin
+  pfCanRenderComposited := true;
+  Result := S_OK;
+end;
+
 function TDeskBand.CloseDW(dwReserved: DWORD): HResult;
 begin
   if Assigned(FDeskBandForm) then
@@ -405,6 +418,12 @@ begin
   Result := NOERROR;
 end;
 
+function TDeskBand.GetCompositionState(var pfCompositionEnabled: BOOL): HRESULT;
+begin
+  pfCompositionEnabled := true;
+  Result := S_OK;
+end;
+
 function TDeskBand.GetFocused: Boolean;
 begin
   Result:=HasFocusIO=1;
@@ -493,6 +512,11 @@ end;
 function TDeskBand.Save(const stm: IStream; fClearDirty: BOOL): HResult;
 begin
   Result:=S_OK;
+end;
+
+function TDeskBand.SetCompositionState(fCompositionEnabled: BOOL): HRESULT;
+begin
+  Result := S_OK;
 end;
 
 function TDeskBand.SetSite(const pUnkSite: IInterface): HResult;
