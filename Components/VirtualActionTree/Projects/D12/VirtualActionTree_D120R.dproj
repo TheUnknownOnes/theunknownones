@@ -20,12 +20,14 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_Inlining>auto</DCC_Inlining>
+			<DCC_StringChecks>off</DCC_StringChecks>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
 			<GenPackage>true</GenPackage>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\VirtualActionTree_D120R.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\VirtualActionTree_D120R.bpl</DCC_DependencyCheckOutputName>
 			<DCC_Platform>x86</DCC_Platform>
 			<DCC_Description>VirtualActionTree - Runtime</DCC_Description>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
@@ -57,8 +59,8 @@
 			<DCCReference Include="vcldb.dcp"/>
 			<DCCReference Include="dbrtl.dcp"/>
 			<DCCReference Include="GDIPlus120.dcp"/>
-			<DCCReference Include="DirectX9_D12.dcp"/>
 			<DCCReference Include="..\..\uVirtualActionTree.pas"/>
+			<DCCReference Include="DirectX9_D12.dcp"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
