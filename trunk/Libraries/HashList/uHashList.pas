@@ -30,8 +30,8 @@ type
     FMaxFillCount : Integer;
     FMaxFillResizeFactor : Integer;
 
-    function Hash(const AKey : String) : Cardinal;
-    function Index(const AKey : String) : Cardinal;
+    function Hash(const AKey : String) : Cardinal; inline;
+    function Index(const AKey : String) : Cardinal; inline;
 
     function CreateEntry(const AKey : String) : PStringHashEntry;
     function GetEntry(const AKey : String) : PStringHashEntry; overload;
