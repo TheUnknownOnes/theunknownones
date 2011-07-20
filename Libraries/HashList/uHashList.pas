@@ -22,6 +22,8 @@ type
   TStringHashEntryList = array of PStringHashEntry;
 
   TStringHashList = class(TPersistent)
+  private
+    FOwnsObjects: Boolean;
   protected
     FCount : Integer;
     FCapacity : Integer;
@@ -37,7 +39,7 @@ type
     function GetEntry(const AKey : String) : PStringHashEntry; overload;
     function GetEntry(const AKey : String; out AIndex : Integer) : PStringHashEntry; overload;
     procedure DeleteEntry(const AKey : String); overload;
-    procedure DeleteEntry(AEntry : PStringHashEntry; AIndex : Integer; var AList : TStringHashEntryList); overload;
+    procedure DeleteEntry(AEntry : PStringHashEntry; AIndex : Integer; var AList : TStringHashEntryList; AFreeObjects : Boolean); overload;
 
     function GetValues(AKey: String): String;
     procedure SetValues(AKey: String; const Value: String);
@@ -47,6 +49,7 @@ type
     procedure SetObjects(AKey: String; const Value: TObject);
 
     procedure AssignTo(Dest: TPersistent); override;
+  published
   public
     constructor Create(); virtual;
     destructor Destroy; override;
@@ -66,6 +69,7 @@ type
     property Exists[AKey : String] : Boolean read GetExists;
     property MaxFillRatio : Single read FMaxFillRatio write FMaxFillRatio;
     property MaxFillResizeFactor : Integer read FMaxFillResizeFactor write FMaxFillResizeFactor;
+    property OwnsObjects : Boolean read FOwnsObjects write FOwnsObjects;
   end;
 
 implementation
@@ -149,7 +153,7 @@ begin
   for idx := Low(FList) to High(FList) do
   begin
     while Assigned(FList[idx]) do
-      DeleteEntry(FList[idx], idx, FList);
+      DeleteEntry(FList[idx], idx, FList, FOwnsObjects);
   end;
 
   FCount := 0;
@@ -160,6 +164,8 @@ begin
   FCount := 0;
   FMaxFillRatio := 0.65;
   FMaxFillResizeFactor := 2;
+
+  FOwnsObjects := False;
 
   Capacity := 1000;
 end;
@@ -189,7 +195,7 @@ begin
   entry := GetEntry(AKey, idx);
   if Assigned(entry) then
   begin
-    DeleteEntry(entry, idx, FList);
+    DeleteEntry(entry, idx, FList, FOwnsObjects);
     Dec(FCount);
   end;
 end;
@@ -199,7 +205,7 @@ begin
   DeleteEntry(AKey);
 end;
 
-procedure TStringHashList.DeleteEntry(AEntry: PStringHashEntry; AIndex : Integer; var AList : TStringHashEntryList);
+procedure TStringHashList.DeleteEntry(AEntry: PStringHashEntry; AIndex : Integer; var AList : TStringHashEntryList; AFreeObjects : Boolean);
 var
   prev,
   entry,
@@ -218,6 +224,9 @@ begin
         prev^.Next := next
       else
         AList[AIndex] := next;
+
+      if AFreeObjects and Assigned(entry._Object) then
+        entry._Object.Free;
 
       Dispose(entry);
       break;
@@ -328,7 +337,7 @@ begin
       newentry^.Value := entry^.Value;
       newentry^._Object := entry^._Object;
 
-      DeleteEntry(oldList[idx], idx, oldList);
+      DeleteEntry(oldList[idx], idx, oldList, False);
     end;
   end;
 
