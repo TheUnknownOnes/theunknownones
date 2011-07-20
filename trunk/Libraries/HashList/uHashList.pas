@@ -311,6 +311,27 @@ begin
   Result := Hash(AKey) mod FCapacity;
 end;
 
+function IsPrime(Prim: Longint): Boolean;
+var
+  Z: Real;
+  Max: LongInt;
+  Divisor: LongInt;
+begin
+  Result := False;
+  if (Prim and 1) = 0 then Exit;
+  Z       := Sqrt(Prim);
+  Max     := Trunc(Z) + 1;
+  Divisor := 3;
+  while Max > Divisor do
+  begin
+    if (Prim mod Divisor) = 0 then Exit;
+    Inc(Divisor, 2);
+    if (Prim mod Divisor) = 0 then Exit;
+    Inc(Divisor, 4);
+  end;
+  Result := True;
+end;
+
 procedure TStringHashList.SetCapacity(const Value: Integer);
 var
   oldList : TStringHashEntryList;
@@ -321,7 +342,16 @@ begin
   Assert(Value > 0, 'The capacity has to be greater then 0');
 
   oldList := FList;
-  FCapacity := Value;
+
+  for idx := Value downto 1 do
+  begin
+    if IsPrime(idx) then
+    begin
+      FCapacity := idx;
+      break;
+    end;
+  end;
+
   SetLength(FList, 0); //set all entries to NIL
   SetLength(FList, FCapacity);
   FMaxFillCount := Trunc(FMaxFillRatio * FCapacity);
