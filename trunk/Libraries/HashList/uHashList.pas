@@ -22,8 +22,6 @@ type
   TStringHashEntryList = array of PStringHashEntry;
 
   TStringHashList = class(TPersistent)
-  private
-    FOwnsObjects: Boolean;
   protected
     FCount : Integer;
     FCapacity : Integer;
@@ -31,6 +29,7 @@ type
     FMaxFillRatio : Single;
     FMaxFillCount : Integer;
     FMaxFillResizeFactor : Integer;
+    FOwnsObjects: Boolean;
 
     function Hash(const AKey : String) : Cardinal; inline;
     function Index(const AKey : String) : Cardinal; inline;
@@ -49,7 +48,6 @@ type
     procedure SetObjects(AKey: String; const Value: TObject);
 
     procedure AssignTo(Dest: TPersistent); override;
-  published
   public
     constructor Create(); virtual;
     destructor Destroy; override;
@@ -60,6 +58,16 @@ type
     procedure AddObject(AKey : String; AObject : TObject);
 
     procedure Assign(Source: TPersistent); override;
+
+    procedure SaveToStream(AStream : TStream; AEncoding : TEncoding); overload; virtual;
+    procedure SaveToStream(AStream : TStream); overload; virtual;
+    procedure SaveToFile(const AFilename : String; AEncoding : TEncoding); overload; virtual;
+    procedure SaveToFile(const AFilename : String); overload; virtual;
+
+    procedure LoadFromStream(AStream : TStream; AEncoding : TEncoding); overload; virtual;
+    procedure LoadFromStream(AStream : TStream); overload; virtual;
+    procedure LoadFromFile(const AFilename : String; AEncoding : TEncoding); overload; virtual;
+    procedure LoadFromFile(const AFilename : String); overload; virtual;
 
     property Count : Integer read FCount;
 
@@ -73,6 +81,27 @@ type
   end;
 
 implementation
+
+function IsPrime(Prim: Longint): Boolean;
+var
+  Z: Real;
+  Max: LongInt;
+  Divisor: LongInt;
+begin
+  Result := False;
+  if (Prim and 1) = 0 then Exit;
+  Z       := Sqrt(Prim);
+  Max     := Trunc(Z) + 1;
+  Divisor := 3;
+  while Max > Divisor do
+  begin
+    if (Prim mod Divisor) = 0 then Exit;
+    Inc(Divisor, 2);
+    if (Prim mod Divisor) = 0 then Exit;
+    Inc(Divisor, 4);
+  end;
+  Result := True;
+end;
 
 { THashList }
 
@@ -311,25 +340,131 @@ begin
   Result := Hash(AKey) mod FCapacity;
 end;
 
-function IsPrime(Prim: Longint): Boolean;
+procedure TStringHashList.LoadFromStream(AStream: TStream;
+  AEncoding: TEncoding);
 var
-  Z: Real;
-  Max: LongInt;
-  Divisor: LongInt;
+  Buffer : TBytes;
+  Size : Integer;
+  idx : Integer;
+  len : Integer;
+  key,
+  value : String;
+const
+  MaxPreambleLength = 1024; //hopefully the preamble wont get longer :-)
 begin
-  Result := False;
-  if (Prim and 1) = 0 then Exit;
-  Z       := Sqrt(Prim);
-  Max     := Trunc(Z) + 1;
-  Divisor := 3;
-  while Max > Divisor do
+  Size := AStream.Size - AStream.Position;
+  if Size > MaxPreambleLength then
+    Size := MaxPreambleLength;
+  SetLength(Buffer, Size);
+  AStream.Read(Buffer[0], Size);
+  Size := TEncoding.GetBufferEncoding(Buffer, AEncoding);
+  AStream.Seek(-Length(Buffer) + Size, soFromCurrent);
+
+  Clear;
+
+  AStream.ReadBuffer(len, Sizeof(len));
+  while len < MaxInt do
   begin
-    if (Prim mod Divisor) = 0 then Exit;
-    Inc(Divisor, 2);
-    if (Prim mod Divisor) = 0 then Exit;
-    Inc(Divisor, 4);
+    SetLength(Buffer, len);
+    AStream.ReadBuffer(buffer[0], len);
+    key := AEncoding.GetString(Buffer);
+
+    AStream.ReadBuffer(len, Sizeof(len));
+    SetLength(Buffer, len);
+    AStream.ReadBuffer(buffer[0], len);
+    value := AEncoding.GetString(Buffer);
+
+    Add(key, value);
+
+    AStream.ReadBuffer(len, Sizeof(len));
   end;
-  Result := True;
+
+end;
+
+procedure TStringHashList.LoadFromFile(const AFilename: String;
+  AEncoding: TEncoding);
+var
+  Stream: TStream;
+begin
+  Stream := TFileStream.Create(AFileName, fmOpenRead or fmShareDenyWrite);
+  try
+    LoadFromStream(Stream, AEncoding);
+  finally
+    Stream.Free;
+  end;
+end;
+
+procedure TStringHashList.LoadFromFile(const AFilename: String);
+begin
+  LoadFromFile(AFilename, nil);
+end;
+
+procedure TStringHashList.LoadFromStream(AStream: TStream);
+begin
+  LoadFromStream(AStream, nil);
+end;
+
+procedure TStringHashList.SaveToStream(AStream: TStream; AEncoding: TEncoding);
+var
+  Buffer : TBytes;
+  entry : PStringHashEntry;
+  idx : Integer;
+
+  procedure _WriteBuffer;
+  var
+    bufferlen : Integer;
+  begin
+    bufferlen := Length(Buffer);
+    AStream.Write(bufferlen, sizeof(bufferlen));
+    AStream.WriteBuffer(Buffer[0], Length(Buffer));
+  end;
+
+begin
+  if not Assigned(AEncoding) then
+    AEncoding := TEncoding.Default;
+
+  Buffer := AEncoding.GetPreamble;
+  AStream.WriteBuffer(Buffer[0], length(Buffer));
+
+  for idx := Low(FList) to High(FList) do
+  begin
+    entry := FList[idx];
+
+    while Assigned(entry) do
+    begin
+      Buffer := AEncoding.GetBytes(entry^.Key);
+      _WriteBuffer;
+      Buffer := AEncoding.GetBytes(entry^.Value);
+      _WriteBuffer;
+
+      entry := entry^.Next;
+    end;
+  end;
+
+  idx := MaxInt;
+  AStream.WriteBuffer(idx, SizeOf(idx)); //end-marker
+end;
+
+procedure TStringHashList.SaveToFile(const AFilename: String; AEncoding: TEncoding);
+var
+  Stream: TStream;
+begin
+  Stream := TFileStream.Create(AFileName, fmCreate);
+  try
+    SaveToStream(Stream, AEncoding);
+  finally
+    Stream.Free;
+  end;
+end;
+
+procedure TStringHashList.SaveToFile(const AFilename: String);
+begin
+  SaveToFile(AFilename, nil);
+end;
+
+procedure TStringHashList.SaveToStream(AStream: TStream);
+begin
+  SaveToStream(AStream, nil);
 end;
 
 procedure TStringHashList.SetCapacity(const Value: Integer);
