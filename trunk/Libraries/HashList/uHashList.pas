@@ -23,6 +23,7 @@ type
 
   TStringHashList = class(TPersistent)
   protected
+    FResizing : Boolean;
     FCount : Integer;
     FCapacity : Integer;
     FList : TStringHashEntryList;
@@ -126,7 +127,7 @@ begin
   begin
     s := TStrings(Source);
     Clear;
-    Capacity := s.Count;
+    Capacity := Round(s.Count * (1 + FMaxFillRatio));
 
     for idx := 0 to s.Count - 1 do
     begin
@@ -193,6 +194,7 @@ begin
   FCount := 0;
   FMaxFillRatio := 0.65;
   FMaxFillResizeFactor := 2;
+  FResizing := false;
 
   FOwnsObjects := False;
 
@@ -476,37 +478,42 @@ var
 begin
   Assert(Value > 0, 'The capacity has to be greater then 0');
 
-  oldList := FList;
+  if FResizing then
+    exit;
 
-  for idx := Value downto 1 do
-  begin
-    if IsPrime(idx) then
+  FResizing := true;
+  try
+    oldList := FList;
+
+    for idx := Value downto 1 do
     begin
-      if idx > FCapacity then
-        FCapacity := idx
-      else
-        FCapacity := Value;
-      break;
+      if IsPrime(idx) then
+      begin
+        FCapacity := idx;
+        break;
+      end;
     end;
-  end;
 
-  SetLength(FList, 0); //set all entries to NIL
-  SetLength(FList, FCapacity);
-  FMaxFillCount := Trunc(FMaxFillRatio * FCapacity);
-  FCount := 0;
+    SetLength(FList, 0); //set all entries to NIL
+    SetLength(FList, FCapacity);
+    FMaxFillCount := Trunc(FMaxFillRatio * FCapacity);
+    FCount := 0;
 
-  for idx := Low(oldList) to High(oldList) do
-  begin
-    while Assigned(oldList[idx]) do
+    for idx := Low(oldList) to High(oldList) do
     begin
-      entry := oldList[idx];
+      while Assigned(oldList[idx]) do
+      begin
+        entry := oldList[idx];
 
-      newentry := CreateEntry(entry^.Key);
-      newentry^.Value := entry^.Value;
-      newentry^._Object := entry^._Object;
+        newentry := CreateEntry(entry^.Key);
+        newentry^.Value := entry^.Value;
+        newentry^._Object := entry^._Object;
 
-      DeleteEntry(oldList[idx], idx, oldList, False);
+        DeleteEntry(oldList[idx], idx, oldList, False);
+      end;
     end;
+  finally
+    FResizing := false;
   end;
 
 end;
