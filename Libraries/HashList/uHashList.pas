@@ -272,6 +272,7 @@ end;
 destructor TStringHashList.Destroy;
 begin
   Clear;
+
   inherited;
 end;
 
@@ -345,7 +346,6 @@ procedure TStringHashList.LoadFromStream(AStream: TStream;
 var
   Buffer : TBytes;
   Size : Integer;
-  idx : Integer;
   len : Integer;
   key,
   value : String;
@@ -482,7 +482,10 @@ begin
   begin
     if IsPrime(idx) then
     begin
-      FCapacity := idx;
+      if idx > FCapacity then
+        FCapacity := idx
+      else
+        FCapacity := Value;
       break;
     end;
   end;
