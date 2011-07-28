@@ -485,14 +485,9 @@ begin
   try
     oldList := FList;
 
-    for idx := Value downto 1 do
-    begin
-      if IsPrime(idx) then
-      begin
-        FCapacity := idx;
-        break;
-      end;
-    end;
+    FCapacity := Value;
+    while not IsPrime(FCapacity) do
+      Inc(FCapacity);
 
     SetLength(FList, 0); //set all entries to NIL
     SetLength(FList, FCapacity);
