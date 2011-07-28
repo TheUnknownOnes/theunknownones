@@ -19,6 +19,7 @@ type
   TExporterDestinationODS = class(TExporterDestinationBase)
   private
     FFilename : String;
+    FEncoding : TEncoding;
   protected
     function Execute(ASource: TExporterSourceBase): Boolean; override;
     function Execute1D(ASource: TExporterSource1DBase): Boolean;
@@ -35,6 +36,8 @@ type
     function GenManifest : String;
 
     procedure WriteFile(AContent : TStream);
+  public
+    constructor Create;
   published
     property Filename : String read FFilename write FFilename;
   end;
@@ -45,6 +48,11 @@ var
   ODSFormatSettings : TFormatSettings;
 
 { TExporterDestinationODS }
+
+constructor TExporterDestinationODS.Create;
+begin
+  FEncoding := TEncoding.UTF8;
+end;
 
 function TExporterDestinationODS.Execute(ASource: TExporterSourceBase): Boolean;
 begin
@@ -64,13 +72,14 @@ function TExporterDestinationODS.Execute1D(
   ASource: TExporterSource1DBase): Boolean;
 var
   content : String;
-  utf8 : UTF8String;
   MS_Content: TMemoryStream;
 
   procedure WriteContent;
+  var
+    buffer : TBytes;
   begin
-    utf8 := content;
-    MS_Content.Write(PAnsiChar(UTF8)^, length(utf8));
+    buffer := FEncoding.GetBytes(content);
+    MS_Content.WriteBuffer(buffer[0], length(buffer));
     content := EmptyStr;
   end;
   
@@ -101,13 +110,14 @@ function TExporterDestinationODS.Execute2D(
   ASource: TExporterSource2DBase): Boolean;
 var
   content : String;
-  utf8 : UTF8String;
   MS_Content: TMemoryStream;
 
   procedure WriteContent;
+  var
+    buffer : TBytes;
   begin
-    utf8 := content;
-    MS_Content.Write(PAnsiChar(UTF8)^, length(utf8));
+    buffer := FEncoding.GetBytes(content);
+    MS_Content.WriteBuffer(buffer[0], length(buffer));
     content := EmptyStr;
   end;
 
@@ -155,13 +165,14 @@ function TExporterDestinationODS.Execute3D(
   ASource: TExporterSource3DBase): Boolean;
 var
   content : String;
-  utf8 : UTF8String;
   MS_Content: TMemoryStream;
 
   procedure WriteContent;
+  var
+    buffer : TBytes;
   begin
-    utf8 := content;
-    MS_Content.Write(PAnsiChar(UTF8)^, length(utf8));
+    buffer := FEncoding.GetBytes(content);
+    MS_Content.WriteBuffer(buffer[0], length(buffer));
     content := EmptyStr;
   end;
 
@@ -200,7 +211,7 @@ begin
 
       content := content + GenTagTableEnd;
       WriteContent;
-      
+
     until ASource.NavigatePage(ndNext) <> nrOK;
 
     content := content + GenTagsDocumentFoot;
@@ -218,7 +229,8 @@ function TExporterDestinationODS.GenManifest: String;
 begin
   Result := '<?xml version="1.0" encoding="UTF-8"?> ';
   Result := Result + '<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">';
-    Result := Result + '<manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.spreadsheet" manifest:version="1.2" manifest:full-path="/"/>';
+    Result := Result + '<manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.spreadsheet" manifest:version="1.2" manifest:full-path="/" />';
+    Result := Result + '<manifest:file-entry manifest:media-type="text/xml" manifest:full-path="content.xml" />';
   Result := Result + '</manifest:manifest>';
 end;
 
@@ -399,13 +411,13 @@ end;
 procedure TExporterDestinationODS.WriteFile(AContent: TStream);
 var
   MS_Manifest : TMemoryStream;
-  s : UTF8String;
   arch : I7zOutArchive;
+  buffer : TBytes;
 begin
   MS_Manifest := TMemoryStream.Create;
   try
-    s := GenManifest;
-    MS_Manifest.Write(PAnsiChar(s)^, Length(s));
+    buffer := FEncoding.GetBytes(GenManifest);
+    MS_Manifest.WriteBuffer(buffer[0], Length(buffer));
 
     arch := CreateOutArchive(CLSID_CFormatZip);
     arch.AddStream(AContent, soReference, faArchive, CurrentFileTime, CurrentFileTime, 'content.xml', false, false);
