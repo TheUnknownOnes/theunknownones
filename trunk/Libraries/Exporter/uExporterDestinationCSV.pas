@@ -38,6 +38,7 @@ type
     FFilePath: TFileName;
     FFileExt: TFileName;
     FBaseFileName: TFilename;
+    FEncoding: TEncoding;
     function GetFilename: String;
     procedure SetFilename(const Value: String);
     procedure SetFilePath(const Value: TFileName);
@@ -53,6 +54,7 @@ type
     property BaseFileName: TFilename read FBaseFileName write FBaseFileName;
     property FileExtension: TFileName read FFileExt write FFileExt;
     property Filename : String read GetFilename write SetFilename;
+    property Encoding : TEncoding read FEncoding write FEncoding;
   end;
 
 implementation
@@ -191,6 +193,7 @@ begin
   inherited Create;
   FFileList:=TStringList.Create;
   Filename := AFileName;
+  FEncoding:=TEncoding.UTF8;
 end;
 
 destructor TExporterDestinationCSVFile.Destroy;
@@ -221,11 +224,11 @@ end;
 
 procedure TExporterDestinationCSVFile.DoWriteLine(AFile, ALine: String);
 var
-  txt : String;
+  Buffer : TBytes;
 begin
-  txt:=ALine+FLineSep;
+  Buffer:=FEncoding.GetBytes(ALine+FLineSep);
 
-  GetFileStream(AFile).WriteBuffer(Pchar(txt)^, Length(txt));
+  GetFileStream(AFile).WriteBuffer(Buffer[0], Length(Buffer));
 end;
 
 function TExporterDestinationCSVFile.GetFilename: String;
@@ -238,6 +241,7 @@ function TExporterDestinationCSVFile.GetFileStream(
 var
   idx : Integer;
   FNam: string;
+  Buffer : TBytes;
 begin
   idx:=FFileList.IndexOf(AFile);
   if idx<0 then
@@ -246,6 +250,8 @@ begin
     
     Result:=TFileStream.Create(FNam, fmCreate);
     FFileList.AddObject(AFile, Result);
+    Buffer:=FEncoding.GetPreamble;
+    Result.WriteBuffer(Buffer[0], Length(Buffer));
   end
   else
     Result:=TFileStream(FFileList.Objects[idx]);
