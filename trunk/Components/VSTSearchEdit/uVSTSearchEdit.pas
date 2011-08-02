@@ -24,6 +24,7 @@ type
     FEdit: TCustomEdit;
     FOldOnChangeProc : TNotifyEvent;
     FOnAfterSearch: TOnAfterSearchEvent;
+    FMaxLevel: Integer;
 
     procedure DoSearch(const AWords : TStrings);
     function NodeMatches(const ANode : PVirtualNode; const AWords : TStrings) : Boolean;
@@ -47,6 +48,7 @@ type
     property VST : TVirtualStringTree read FTree write FTree;
     property Edit : TCustomEdit read FEdit write SetEdit;
     property Progress : TProgressBar read FProgress write FProgress;
+    property MaxLevel : Integer read FMaxLevel write FMaxLevel default -1;
   end;
 
 
@@ -60,6 +62,7 @@ uses
 constructor TVSTSearchEdit.Create(AOwner: TComponent);
 begin
   inherited;
+  FMaxLevel := -1;
 end;
 
 destructor TVSTSearchEdit.Destroy;
@@ -99,7 +102,17 @@ begin
       FTree.FullyVisible[Node] := Matches;
 
       if not Matches then
-        NewNode := FTree.GetFirstChild(Node)
+      begin
+        if FMaxLevel > -1 then
+        begin
+          if FTree.GetNodeLevel(Node) < Cardinal(FMaxLevel) then
+            NewNode := FTree.GetFirstChild(Node)
+          else
+            NewNode := FTree.GetNextSibling(Node)
+        end
+        else
+          NewNode := FTree.GetFirstChild(Node)
+      end
       else
       begin
         FTree.VisibleRecursive[Node] := true;
