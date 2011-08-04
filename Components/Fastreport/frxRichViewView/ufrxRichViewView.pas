@@ -118,12 +118,6 @@ begin
   FReportHelper.RichView.LeftMargin:=0;
   FReportHelper.RichView.BottomMargin:=0;
   FReportHelper.RichView.RightMargin:=0;
-
-  if IsDesigning then
-  begin
-    FBMPLogo:=TBitmap.Create;
-
-  end;
 end;
 
 procedure TfrxCustomRichViewView.DefineProperties(Filer: TFiler);
@@ -134,6 +128,8 @@ end;
 
 destructor TfrxCustomRichViewView.Destroy;
 begin
+  if Assigned(FBMPLogo) then
+    FBMPLogo.Free;
   FReportHelper.Free;
   FMetaFile.Free;
   inherited;
@@ -148,10 +144,16 @@ begin
   if IsDesigning then
   begin
     Canvas.TextOut(FX+30, FY, self.ClassName+'   '+Self.Name);
-    Canvas.MoveTo(FX, FY);
-    Canvas.LineTo(FX1, FY1);
-    Canvas.MoveTo(FX, FY1);
-    Canvas.LineTo(FX1, FY);
+    Canvas.brush.Style := bsBDiagonal;
+    Canvas.brush.color := clBlue;
+    SetBkColor(Canvas.Handle, ColorToRGB(clWhite));
+    Canvas.FillRect(Rect(FX, FY, FX1, FY1));
+    if not Assigned(FBMPLogo) then
+    begin
+      FBMPLogo:=TBitmap.Create;
+      FBMPLogo.LoadFromResourceName(HInstance, 'LOGO');
+    end;
+    Canvas.Draw(FX+(FDX div 2)-(FBMPLogo.Width div 2),FY+(FDY div 2)-(FBMPLogo.Height div 2), FBMPLogo);
   end
   else
   begin
