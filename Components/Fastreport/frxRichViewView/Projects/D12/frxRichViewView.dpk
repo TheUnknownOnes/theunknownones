@@ -28,7 +28,8 @@ package frxRichViewView;
 requires
   rtl,
   frx12,
-  fs12;
+  fs12,
+  RVPkgD2009;
 
 contains
   ufrxRichViewView in '..\..\ufrxRichViewView.pas';

@@ -50,6 +50,7 @@
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="frx12.dcp"/>
 			<DCCReference Include="fs12.dcp"/>
+			<DCCReference Include="RVPkgD2009.dcp"/>
 			<DCCReference Include="..\..\ufrxRichViewView.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>

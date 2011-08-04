@@ -9,7 +9,6 @@ uses
 type
   TfrxCustomRichViewView = class(TfrxStretcheable)
   private
-    FBMPLogo : TBitmap;
     FMetaFile : TMetaFile;
     FPage : Integer;
     FReportHelper: TRVReportHelper;
@@ -128,8 +127,6 @@ end;
 
 destructor TfrxCustomRichViewView.Destroy;
 begin
-  if Assigned(FBMPLogo) then
-    FBMPLogo.Free;
   FReportHelper.Free;
   FMetaFile.Free;
   inherited;
@@ -143,17 +140,10 @@ begin
 
   if IsDesigning then
   begin
-    Canvas.TextOut(FX+30, FY, self.ClassName+'   '+Self.Name);
     Canvas.brush.Style := bsBDiagonal;
     Canvas.brush.color := clBlue;
     SetBkColor(Canvas.Handle, ColorToRGB(clWhite));
     Canvas.FillRect(Rect(FX, FY, FX1, FY1));
-    if not Assigned(FBMPLogo) then
-    begin
-      FBMPLogo:=TBitmap.Create;
-      FBMPLogo.LoadFromResourceName(HInstance, 'LOGO');
-    end;
-    Canvas.Draw(FX+(FDX div 2)-(FBMPLogo.Width div 2),FY+(FDY div 2)-(FBMPLogo.Height div 2), FBMPLogo);
   end
   else
   begin
