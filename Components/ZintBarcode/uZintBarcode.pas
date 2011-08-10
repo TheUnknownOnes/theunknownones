@@ -178,7 +178,7 @@ type
     property Option1 : Integer index 1 read GetOption write SetOption;
     property Option2 : Integer index 2 read GetOption write SetOption;
     property Option3 : Integer index 3 read GetOption write SetOption;
-    property Roatation : TZBRotation read FRotation write SetRotation;
+    property Rotation : TZBRotation read FRotation write SetRotation;
     property Primary : String read GetPrimary write SetPrimary;
     property ShowHumanReadableText : Boolean read GetSHRT write SetSHRT;
     property Stacked : Boolean read FStacked write SetStacked;
@@ -244,7 +244,7 @@ begin
     Option1 := TZintBarcode(Source).Option1;
     Option2 := TZintBarcode(Source).Option2;
     Option3 := TZintBarcode(Source).Option3;
-    Roatation := TZintBarcode(Source).Roatation;
+    Rotation := TZintBarcode(Source).Rotation;
     Primary := TZintBarcode(Source).Primary;
     ShowHumanReadableText:=TZintBarcode(Source).ShowHumanReadableText;
     Stacked := TZintBarcode(Source).Stacked;
