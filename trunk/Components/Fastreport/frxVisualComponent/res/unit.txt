@@ -1,0 +1,63 @@
+unit $ModuleIdent$;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
+  Dialogs, ufrxVisualComponent, frxDsgnIntf, fs_iinterpreter;
+
+type
+  T$FormIdent$ = class(T$AncestorIdent$)
+  private
+
+  public
+		
+  end;
+
+  TfrxVisualComponent$Ident$ = class(TfrxVisualComponent)
+  private
+    FFrame : T$FormIdent$;
+  public  
+    constructor Create(AOwner : TComponent); override;  
+  published
+    //Add the properties, which should be shown in the Fasreport-Designer
+  end;
+  
+  TfrxVisualComponentRTTI$Ident$ = class(TfsRTTIModule)
+  public
+    constructor Create(AScript: TfsScript); override;
+  end;
+
+implementation
+
+{$R *.dfm}
+ 
+{ TfrxVisualComponent$Ident$ }
+
+constructor TfrxVisualComponent$Ident$.Create(AOwner: TComponent);
+begin
+  inherited;
+  FFrame := T$FormIdent$.Create(self);
+  _FFrame := FFrame;
+end;
+
+{ TfrxVisualComponentRTTI$Ident$ }
+
+constructor TfrxVisualComponentRTTI$Ident$.Create(AScript: TfsScript);
+begin
+  inherited;
+  with AScript do
+  begin
+    AddClass(TfrxVisualComponent$Ident$, 'TfrxVisualComponent');
+  end;
+end;
+
+initialization
+  fsRTTIModules.Add(TfrxVisualComponentRTTI$Ident$);
+  frxObjects.RegisterObject1(TfrxVisualComponent$Ident$, nil, '', FRX_VISUALCOMPONENT_GROUP, 
+                             0, TryLoadFrxObjectIcon('TfrxVisualComponent$Ident$'));
+
+finalization
+  frxObjects.Unregister(TfrxVisualComponent$Ident$);
+
+end.

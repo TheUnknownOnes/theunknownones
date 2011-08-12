@@ -1,0 +1,48 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{DA14B90B-9AD5-47EE-AC43-19E585029B7A}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="D12\frxVisualComponent.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="D12\frxVisualComponent_IDE.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="frxVisualComponent">
+			<MSBuild Projects="D12\frxVisualComponent.dproj"/>
+		</Target>
+		<Target Name="frxVisualComponent:Clean">
+			<MSBuild Targets="Clean" Projects="D12\frxVisualComponent.dproj"/>
+		</Target>
+		<Target Name="frxVisualComponent:Make">
+			<MSBuild Targets="Make" Projects="D12\frxVisualComponent.dproj"/>
+		</Target>
+		<Target Name="frxVisualComponent_IDE">
+			<MSBuild Projects="D12\frxVisualComponent_IDE.dproj"/>
+		</Target>
+		<Target Name="frxVisualComponent_IDE:Clean">
+			<MSBuild Targets="Clean" Projects="D12\frxVisualComponent_IDE.dproj"/>
+		</Target>
+		<Target Name="frxVisualComponent_IDE:Make">
+			<MSBuild Targets="Make" Projects="D12\frxVisualComponent_IDE.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="frxVisualComponent;frxVisualComponent_IDE"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="frxVisualComponent:Clean;frxVisualComponent_IDE:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="frxVisualComponent:Make;frxVisualComponent_IDE:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>
