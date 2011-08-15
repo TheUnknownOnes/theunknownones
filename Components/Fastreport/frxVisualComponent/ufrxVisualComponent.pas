@@ -1,3 +1,9 @@
+//**********************************************************
+// Developed by TheUnkownOnes.net
+//
+// for more information look at www.TheUnknownOnes.net
+//**********************************************************
+
 unit ufrxVisualComponent;
 
 interface
@@ -19,7 +25,7 @@ uses
 const
   DEF_LINE_COLOR_MM = $00E9E9E9;
   DEF_LINE_COLOR_CM = $00C5C5C5;
-  DEF_PIXELS_PER_CM = 60;
+  DEF_PIXELS_PER_CM = 80;
   DEF_SHOW_LINES_MM = true;
   FRX_VISUALCOMPONENT_GROUP = 'VisualComponents';
 
