@@ -75,7 +75,8 @@ type
     constructor Create(AScript: TfsScript); override;
   end;
 
-  function TryLoadFrxObjectIcon(AName : String) : Integer;
+  function TryLoadFrxObjectIcon(AInstance: HINST; AName : String) : Integer; overload;
+  function TryLoadFrxObjectIcon(AName : String) : Integer; overload;
 
 implementation
 
@@ -95,6 +96,11 @@ begin
 end;
 
 function TryLoadFrxObjectIcon(AName : String) : Integer;
+begin
+  Result:=TryLoadFrxObjectIcon(HInstance, AName);
+end;
+
+function TryLoadFrxObjectIcon(AInstance: HINST; AName : String) : Integer;
 var
   bmp : TBitmap;
 begin
@@ -102,7 +108,7 @@ begin
   bmp := TBitmap.Create;
   try
     try
-      bmp.LoadFromResourceName(HInstance, AName);
+      bmp.LoadFromResourceName(AInstance, AName);
     except
       bmp.LoadFromResourceName(HInstance, 'TFRXVISUALCOMPONENT');
     end;
@@ -132,7 +138,6 @@ var
   emfc : TMetafileCanvas;
 begin
   BeginDraw(Canvas, ScaleX, ScaleY, OffsetX, OffsetY);
-  DrawFrame;
 
   emf := TMetafile.Create;
   try
@@ -148,6 +153,8 @@ begin
   finally
     emf.Free;
   end;
+
+  DrawFrame;
 end;
 
 procedure TfrxVisualComponent.SetHeight(Value: Extended);
