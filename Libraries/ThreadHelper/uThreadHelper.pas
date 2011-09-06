@@ -4,32 +4,50 @@
 // for more information look at www.TheUnknownOnes.net
 //**********************************************************
 
+{ Examples
+
+function MachWasLanges : Int64;
+begin
+  sleep(5000);
+  Result := SecondOf(Now);
+end;
+
+procedure ShowResult (AResult : Int64);
+begin
+  ShowMessage(IntToStr(AResult));
+end;
+
+procedure TForm61.Button3Click(Sender: TObject);
+begin
+  TThread.Exec<Int64>(MachWasLanges, ShowResult);
+end;
+
+}
+
 unit uThreadHelper;
 
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, SyncObjs, Generics.Collections;
 
 type
-  TThreadExecProc = class(TThread)
-  protected
-    FProc,
-    FCallback : TProc;
-    FSyncCallback : Boolean;
-    procedure Execute; override;
-  public
-    constructor Create(AProc, ACallback : TProc; ASyncCallback : Boolean); reintroduce;
-  end;
+  TThreadExecWork = (thwFunction, thwProcedure);
 
-  TThreadExecFunc<TType> = class(TThread)
+  TThreadExec<TType> = class(TThread)
   protected
     FFunc : TFunc<TType>;
-    FCallback : TProc<TType>;
+    FFuncCallback : TProc<TType>;
+    FProc,
+    FProcCallback : TProc;
     FSyncCallback : Boolean;
+    FWork : TThreadExecWork;
     procedure Execute; override;
+
+    constructor BaseConstrutor(); virtual;
   public
-    constructor Create(AFunc : TFunc<TType>; ACallback : TProc<TType>; ASyncCallback : Boolean); reintroduce;
+    constructor Create(AFunc : TFunc<TType>; ACallback : TProc<TType>; ASyncCallback : Boolean); reintroduce; overload;
+    constructor Create(AProc, ACallback : TProc; ASyncCallback : Boolean); reintroduce; overload;
   end;
 
   TThreadHelper = class helper for TThread
@@ -46,7 +64,7 @@ implementation
 class procedure TThreadHelper.Exec(AProc, ACallback: TProc;
   ASyncCallback: Boolean);
 begin
-  TThreadExecProc.Create(AProc, ACallback, ASyncCallback);
+  TThreadExec<Pointer>.Create(AProc, ACallback, ASyncCallback);
 end;
 
 class procedure TThreadHelper.Exec(AProc: TNotifyEvent; ASender: TObject;
@@ -58,66 +76,74 @@ end;
 class procedure TThreadHelper.Exec<TType>(AFunc: TFunc<TType>;
   ACallback: TProc<TType>; ASyncCallback: Boolean);
 begin
-  TThreadExecFunc<TType>.Create(AFunc, ACallback, ASyncCallback);
+  TThreadExec<TType>.Create(AFunc, ACallback, ASyncCallback);
 end;
 
-{ TThreadExecProc }
+{ TThreadExec<TType> }
 
-constructor TThreadExecProc.Create(AProc, ACallback: TProc;
-  ASyncCallback: Boolean);
-begin
-  inherited Create(true);
-
-  FProc := AProc;
-  FCallback := ACallback;
-  FSyncCallback := ASyncCallback;
-
-  FreeOnTerminate := true;
-
-  Resume;
-end;
-
-procedure TThreadExecProc.Execute;
-begin
-  FProc;
-
-  if Assigned(FCallback) then
-  begin
-    if FSyncCallback then
-      Synchronize(procedure begin FCallback; end)
-    else
-      FCallback;
-  end;
-end;
-
-{ TThreadExecFunc<TType> }
-
-constructor TThreadExecFunc<TType>.Create(AFunc: TFunc<TType>;
+constructor TThreadExec<TType>.Create(AFunc: TFunc<TType>;
   ACallback: TProc<TType>; ASyncCallback: Boolean);
 begin
-  inherited Create(true);
+  BaseConstrutor;
+
+  FWork := thwFunction;
 
   FFunc := AFunc;
-  FCallback := ACallback;
+  FFuncCallback := ACallback;
   FSyncCallback := ASyncCallback;
-
-  FreeOnTerminate := true;
 
   Resume;
 end;
 
-procedure TThreadExecFunc<TType>.Execute;
+constructor TThreadExec<TType>.BaseConstrutor;
+begin
+  inherited Create(true);
+  FreeOnTerminate := true;
+
+end;
+
+constructor TThreadExec<TType>.Create(AProc, ACallback: TProc;
+  ASyncCallback: Boolean);
+begin
+  BaseConstrutor;
+
+  FWork := thwProcedure;
+
+  FProc := AProc;
+  FProcCallback := ACallback;
+  ASyncCallback := ASyncCallback;
+
+  Resume;
+end;
+
+procedure TThreadExec<TType>.Execute;
 var
   temp : TType;
 begin
-  temp := FFunc;
-
-  if Assigned(FCallback) then
+  if FWork = thwFunction then
   begin
-    if FSyncCallback then
-      Synchronize(procedure begin FCallback(temp); end)
-    else
-      FCallback(temp);
+    temp := FFunc;
+
+    if Assigned(FFuncCallback) then
+    begin
+      if FSyncCallback then
+        Synchronize(procedure begin FFuncCallback(temp); end)
+      else
+        FFuncCallback(temp);
+    end;
+  end
+  else
+  if FWork = thwProcedure then
+  begin
+    FProc;
+
+    if Assigned(FProcCallback) then
+    begin
+      if FSyncCallback then
+        Synchronize(procedure begin FProcCallback; end)
+      else
+        FProcCallback;
+    end;
   end;
 end;
 
