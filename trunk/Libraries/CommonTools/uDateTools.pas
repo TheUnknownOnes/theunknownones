@@ -26,6 +26,7 @@ type
     function WeekEnd : TDateTime;
     property Week: Byte read GetWeek write SetWeek;
     property Year: Word read GetYear write SetYear;
+    property AsString: String read ToString;
   End;
 
   TCalendarWeek = class(TInterfacedObject,ICalendarWeek)
