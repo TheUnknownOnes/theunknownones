@@ -61,6 +61,7 @@ type
 
     procedure SetWidth(Value: Extended); override;
     procedure SetHeight(Value: Extended); override;
+  published
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;

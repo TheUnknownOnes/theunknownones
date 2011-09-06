@@ -55,7 +55,7 @@ end;
 initialization
   fsRTTIModules.Add(TfrxVisualComponentRTTI$Ident$);
   frxObjects.RegisterObject1(TfrxVisualComponent$Ident$, nil, '', FRX_VISUALCOMPONENT_GROUP, 
-                             0, TryLoadFrxObjectIcon('TfrxVisualComponent$Ident$'));
+                             0, TryLoadFrxObjectIcon(hInstance, 'TfrxVisualComponent$Ident$'));
 
 finalization
   frxObjects.Unregister(TfrxVisualComponent$Ident$);
