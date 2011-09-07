@@ -75,10 +75,15 @@ type
     destructor Destroy; override;
 
     property MaxRunningThreads : Integer read FMaxRunningThreads write FMaxRunningThreads;
+    property WaitingThreads : TList<TThread> read FThreads;
+    property RunningThreads : TList<TThread> read FRunningThreads;
   end;
 
 var
   ThreadExecManager : TThreadExecManager;
+
+threadvar
+  MyExecThread : TThread;
 
 implementation
 
@@ -145,6 +150,8 @@ procedure TThreadExec<TType>.Execute;
 var
   temp : TType;
 begin
+  MyExecThread := Self;
+
   if FWork = thwFunction then
   begin
     temp := FFunc;
@@ -224,36 +231,16 @@ begin
 end;
 
 destructor TThreadExecManager.Destroy;
-var
-  thread : TThread;
 begin
   while FThreads.Count > 0 do
-  begin
-    FThreadsLock.Enter;
-    try
-      thread := FThreads[0];
-    finally
-      FThreadsLock.Leave;
-    end;
-
-    thread.Free;
-  end;
+    FThreads[0].Free;
 
   FThreads.Free;
   FThreadsLock.Free;
 
 
   while FRunningThreads.Count > 0 do
-  begin
-    FRunningThreadsLock.Enter;
-    try
-      thread := FRunningThreads[0];
-    finally
-      FRunningThreadsLock.Leave;
-    end;
-
-    thread.Terminate;
-  end;
+    FRunningThreads[0].Terminate;
 
   FRunningThreads.Free;
   FRunningThreadsLock.Free;
@@ -289,7 +276,7 @@ begin
       end;
     end;
 
-    if WaitForSingleObject(FNewThreadEvent.Handle, 10) = WAIT_OBJECT_0 then
+    if (FThreads.Count = 0) and (WaitForSingleObject(FNewThreadEvent.Handle, 50) = WAIT_OBJECT_0) then
       FNewThreadEvent.ResetEvent;
   end;
 end;
@@ -299,7 +286,6 @@ initialization
 
 finalization
   ThreadExecManager.Terminate;
-  ThreadExecManager.WaitFor;
   ThreadExecManager.Free;
 
 end.
