@@ -29,7 +29,7 @@ unit uThreadHelper;
 interface
 
 uses
-  Classes, SysUtils, SyncObjs, Generics.Collections;
+  Classes, SysUtils, SyncObjs, Generics.Collections, Windows;
 
 type
   TThreadExecWork = (thwFunction, thwProcedure);
@@ -48,6 +48,7 @@ type
   public
     constructor Create(AFunc : TFunc<TType>; ACallback : TProc<TType>; ASyncCallback : Boolean); reintroduce; overload;
     constructor Create(AProc, ACallback : TProc; ASyncCallback : Boolean); reintroduce; overload;
+    destructor Destroy; override;
   end;
 
   TThreadHelper = class helper for TThread
@@ -56,6 +57,28 @@ type
     class procedure Exec(AProc : TNotifyEvent; ASender : TObject = nil; ACallback : TProc = nil; ASyncCallback : Boolean = true); overload;
     class procedure Exec<TType>(AFunc : TFunc<TType>; ACallback : TProc<TType>; ASyncCallback : Boolean = true); overload;
   end;
+
+  TThreadExecManager = class(TThread)
+  protected
+    FMaxRunningThreads: Integer;
+    FThreads,
+    FRunningThreads : TList<TThread>;
+    FThreadsLock,
+    FRunningThreadsLock : TCriticalSection;
+    FNewThreadEvent : TEvent;
+
+    procedure Execute; override;
+    procedure Add(const AThread : TThread);
+    procedure Delete(const AThread : TThread);
+  public
+    constructor Create; reintroduce; virtual;
+    destructor Destroy; override;
+
+    property MaxRunningThreads : Integer read FMaxRunningThreads write FMaxRunningThreads;
+  end;
+
+var
+  ThreadExecManager : TThreadExecManager;
 
 implementation
 
@@ -91,15 +114,13 @@ begin
   FFunc := AFunc;
   FFuncCallback := ACallback;
   FSyncCallback := ASyncCallback;
-
-  Resume;
 end;
 
 constructor TThreadExec<TType>.BaseConstrutor;
 begin
   inherited Create(true);
   FreeOnTerminate := true;
-
+  ThreadExecManager.Add(Self);
 end;
 
 constructor TThreadExec<TType>.Create(AProc, ACallback: TProc;
@@ -112,8 +133,12 @@ begin
   FProc := AProc;
   FProcCallback := ACallback;
   ASyncCallback := ASyncCallback;
+end;
 
-  Resume;
+destructor TThreadExec<TType>.Destroy;
+begin
+  ThreadExecManager.Delete(Self);
+  inherited;
 end;
 
 procedure TThreadExec<TType>.Execute;
@@ -146,5 +171,135 @@ begin
     end;
   end;
 end;
+
+{ TThreadExecManager }
+
+procedure TThreadExecManager.Add(const AThread: TThread);
+begin
+  FThreadsLock.Enter;
+  try
+    FThreads.Add(AThread);
+  finally
+    FThreadsLock.Leave;
+  end;
+
+  FNewThreadEvent.SetEvent;
+end;
+
+constructor TThreadExecManager.Create;
+begin
+  FThreads := TList<TThread>.Create;
+  FThreadsLock := TCriticalSection.Create;
+  FRunningThreads := TList<TThread>.Create;
+  FRunningThreadsLock := TCriticalSection.Create;
+  FMaxRunningThreads := MaxInt;
+
+  FNewThreadEvent := TEvent.Create();
+
+  inherited Create(false);
+
+  FreeOnTerminate := false;
+end;
+
+procedure TThreadExecManager.Delete(const AThread: TThread);
+var
+   Done : Boolean;
+begin
+  FRunningThreadsLock.Enter;
+  try
+    Done := Assigned(FRunningThreads.Extract(AThread));
+  finally
+    FRunningThreadsLock.Leave;
+  end;
+
+  if not Done then
+  begin
+    FThreadsLock.Enter;
+    try
+      FThreads.Extract(AThread);
+    finally
+      FThreadsLock.Leave;
+    end;
+  end;
+end;
+
+destructor TThreadExecManager.Destroy;
+var
+  thread : TThread;
+begin
+  while FThreads.Count > 0 do
+  begin
+    FThreadsLock.Enter;
+    try
+      thread := FThreads[0];
+    finally
+      FThreadsLock.Leave;
+    end;
+
+    thread.Free;
+  end;
+
+  FThreads.Free;
+  FThreadsLock.Free;
+
+
+  while FRunningThreads.Count > 0 do
+  begin
+    FRunningThreadsLock.Enter;
+    try
+      thread := FRunningThreads[0];
+    finally
+      FRunningThreadsLock.Leave;
+    end;
+
+    thread.Terminate;
+  end;
+
+  FRunningThreads.Free;
+  FRunningThreadsLock.Free;
+
+  FNewThreadEvent.Free;
+
+  inherited;
+end;
+
+procedure TThreadExecManager.Execute;
+var
+  thread : TThread;
+begin
+  while not Terminated do
+  begin
+
+    while (FThreads.Count > 0) and (FRunningThreads.Count < FMaxRunningThreads) do
+    begin
+      FThreadsLock.Enter;
+      try
+        thread := FThreads[0];
+        FThreads.Delete(0);
+      finally
+        FThreadsLock.Leave;
+      end;
+
+      FRunningThreadsLock.Enter;
+      try
+        thread.Resume;
+        FRunningThreads.Add(thread);
+      finally
+        FRunningThreadsLock.Leave;
+      end;
+    end;
+
+    if WaitForSingleObject(FNewThreadEvent.Handle, 10) = WAIT_OBJECT_0 then
+      FNewThreadEvent.ResetEvent;
+  end;
+end;
+
+initialization
+  ThreadExecManager := TThreadExecManager.Create;
+
+finalization
+  ThreadExecManager.Terminate;
+  ThreadExecManager.WaitFor;
+  ThreadExecManager.Free;
 
 end.
