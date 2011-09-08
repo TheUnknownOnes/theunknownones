@@ -15,6 +15,7 @@ type
     FFileName: String;
     FContent: String;
     procedure DoDrawMetafile;
+//    function UsePrinterCanvas: Boolean;
   protected
     procedure DefineProperties(Filer: TFiler); override;
     procedure ReadData(Stream: TStream);
@@ -32,8 +33,9 @@ type
     procedure Draw(Canvas: TCanvas; ScaleX, ScaleY, OffsetX, OffsetY: Extended); override;
 
     procedure GetData; override;
-    
+
     procedure LoadFromFile(AFileName: String);
+    procedure LoadContentFromStream(AStream: TStream);
     property ReportHelper : TRVReportHelper read FReportHelper;
 
     property FileName : String read FFileName write FFileName;
@@ -64,9 +66,12 @@ uses
 
 function TfrxCustomRichViewView.CalcHeight: Extended;
 var
-  tmpH: Integer;
+  lCanvas : TCanvas;
 begin
-  ReportHelper.Init(FCanvas, Round(Width));
+  lCanvas:=TCanvas.Create;
+  lCanvas.Handle:=GetDC(0);
+
+  ReportHelper.Init(lCanvas, Round(Width));
   ReportHelper.FormatNextPage(Round(Report.Engine.FreeSpace-Top));
 
   FMetaFile.Clear;
@@ -83,7 +88,7 @@ begin
   else
   begin
     Result:=Report.Engine.FreeSpace-Top;
-    
+
     while not ReportHelper.Finished do
     begin
       ReportHelper.FormatNextPage(Round(Report.Engine.FreeSpace));
@@ -93,6 +98,9 @@ begin
         Result:=Result+ReportHelper.GetLastPageHeight;
     end;
   end;
+
+  ReleaseDC(0, lCanvas.Handle);
+  lCanvas.Free;
 end;
 
 
@@ -218,9 +226,19 @@ begin
 end;
 
 procedure TfrxCustomRichViewView.InitPart;
+var
+  lCanvas : TCanvas;
 begin
   inherited;
-  ReportHelper.Init(FCanvas, Round(Width));
+
+  lCanvas:=TCanvas.Create;
+  lCanvas.Handle:=GetDC(0);
+
+  ReportHelper.Init(lCanvas, Round(Width));
+
+  ReleaseDC(0, lCanvas.Handle);
+  lCanvas.Free;
+
   FPage:=1;
 end;
 
@@ -230,10 +248,22 @@ begin
   ReportHelper.RichView.LoadRVF(AFileName);
 end;
 
+procedure TfrxCustomRichViewView.LoadContentFromStream(AStream: TStream);
+begin
+  ReportHelper.RichView.Clear;
+  ReportHelper.RichView.LoadRVFFromStream(AStream);
+end;
+
 procedure TfrxCustomRichViewView.DoDrawMetafile;
 var
   EMFCanvas: TMetafileCanvas;
+  lCanvas : TCanvas;
 begin
+  lCanvas:=nil;
+
+  lCanvas:=TCanvas.Create;
+  lCanvas.Handle:=GetDC(0);
+
   FMetaFile.Clear;
   FMetaFile.Enhanced := True;
   FMetaFile.Width := Round(Width);
@@ -242,7 +272,7 @@ begin
   else
     FMetaFile.Height := Round(Height);
 
-  EMFCanvas := TMetafileCanvas.Create(TMetaFile(FMetaFile), FCanvas.Handle);
+  EMFCanvas := TMetafileCanvas.Create(TMetaFile(FMetaFile), lCanvas.Handle);
   try
     FMetaFile.Transparent := True;
     ReportHelper.DrawPage(FPage, EMFCanvas, False, Round(FMetaFile.Height));
@@ -250,6 +280,9 @@ begin
   finally
     EMFCanvas.Free;
   end;
+
+  ReleaseDC(0, lCanvas.Handle);
+  lCanvas.Free;
 end;
 
 procedure TfrxCustomRichViewView.ReadData(Stream: TStream);
@@ -303,6 +336,37 @@ begin
   end;
 end;
 
+type
+  TfrxRichViewViewRTTI = class(TfsRTTIModule)
+  public
+    constructor Create(AScript: TfsScript); override;
+    function CallEvent(Instance: TObject; ClassType: TClass;
+    const MethodName: String; Caller: TfsMethodHelper): Variant;
+  end;
+
+{ TfrxCustomRichViewViewRTTI }
+
+function TfrxRichViewViewRTTI.CallEvent(Instance: TObject; ClassType: TClass;
+  const MethodName: String; Caller: TfsMethodHelper): Variant;
+begin
+  if SameText('LoadFromStream', MethodName) then
+  begin
+    TfrxRichViewView(Instance).LoadContentFromStream(TStream(Integer(Caller.Params[0])));
+  end;
+end;
+
+constructor TfrxRichViewViewRTTI.Create(AScript: TfsScript);
+begin
+  inherited Create(AScript);
+  with AScript do
+  begin
+    with AddClass(TfrxRichViewView, 'TfrxCustomRichViewView') do
+    begin
+      AddMethod('procedure LoadFromStream(AStream: TStream);', CallEvent);
+    end;
+  end;
+end;
+
 var
   bmpButton: TBitmap;
 
@@ -314,6 +378,7 @@ initialization
   frxObjects.RegisterObject(TfrxRichViewView, bmpButton);
 
   fsRTTIModules.Add(TfrxCustomRichViewViewRTTI);
+  fsRTTIModules.Add(TfrxRichViewViewRTTI);
 
 finalization
   bmpButton.Free;
@@ -322,5 +387,8 @@ finalization
     frxObjects.Unregister(TfrxRichViewView);
 
   if fsRTTIModules <> nil then
+  begin
+    fsRTTIModules.Remove(TfrxRichViewViewRTTI);
     fsRTTIModules.Remove(TfrxCustomRichViewViewRTTI);
+  end;
 end.
