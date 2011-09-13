@@ -27,9 +27,11 @@ package ThreadHelper;
 {$IMPLICITBUILD OFF}
 
 requires
-  rtl;
+  rtl,
+  vcl;
 
 contains
-  uThreadHelper in '..\..\uThreadHelper.pas';
+  uThreadHelper in '..\..\uThreadHelper.pas',
+  uThreadLists in '..\..\uThreadLists.pas';
 
 end.
