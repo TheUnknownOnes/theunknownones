@@ -53,9 +53,9 @@ type
 
   TThreadHelper = class helper for TThread
   public
-    class procedure Exec(AProc : TProc; ACallback : TProc = nil; ASyncCallback : Boolean = true); overload;
-    class procedure Exec(AProc : TNotifyEvent; ASender : TObject = nil; ACallback : TProc = nil; ASyncCallback : Boolean = true); overload;
-    class procedure Exec<TType>(AFunc : TFunc<TType>; ACallback : TProc<TType>; ASyncCallback : Boolean = true); overload;
+    class function Exec(AProc : TProc; ACallback : TProc = nil; ASyncCallback : Boolean = true) : TThread; overload;
+    class function Exec(AProc : TNotifyEvent; ASender : TObject = nil; ACallback : TProc = nil; ASyncCallback : Boolean = true) : TThread; overload;
+    class function Exec<TType>(AFunc : TFunc<TType>; ACallback : TProc<TType>; ASyncCallback : Boolean = true) : TThread; overload;
   end;
 
   TThreadExecManager = class(TThread)
@@ -89,22 +89,22 @@ implementation
 
 { TThreadHelper }
 
-class procedure TThreadHelper.Exec(AProc, ACallback: TProc;
-  ASyncCallback: Boolean);
+class function TThreadHelper.Exec(AProc, ACallback: TProc;
+  ASyncCallback: Boolean) : TThread;
 begin
-  TThreadExec<Pointer>.Create(AProc, ACallback, ASyncCallback);
+  Result := TThreadExec<Pointer>.Create(AProc, ACallback, ASyncCallback);
 end;
 
-class procedure TThreadHelper.Exec(AProc: TNotifyEvent; ASender: TObject;
-  ACallback: TProc; ASyncCallback: Boolean);
+class function TThreadHelper.Exec(AProc: TNotifyEvent; ASender: TObject;
+  ACallback: TProc; ASyncCallback: Boolean) : TThread;
 begin
-  Exec(procedure begin AProc(ASender); end, ACallback, ASyncCallback);
+  Result := Exec(procedure begin AProc(ASender); end, ACallback, ASyncCallback);
 end;
 
-class procedure TThreadHelper.Exec<TType>(AFunc: TFunc<TType>;
-  ACallback: TProc<TType>; ASyncCallback: Boolean);
+class function TThreadHelper.Exec<TType>(AFunc: TFunc<TType>;
+  ACallback: TProc<TType>; ASyncCallback: Boolean) : TThread;
 begin
-  TThreadExec<TType>.Create(AFunc, ACallback, ASyncCallback);
+  Result := TThreadExec<TType>.Create(AFunc, ACallback, ASyncCallback);
 end;
 
 { TThreadExec<TType> }
