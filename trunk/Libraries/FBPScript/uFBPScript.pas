@@ -56,6 +56,8 @@ type
     function Short_DefaultDatabase : TUIBDataBase;
     function Short_DefaultTransaction : TUIBTransaction;
 
+    procedure LogQuerySummary(AQuery : TUIBQuery);
+
     procedure Log(ALog : String);
 
   public
@@ -185,7 +187,7 @@ end;
 
 procedure TFBPScript.DoBeforeCompile;
 begin
-  
+
 end;
 
 procedure TFBPScript.DoBeforeExecLoad;
@@ -213,6 +215,7 @@ begin
   FExec.RegisterDelphiMethod(Self, @TFBPScript.Short_DefaultDatabase, 'DefaultDatabase', cdRegister);
   FExec.RegisterDelphiMethod(Self, @TFBPScript.Short_DefaultTransaction, 'DefaultTransaction', cdRegister);
 
+  FExec.RegisterDelphiMethod(Self, @TFBPScript.LogQuerySummary, 'LogQuerySummary', cdRegister);
 end;
 
 procedure TFBPScript.DoBeforeExecute;
@@ -259,6 +262,17 @@ begin
     FOnLog(ALog);
 end;
 
+procedure TFBPScript.LogQuerySummary(AQuery: TUIBQuery);
+var
+  s,i,u,d : Cardinal;
+begin
+  if AQuery = nil then
+    AQuery := DefaultQuery;
+
+  AQuery.AffectedRows(s, i, u, d);
+  Log(Format('%d Selects / %d Inserts / %d Updates / %d Deletes', [s, i, u, d]));
+end;
+
 function TFBPScript.OnUses(AUnit: TbtString): Boolean;
 begin
   if AUnit = 'SYSTEM' then
@@ -289,7 +303,7 @@ begin
     FCompiler.AddDelphiFunction('function DefaultDatabase : TUIBDatabase;');
     FCompiler.AddDelphiFunction('function DefaultTransaction : TUIBTransaction;');
 
-
+    FCompiler.AddDelphiFunction('procedure LogQuerySummary(AQuery : TUIBQuery);');
   end
   else
     Result := false;
