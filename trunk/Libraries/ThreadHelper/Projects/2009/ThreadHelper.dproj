@@ -46,7 +46,9 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="..\..\uThreadHelper.pas"/>
+			<DCCReference Include="..\..\uThreadLists.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
