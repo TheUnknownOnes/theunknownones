@@ -9,7 +9,7 @@ unit uVirtualTreeHelpers;
 interface
 
 uses
-  VirtualTrees, Windows, SysUtils, SndKey32;
+  VirtualTrees, Windows, SysUtils, SndKey32, Graphics;
 
 type
   TCheckStates = set of TCheckState;
@@ -25,15 +25,9 @@ type
   private
     function GetVisibleRecursive(Node: PVirtualNode): Boolean;
     procedure SetVisibleRecursive(Node: PVirtualNode; const Value: Boolean);
-
-  protected
-
   public
-
-
     property VisibleRecursive[Node: PVirtualNode]: Boolean read GetVisibleRecursive write SetVisibleRecursive;
 
-    function GetCheckedChildrenCountRecursive(Node: PVirtualNode; VisibleOnly : Boolean = false): Integer; deprecated;
     function GetCheckedChildrenCount(ANode : PVirtualNode;
                                      ACheckStates : TCheckStates = [csCheckedNormal];
                                      AVisibleOnly : Boolean = false;
@@ -54,10 +48,11 @@ type
   end;
 
 
+
 implementation
 
 var
-  FFakeData : Pointer;
+  FFakeData : PInteger;
 
 { TBaseVirtualTreeHelper }
 
@@ -123,32 +118,6 @@ begin
     end;
 
     Node := GetNextSibling(Node);
-  end;
-end;
-
-function TBaseVirtualTreeHelper.GetCheckedChildrenCountRecursive(
-  Node: PVirtualNode; VisibleOnly : Boolean): Integer;
-
-// Returns the number of children of "Node" which are checked
-
-var
-  Child : PVirtualNode;
-begin
-  Result := 0;
-
-  Child := GetFirstChild(Node);
-  while Assigned(Child) do
-  begin
-    if (CheckState[Child] = csCheckedNormal) then
-    begin
-      if (VisibleOnly and IsVisible[Child]) or
-         (not VisibleOnly) then
-        Inc(Result);
-    end;
-
-    Inc(Result, GetCheckedChildrenCountRecursive(Child, VisibleOnly));
-
-    Child := GetNextSibling(Child);
   end;
 end;
 
@@ -248,7 +217,7 @@ begin
   Data := GetNodeData(ANode);
   
   if Assigned(Data) then
-    Result:= Pointer(Data^) = FFakeData
+    Result:= PInteger(Data^) = FFakeData
   else
     Result := false;
 end;
@@ -333,9 +302,9 @@ begin
 end;
 
 initialization
-  GetMem(FFakeData, 4);
+  GetMem(FFakeData, SizeOf(Integer));
 
 finalization
-  FreeMem(FFakeData, 4);
+  FreeMem(FFakeData, SizeOf(Integer));
 
 end.
