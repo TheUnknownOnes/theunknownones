@@ -13,58 +13,69 @@ uses
   jwaWindows;
 
 type
-  TWaitList = class
+  TWaitList = class(TObject)
   protected
     FList : TList;
-    FLock : TCriticalSection;
+    FLock : TSrwLock;
     FcvEmpty,
     FcvNotEmpty : TConditionVariable;
   public
     constructor Create; virtual;
     destructor Destroy; override;
 
-    function BeginUpdate : TList;
-    procedure EndUpdate(AWakeWaitingThreads : Boolean = true;
+    function BeginWrite : TList;
+    procedure EndWrite(AWakeWaitingThreads : Boolean = true;
                         AAll : Boolean = true);
+    function BeginRead : TList;
+    procedure EndRead;
 
-    function WaitForEmpty(ATimeout : Cardinal = INFINITE) : TList;
-    //returns nil if timed out or the list wasn't cleared in the desired time
-    //if the result is not nil, you have to call EndUpdate
-    function WaitForNotEmpty(ATimeout : Cardinal = INFINITE) : TList;
-    //returns nil if timed out or the list wasn't filled in the desired time
-    //if the result is not nil, you have to call EndUpdate
+    function WaitForEmpty(AWantToWrite : Boolean = true; ATimeout : Cardinal = INFINITE) : TList;
+    //returns nil if timed out
+    //if the result is not nil, you have to call EndWrite
+    function WaitForNotEmpty(AWantToWrite : Boolean = true; ATimeout : Cardinal = INFINITE) : TList;
+    //returns nil if timed out
+    //if the result is not nil, you have to call EndWrite
   end;
 
 implementation
 
 { TWaitList }
 
-function TWaitList.BeginUpdate: TList;
+function TWaitList.BeginRead: TList;
 begin
-  EnterCriticalSection(FLock);
+  AcquireSRWLockShared(FLock);
+  Result := FList;
+end;
+
+function TWaitList.BeginWrite: TList;
+begin
+  AcquireSRWLockExclusive(FLock);
   Result := FList;
 end;
 
 constructor TWaitList.Create;
 begin
   FList := TList.Create;
-  InitializeCriticalSection(FLock);
+  InitializeSRWLock(FLock);
   InitializeConditionVariable(FcvEmpty);
   InitializeConditionVariable(FcvNotEmpty);
 end;
 
 destructor TWaitList.Destroy;
 begin
-  EndUpdate(true, true);
-  DeleteCriticalSection(FLock);
   FList.Free;
 
   inherited;
 end;
 
-procedure TWaitList.EndUpdate(AWakeWaitingThreads, AAll: Boolean);
+procedure TWaitList.EndRead;
 begin
-  LeaveCriticalSection(FLock);
+  ReleaseSRWLockShared(FLock);
+end;
+
+procedure TWaitList.EndWrite(AWakeWaitingThreads, AAll: Boolean);
+begin
+  ReleaseSRWLockExclusive(FLock);
 
   if AWakeWaitingThreads then
   begin
@@ -85,32 +96,46 @@ begin
   end;
 end;
 
-function TWaitList.WaitForEmpty(ATimeout: Cardinal): TList;
+function TWaitList.WaitForEmpty(AWantToWrite : Boolean; ATimeout: Cardinal): TList;
+var
+  Flags : Cardinal;
 begin
-  Result := BeginUpdate;
+  if AWantToWrite then
+    Flags := 0
+  else
+    Flags := CONDITION_VARIABLE_LOCKMODE_SHARED;
+
+  Result := BeginWrite;
 
   while Result.Count > 0 do
   begin
-    if not SleepConditionVariableCS(FcvEmpty, FLock, ATimeout) then
+    if not SleepConditionVariableSRW(FcvEmpty, FLock, ATimeout, Flags) then
     begin
       Result := nil;
-      EndUpdate(false);
+      EndWrite(false);
       break;
     end;
   end;
 
 end;
 
-function TWaitList.WaitForNotEmpty(ATimeout: Cardinal): TList;
+function TWaitList.WaitForNotEmpty(AWantToWrite : Boolean; ATimeout: Cardinal): TList;
+var
+  Flags : Cardinal;
 begin
-  Result := BeginUpdate;
+  if AWantToWrite then
+    Flags := 0
+  else
+    Flags := CONDITION_VARIABLE_LOCKMODE_SHARED;
+
+  Result := BeginWrite;
 
   while Result.Count = 0 do
   begin
-    if not SleepConditionVariableCS(FcvNotEmpty, FLock, ATimeout) then
+    if not SleepConditionVariableSRW(FcvNotEmpty, FLock, ATimeout, Flags) then
     begin
       Result := nil;
-      EndUpdate(false);
+      EndWrite(false);
       break;
     end;
   end;
