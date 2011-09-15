@@ -83,7 +83,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
       inherited Label1: TLabel
         Left = 436
         Top = 2
-        Height = 17
+        Height = 13
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -94,7 +94,7 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
       inherited Label2: TLabel
         Left = 327
         Top = 2
-        Height = 17
+        Height = 13
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -105,8 +105,8 @@ object ch2FormProvider3rdPartyHelp: Tch2FormProvider3rdPartyHelp
       inherited lbl_Caption: TLabel
         Left = 2
         Top = 2
-        Width = 321
-        Height = 17
+        Width = 72
+        Height = 13
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2

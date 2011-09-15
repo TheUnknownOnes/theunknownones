@@ -126,14 +126,17 @@ object ch2FormConfigHTMLHelp: Tch2FormConfigHTMLHelp
         ExplicitWidth = 549
         inherited Label1: TLabel
           Left = 270
+          Height = 13
           ExplicitLeft = 270
         end
         inherited Label2: TLabel
           Left = 134
+          Height = 13
           ExplicitLeft = 134
         end
         inherited lbl_Caption: TLabel
-          Width = 125
+          Width = 63
+          Height = 13
           Caption = 'Sample entry'
           ExplicitWidth = 63
         end

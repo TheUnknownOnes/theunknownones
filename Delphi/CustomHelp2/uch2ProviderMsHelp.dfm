@@ -91,17 +91,17 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
         ExplicitHeight = 24
         inherited Label1: TLabel
           Left = 332
-          Height = 18
+          Height = 13
           ExplicitLeft = 332
         end
         inherited Label2: TLabel
           Left = 221
-          Height = 18
+          Height = 13
           ExplicitLeft = 221
         end
         inherited lbl_Caption: TLabel
-          Width = 212
-          Height = 18
+          Width = 72
+          Height = 13
           Caption = 'Sample Header'
           ExplicitWidth = 72
         end
@@ -199,7 +199,7 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
           Margins.Top = 2
           Margins.Right = 2
           Margins.Bottom = 2
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 0
           OnChange = cbSearchTypeChange
         end

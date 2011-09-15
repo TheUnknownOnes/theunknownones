@@ -117,8 +117,9 @@ type
   THIQuery = class(TInterfacedObject, Ich2HelpItem)
   private
     FQuery : Tch2GCSQuery;
+    FPriority : Integer;
   public
-    constructor Create(AQuery : Tch2GCSQuery);
+    constructor Create(AQuery : Tch2GCSQuery; APriority : Integer);
 
     {$REGION 'Ich2HelpItem'}
     function GetGUID : TGUID;
@@ -126,6 +127,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
   end;
@@ -145,6 +147,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
   end;
@@ -164,13 +167,15 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
   end;
 
-constructor THIQuery.Create(AQuery: Tch2GCSQuery);
+constructor THIQuery.Create(AQuery: Tch2GCSQuery; APriority : Integer);
 begin
   FQuery := AQuery;
+  FPriority := APriority;
 end;
 
 function THIQuery.GetCaption: String;
@@ -196,6 +201,11 @@ end;
 function THIQuery.GetGUID: TGUID;
 begin
   Result := FQuery.GUID;
+end;
+
+function THIQuery.GetPriority: Integer;
+begin
+  Result := FPriority;
 end;
 
 procedure THIQuery.ShowHelp;
@@ -435,7 +445,7 @@ var
   procedure NeedParent();
   begin
     if not Assigned(Parent) then
-      Parent := AGUI.AddHelpItem(THIQuery.Create(AQuery) as Ich2HelpItem)
+      Parent := AGUI.AddHelpItem(THIQuery.Create(AQuery, FPriority) as Ich2HelpItem)
   end;
 begin
   Parent := nil;
@@ -753,6 +763,11 @@ begin
   Result := g;
 end;
 
+function THIEntry.GetPriority: Integer;
+begin
+  Result := 0;
+end;
+
 procedure THIEntry.ShowHelp;
 begin
   ch2Main.ShowURL(FURL, FQuery.OpenLocation);
@@ -794,6 +809,11 @@ const
   g : TGUID = '{5AEAEC5F-05E0-4B75-B793-73790A1FC7A6}';
 begin
   Result := g;
+end;
+
+function THIMatch.GetPriority: Integer;
+begin
+  Result := 0;
 end;
 
 procedure THIMatch.ShowHelp;

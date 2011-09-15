@@ -103,8 +103,9 @@ type
   Tch2HIURL = class(TInterfacedObject, Ich2HelpItem)
   private
     FURL : Tch2RSSURL;
+    FPriority : Integer;
   public
-    constructor Create(AURL : Tch2RSSURL);
+    constructor Create(AURL : Tch2RSSURL; APriority : Integer);
 
     {$REGION 'Ich2HelpItem'}
     function GetGUID : TGUID;
@@ -112,6 +113,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
   end;
@@ -132,6 +134,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
   end;
@@ -176,7 +179,7 @@ var
   procedure NeedParent();
   begin
     if not Assigned(Parent) then
-      Parent := AGUI.AddHelpItem(Tch2HIURL.Create(AURL) as Ich2HelpItem)
+      Parent := AGUI.AddHelpItem(Tch2HIURL.Create(AURL, FPriority) as Ich2HelpItem)
   end;
 begin
   url := ReplaceText(AURL.URL, '$(HelpString)', AKeyword);
@@ -564,9 +567,10 @@ end;
 
 { Tch2HIURL }
 
-constructor Tch2HIURL.Create(AURL: Tch2RSSURL);
+constructor Tch2HIURL.Create(AURL: Tch2RSSURL; APriority : Integer);
 begin
   FURL := AURL;
+  FPriority := APriority;
 end;
 
 function Tch2HIURL.GetCaption: String;
@@ -592,6 +596,11 @@ end;
 function Tch2HIURL.GetGUID: TGUID;
 begin
   Result := FURL.GUID;
+end;
+
+function Tch2HIURL.GetPriority: Integer;
+begin
+  Result := FPriority;
 end;
 
 procedure Tch2HIURL.ShowHelp;
@@ -634,6 +643,11 @@ const
   g : TGUID = '{971832BD-A7E3-40E9-84AD-1193DA34655F}';
 begin
   Result := g;
+end;
+
+function Tch2HIRSSEntry.GetPriority: Integer;
+begin
+  Result := 0;
 end;
 
 procedure Tch2HIRSSEntry.ShowHelp;

@@ -118,14 +118,17 @@ object uch2FormProviderWindowsSearch: Tuch2FormProviderWindowsSearch
         ExplicitWidth = 646
         inherited Label1: TLabel
           Left = 368
+          Height = 13
           ExplicitLeft = 368
         end
         inherited Label2: TLabel
           Left = 231
+          Height = 13
           ExplicitLeft = 231
         end
         inherited lbl_Caption: TLabel
-          Width = 222
+          Width = 63
+          Height = 13
           Caption = 'Sample entry'
           ExplicitWidth = 63
         end

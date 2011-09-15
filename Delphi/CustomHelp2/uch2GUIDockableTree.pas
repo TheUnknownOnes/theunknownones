@@ -103,7 +103,7 @@ end;
 function Tch2GUIDockableTree.AddHelpItem(AHelpItem: Ich2HelpItem;
   AParent: Pointer): Pointer;
 begin
-  Result:=FForm.Frame.AddHelpItem(AHelpItem, AParent);
+  Result := FForm.Frame.AddHelpItem(AHelpItem, AParent);
 end;
 
 procedure Tch2GUIDockableTree.AfterConstruction;

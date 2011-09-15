@@ -92,14 +92,17 @@ object ch2FormConfigShellCommand: Tch2FormConfigShellCommand
         ExplicitWidth = 560
         inherited Label1: TLabel
           Left = 283
+          Height = 13
           ExplicitLeft = 283
         end
         inherited Label2: TLabel
           Left = 147
+          Height = 13
           ExplicitLeft = 147
         end
         inherited lbl_Caption: TLabel
-          Width = 138
+          Width = 63
+          Height = 13
           Caption = 'Sample entry'
           ExplicitWidth = 63
         end

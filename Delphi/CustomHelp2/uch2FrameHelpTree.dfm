@@ -11,7 +11,7 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
     Left = 3
     Top = 33
     Width = 445
-    Height = 268
+    Height = 249
     Align = alClient
     Images = ch2Data.ch2Images16
     Indent = 19
@@ -20,9 +20,11 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
     TabOrder = 0
     OnAdvancedCustomDrawItem = TreeView1AdvancedCustomDrawItem
     OnCollapsed = TreeView1Expanded
+    OnCompare = TreeView1Compare
     OnDblClick = TreeView1DblClick
     OnExpanded = TreeView1Expanded
     OnKeyPress = TreeView1KeyPress
+    ExplicitHeight = 268
   end
   object Panel1: TPanel
     Left = 0
@@ -36,24 +38,47 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 65
+      Width = 54
       Height = 24
       Align = alLeft
       Caption = 'Search for:'
       Layout = tlCenter
-      ExplicitHeight = 16
+      ExplicitHeight = 13
     end
     object cbKeywords: TComboBox
       AlignWithMargins = True
-      Left = 74
+      Left = 63
       Top = 3
-      Width = 374
-      Height = 24
+      Width = 385
+      Height = 21
       Align = alClient
-      ItemHeight = 16
+      ItemHeight = 13
       TabOrder = 0
       OnCloseUp = cbKeywordsCloseUp
       OnKeyPress = cbKeywordsKeyPress
     end
+  end
+  object StatusBar: TStatusBar
+    Left = 0
+    Top = 285
+    Width = 451
+    Height = 19
+    Panels = <
+      item
+        Alignment = taCenter
+        Width = 150
+      end
+      item
+        Width = 50
+      end>
+    ExplicitLeft = 224
+    ExplicitTop = 144
+    ExplicitWidth = 0
+  end
+  object Timer1: TTimer
+    Interval = 500
+    OnTimer = Timer1Timer
+    Left = 208
+    Top = 136
   end
 end

@@ -102,8 +102,9 @@ type
   private
     FItem : Tch2HHItem;
     FKeyword : String;
+    FPriority : Integer;
   public
-    constructor Create(AItem : Tch2HHItem; AKeyword : String);
+    constructor Create(AItem : Tch2HHItem; AKeyword : String; APriority : Integer);
 
     {$REGION 'Ich2HelpItem'}
     function GetGUID : TGUID;
@@ -111,6 +112,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
   end;
@@ -256,7 +258,7 @@ var
 begin
   for o in Items do
   begin
-    AGUI.AddHelpItem(Tch2HIHHItem.Create(i, AKeyword));
+    AGUI.AddHelpItem(Tch2HIHHItem.Create(i, AKeyword, FPriority));
   end;
 end;
 
@@ -440,12 +442,13 @@ end;
 
 { Tch2HIHHItem }
 
-constructor Tch2HIHHItem.Create(AItem: Tch2HHItem; AKeyword : String);
+constructor Tch2HIHHItem.Create(AItem: Tch2HHItem; AKeyword : String; APriority : Integer);
 begin
   inherited Create;
 
   FItem := AItem;
   FKeyword := AKeyword;
+  FPriority := APriority;
 end;
 
 function Tch2HIHHItem.GetCaption: String;
@@ -471,6 +474,11 @@ end;
 function Tch2HIHHItem.GetGUID: TGUID;
 begin
   Result := FItem.GUID;
+end;
+
+function Tch2HIHHItem.GetPriority: Integer;
+begin
+  Result := FPriority;
 end;
 
 procedure Tch2HIHHItem.ShowHelp;

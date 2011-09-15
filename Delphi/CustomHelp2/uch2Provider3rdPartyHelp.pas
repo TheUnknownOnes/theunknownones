@@ -119,6 +119,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
 
@@ -138,6 +139,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
 
@@ -507,6 +509,11 @@ begin
   Result:=FProvider.GetGUIDForHelpViewer(FHelpViewer.GetViewerName);
 end;
 
+function Tch2Provider3rdPartyHelpItemCategory.GetPriority: Integer;
+begin
+  Result := FProvider.GetPriority;
+end;
+
 procedure Tch2Provider3rdPartyHelpItemCategory.ShowHelp;
 begin
 end;
@@ -546,6 +553,11 @@ end;
 
 function Tch2Provider3rdPartyHelpItemItem.GetGUID: TGUID;
 begin
+end;
+
+function Tch2Provider3rdPartyHelpItemItem.GetPriority: Integer;
+begin
+  Result := FProvider.GetPriority;
 end;
 
 procedure Tch2Provider3rdPartyHelpItemItem.ShowHelp;

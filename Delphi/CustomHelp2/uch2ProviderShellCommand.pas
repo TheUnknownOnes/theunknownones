@@ -100,8 +100,9 @@ type
   private
     FCMD : Tch2ShellCommand;
     FKeyword : String;
+    FPriority : Integer;
   public
-    constructor Create(ACMD : Tch2ShellCommand; AKeyword : String);
+    constructor Create(ACMD : Tch2ShellCommand; AKeyword : String; APriority : Integer);
 
     {$REGION 'Ich2HelpItem'}
     function GetGUID : TGUID;
@@ -109,6 +110,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
   end;
@@ -220,9 +222,8 @@ var
 begin
   for o in FCommands do
   begin
-    AGUI.AddHelpItem(Tch2HIShellCommand.Create(c, AKeyword));
+    AGUI.AddHelpItem(Tch2HIShellCommand.Create(c, AKeyword, FPriority));
   end;
-
 end;
 
 procedure Tch2ProviderShellCommand.SaveSettings;
@@ -453,10 +454,11 @@ end;
 
 { Tch2HIShellCommand }
 
-constructor Tch2HIShellCommand.Create(ACMD: Tch2ShellCommand; AKeyword: String);
+constructor Tch2HIShellCommand.Create(ACMD: Tch2ShellCommand; AKeyword: String; APriority : Integer);
 begin
   FCMD := ACMD;
   FKeyword := AKeyword;
+  FPriority := APriority;
 end;
 
 function Tch2HIShellCommand.GetCaption: String;
@@ -484,6 +486,11 @@ const
   g : TGUID = '{13A826AF-3BA7-4A22-BDE6-8C2C26382761}';
 begin
   Result := g;
+end;
+
+function Tch2HIShellCommand.GetPriority: Integer;
+begin
+  Result := FPriority;
 end;
 
 procedure Tch2HIShellCommand.ShowHelp;

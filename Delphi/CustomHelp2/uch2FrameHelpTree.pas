@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, StdCtrls, ExtCtrls, ComCtrls, uch2Main, ImgList, uch2Data;
+  Dialogs, StdCtrls, ExtCtrls, ComCtrls, uch2Main, ImgList, uch2Data, SyncObjs;
 
 type
   Tch2FrameHelpTree = class(TFrame)
@@ -12,6 +12,8 @@ type
     Panel1: TPanel;
     Label1: TLabel;
     cbKeywords: TComboBox;
+    StatusBar: TStatusBar;
+    Timer1: TTimer;
     procedure cbKeywordsCloseUp(Sender: TObject);
     procedure cbKeywordsKeyPress(Sender: TObject; var Key: Char);
     procedure TreeView1AdvancedCustomDrawItem(Sender: TCustomTreeView;
@@ -20,7 +22,19 @@ type
     procedure TreeView1DblClick(Sender: TObject);
     procedure TreeView1KeyPress(Sender: TObject; var Key: Char);
     procedure TreeView1Expanded(Sender: TObject; Node: TTreeNode);
+    procedure TreeView1Compare(Sender: TObject; Node1, Node2: TTreeNode;
+      Data: Integer; var Compare: Integer);
+    procedure Timer1Timer(Sender: TObject);
+  private
+    FLock : TCriticalSection;
+    FHelpItem : Ich2HelpItem;
+    FHelpItemParent : Pointer;
+    FAddHelpItemResult : Pointer;
+    procedure DoAddHelpItem;
   public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
     function AddHelpItem(AHelpItem : Ich2HelpItem; AParent : Pointer = nil) : Pointer;
     procedure Init(const AHelpString: String; const Ach2Keywords: TStringList; ASeachImmediate : Boolean = true);
 
@@ -39,6 +53,22 @@ const
   IMG_INDENT_PLUSMINUS = 35;
   IMG_INDENT_IMAGE = 18;
 
+var
+  ProviderThreads : TThreadList;
+
+type
+  TProviderThread = class(TThread)
+  protected
+    FKeyword : String;
+    FGUI : Ich2GUI;
+    FProvider : Ich2Provider;
+
+    procedure Execute; override;
+  public
+    constructor Create(AProvider : Ich2Provider; AKeyword : String; AGUI : Ich2GUI);
+    destructor Destroy; override;
+  end;
+
 {$R *.dfm}
 
 type
@@ -53,30 +83,26 @@ type
     procedure Execute;
 
     property Expanded: Boolean read GetExpanded write SetExpanded;
+    property Item : Ich2HelpItem read FItemInterface;
   end;
 
 { TFrame1 }
 
 function Tch2FrameHelpTree.AddHelpItem(AHelpItem: Ich2HelpItem;
   AParent: Pointer): Pointer;
-var
-  Node : TTreeNode;
 begin
-  Node:=TreeView1.Items.AddChild(AParent, AHelpItem.GetCaption+AHelpItem.GetDescription);
-  Node.Data:=TNodeData.Create(AHelpItem);
+  Result := nil;
 
-  if Assigned(AParent) then
-  begin
-    if TNodeData(TTreeNode(AParent).Data).Expanded then
-      TTreeNode(AParent).Expanded:=True;
+  FLock.Enter;
+  try
+    FHelpItem := AHelpItem;
+    FHelpItemParent := AParent;
+    FAddHelpItemResult := nil;
+    TThread.Synchronize(TThread.CurrentThread, DoAddHelpItem);
+    Result := FAddHelpItemResult;
+  finally
+    FLock.Leave;
   end;
-
-  if ifProvidesHelp in AHelpItem.GetFlags then
-    Node.ImageIndex:=2
-  else
-    Node.ImageIndex:=-1;
-
-  Result:=Node;
 end;
 
 procedure Tch2FrameHelpTree.cbKeywordsCloseUp(Sender: TObject);
@@ -89,6 +115,42 @@ procedure Tch2FrameHelpTree.cbKeywordsKeyPress(Sender: TObject; var Key: Char);
 begin
   if Key=#13 then
     ShowHelp(cbKeywords.Text);
+end;
+
+constructor Tch2FrameHelpTree.Create(AOwner: TComponent);
+begin
+  inherited;
+  FLock := TCriticalSection.Create;
+end;
+
+destructor Tch2FrameHelpTree.Destroy;
+begin
+  FLock.Free;
+  inherited;
+end;
+
+procedure Tch2FrameHelpTree.DoAddHelpItem;
+var
+  Node : TTreeNode;
+begin
+  Node:=TreeView1.Items.AddChildObject(FHelpItemParent,
+                                       FHelpItem.GetCaption + FHelpItem.GetDescription,
+                                       TNodeData.Create(FHelpItem));
+
+  if Assigned(FHelpItemParent) then
+  begin
+    if TNodeData(TTreeNode(FHelpItemParent).Data).Expanded then
+      TTreeNode(FHelpItemParent).Expanded:=True;
+  end;
+
+  if ifProvidesHelp in FHelpItem.GetFlags then
+    Node.ImageIndex:=2
+  else
+    Node.ImageIndex:=-1;
+
+  FAddHelpItemResult:=Node;
+
+  TreeView1.CustomSort(nil, 0);
 end;
 
 procedure Tch2FrameHelpTree.Init(const AHelpString: String;
@@ -118,12 +180,24 @@ begin
     begin
       for intf in ch2Main.Providers do
       begin
-        IProv.ProvideHelp(FKeyword, ch2Main.CurrentGUI);
+        TProviderThread.Create(IProv, FKeyword, ch2Main.CurrentGUI);
       end;
     end;
   finally
     TreeView1.Items.EndUpdate;
     Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure Tch2FrameHelpTree.Timer1Timer(Sender: TObject);
+var
+  lst : TList;
+begin
+  lst := ProviderThreads.LockList;
+  try
+    StatusBar.Panels[0].Text := Format('%d', [lst.Count]) + ' provider active';
+  finally
+    ProviderThreads.UnlockList;
   end;
 end;
 
@@ -198,6 +272,17 @@ begin
     DefaultDraw:=true;
     PaintImages:=True;
   end;
+end;
+
+procedure Tch2FrameHelpTree.TreeView1Compare(Sender: TObject; Node1,
+  Node2: TTreeNode; Data: Integer; var Compare: Integer);
+var
+  NodeData1,
+  NodeData2 : TNodeData;
+begin
+  NodeData1 := TNodeData(Node1.Data);
+  NodeData2 := TNodeData(Node2.Data);
+  Compare := NodeData2.Item.GetPriority - NodeData1.Item.GetPriority;
 end;
 
 procedure Tch2FrameHelpTree.TreeView1DblClick(Sender: TObject);
@@ -288,5 +373,38 @@ begin
     Reg.Free;
   end;
 end;
+
+{ TProviderThread }
+
+constructor TProviderThread.Create(AProvider : Ich2Provider; AKeyword: String; AGUI: Ich2GUI);
+begin
+  inherited Create(true);
+  FreeOnTerminate := true;
+  FKeyword := AKeyword;
+  FGUI := AGUI;
+  FProvider := AProvider;
+  ProviderThreads.Add(Self);
+  Resume;
+end;
+
+destructor TProviderThread.Destroy;
+begin
+  ProviderThreads.Remove(Self);
+  inherited;
+end;
+
+procedure TProviderThread.Execute;
+begin
+  try
+    FProvider.ProvideHelp(FKeyword, FGUI);
+  except
+  end;
+end;
+
+initialization
+  ProviderThreads := TThreadList.Create;
+
+finalization
+  ProviderThreads.Free;
 
 end.
