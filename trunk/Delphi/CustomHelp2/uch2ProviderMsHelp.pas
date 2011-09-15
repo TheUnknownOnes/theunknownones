@@ -107,6 +107,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
 
@@ -128,6 +129,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
 
@@ -659,6 +661,11 @@ begin
   result:=FProvider.GetGUIDForNamespace(FNamespace);
 end;
 
+function Tch2ProviderMsHelpItemCategory.GetPriority: Integer;
+begin
+  Result := FProvider.GetPriority;
+end;
+
 procedure Tch2ProviderMsHelpItemCategory.ShowHelp;
 begin
 
@@ -699,6 +706,11 @@ end;
 function Tch2ProviderMsHelpItemItem.GetGUID: TGUID;
 begin
   Result:=StringToGUID('{81DF310E-D56E-40C2-9907-83D7E4F2CB77}');
+end;
+
+function Tch2ProviderMsHelpItemItem.GetPriority: Integer;
+begin
+  Result := FProvider.GetPriority;
 end;
 
 procedure Tch2ProviderMsHelpItemItem.ShowHelp;

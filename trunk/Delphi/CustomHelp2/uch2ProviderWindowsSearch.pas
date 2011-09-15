@@ -90,6 +90,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
 
@@ -111,6 +112,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
 
@@ -604,6 +606,11 @@ begin
   Result:=FProvider.GetGUIDForName(FCaption);
 end;
 
+function Tch2ProviderWindowsSearchCategory.GetPriority: Integer;
+begin
+  Result := FProvider.GetPriority;
+end;
+
 procedure Tch2ProviderWindowsSearchCategory.ShowHelp;
 begin
 end;
@@ -644,6 +651,11 @@ end;
 
 function Tch2ProviderWindowsSearchItem.GetGUID: TGUID;
 begin
+end;
+
+function Tch2ProviderWindowsSearchItem.GetPriority: Integer;
+begin
+  Result := 0;
 end;
 
 procedure Tch2ProviderWindowsSearchItem.ShowHelp;

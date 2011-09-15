@@ -100,8 +100,9 @@ type
   private
     FURL : Tch2StatWebURL;
     FKeyword : String;
+    FPriority : Integer;
   public
-    constructor Create(AURL : Tch2StatWebURL; AKeyword : String);
+    constructor Create(AURL : Tch2StatWebURL; AKeyword : String; APriority : Integer);
 
     {$REGION 'Ich2HelpItem'}
     function GetGUID : TGUID;
@@ -109,6 +110,7 @@ type
     function GetDescription : String;
     function GetDecoration : Tch2HelpItemDecoration;
     function GetFlags : Tch2HelpItemFlags;
+    function GetPriority : Integer;
     procedure ShowHelp;
     {$ENDREGION}
   end;
@@ -218,7 +220,7 @@ var
 begin
   for o in FURLs do
   begin
-    AGUI.AddHelpItem(Tch2HIURL.Create(u, AKeyword) as Ich2HelpItem);
+    AGUI.AddHelpItem(Tch2HIURL.Create(u, AKeyword, FPriority) as Ich2HelpItem);
   end;
 end;
 
@@ -442,10 +444,11 @@ end;
 
 { Tch2HIURL }
 
-constructor Tch2HIURL.Create(AURL: Tch2StatWebURL; AKeyword : String);
+constructor Tch2HIURL.Create(AURL: Tch2StatWebURL; AKeyword : String; APriority : Integer);
 begin
   FURL := AURL;
   FKeyword := AKeyword;
+  FPriority := APriority;
 end;
 
 function Tch2HIURL.GetCaption: String;
@@ -473,6 +476,11 @@ const
   g : TGUID = '{E30101F2-352E-47DB-8D2E-0DBF999FB803}';
 begin
   Result := g;
+end;
+
+function Tch2HIURL.GetPriority: Integer;
+begin
+  Result := FPriority;
 end;
 
 procedure Tch2HIURL.ShowHelp;

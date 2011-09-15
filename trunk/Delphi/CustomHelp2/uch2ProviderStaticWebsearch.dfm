@@ -123,7 +123,7 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
         Width = 142
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 2
         OnChange = com_LocationChange
       end
@@ -139,14 +139,17 @@ object ch2FormConfigStaticWebsearch: Tch2FormConfigStaticWebsearch
         ExplicitWidth = 592
         inherited Label1: TLabel
           Left = 315
+          Height = 13
           ExplicitLeft = 315
         end
         inherited Label2: TLabel
           Left = 178
+          Height = 13
           ExplicitLeft = 178
         end
         inherited lbl_Caption: TLabel
-          Width = 169
+          Width = 63
+          Height = 13
           Caption = 'Sample entry'
           ExplicitWidth = 63
         end
