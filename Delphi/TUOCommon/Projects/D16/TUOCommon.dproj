@@ -2,7 +2,7 @@
 		<PropertyGroup>
 			<ProjectGuid>{2793A2A4-2254-40AC-A155-A342CB4C05DC}</ProjectGuid>
 			<MainSource>TUOCommon.dpk</MainSource>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<ProjectVersion>13.4</ProjectVersion>
 			<FrameworkType>VCL</FrameworkType>
@@ -14,11 +14,6 @@
 		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
 			<Base>true</Base>
 		</PropertyGroup>
-		<PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
-			<Base_Win64>true</Base_Win64>
-			<CfgParent>Base</CfgParent>
-			<Base>true</Base>
-		</PropertyGroup>
 		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
 			<Base_Win32>true</Base_Win32>
 			<CfgParent>Base</CfgParent>
@@ -27,6 +22,12 @@
 		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
 			<Cfg_1>true</Cfg_1>
 			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+			<Cfg_1_Win32>true</Cfg_1_Win32>
+			<CfgParent>Cfg_1</CfgParent>
+			<Cfg_1>true</Cfg_1>
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
@@ -47,7 +48,7 @@
 			<DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<DesignOnlyPackage>true</DesignOnlyPackage>
-			<DllSuffix>_D140</DllSuffix>
+			<DllSuffix>_D160</DllSuffix>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_Platform>x86</DCC_Platform>
@@ -61,11 +62,7 @@
 			<DCC_F>false</DCC_F>
 			<DCC_K>false</DCC_K>
 		</PropertyGroup>
-		<PropertyGroup Condition="'$(Base_Win64)'!=''">
-			<Icon_MainIcon>C:\Users\Devy\Documents\libs\tuo\Delphi\TUOCommon\Projects\D16\TUOCommon_Icon.ico</Icon_MainIcon>
-		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_Win32)'!=''">
-			<Icon_MainIcon>C:\Users\Devy\Documents\libs\tuo\Delphi\TUOCommon\Projects\D16\TUOCommon_Icon.ico</Icon_MainIcon>
 			<DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
 			<DCC_UsePackage>vcl;$(DCC_UsePackage)</DCC_UsePackage>
 		</PropertyGroup>
@@ -75,6 +72,9 @@
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
 			<DCC_DebugInformation>false</DCC_DebugInformation>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+			<DllSuffix>_D160</DllSuffix>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
@@ -82,7 +82,7 @@
 			<DllSuffix>_D160</DllSuffix>
 		</PropertyGroup>
 		<ItemGroup>
-			<DelphiCompile Include="TUOCommon.dpk">
+			<DelphiCompile Include="$(MainSource)">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="..\D10\images.res"/>
