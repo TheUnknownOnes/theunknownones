@@ -27,10 +27,10 @@ object ch2FormGUIDockableTree: Tch2FormGUIDockableTree
     ExplicitHeight = 253
     inherited TreeView1: TTreeView
       Width = 446
-      Height = 217
+      Height = 198
       ParentFont = False
       ExplicitWidth = 446
-      ExplicitHeight = 217
+      ExplicitHeight = 198
     end
     inherited Panel1: TPanel
       Width = 452
@@ -39,6 +39,13 @@ object ch2FormGUIDockableTree: Tch2FormGUIDockableTree
         Width = 386
         ExplicitWidth = 386
       end
+    end
+    inherited StatusBar: TStatusBar
+      Top = 234
+      Width = 452
+      ExplicitLeft = 0
+      ExplicitTop = 234
+      ExplicitWidth = 452
     end
   end
 end

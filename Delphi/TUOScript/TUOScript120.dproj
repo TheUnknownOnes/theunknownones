@@ -26,7 +26,7 @@
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<DCC_Description>TUOScript for Delphi 2006</DCC_Description>
-			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\TUOScript120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\TUOScript120.bpl</DCC_DependencyCheckOutputName>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<GenDll>true</GenDll>
 			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>

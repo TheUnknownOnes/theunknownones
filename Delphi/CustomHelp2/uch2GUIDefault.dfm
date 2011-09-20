@@ -29,9 +29,9 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
     ExplicitHeight = 398
     inherited TreeView1: TTreeView
       Width = 525
-      Height = 362
+      Height = 343
       ExplicitWidth = 525
-      ExplicitHeight = 362
+      ExplicitHeight = 343
     end
     inherited Panel1: TPanel
       Width = 531
@@ -40,6 +40,13 @@ object ch2FormGUIDefault: Tch2FormGUIDefault
         Width = 465
         ExplicitWidth = 465
       end
+    end
+    inherited StatusBar: TStatusBar
+      Top = 379
+      Width = 531
+      ExplicitLeft = 0
+      ExplicitTop = 379
+      ExplicitWidth = 531
     end
   end
   object tmDoSearch: TTimer

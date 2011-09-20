@@ -17,7 +17,8 @@ uses
   ShellAPI,
   Controls,
   Graphics,
-  ExtCtrls;
+  ExtCtrls,
+  Forms;
 
 type
   Tch2HelpItemFlag = (ifSaveStats,
@@ -69,10 +70,19 @@ type
     procedure SetPriority(ANewPriority : Integer);
   end;
 
-  Tch2HelpViewer = class(TInterfacedObject, ICustomHelpViewer)
+  Ich2HelpViewer = interface(ICustomHelpViewer)
+    ['{8E664AF2-D423-4F97-B2E1-4E3F43468B05}']
+    function GetID: Integer;
+    property ID : Integer read GetID;
+  end;
+
+  Tch2HelpViewer = class(TInterfacedObject, ICustomHelpViewer, Ich2HelpViewer)
   private
     FID : Integer;
   public
+    {$REGION 'Ich2HelpViewer'}
+    function GetID: Integer;
+    {$ENDREGION}
     {$REGION 'ICustomHelpViewer'}
     function  GetViewerName: string;
     function  UnderstandsKeyword(const HelpString: string): Integer;
@@ -86,9 +96,6 @@ type
     {$ENDREGION}
   public
     destructor Destroy; override;
-    procedure AfterConstruction(); override;
-    procedure BeforeDestruction(); override;
-
     property ID : Integer read FID;
   end;
 
@@ -110,17 +117,17 @@ type
 
   Tch2Main = class
   private
-    FHelpViewer : Tch2HelpViewer;
+    FHelpViewer : Ich2HelpViewer;
     FHelpManager : IHelpManager;
 
     FMenuItemConfig : TMenuItem;
-    FProviders: TInterfaceList;
+    FProviders: IInterfaceListEx;
     FKeywords: TStringList;
     FHelpString: String;
 
     FCurrentGUIGUID : String;
     FCurrentGUI : Ich2GUI;
-    FGUIs: TInterfaceList;
+    FGUIs: IInterfaceListEx;
 
     FWPTimer : TTimer;
     FWPURL : String;
@@ -161,19 +168,19 @@ type
 
     procedure ShowHelp;
 
-    procedure RegisterGUI(AGUI : Ich2GUI);
-    procedure RegisterProvider(AProvider : Ich2Provider);
+    procedure RegisterGUI(const AGUI : Ich2GUI);
+    procedure RegisterProvider(const AProvider : Ich2Provider);
 
-    property HelpViewer : Tch2HelpViewer read FHelpViewer;
+    property HelpViewer : Ich2HelpViewer read FHelpViewer;
     property HelpManager : IHelpManager read FHelpManager;
 
     property RegRootKey : String read GetRegRootKey;
     property RegRootKeyProvider[AGUID : TGUID] : String read GetRegRootKeyProvider;
     property RegRootKeyGUI[AGUID : TGUID] : String read GetRegRootKeyGUI;
 
-    property Providers : TInterfaceList read FProviders;
+    property Providers : IInterfaceListEx read FProviders;
     property Provider[AIndex : Integer] : Ich2Provider read GetProvider;
-    property GUIs : TInterfaceList read FGUIs;
+    property GUIs : IInterfaceListEx read FGUIs;
     property GUI[AIndex : Integer] : Ich2GUI read GetGUI;
 
     property CurrentGUI : Ich2GUI read GetCurrentGUI write SetCurrentGUI;
@@ -265,22 +272,10 @@ type
 
 { Tch2HelpViewer }
 
-
-procedure Tch2HelpViewer.AfterConstruction;
-begin
-  inherited;
-end;
-
-procedure Tch2HelpViewer.BeforeDestruction;
-begin
-  inherited;
-end;
-
 function Tch2HelpViewer.CanShowTableOfContents: Boolean;
 begin
   Result := false;
 end;
-
 
 destructor Tch2HelpViewer.Destroy;
 begin
@@ -291,6 +286,11 @@ function Tch2HelpViewer.GetHelpStrings(const HelpString: string): TStringList;
 begin
   Result := TStringList.Create;
   Result.Add(HelpKeywordGUID);
+end;
+
+function Tch2HelpViewer.GetID: Integer;
+begin
+  Result:=FID;
 end;
 
 function Tch2HelpViewer.GetViewerName: string;
@@ -484,11 +484,8 @@ begin
 
   SaveSettings;
 
-  FProviders.Free;
-  FGUIs.Free;
-
   FKeywords.Free;
-  
+
   inherited;
 end;
 
@@ -687,7 +684,7 @@ var
  end;
 
 
-procedure Tch2Main.RegisterGUI(AGUI: Ich2GUI);
+procedure Tch2Main.RegisterGUI(const AGUI: Ich2GUI);
 begin
   GUIs.Add(AGUI);
 
@@ -695,7 +692,7 @@ begin
     FCurrentGUI := AGUI;
 end;
 
-procedure Tch2Main.RegisterProvider(AProvider: Ich2Provider);
+procedure Tch2Main.RegisterProvider(const AProvider: Ich2Provider);
 begin
   AProvider.SetPriority(GetNextFreePriority(AProvider.GetPriority));
   Providers.Add(AProvider);
@@ -839,6 +836,7 @@ initialization
 
 finalization
   ch2Main.Free;
+
   if Assigned(bmp) then
     bmp.Free;
 

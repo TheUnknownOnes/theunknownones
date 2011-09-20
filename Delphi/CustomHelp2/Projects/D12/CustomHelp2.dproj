@@ -38,6 +38,7 @@
 			<DCC_DebugInformation>false</DCC_DebugInformation>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<DCC_MapFile>3</DCC_MapFile>
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
@@ -129,6 +130,7 @@
 						<Parameters Name="UseLauncher">False</Parameters>
 						<Parameters Name="LoadAllSymbols">True</Parameters>
 						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+						<Parameters Name="HostApplication">C:\Program Files (x86)\CodeGear\RAD Studio\6.0\bin\bds.exe</Parameters>
 					</Parameters>
 					<VersionInfo>
 						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
@@ -157,7 +159,13 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
-					<Excluded_Packages/>
+					<Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\Bin\RaudusD120.bpl">Datei c:\program files (x86)\codegear\rad studio\6.0\Bin\RaudusD120.bpl nicht gefunden</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\chrometab.bpl">Datei C:\Users\Public\Documents\RAD Studio\6.0\Bpl\chrometab.bpl nicht gefunden</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\ChromeFrame.bpl">Datei C:\Users\Public\Documents\RAD Studio\6.0\Bpl\ChromeFrame.bpl nicht gefunden</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\zCube_D120.bpl">Datei C:\Users\Public\Documents\RAD Studio\6.0\Bpl\zCube_D120.bpl nicht gefunden</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\6.0\Bpl\SynEdit_D2010.bpl">Datei C:\Users\Public\Documents\RAD Studio\6.0\Bpl\SynEdit_D2010.bpl nicht gefunden</Excluded_Packages>
+					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
