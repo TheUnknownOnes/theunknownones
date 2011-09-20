@@ -26,6 +26,7 @@ package CustomHelp2;
 {$LIBSUFFIX '_D120'}
 {$DESIGNONLY}
 {$IMPLICITBUILD ON}
+{$DEFINE DEBUG}
 
 requires
   rtl,

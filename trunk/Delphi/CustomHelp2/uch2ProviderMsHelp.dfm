@@ -199,7 +199,6 @@ object ch2FormProviderMsHelp: Tch2FormProviderMsHelp
           Margins.Top = 2
           Margins.Right = 2
           Margins.Bottom = 2
-          ItemHeight = 0
           TabOrder = 0
           OnChange = cbSearchTypeChange
         end

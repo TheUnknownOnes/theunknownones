@@ -44,6 +44,7 @@ type
 implementation
 
 {$R *.dfm}
+{$I CustomHelp2.inc}
 
 const
   Settings_Key_Stats = '\Stats\';
@@ -171,9 +172,6 @@ begin
 end;
 
 initialization
-  ch2Main.RegisterGUI(Tch2GUIDefault.Create as Ich2GUI);
-
-finalization
-
+  {$IFDEF GUIDefault}ch2Main.RegisterGUI(Tch2GUIDefault.Create as Ich2GUI);{$ENDIF}
 
 end.

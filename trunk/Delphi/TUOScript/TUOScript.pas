@@ -44,12 +44,12 @@ type
   TTUOScriptInterpreter_1_0 = class(TObject)
   private
     FRegisteredFunctions : TStrings;
-    FRegisteredHandlers : TInterfaceList;
+    FRegisteredHandlers : IInterfaceListEx;
     
     function Execute(const AFunctionName : WideString; const AParams : TTUOScriptParams) : TTUOScriptFunctionResult;
   public
     constructor Create(const ARegisteredFunctions : TStrings;
-                       const ARegisteredFunctionHandlers : TInterfaceList);
+                       const ARegisteredFunctionHandlers : IInterfaceListEx);
     destructor Destroy(); override;
 
     function Run( const ATemplate: IOTACodeTemplate;
@@ -60,10 +60,29 @@ type
 
   TTUOScriptLogType = (ltInfo, ltError);
 
-  TTUOScript = class(TNotifierObject, IOTACodeTemplateScriptEngine)
+  ITUOScript = interface(IOTACodeTemplateScriptEngine)
+    ['{FC593E22-7E8A-413B-97C6-CBAE977B8779}']
+    procedure Execute(const ATemplate: IOTACodeTemplate;
+                      const APoint: IOTACodeTemplatePoint;
+                      const ASyncPoints: IOTASyncEditPoints;
+                      const AScript: IOTACodeTemplateScript;
+                      var Cancel: Boolean);
+    function GetIDString: WideString;
+    function GetLanguage: WideString;
+
+    function RegisterFunction(AName : String;
+                              AFunctionAddr : TTUOScriptFunctionAddr) : Boolean; deprecated;
+    function UnregisterFunction(AName : String) : Boolean; overload; deprecated;
+    function UnregisterFunction(AFunction : TTUOScriptFunctionAddr) : Boolean; overload; deprecated;
+
+    function RegisterFunctionHandler(const AHandler : ITUOScriptFunctionHandler) : Boolean;
+    function UnregisterFunctionHandler(const AHandler : ITUOScriptFunctionHandler) : Boolean;
+  end;
+
+  TTUOScript = class(TNotifierObject, ITUOScript, IOTACodeTemplateScriptEngine)
   private
     FRegisteredFunctions : TStrings;
-    FRegisteredHandlers : TInterfaceList;
+    FRegisteredHandlers : IInterfaceListEx;
 
     FMessageGroup : IOTAMessageGroup;
 
@@ -92,7 +111,7 @@ type
   end;
 
 var
-  TUOScriptEngine : TTUOScript;
+  TUOScriptEngine : ITUOScript;
 
 implementation
 
@@ -115,7 +134,7 @@ end;
 destructor TTUOScript.Destroy;
 begin
   FRegisteredFunctions.Free;
-  FRegisteredHandlers.Free;
+//  FRegisteredHandlers.Free;
 
   if Assigned(FMessageGroup) then  
     (BorlandIDEServices as IOTAMessageServices).RemoveMessageGroup(FMessageGroup);
@@ -296,7 +315,7 @@ end;
 {$REGION 'TTUOScriptInterpreter_1_0'}
 
 constructor TTUOScriptInterpreter_1_0.Create(const ARegisteredFunctions : TStrings;
-                                             const ARegisteredFunctionHandlers : TInterfaceList);
+                                             const ARegisteredFunctionHandlers : IInterfaceListEx);
 begin
   FRegisteredFunctions:=ARegisteredFunctions;
   FRegisteredHandlers:=ARegisteredFunctionHandlers;
@@ -422,5 +441,5 @@ initialization
   (BorlandIDEServices as IOTACodeTemplateServices).RegisterScriptEngine(TUOScriptEngine);
 
 finalization
-  
+
 end.

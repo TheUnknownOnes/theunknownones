@@ -11,7 +11,7 @@ type
   Tch2ProviderMSHelp = class(TInterfacedObject, Ich2Provider)
   private
     FPriority : Integer;
-    FEnabledhxSessions: TInterfaceList;
+    FEnabledhxSessions: IInterfaceListEx;
     FSessionLock:     TCriticalSection;
 
 
@@ -290,7 +290,7 @@ end;
 procedure Tch2ProviderMSHelp.BeforeDestruction;
 begin
   inherited;
-  FEnabledhxSessions.Free;
+  FEnabledhxSessions:=Nil;
   FSessionLock.Free;
 end;
 

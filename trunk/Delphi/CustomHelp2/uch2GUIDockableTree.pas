@@ -45,7 +45,7 @@ procedure ShowDockableForm(Form: TDockableForm);
 implementation
 
 {$R *.dfm}
-
+{$I CustomHelp2.inc}
 
 {$Region 'DockableForm Routines'}
 procedure RegisterDockableForm(FormClass: TDockableFormClass;
@@ -91,8 +91,8 @@ begin
   begin
     FormVar.Hide;
     UnRegisterDockableForm(FormVar, FormVar.Name);
-    {FormVar.Release;
-    FormVar:=nil;  }
+//    FormVar.Release;
+//    FormVar:=nil;
     FreeAndNil(FormVar);
   end;
 end;
@@ -114,7 +114,10 @@ end;
 
 procedure Tch2GUIDockableTree.BeforeDestruction;
 begin
-  FreeDockableForm(TDockableForm(FForm));
+  try
+    FreeDockableForm(TDockableForm(FForm));
+  except
+  end;
   inherited;
 end;
 
@@ -147,8 +150,7 @@ begin
   Self.DeskSection:='CustomHelp2_GUI_DOCKABLE_TREE';
 end;
 
-
 initialization
-  ch2Main.RegisterGUI(Tch2GUIDockableTree.Create as Ich2GUI);
+  {$IFDEF GUIDockableTree}ch2Main.RegisterGUI(Tch2GUIDockableTree.Create as Ich2GUI);{$ENDIF}
 
 end.

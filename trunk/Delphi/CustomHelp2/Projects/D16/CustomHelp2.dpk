@@ -1,3 +1,5 @@
+// JCL_DEBUG_EXPERT_GENERATEJDBG ON
+// JCL_DEBUG_EXPERT_INSERTJDBG ON
 package CustomHelp2;
 
 {$R *.res}
@@ -35,7 +37,8 @@ requires
   vclx,
   xmlrtl,
   designide,
-  TUOCommon;
+  TUOCommon,
+  Jcl;
 
 contains
   uch2Configure in '..\..\uch2Configure.pas' {ch2FormConfigure},

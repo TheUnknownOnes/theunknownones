@@ -7,3 +7,6 @@
 {$DEFINE ProviderStaticWebsearch}
 {$DEFINE ProviderWindowsSearch}
 {$DEFINE ProviderWinhelp}
+
+{$DEFINE GUIDockableTree}
+{$DEFINE GUIDefault}
