@@ -250,7 +250,9 @@ procedure TSIAFB.OnSimpleSearchKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if ShortCut(Key, Shift) = SIAF_Shortcut then
-    FButton.Click
+  begin
+    FButton.Click;
+  end
   else
   if Assigned(FSimpleSearchOrigKeyUp) then
     FSimpleSearchOrigKeyUp(Sender, Key, Shift);
@@ -272,7 +274,7 @@ begin
 end;
 
 initialization
-  SIAF_Shortcut := ShortCut(VK_RETURN, [ssCtrl]);
+  SIAF_Shortcut := ShortCut(VK_RETURN, [ssAlt]);
   FSIAFB := TSIAFB.Create(nil);
 
 finalization
