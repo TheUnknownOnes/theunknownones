@@ -23,7 +23,7 @@ type
     Command : Integer;
     State : Byte;
     Style : Byte;
-    Data : Integer;
+    Data : NativeUInt;
     Text : Integer;
   end;
 
@@ -51,7 +51,7 @@ type
     function CreateButtonFromTaskbar(AIndex : Integer) : TTaskbarButton;
 
     procedure ReadFromTaskbar;
-    function IndexOfButtonWith(ACommand : Integer; AData : integer) : Integer;
+    function IndexOfButtonWith(ACommand : Integer; AData : NativeUInt) : Integer;
   public
     Buttons : TTaskbarButtonList;
 
@@ -81,7 +81,7 @@ type
       //retrieves the raw button data
     class procedure CGetButtonRect(AButtonIndex : Integer; ARect : PRect);
       //gets the rect of the button relative to the Taskbar
-    class function COpenTaskbarProcess : Cardinal;
+    class function COpenTaskbarProcess : NativeUInt;
       //dont forget to close the handle
     class function CButtonCount : Integer;
       //the real amount ... maybe our object isnt up to date :)
@@ -89,7 +89,7 @@ type
       //the window handle of the taskbar control
     class function CButtonText (ACommand : Integer) : WideString;
       //the text u can see on the button
-    class function CAppWindowOfButton(AData : Integer) : HWND;
+    class function CAppWindowOfButton(AData : NativeUint) : HWND;
       //retrieves the window handle the button points to
     {$ENDREGION}
   end;
@@ -118,13 +118,13 @@ var
   Icon: HICON;
 begin
   Icon := 0;
-  SendMessageTimeout(hwnd, WM_GETICON, ICON_SMALL2, 0, SMTO_ABORTIFHUNG, 1000, DWORD(Icon));
+  SendMessageTimeout(hwnd, WM_GETICON, ICON_SMALL2, 0, SMTO_ABORTIFHUNG, 1000, PDWORD_PTR(@Icon));
 
   if Icon = 0 then
-    SendMessageTimeout(hwnd, WM_GETICON, ICON_SMALL, 0, SMTO_ABORTIFHUNG, 1000, DWORD(Icon));
+    SendMessageTimeout(hwnd, WM_GETICON, ICON_SMALL, 0, SMTO_ABORTIFHUNG, 1000, PDWORD_PTR(@Icon));
 
   if Icon = 0 then
-    SendMessageTimeout(hwnd, WM_GETICON, ICON_BIG, 0, SMTO_ABORTIFHUNG, 1000, DWORD(Icon));
+    SendMessageTimeout(hwnd, WM_GETICON, ICON_BIG, 0, SMTO_ABORTIFHUNG, 1000, PDWORD_PTR(@Icon));
 
   if Icon = 0 then
     Icon := HICON(GetClassLong(hwnd, GCL_HICONSM));
@@ -133,7 +133,7 @@ begin
     Icon := HICON(GetClassLong(hwnd, GCL_HICON));
 
   if Icon = 0 then
-    SendMessageTimeout(hwnd, WM_QUERYDRAGICON, 0, 0, 0, 1000, DWORD(Icon));
+    SendMessageTimeout(hwnd, WM_QUERYDRAGICON, 0, 0, 0, 1000, PDWORD_PTR(@Icon));
 
   Result := Icon;
 end;
@@ -144,13 +144,13 @@ var
   Icon: HICON;
 begin
   Icon := 0;
-  SendMessageTimeout(hwnd, WM_GETICON, ICON_BIG, 0, SMTO_ABORTIFHUNG, 1000, DWORD(Icon));
+  SendMessageTimeout(hwnd, WM_GETICON, ICON_BIG, 0, SMTO_ABORTIFHUNG, 1000, PDWORD_PTR(@Icon));
 
   if Icon = 0 then
-    SendMessageTimeout(hwnd, WM_GETICON, ICON_SMALL2, 0, SMTO_ABORTIFHUNG, 1000, DWORD(Icon));
+    SendMessageTimeout(hwnd, WM_GETICON, ICON_SMALL2, 0, SMTO_ABORTIFHUNG, 1000, PDWORD_PTR(@Icon));
 
   if Icon = 0 then
-    SendMessageTimeout(hwnd, WM_GETICON, ICON_SMALL, 0, SMTO_ABORTIFHUNG, 1000, DWORD(Icon));
+    SendMessageTimeout(hwnd, WM_GETICON, ICON_SMALL, 0, SMTO_ABORTIFHUNG, 1000, PDWORD_PTR(@Icon));
 
   if allow_from_class then
   begin
@@ -162,7 +162,7 @@ begin
   end;
 
   if Icon = 0 then
-    SendMessageTimeout(hwnd, WM_QUERYDRAGICON, 0, 0, 0, 1000, DWORD(Icon));
+    SendMessageTimeout(hwnd, WM_QUERYDRAGICON, 0, 0, 0, 1000, PDWORD_PTR(@Icon));
 
   Result := Icon;
 end;
@@ -280,12 +280,12 @@ begin
     InvalidButton;
 end;
 
-class function TTaskbar.CAppWindowOfButton(AData: Integer): HWND;
+class function TTaskbar.CAppWindowOfButton(AData: NativeUInt): HWND;
 //gets the handle of the window, the button points to
 var
-  LTBProcessHandle : Cardinal;
+  LTBProcessHandle : NativeUInt;
   LWindowHandle : HWND;
-  LBytesRead : Cardinal;
+  LBytesRead : NativeUInt;
 begin
   Result:=0;
   
@@ -309,10 +309,10 @@ end;
 class function TTaskbar.CButtonText(ACommand: Integer): WideString;
 //retrives the text of the button
 var
-  LTBProcessHandle : Cardinal;
+  LTBProcessHandle : THandle;
   LRemoteBuffer : Pointer;
   LLocalBuffer  : array of WideChar;
-  LBytesRead : Cardinal;
+  LBytesRead : NativeUInt;
   LTextLen : Integer;
 begin
   LTBProcessHandle:=TTaskBar.COpenTaskbarProcess;
@@ -434,7 +434,7 @@ begin
 end;
 
 function TTaskbar.IndexOfButtonWith(ACommand: Integer;
-  AData: Integer): Integer;
+  AData: NativeUInt): Integer;
 var
   LIndex : Integer;
 begin
@@ -514,9 +514,9 @@ end;
 class procedure TTaskbar.CGetButton(AButtonIndex: Integer; AButton: PTBButton);
 //retrives the raw button data
 var
-  LTBProcessHandle : Cardinal;
+  LTBProcessHandle : NativeUInt;
   LRemoteButton  : PTBButton;
-  LBytesRead : Cardinal;
+  LBytesRead : NativeUInt;
   LButton : PTBButton;
 begin
   LTBProcessHandle:=TTaskbar.COpenTaskbarProcess;
@@ -567,10 +567,10 @@ end;
 
 class procedure TTaskbar.CGetButtonRect(AButtonIndex: Integer; ARect: PRect);
 var
-  LTBProcessHandle : Cardinal;
+  LTBProcessHandle : NativeUInt;
   LRemoteRect : Pointer;
   LLocalRect : PRect;
-  LBytesRead : Cardinal;
+  LBytesRead : NativeUInt;
 begin
   //open remote process
   LTBProcessHandle:=TTaskbar.COpenTaskbarProcess;
@@ -611,11 +611,11 @@ begin
   CloseHandle(LTBProcessHandle);
 end;
 
-class function TTaskbar.COpenTaskbarProcess: Cardinal;
+class function TTaskbar.COpenTaskbarProcess: NativeUInt;
 //opens the taskbars owner process for any task ;)
 var
-  LTBProcessID,
-  LTBProcessHandle : Cardinal;
+  LTBProcessID     : DWORD;
+  LTBProcessHandle : HWND;
 begin
   //find the PID of the owner process of the taskbar
   GetWindowThreadProcessId(TTaskbar.CWindowHandle,LTBProcessID);
