@@ -1,0 +1,72 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{46D78AEF-F8B7-4E33-836E-124417FC8E29}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="D16\Settings_D160R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="D16\Settings_VirtualTrees_D160R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="D16\Settings_D160D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="D16\Settings_VirtualTrees_D160D.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="Settings_D160R">
+			<MSBuild Projects="D16\Settings_D160R.dproj"/>
+		</Target>
+		<Target Name="Settings_D160R:Clean">
+			<MSBuild Projects="D16\Settings_D160R.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="Settings_D160R:Make">
+			<MSBuild Projects="D16\Settings_D160R.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees_D160R">
+			<MSBuild Projects="D16\Settings_VirtualTrees_D160R.dproj"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees_D160R:Clean">
+			<MSBuild Projects="D16\Settings_VirtualTrees_D160R.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees_D160R:Make">
+			<MSBuild Projects="D16\Settings_VirtualTrees_D160R.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Settings_D160D">
+			<MSBuild Projects="D16\Settings_D160D.dproj"/>
+		</Target>
+		<Target Name="Settings_D160D:Clean">
+			<MSBuild Projects="D16\Settings_D160D.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="Settings_D160D:Make">
+			<MSBuild Projects="D16\Settings_D160D.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees_D160D">
+			<MSBuild Projects="D16\Settings_VirtualTrees_D160D.dproj"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees_D160D:Clean">
+			<MSBuild Projects="D16\Settings_VirtualTrees_D160D.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees_D160D:Make">
+			<MSBuild Projects="D16\Settings_VirtualTrees_D160D.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="Settings_D160R;Settings_VirtualTrees_D160R;Settings_D160D;Settings_VirtualTrees_D160D"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="Settings_D160R:Clean;Settings_VirtualTrees_D160R:Clean;Settings_D160D:Clean;Settings_VirtualTrees_D160D:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="Settings_D160R:Make;Settings_VirtualTrees_D160R:Make;Settings_D160D:Make;Settings_VirtualTrees_D160D:Make"/>
+		</Target>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
+	</Project>
