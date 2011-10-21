@@ -404,126 +404,129 @@ var
   end;
 
 begin
-  inherited;
+  try
+    inherited;
 
-  NData:=TObject(Self.GetNodeData(PaintInfo.Node)^);
-  if NData is TVirtualActionGroup then
-  begin
-    txt:=TVirtualActionGroup(NData).Caption;
-    DrawRegion:=drHeader;
-    iml:=nil;
-  end
-  else
-  if (NData is TVirtualActionLink) then
-  begin
-    DrawRegion:=drAction;
-    if TVirtualActionLink(NData).Action is TCustomAction then
+    NData:=TObject(Self.GetNodeData(PaintInfo.Node)^);
+    if NData is TVirtualActionGroup then
     begin
-      if not TCustomAction(TVirtualActionLink(NData).Action).Visible then
-      begin
-        self.IsVisible[PaintInfo.Node]:=False;
-        exit;
-      end;
-
-      txt:=TCustomAction(TVirtualActionLink(NData).Action).Caption;
-      actEnabled:=TCustomAction(TVirtualActionLink(NData).Action).Enabled;
-
-      if Assigned(TCustomAction(TVirtualActionLink(NData).Action).ActionList.Images) then
-      begin
-        icow:=TCustomAction(TVirtualActionLink(NData).Action).ActionList.Images.Width;
-        if icow>FItemIndent then
-          FItemIndent:=icow;
-        icoh:=TCustomAction(TVirtualActionLink(NData).Action).ActionList.Images.Height;
-
-        iml:=TCustomAction(TVirtualActionLink(NData).Action).ActionList.Images;
-        imgidx:=TCustomAction(TVirtualActionLink(NData).Action).ImageIndex;
-      end;
-    end;
-  end;
-
-  ColItem:=MakeColor(GetRed(ColorToRGB(Color)),GetGreen(ColorToRGB(Color)),GetBlue(ColorToRGB(Color)));
-
-  ItemRect:=MakeRect(1.0*PaintInfo.CellRect.Left,
-                     PaintInfo.CellRect.Top,
-                     PaintInfo.CellRect.Right-PaintInfo.CellRect.Left,
-                     PaintInfo.CellRect.Bottom-PaintInfo.CellRect.Top);
-  ItemRect.X:=ItemRect.X+4;
-  ItemRect.Width:=ItemRect.Width-8;
-  TxtRect:=ItemRect;
-
-  PaintInfo.Canvas.Brush.Color:=Color;
-  PaintInfo.Canvas.FillRect(PaintInfo.CellRect);
-
-  graphics:=TGPGraphics.Create(PaintInfo.Canvas.Handle);
-  graphics.SetSmoothingMode(SmoothingModeAntiAlias);
-
-  case DrawRegion of
-    drHeader: begin
-                background:= TGPLinearGradientBrush.Create(ItemRect, Colors.HeaderGradientStart, Colors.HeaderGradientEnd, -90);
-                Font:=TGPFont.Create(Self.Font.Name, Self.Font.Size, FontStyleBoldItalic);
-                FontBrush:=TGPSolidBrush.Create(MakeColor(GetRed(ColorToRGB(self.Font.Color)),GetGreen(ColorToRGB(self.Font.Color)),GetBlue(ColorToRGB(self.Font.Color))));
-                StrFormat:=TGPStringFormat.Create(0);
-                StrFormat.SetLineAlignment(StringAlignmentCenter);
-                TxtRect.X:=TxtRect.X+8;
-                TxtRect.Width:=TxtRect.Width-8;
-              end;
-    drAction: begin
-                background:= TGPSolidBrush.Create(COLITEM);
-                Font:=TGPFont.Create(Self.Font.Name, Self.Font.Size);
-                FontBrush:=TGPSolidBrush.Create(MakeColor(GetRed(ColorToRGB(self.Font.Color)),GetGreen(ColorToRGB(self.Font.Color)),GetBlue(ColorToRGB(self.Font.Color))));
-                StrFormat:=TGPStringFormat.Create(0);
-                StrFormat.SetLineAlignment(StringAlignmentCenter);
-                TxtRect.X:=TxtRect.X+FItemIndent+8;
-                TxtRect.Width:=TxtRect.Width-FItemIndent-8;
-              end;
-  end;
-
-  DrawRoundedRectangle(Graphics, ItemRect, 10, nil, background);
-
-  if (PaintInfo.Node=Hotnode) and (DrawRegion=drAction) and ActEnabled then
-  begin
-    if FLeftMousePressed then
-    begin
-      ds:=dsSelected;
-      HotFrame:=TGPPen.Create(Colors.PressedFrame);
-      HotBackground:=TGPLinearGradientBrush.Create(ItemRect,
-                                                   Colors.PressedGradientStart,
-                                                   Colors.PressedGradientEnd,
-                                                   -90);
+      txt:=TVirtualActionGroup(NData).Caption;
+      DrawRegion:=drHeader;
+      iml:=nil;
     end
     else
+    if (NData is TVirtualActionLink) then
     begin
-      ds:=dsFocus;
-      HotFrame:=TGPPen.Create(Colors.HottrackFrame);
-      HotBackground:=TGPLinearGradientBrush.Create(ItemRect,
-                                                   Colors.HottrackGradientStart,
-                                                   Colors.HottrackGradientEnd,
-                                                   -90);
+      DrawRegion:=drAction;
+      if TVirtualActionLink(NData).Action is TCustomAction then
+      begin
+        if not TCustomAction(TVirtualActionLink(NData).Action).Visible then
+        begin
+          self.IsVisible[PaintInfo.Node]:=False;
+          exit;
+        end;
+
+        txt:=TCustomAction(TVirtualActionLink(NData).Action).Caption;
+        actEnabled:=TCustomAction(TVirtualActionLink(NData).Action).Enabled;
+
+        if Assigned(TCustomAction(TVirtualActionLink(NData).Action).ActionList.Images) then
+        begin
+          icow:=TCustomAction(TVirtualActionLink(NData).Action).ActionList.Images.Width;
+          if icow>FItemIndent then
+            FItemIndent:=icow;
+          icoh:=TCustomAction(TVirtualActionLink(NData).Action).ActionList.Images.Height;
+
+          iml:=TCustomAction(TVirtualActionLink(NData).Action).ActionList.Images;
+          imgidx:=TCustomAction(TVirtualActionLink(NData).Action).ImageIndex;
+        end;
+      end;
     end;
-    DrawRoundedRectangle(Graphics, ItemRect, 10, HotFrame, Hotbackground);
-    HotBackground.Free;
-    HotFrame.Free;
-  end
-  else
-    ds:=dsNormal;
 
-  graphics.DrawString(txt,Length(txt),font,TxtRect,StrFormat, FontBrush);
+    ColItem:=MakeColor(GetRed(ColorToRGB(Color)),GetGreen(ColorToRGB(Color)),GetBlue(ColorToRGB(Color)));
 
-  FontBrush.Free;
-  font.free;
-  StrFormat.Free;
-  background.Free;
-  graphics.Free;
+    ItemRect:=MakeRect(1.0*PaintInfo.CellRect.Left,
+                       PaintInfo.CellRect.Top,
+                       PaintInfo.CellRect.Right-PaintInfo.CellRect.Left,
+                       PaintInfo.CellRect.Bottom-PaintInfo.CellRect.Top);
+    ItemRect.X:=ItemRect.X+4;
+    ItemRect.Width:=ItemRect.Width-8;
+    TxtRect:=ItemRect;
 
-  if Assigned(iml) then
-  begin
-    iml.Draw(PaintInfo.Canvas,
-             round(itemRect.X+4),
-             round(ItemRect.Y + ((ItemRect.Height - icoh) / 2)),
-             imgidx,
-             ds,
-             itImage,
-             actEnabled);
+    PaintInfo.Canvas.Brush.Color:=Color;
+    PaintInfo.Canvas.FillRect(PaintInfo.CellRect);
+
+    graphics:=TGPGraphics.Create(PaintInfo.Canvas.Handle);
+    graphics.SetSmoothingMode(SmoothingModeAntiAlias);
+
+    case DrawRegion of
+      drHeader: begin
+                  background:= TGPLinearGradientBrush.Create(ItemRect, Colors.HeaderGradientStart, Colors.HeaderGradientEnd, -90);
+                  Font:=TGPFont.Create(Self.Font.Name, Self.Font.Size, FontStyleBoldItalic);
+                  FontBrush:=TGPSolidBrush.Create(MakeColor(GetRed(ColorToRGB(self.Font.Color)),GetGreen(ColorToRGB(self.Font.Color)),GetBlue(ColorToRGB(self.Font.Color))));
+                  StrFormat:=TGPStringFormat.Create(0);
+                  StrFormat.SetLineAlignment(StringAlignmentCenter);
+                  TxtRect.X:=TxtRect.X+8;
+                  TxtRect.Width:=TxtRect.Width-8;
+                end;
+      drAction: begin
+                  background:= TGPSolidBrush.Create(COLITEM);
+                  Font:=TGPFont.Create(Self.Font.Name, Self.Font.Size);
+                  FontBrush:=TGPSolidBrush.Create(MakeColor(GetRed(ColorToRGB(self.Font.Color)),GetGreen(ColorToRGB(self.Font.Color)),GetBlue(ColorToRGB(self.Font.Color))));
+                  StrFormat:=TGPStringFormat.Create(0);
+                  StrFormat.SetLineAlignment(StringAlignmentCenter);
+                  TxtRect.X:=TxtRect.X+FItemIndent+8;
+                  TxtRect.Width:=TxtRect.Width-FItemIndent-8;
+                end;
+    end;
+
+    DrawRoundedRectangle(Graphics, ItemRect, 10, nil, background);
+
+    if (PaintInfo.Node=Hotnode) and (DrawRegion=drAction) and ActEnabled then
+    begin
+      if FLeftMousePressed then
+      begin
+        ds:=dsSelected;
+        HotFrame:=TGPPen.Create(Colors.PressedFrame);
+        HotBackground:=TGPLinearGradientBrush.Create(ItemRect,
+                                                     Colors.PressedGradientStart,
+                                                     Colors.PressedGradientEnd,
+                                                     -90);
+      end
+      else
+      begin
+        ds:=dsFocus;
+        HotFrame:=TGPPen.Create(Colors.HottrackFrame);
+        HotBackground:=TGPLinearGradientBrush.Create(ItemRect,
+                                                     Colors.HottrackGradientStart,
+                                                     Colors.HottrackGradientEnd,
+                                                     -90);
+      end;
+      DrawRoundedRectangle(Graphics, ItemRect, 10, HotFrame, Hotbackground);
+      HotBackground.Free;
+      HotFrame.Free;
+    end
+    else
+      ds:=dsNormal;
+
+    graphics.DrawString(txt,Length(txt),font,TxtRect,StrFormat, FontBrush);
+
+    FontBrush.Free;
+    font.free;
+    StrFormat.Free;
+    background.Free;
+    graphics.Free;
+
+    if Assigned(iml) then
+    begin
+      iml.Draw(PaintInfo.Canvas,
+               round(itemRect.X+4),
+               round(ItemRect.Y + ((ItemRect.Height - icoh) / 2)),
+               imgidx,
+               ds,
+               itImage,
+               actEnabled);
+    end;
+  except
   end;
 end;
 
