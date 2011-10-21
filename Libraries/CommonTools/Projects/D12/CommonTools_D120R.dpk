@@ -51,7 +51,6 @@ contains
   uNNumber in '..\..\uNNumber.pas',
   uStreamTools in '..\..\uStreamTools.pas',
   uSysTools in '..\..\uSysTools.pas',
-  uTaskbar in '..\..\uTaskbar.pas',
   uWinNT in '..\..\uWinNT.pas',
   wm_helper in '..\..\wm_helper.pas',
   uVirtualEarth in '..\..\uVirtualEarth.pas',
