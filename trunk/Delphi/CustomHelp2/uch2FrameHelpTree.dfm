@@ -24,7 +24,6 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
     OnDblClick = TreeView1DblClick
     OnExpanded = TreeView1Expanded
     OnKeyPress = TreeView1KeyPress
-    ExplicitHeight = 268
   end
   object Panel1: TPanel
     Left = 0
@@ -52,6 +51,7 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
       Width = 385
       Height = 21
       Align = alClient
+      ItemHeight = 13
       TabOrder = 0
       OnCloseUp = cbKeywordsCloseUp
       OnKeyPress = cbKeywordsKeyPress
@@ -70,9 +70,6 @@ object ch2FrameHelpTree: Tch2FrameHelpTree
       item
         Width = 50
       end>
-    ExplicitLeft = 224
-    ExplicitTop = 144
-    ExplicitWidth = 0
   end
   object Timer1: TTimer
     Interval = 500

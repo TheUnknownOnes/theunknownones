@@ -3,23 +3,23 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'FormResEdManifestEditor'
-  ClientHeight = 265
-  ClientWidth = 600
+  ClientHeight = 203
+  ClientWidth = 459
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -14
+  Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
-  PixelsPerInch = 120
-  TextHeight = 17
+  PixelsPerInch = 96
+  TextHeight = 13
   object Label1: TLabel
-    Left = 10
-    Top = 14
-    Width = 104
-    Height = 17
+    Left = 8
+    Top = 11
+    Width = 82
+    Height = 13
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
@@ -27,10 +27,10 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
     Caption = 'Application Name'
   end
   object Label2: TLabel
-    Left = 10
-    Top = 50
-    Width = 137
-    Height = 17
+    Left = 8
+    Top = 38
+    Width = 108
+    Height = 13
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
@@ -38,10 +38,10 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
     Caption = 'Application Description'
   end
   object Label3: TLabel
-    Left = 10
-    Top = 109
-    Width = 165
-    Height = 17
+    Left = 8
+    Top = 83
+    Width = 130
+    Height = 13
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
@@ -49,9 +49,9 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
     Caption = 'Requested Execution Level'
   end
   object edAppName: TEdit
-    Left = 188
-    Top = 10
-    Width = 263
+    Left = 144
+    Top = 8
+    Width = 201
     Height = 25
     Margins.Left = 4
     Margins.Top = 4
@@ -60,9 +60,9 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
     TabOrder = 0
   end
   object edAppDesc: TEdit
-    Left = 188
-    Top = 46
-    Width = 399
+    Left = 144
+    Top = 35
+    Width = 305
     Height = 25
     Margins.Left = 4
     Margins.Top = 4
@@ -71,10 +71,10 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
     TabOrder = 1
   end
   object btnOk: TButton
-    Left = 489
-    Top = 223
-    Width = 98
-    Height = 33
+    Left = 374
+    Top = 171
+    Width = 75
+    Height = 25
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
@@ -84,10 +84,10 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
     TabOrder = 2
   end
   object cbUIA: TCheckBox
-    Left = 188
-    Top = 140
-    Width = 127
-    Height = 22
+    Left = 144
+    Top = 107
+    Width = 97
+    Height = 17
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
@@ -96,16 +96,16 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
     TabOrder = 3
   end
   object cbREL: TComboBox
-    Left = 188
-    Top = 105
-    Width = 263
-    Height = 25
+    Left = 144
+    Top = 80
+    Width = 201
+    Height = 21
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
     Margins.Bottom = 4
     Style = csDropDownList
-    ItemHeight = 17
+    ItemHeight = 13
     ItemIndex = 0
     TabOrder = 4
     Text = 'asInvoker'
@@ -115,10 +115,10 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
       'requireAdministrator')
   end
   object cbWin7Compatibility: TCheckBox
-    Left = 188
-    Top = 162
-    Width = 263
-    Height = 22
+    Left = 144
+    Top = 124
+    Width = 201
+    Height = 17
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
@@ -127,10 +127,10 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
     TabOrder = 5
   end
   object cbDPIAware: TCheckBox
-    Left = 188
-    Top = 186
-    Width = 263
-    Height = 22
+    Left = 144
+    Top = 142
+    Width = 201
+    Height = 17
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4

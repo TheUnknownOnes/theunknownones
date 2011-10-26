@@ -12,6 +12,8 @@ uses
   Dialogs, unitResourceXPManifests, unitResourceElement, StdCtrls,
   unitMSXML2_TLB, StrUtils;
 
+{$I ..\..\Common\Jedi\Jedi.inc}
+
 type
   TFormResEdManifestEditor = class(TForm)
     edAppName: TEdit;
@@ -37,6 +39,18 @@ implementation
 uses XMLIntf, ComObj;
 
 {$R *.dfm}
+
+{$IFNDEF DELPHI2009_UP}
+function UTF8ToString(const AString: UTF8String): String;
+begin
+  Result:=UTF8Decode(AString);
+end;
+
+function UTF8EncodeToShortString(const AString: UTF8String): ShortString;
+begin
+  Result:=UTF8Decode(AString);
+end;
+{$ENDIF}
 
 { TFormResEdManifestEditor }
 

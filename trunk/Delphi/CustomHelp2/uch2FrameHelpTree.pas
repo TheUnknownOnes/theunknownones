@@ -98,7 +98,7 @@ begin
     FHelpItem := AHelpItem;
     FHelpItemParent := AParent;
     FAddHelpItemResult := nil;
-    TThread.Synchronize(TThread.CurrentThread, DoAddHelpItem);
+    TThread.Synchronize(nil {TThread.CurrentThread}, DoAddHelpItem);
     Result := FAddHelpItemResult;
   finally
     FLock.Leave;
