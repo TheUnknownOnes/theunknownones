@@ -30,7 +30,7 @@ requires
   rtl,
   vcl,
   TntUnicodeVcl,
-  VirtualTreesR,
+  VirtualTreesD10,
   vclx,
   CommonTools_D100R;
 
