@@ -35,7 +35,7 @@ package VSTSearchEdit_D100R;
 requires
   rtl,
   vcl,
-  VirtualTreesR,
+  VirtualTreesD10,
   TntUnicodeVcl,
   vclactnband,
   vclx,
