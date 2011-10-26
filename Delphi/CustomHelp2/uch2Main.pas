@@ -20,6 +20,8 @@ uses
   ExtCtrls,
   Forms;
 
+{$I ..\..\Common\Jedi\Jedi.inc}
+
 type
   Tch2HelpItemFlag = (ifSaveStats,
                       ifProvidesHelp);
@@ -114,6 +116,16 @@ type
     function SelectContext(Viewers: TStrings): Integer;
     {$ENDREGION}
   end;
+
+  {$IFNDEF DELPHI2009_UP}
+  IInterfaceListEx = interface(IInterfaceList)
+    ['{FDB39D70-65B9-4995-9436-6084ACA05DB3}']
+    function GetEnumerator: TInterfaceListEnumerator;
+  end;
+
+  TInterfaceList = class(Classes.TInterfaceList, IInterfaceListEx)
+  end;
+  {$ENDIF}
 
   Tch2Main = class
   private

@@ -10,6 +10,7 @@ interface
 uses
   Classes, Windows, Messages, CommCtrl, SysUtils, Math, Controls, uSysTools;
 
+{$I jedi.inc}
 
 type
   ETaskbarError = class(Exception);
@@ -101,6 +102,11 @@ implementation
 
 uses
   Graphics;
+
+{$IFNDEF DELPHIXE2_UP}
+type
+  PDWORD_PTR = type CARDINAL;
+{$ENDIF}
 
 {$REGION 'Helper'}
 function ReasonSysError: String;

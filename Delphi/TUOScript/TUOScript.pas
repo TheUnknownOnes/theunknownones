@@ -22,6 +22,8 @@ interface
 uses
   Classes, SysUtils, StrUtils, ToolsAPI, CodeTemplateAPI, Dialogs;
 
+{$I ..\..\Common\Jedi\Jedi.inc}
+
 type
   TTUOScriptParams = TStrings;
   TTUOScriptFunctionResult = Integer;
@@ -29,6 +31,17 @@ type
   TTUOScriptFunctionAddr = Integer;
 
   TTUOSctiptFunction2 = function(AParams : TTUOScriptParams; const AEditor : IOTAEditor) : TTUOScriptFunctionResult of object;
+
+  {$IFNDEF DELPHI2009_UP}
+  IInterfaceListEx = interface(IInterfaceList)
+    ['{FDB39D70-65B9-4995-9436-6084ACA05DB3}']
+    function GetEnumerator: TInterfaceListEnumerator;
+  end;
+
+  TInterfaceList = class(Classes.TInterfaceList, IInterfaceListEx)
+  end;
+  {$ENDIF}
+
 
   ITUOScriptFunctionHandler = interface
   ['{1F75D9E2-1E1E-4166-BA09-4DAB68E519BD}']
