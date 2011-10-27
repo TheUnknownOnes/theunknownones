@@ -35,6 +35,7 @@ type
     FOnActivateTab: TNotifyEvent;
     FTabProps: TTabProperties;
     FInsertBefore: TTaskbarListTab;
+    FHint: String;
 
     procedure SetControl(const Value: TControl);
     procedure SetActive(const Value: Boolean);
@@ -50,6 +51,7 @@ type
     function DoDrawPreview(PreviewMode: TPreviewMode; Canvas: TCanvas; Rect: TRect): Boolean;
     procedure SetAppProps(const Value: TTabProperties);
     procedure SetInsertBefore(const Value: TTaskbarListTab);
+    procedure SetHint(const Value: String);
 
   protected
     procedure DoRegisterTab;
@@ -78,6 +80,8 @@ type
     property OnActivateTab: TNotifyEvent read FOnActivateTab write FOnActivateTab;
     property OnGetPreviewRect: TOnGetPreviewRect read FOnGetPreviewRect write FOnGetPreviewRect;
     property OnDrawPreview: TOnDrawPreview read FOnDrawPreview write FOnDrawPreview;
+
+    property Hint: String read FHint write SetHint;
 
     property AutoInitialize;
 
@@ -456,6 +460,8 @@ begin
     begin
       if IsWindowActive then
         FTaskbarList3.SetTabActive(FProxyHandle, TaskBarEntryHandle, 0);
+
+      FTaskbarList3.SetThumbnailTooltip(FProxyHandle, PWideChar(FHint));
     end;
 
     DefWindowProc(FProxyHandle, WM_SETTEXT, 0 , LPARAM(PChar(GetWindowCaption)));
@@ -464,7 +470,7 @@ begin
     if Assigned(Icon) then
       SendMessage(FProxyHandle, WM_SETICON, ICON_SMALL, Icon.Handle)
     else
-      SendMessage(FProxyHandle, WM_SETICON, ICON_SMALL, 0)
+      SendMessage(FProxyHandle, WM_SETICON, ICON_SMALL, 0);
   end;
 end;
 
@@ -549,6 +555,13 @@ begin
     FControl.FreeNotification(self);
 
   UpdateTaskWindow;
+end;
+
+procedure TTaskbarListTab.SetHint(const Value: String);
+begin
+  FHint := Value;
+
+  PostUpdateMessage;
 end;
 
 procedure TTaskbarListTab.SetIcon(const Value: TIcon);
