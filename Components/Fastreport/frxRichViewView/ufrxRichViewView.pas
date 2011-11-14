@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Classes, frxClass, frxDsgnIntf, fs_iinterpreter, Graphics, frxPrinter,
-  Dialogs, RichView, RVReport, Forms, Math, ZLib;
+  Dialogs, RichView, RVReport, Forms, Math, ZLib, Printers;
 
 type
   TfrxCustomRichViewView = class(TfrxStretcheable)
@@ -67,12 +67,17 @@ uses
 function TfrxCustomRichViewView.CalcHeight: Extended;
 var
   lCanvas : TCanvas;
+  FirstPageSpace : Integer;
+
 begin
   lCanvas:=TCanvas.Create;
   lCanvas.Handle:=GetDC(0);
 
   ReportHelper.Init(lCanvas, Round(Width));
-  ReportHelper.FormatNextPage(Round(Report.Engine.FreeSpace-Top));
+
+  FirstPageSpace:=round(Report.Engine.FreeSpace-Top); //Round(Report.Engine.FreeSpace-self.Parent.Top-Top);
+
+  ReportHelper.FormatNextPage(FirstPageSpace);
 
   FMetaFile.Clear;
   FMetaFile.Width:=0;
@@ -87,7 +92,7 @@ begin
   end
   else
   begin
-    Result:=Report.Engine.FreeSpace-Top;
+    Result:=FirstPageSpace;
 
     while not ReportHelper.Finished do
     begin
@@ -95,14 +100,20 @@ begin
       if not ReportHelper.Finished then
         Result:=Result+Report.Engine.FreeSpace
       else
+      begin
         Result:=Result+ReportHelper.GetLastPageHeight;
+
+        //the most disagrrrrreable hack:
+        if (Result<Report.Engine.PageHeight) and (Result>Report.Engine.FreeSpace) then
+           Result:=Report.Engine.PageHeight+1;
+      end;
     end;
   end;
+
 
   ReleaseDC(0, lCanvas.Handle);
   lCanvas.Free;
 end;
-
 
 constructor TfrxCustomRichViewView.Create(AOwner: TComponent);
 begin
@@ -155,7 +166,7 @@ begin
   end
   else
   begin
-    Canvas.StretchDraw(Rect(FX, FY, FX1, FY1), FMetaFile);
+    Canvas.StretchDraw(Rect(FX, FY, FX1, FY+round( (FY1-FY) / Height * FMetaFile.Height)), FMetaFile);
   end;
 
   DrawFrame;
@@ -175,7 +186,7 @@ begin
 
     if FReportHelper.Finished then
     begin
-      Result:=Height-FReportHelper.GetLastPageHeight;
+      Result:=0;//{Report.Engine.FreeSpace-}FReportHelper.GetLastPageHeight;
       FSaveHeight:=Abs(FSaveHeight);
     end
     else
@@ -257,12 +268,19 @@ end;
 procedure TfrxCustomRichViewView.DoDrawMetafile;
 var
   EMFCanvas: TMetafileCanvas;
-  lCanvas : TCanvas;
+  hCanvas : THandle;
+  useScreenCanvas : Boolean;
 begin
-  lCanvas:=nil;
-
-  lCanvas:=TCanvas.Create;
-  lCanvas.Handle:=GetDC(0);
+  if Printer.Handle<>0 then
+  begin
+    useScreenCanvas:=False;
+    hCanvas:=Printer.Handle;
+  end
+  else
+  begin
+    useScreenCanvas:=True;
+    hCanvas:=GetDC(0);
+  end;
 
   FMetaFile.Clear;
   FMetaFile.Enhanced := True;
@@ -272,7 +290,7 @@ begin
   else
     FMetaFile.Height := Round(Height);
 
-  EMFCanvas := TMetafileCanvas.Create(TMetaFile(FMetaFile), lCanvas.Handle);
+  EMFCanvas := TMetafileCanvas.Create(TMetaFile(FMetaFile), hCanvas);
   try
     FMetaFile.Transparent := True;
     ReportHelper.DrawPage(FPage, EMFCanvas, False, Round(FMetaFile.Height));
@@ -281,8 +299,8 @@ begin
     EMFCanvas.Free;
   end;
 
-  ReleaseDC(0, lCanvas.Handle);
-  lCanvas.Free;
+  if useScreenCanvas then
+    ReleaseDC(0, hCanvas);
 end;
 
 procedure TfrxCustomRichViewView.ReadData(Stream: TStream);

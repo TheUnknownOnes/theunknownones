@@ -43,15 +43,15 @@ procedure TUIBDatabase_Role_W(Self: TUIBDataBase; const T: String); begin Self.R
 
 procedure TUIBTransaction_InTransaction_R(Self: TUIBTransaction; var T: Boolean); begin T := Self.InTransaction; end;
 procedure TUIBTransaction_Database_R(Self: TUIBTransaction; var T: TUIBDataBase); begin T := Self.DataBase; end;
-procedure TUIBTransaction_Database_W(Self: TUIBTransaction; var T: TUIBDataBase); begin Self.DataBase := T; end;
+procedure TUIBTransaction_Database_W(Self: TUIBTransaction; const T: TUIBDataBase); begin Self.DataBase := T; end;
 procedure TUIBTransaction_Options_R(Self: TUIBTransaction; var T: TTransParams); begin T := Self.Options; end;
-procedure TUIBTransaction_Options_W(Self: TUIBTransaction; var T: TTransParams); begin Self.Options := T; end;
+procedure TUIBTransaction_Options_W(Self: TUIBTransaction; const T: TTransParams); begin Self.Options := T; end;
 procedure TUIBTransaction_AutoStart_R(Self: TUIBTransaction; var T: Boolean); begin T := Self.AutoStart; end;
-procedure TUIBTransaction_AutoStart_W(Self: TUIBTransaction; var T: Boolean); begin Self.AutoStart := T; end;
+procedure TUIBTransaction_AutoStart_W(Self: TUIBTransaction; const T: Boolean); begin Self.AutoStart := T; end;
 procedure TUIBTransaction_AutoStop_R(Self: TUIBTransaction; var T: Boolean); begin T := Self.AutoStop; end;
-procedure TUIBTransaction_AutoStop_W(Self: TUIBTransaction; var T: Boolean); begin Self.AutoStop := T; end;
+procedure TUIBTransaction_AutoStop_W(Self: TUIBTransaction; const T: Boolean); begin Self.AutoStop := T; end;
 procedure TUIBTransaction_DefaultAction_R(Self: TUIBTransaction; var T: TEndTransMode); begin T := Self.DefaultAction; end;
-procedure TUIBTransaction_DefaultAction_W(Self: TUIBTransaction; var T: TEndTransMode); begin Self.DefaultAction := T; end;
+procedure TUIBTransaction_DefaultAction_W(Self: TUIBTransaction; const T: TEndTransMode); begin Self.DefaultAction := T; end;
 
 procedure TSQLDA_IsBlob_R(Self: TSQLDA; var T: Boolean; I : Word); begin T := Self.IsBlob[I]; end;
 procedure TSQLDA_IsBlobText_R(Self: TSQLDA; var T: Boolean; I : Word); begin T := Self.IsBlobText[I]; end;
@@ -327,7 +327,7 @@ begin
     RegisterMethod('procedure Close();');
     RegisterMethod('procedure CloseCursor;');
     RegisterMethod('procedure FetchAll;');
-    RegisterMethod('procedure Open();');
+    RegisterMethod('procedure Open(AFetchFirst : Boolean);');
     RegisterMethod('procedure Prepare();');
     RegisterMethod('procedure Execute;');
     RegisterMethod('procedure ExecSQL;');

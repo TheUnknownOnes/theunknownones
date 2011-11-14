@@ -22,7 +22,7 @@
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DllSuffix>_D120</DllSuffix>
 			<DesignOnlyPackage>false</DesignOnlyPackage>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\frxRichViewView_D120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\frxRichViewView_D120.bpl</DCC_DependencyCheckOutputName>
 			<GenPackage>true</GenPackage>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<GenDll>true</GenDll>
@@ -74,7 +74,7 @@
 						<Source Name="MainSource">frxRichViewView.dpk</Source>
 					</Source>
 					<Parameters>
-						<Parameters Name="HostApplication">..\..\bin\sppdesk.exe</Parameters>
+						<Parameters Name="HostApplication">C:\Users\MaWarm\DelphiProjekte\SPPDesk\trunk\bin\SPPDesk.exe</Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
 						<Parameters Name="LoadAllSymbols">True</Parameters>
 						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
