@@ -69,6 +69,17 @@ begin
   ACompiler.AddConstantN('fmShareDenyRead', 'Integer').Value.ts32 := fmShareDenyRead;
   ACompiler.AddConstantN('fmShareDenyNone', 'Integer').Value.ts32 := fmShareDenyNone;
 
+  ACompiler.AddConstantN('faReadOnly', 'Integer').Value.ts32 := faReadOnly;
+  ACompiler.AddConstantN('faHidden', 'Integer').Value.ts32 := faHidden;
+  ACompiler.AddConstantN('faSysFile', 'Integer').Value.ts32 := faSysFile;
+  ACompiler.AddConstantN('faDirectory', 'Integer').Value.ts32 := faDirectory;
+  ACompiler.AddConstantN('faArchive', 'Integer').Value.ts32 := faArchive;
+  ACompiler.AddConstantN('faSymLink', 'Integer').Value.ts32 := faSymLink;
+  ACompiler.AddConstantN('faNormal', 'Integer').Value.ts32 := faNormal;
+  ACompiler.AddConstantN('faTemporary', 'Integer').Value.ts32 := faTemporary;
+  ACompiler.AddConstantN('faAnyFile', 'Integer').Value.ts32 := faAnyFile;
+
+
   ACompiler.AddDelphiFunction('function FileExists(const FileName: string): Boolean');
   ACompiler.AddDelphiFunction('function IncludeTrailingPathDelimiter(const S: string): string');
   ACompiler.AddDelphiFunction('function ExcludeTrailingPathDelimiter(const S: string): string;');
@@ -78,7 +89,7 @@ begin
   ACompiler.AddTypeS('TWin32FindData', 'record dwFileAttributes: DWORD; ftCreationTime: TFileTime; ftLastAccessTime: TFileTime; '+
                                        'ftLastWriteTime: TFileTime; nFileSizeHigh: DWORD; nFileSizeLow: DWORD; dwReserved0: DWORD; '+
                                        'dwReserved1: DWORD; cFileName: array[0..MAX_PATH - 1] of WideChar; cAlternateFileName: array[0..13] of WideChar; end;');
-  ACompiler.AddTypeS('TSearchRec', 'record Time: Integer; Size: Int64; Attr: Integer; Name: TFileName; ExcludeAttr: Integer; FindHandle: Cardinal; FindData: TWin32FindData; end;');
+  ACompiler.AddTypeS('TSearchRec', 'record Time: Integer; Size: Int64; Attr: Integer; Name: String; ExcludeAttr: Integer; FindHandle: Cardinal; FindData: TWin32FindData; end;');
 
   ACompiler.AddDelphiFunction('function FindFirst(const Path: string; Attr: Integer; var F: TSearchRec): Integer');
   ACompiler.AddDelphiFunction('function FindNext(var F: TSearchRec): Integer');

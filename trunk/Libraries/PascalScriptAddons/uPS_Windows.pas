@@ -5,6 +5,7 @@ interface
 uses
   uPSCompiler,
   uPSRuntime,
+  uPSUtils,
   SysUtils,
   Windows;
 
@@ -26,7 +27,7 @@ end;
 procedure PS_Register_Windows_C(ACompiler : TPSPascalCompiler);
 begin
   ACompiler.AddTypeCopyN('DWORD', 'Cardinal');
-  ACompiler.AddTypeCopyN('TFilename', 'String');
+  ACompiler.AddType('TFilename', btString);
   ACompiler.AddConstantN('MAX_PATH', 'Integer').SetInt(260);
   ACompiler.AddTypeS('TFileTime', 'record dwLowDateTime: DWORD; dwHighDateTime: DWORD; end;');
 
