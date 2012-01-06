@@ -6,14 +6,17 @@
 unit uIB2007;
 
 interface
+{$IFDEF FPC}
+{$MODE Delphi}
+{$ENDIF}
 
 uses
   uIBFBGLobals,
   DateUtils;
 
 const
-  gds32dll = 'gds32.dll';
-  ib_utildll = 'ib_util.dll';
+  gds32dll = 'libfbclient';
+  ib_utildll = 'ib_util';
   
   ISC_TRUE	= 1;
   ISC_FALSE	= 0;
@@ -172,7 +175,6 @@ type
   function getb(var p: BSTREAM): AnsiChar;
   function putb(x: AnsiChar; var p: BSTREAM): Int;
   function putbx(x: AnsiChar; var p: BSTREAM): Int;
-  
 
   {**********************************************************************
    * Older and obsolete XSQLVAR, ISC_BLOB_DESC, ISC_ARRAY_DESC strucutres.
@@ -319,6 +321,7 @@ type
   { OSRI database functions }
   {*************************}
 
+  {$ifndef FPC}
 
   function isc_attach_database(var status_vector : ISC_STATUS;
                 db_name_length : short;
@@ -682,6 +685,7 @@ type
 
   function isc_portable_integer(buffer : PAnsiChar;
                                 length : short) : ISC_INT64; cdecl; external gds32dll;
+  {$endif}
 
   {***********************************}
   { Security Functions and structures }
@@ -722,12 +726,14 @@ type
   end;
   PUSER_SEC_DATA = ^USER_SEC_DATA;
 
+  {$ifndef FPC}
   function isc_add_user(var status_vector : ISC_STATUS; var _user_sec_data : USER_SEC_DATA) : int; cdecl; external gds32dll;
 
   function isc_delete_user(var status_vector : ISC_STATUS; var _user_sec_data : USER_SEC_DATA) : int; cdecl; external gds32dll;
 
   function isc_modify_user(var status_vector : ISC_STATUS; var _user_sec_data : USER_SEC_DATA) : int; cdecl; external gds32dll;
 
+  {$endif}
   {********************************}
   {  Other OSRI functions          }
   {********************************}
@@ -760,10 +766,12 @@ type
   {******************************}
   { Client information functions }
   {******************************}
+    {$ifndef FPC}
   procedure isc_get_client_version (buffer : PAnsiChar); cdecl; external gds32dll;
   function isc_get_client_major_version() : Int; cdecl; external gds32dll;
   function isc_get_client_minor_version() : Int; cdecl; external gds32dll;
 
+  {$endif}
   {*****************************}
   { Forms functions             }
   {*****************************}
@@ -2235,7 +2243,7 @@ type
   TBlob_Get_Segment_Function = function(blob_handle : isc_blob_handle;
                                         buffer : Pointer;
                                         buffer_size : ISC_USHORT;
-                                        var result_length : ISC_USHORT): Short cdecl;
+                                        out result_length : ISC_USHORT): Short cdecl;
 
   TBlob_Put_Segment_Function = procedure(blob_handle : isc_blob_handle;
                                          buffer : Pointer;
@@ -2343,4 +2351,4 @@ begin
 end;
 
 
-end.
+end.
