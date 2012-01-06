@@ -15,8 +15,8 @@ uses
   DateUtils;
 
 const
-  gds32dll = 'gds32.dll';
-  ib_utildll = 'ib_util.dll';
+  gds32dll = 'libfbclient';
+  ib_utildll = 'ib_util';
   
   ISC_TRUE	= 1;
   ISC_FALSE	= 0;
@@ -175,7 +175,6 @@ type
   function getb(var p: BSTREAM): AnsiChar;
   function putb(x: AnsiChar; var p: BSTREAM): Int;
   function putbx(x: AnsiChar; var p: BSTREAM): Int;
-  
 
   {**********************************************************************
    * Older and obsolete XSQLVAR, ISC_BLOB_DESC, ISC_ARRAY_DESC strucutres.
@@ -321,7 +320,6 @@ type
   {*************************}
   { OSRI database functions }
   {*************************}
-
 
   function isc_attach_database(var status_vector : ISC_STATUS;
                 db_name_length : short;
@@ -763,6 +761,7 @@ type
   {******************************}
   { Client information functions }
   {******************************}
+
   procedure isc_get_client_version (buffer : PAnsiChar); cdecl; external gds32dll;
   function isc_get_client_major_version() : Int; cdecl; external gds32dll;
   function isc_get_client_minor_version() : Int; cdecl; external gds32dll;
@@ -2346,4 +2345,4 @@ begin
 end;
 
 
-end.
+end.
