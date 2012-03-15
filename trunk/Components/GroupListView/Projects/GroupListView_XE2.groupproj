@@ -1,0 +1,48 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{9845C1F8-E327-4D59-976E-3E877250A390}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="XE2\GroupListView.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="XE2\dclGroupListView.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="GroupListView">
+			<MSBuild Projects="XE2\GroupListView.dproj"/>
+		</Target>
+		<Target Name="GroupListView:Clean">
+			<MSBuild Projects="XE2\GroupListView.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="GroupListView:Make">
+			<MSBuild Projects="XE2\GroupListView.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclGroupListView">
+			<MSBuild Projects="XE2\dclGroupListView.dproj"/>
+		</Target>
+		<Target Name="dclGroupListView:Clean">
+			<MSBuild Projects="XE2\dclGroupListView.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclGroupListView:Make">
+			<MSBuild Projects="XE2\dclGroupListView.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="GroupListView;dclGroupListView"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="GroupListView:Clean;dclGroupListView:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="GroupListView:Make;dclGroupListView:Make"/>
+		</Target>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
+	</Project>
