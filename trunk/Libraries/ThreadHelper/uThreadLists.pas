@@ -10,7 +10,7 @@ interface
 
 uses
   Classes,
-  jwaWindows;
+  jwaWinBase;
 
 type
   TWaitList = class(TObject)

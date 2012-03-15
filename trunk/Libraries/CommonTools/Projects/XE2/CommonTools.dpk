@@ -1,0 +1,58 @@
+package CommonTools;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$LIBSUFFIX '160'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  vcl,
+  rtl,
+  RegExp,
+  vclimg,
+  JediApi_SingleUnits,
+  dbrtl;
+
+contains
+  sndkey32 in '..\..\sndkey32.pas',
+  uCanvasClassHelper in '..\..\uCanvasClassHelper.pas',
+  uCommonTypes in '..\..\uCommonTypes.pas',
+  uControlTools in '..\..\uControlTools.pas',
+  uDateTools in '..\..\uDateTools.pas',
+  uGraphicalTools in '..\..\uGraphicalTools.pas',
+  uImageTools in '..\..\uImageTools.pas',
+  uInterfacedTools in '..\..\uInterfacedTools.pas',
+  uLogForDebug in '..\..\uLogForDebug.pas',
+  uNNumber in '..\..\uNNumber.pas',
+  uStreamTools in '..\..\uStreamTools.pas',
+  uSysTools in '..\..\uSysTools.pas',
+  uWinNT in '..\..\uWinNT.pas',
+  wm_helper in '..\..\wm_helper.pas',
+  uVirtualEarth in '..\..\uVirtualEarth.pas',
+  uRDPHash in '..\..\uRDPHash.pas';
+
+end.
