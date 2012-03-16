@@ -40,7 +40,7 @@
 			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 			<GenPackage>true</GenPackage>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
-			<DCC_Description>EffectPNGEdit - Runtime</DCC_Description>
+			<DCC_Description>TUO EffectPNGEdit Runtime</DCC_Description>
 			<DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;$(DCC_Namespace)</DCC_Namespace>
 			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
 			<DCC_N>false</DCC_N>
@@ -131,6 +131,8 @@
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
 					<Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclwebsnap160.bpl">Embarcadero WebSnap-Komponenten</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclwbm160.bpl">Embarcadero InternetExpress-Komponenten</Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automatisierungsserver</Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
 					</Excluded_Packages>

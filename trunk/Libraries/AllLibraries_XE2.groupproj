@@ -1,0 +1,132 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{4DBB6879-EA74-444D-97D3-83A7124694A3}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="RegEx\Projects\XE2\RegExp.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="CommonTools\Projects\XE2\CommonTools.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="RTTIHelper\Projects\XE2\RTTIHelper.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ThreadedDialogs\Projects\XE2\ThreadedDialogs.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ThreadHelper\Projects\XE2\ThreadHelper.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="PDSevenZip\Projects\XE2\PDSevenZip.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Exporter\Projects\XE2\Exporter.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="XMLTools\Projects\XE2\XMLTools.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="VirtualTreeHelpers\projects\XE2\VirtualTreeHelpers.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="RegExp">
+			<MSBuild Projects="RegEx\Projects\XE2\RegExp.dproj"/>
+		</Target>
+		<Target Name="RegExp:Clean">
+			<MSBuild Projects="RegEx\Projects\XE2\RegExp.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="RegExp:Make">
+			<MSBuild Projects="RegEx\Projects\XE2\RegExp.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="CommonTools">
+			<MSBuild Projects="CommonTools\Projects\XE2\CommonTools.dproj"/>
+		</Target>
+		<Target Name="CommonTools:Clean">
+			<MSBuild Projects="CommonTools\Projects\XE2\CommonTools.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="CommonTools:Make">
+			<MSBuild Projects="CommonTools\Projects\XE2\CommonTools.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="RTTIHelper">
+			<MSBuild Projects="RTTIHelper\Projects\XE2\RTTIHelper.dproj"/>
+		</Target>
+		<Target Name="RTTIHelper:Clean">
+			<MSBuild Projects="RTTIHelper\Projects\XE2\RTTIHelper.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="RTTIHelper:Make">
+			<MSBuild Projects="RTTIHelper\Projects\XE2\RTTIHelper.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="ThreadedDialogs">
+			<MSBuild Projects="ThreadedDialogs\Projects\XE2\ThreadedDialogs.dproj"/>
+		</Target>
+		<Target Name="ThreadedDialogs:Clean">
+			<MSBuild Projects="ThreadedDialogs\Projects\XE2\ThreadedDialogs.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="ThreadedDialogs:Make">
+			<MSBuild Projects="ThreadedDialogs\Projects\XE2\ThreadedDialogs.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="ThreadHelper">
+			<MSBuild Projects="ThreadHelper\Projects\XE2\ThreadHelper.dproj"/>
+		</Target>
+		<Target Name="ThreadHelper:Clean">
+			<MSBuild Projects="ThreadHelper\Projects\XE2\ThreadHelper.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="ThreadHelper:Make">
+			<MSBuild Projects="ThreadHelper\Projects\XE2\ThreadHelper.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="PDSevenZip">
+			<MSBuild Projects="PDSevenZip\Projects\XE2\PDSevenZip.dproj"/>
+		</Target>
+		<Target Name="PDSevenZip:Clean">
+			<MSBuild Projects="PDSevenZip\Projects\XE2\PDSevenZip.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="PDSevenZip:Make">
+			<MSBuild Projects="PDSevenZip\Projects\XE2\PDSevenZip.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Exporter">
+			<MSBuild Projects="Exporter\Projects\XE2\Exporter.dproj"/>
+		</Target>
+		<Target Name="Exporter:Clean">
+			<MSBuild Projects="Exporter\Projects\XE2\Exporter.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="Exporter:Make">
+			<MSBuild Projects="Exporter\Projects\XE2\Exporter.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="XMLTools">
+			<MSBuild Projects="XMLTools\Projects\XE2\XMLTools.dproj"/>
+		</Target>
+		<Target Name="XMLTools:Clean">
+			<MSBuild Projects="XMLTools\Projects\XE2\XMLTools.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="XMLTools:Make">
+			<MSBuild Projects="XMLTools\Projects\XE2\XMLTools.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="VirtualTreeHelpers">
+			<MSBuild Projects="VirtualTreeHelpers\projects\XE2\VirtualTreeHelpers.dproj"/>
+		</Target>
+		<Target Name="VirtualTreeHelpers:Clean">
+			<MSBuild Projects="VirtualTreeHelpers\projects\XE2\VirtualTreeHelpers.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="VirtualTreeHelpers:Make">
+			<MSBuild Projects="VirtualTreeHelpers\projects\XE2\VirtualTreeHelpers.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="RegExp;CommonTools;RTTIHelper;ThreadedDialogs;ThreadHelper;PDSevenZip;Exporter;XMLTools;VirtualTreeHelpers"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="RegExp:Clean;CommonTools:Clean;RTTIHelper:Clean;ThreadedDialogs:Clean;ThreadHelper:Clean;PDSevenZip:Clean;Exporter:Clean;XMLTools:Clean;VirtualTreeHelpers:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="RegExp:Make;CommonTools:Make;RTTIHelper:Make;ThreadedDialogs:Make;ThreadHelper:Make;PDSevenZip:Make;Exporter:Make;XMLTools:Make;VirtualTreeHelpers:Make"/>
+		</Target>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
+	</Project>

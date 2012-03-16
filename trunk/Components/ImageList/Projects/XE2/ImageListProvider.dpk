@@ -25,7 +25,7 @@ package ImageListProvider;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'ImageListProvider - Runtime'}
+{$DESCRIPTION 'TUO ImageListProvider Runtime'}
 {$LIBSUFFIX '160'}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}

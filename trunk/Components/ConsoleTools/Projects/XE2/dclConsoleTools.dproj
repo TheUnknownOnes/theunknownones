@@ -45,7 +45,7 @@
 			<DllSuffix>160</DllSuffix>
 			<DCC_UsePackage>rtl;$(DCC_UsePackage)</DCC_UsePackage>
 			<DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-			<DCC_Description>ConsoleTools - Design</DCC_Description>
+			<DCC_Description>TUO ConsoleTools</DCC_Description>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<DCC_N>false</DCC_N>
@@ -138,6 +138,8 @@
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
 					<Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclwebsnap160.bpl">Embarcadero WebSnap-Komponenten</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclwbm160.bpl">Embarcadero InternetExpress-Komponenten</Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automatisierungsserver</Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
 					</Excluded_Packages>
