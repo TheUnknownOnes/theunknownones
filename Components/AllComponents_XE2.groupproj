@@ -1,0 +1,468 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{3F4359EC-76B3-4134-935B-C82694A0ACCB}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="PNGUtils\Projects\XE2\PNGUtils.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ImageList\Projects\XE2\BaseImageList.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ImageList\Projects\XE2\PNGImageList.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ImageList\Projects\XE2\dclPNGImageList.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ImageList\Projects\XE2\dclPNGImageListDesigner.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ImageList\Projects\XE2\ImageListProvider.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ImageList\Projects\XE2\dclImageListProvider.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="SearchEdit\Projects\XE2\SearchEdit.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="SearchEdit\Projects\XE2\dclSearchEdit.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="PSBuzz\Projects\XE2\PSBuzz.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="PSBuzz\Projects\XE2\dclPSBuzz.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\XE2\EffectPNG.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\XE2\EffectPNGImage.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\XE2\dclEffectPNGImage.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\XE2\EffectPNGEdit.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\XE2\dclEffectPNGEdit.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\XE2\EffectPNGImageList.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\XE2\dclEffectPNGImageList.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\XE2\EffectPNGToolbar.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EffectPNG\Projects\XE2\dclEffectPNGToolbar.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ConsoleTools\Projects\XE2\ConsoleTools.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="ConsoleTools\Projects\XE2\dclConsoleTools.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="GroupListView\Projects\XE2\GroupListView.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="GroupListView\Projects\XE2\dclGroupListView.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="HTMLEditor\projects\XE2\HTMLEditor.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="IBEScriptComponent\projects\XE2\IBEScriptComponent.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="IBEScriptComponent\projects\XE2\dclIBEScriptComponent.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="NPipe\packages\XE2\NPipe.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Settings\Projects\XE2\Settings.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Settings\Projects\XE2\dclSettings.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Settings\Projects\XE2\Settings_VirtualTrees.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Settings\Projects\XE2\dclSettings_VirtualTrees.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="VSTSearchEdit\Projects\XE2\VSTSearchEdit.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="VSTSearchEdit\Projects\XE2\dclVSTSearchEdit.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Wiimote\Projects\XE2\Wiimote.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Wiimote\Projects\XE2\dclWiimote.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="YearCalendar\Projects\XE2\YearCalendar.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="PNGUtils">
+			<MSBuild Projects="PNGUtils\Projects\XE2\PNGUtils.dproj"/>
+		</Target>
+		<Target Name="PNGUtils:Clean">
+			<MSBuild Projects="PNGUtils\Projects\XE2\PNGUtils.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="PNGUtils:Make">
+			<MSBuild Projects="PNGUtils\Projects\XE2\PNGUtils.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="BaseImageList">
+			<MSBuild Projects="ImageList\Projects\XE2\BaseImageList.dproj"/>
+		</Target>
+		<Target Name="BaseImageList:Clean">
+			<MSBuild Projects="ImageList\Projects\XE2\BaseImageList.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="BaseImageList:Make">
+			<MSBuild Projects="ImageList\Projects\XE2\BaseImageList.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="PNGImageList">
+			<MSBuild Projects="ImageList\Projects\XE2\PNGImageList.dproj"/>
+		</Target>
+		<Target Name="PNGImageList:Clean">
+			<MSBuild Projects="ImageList\Projects\XE2\PNGImageList.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="PNGImageList:Make">
+			<MSBuild Projects="ImageList\Projects\XE2\PNGImageList.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclPNGImageList">
+			<MSBuild Projects="ImageList\Projects\XE2\dclPNGImageList.dproj"/>
+		</Target>
+		<Target Name="dclPNGImageList:Clean">
+			<MSBuild Projects="ImageList\Projects\XE2\dclPNGImageList.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclPNGImageList:Make">
+			<MSBuild Projects="ImageList\Projects\XE2\dclPNGImageList.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclPNGImageListDesigner">
+			<MSBuild Projects="ImageList\Projects\XE2\dclPNGImageListDesigner.dproj"/>
+		</Target>
+		<Target Name="dclPNGImageListDesigner:Clean">
+			<MSBuild Projects="ImageList\Projects\XE2\dclPNGImageListDesigner.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclPNGImageListDesigner:Make">
+			<MSBuild Projects="ImageList\Projects\XE2\dclPNGImageListDesigner.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="ImageListProvider">
+			<MSBuild Projects="ImageList\Projects\XE2\ImageListProvider.dproj"/>
+		</Target>
+		<Target Name="ImageListProvider:Clean">
+			<MSBuild Projects="ImageList\Projects\XE2\ImageListProvider.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="ImageListProvider:Make">
+			<MSBuild Projects="ImageList\Projects\XE2\ImageListProvider.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclImageListProvider">
+			<MSBuild Projects="ImageList\Projects\XE2\dclImageListProvider.dproj"/>
+		</Target>
+		<Target Name="dclImageListProvider:Clean">
+			<MSBuild Projects="ImageList\Projects\XE2\dclImageListProvider.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclImageListProvider:Make">
+			<MSBuild Projects="ImageList\Projects\XE2\dclImageListProvider.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="SearchEdit">
+			<MSBuild Projects="SearchEdit\Projects\XE2\SearchEdit.dproj"/>
+		</Target>
+		<Target Name="SearchEdit:Clean">
+			<MSBuild Projects="SearchEdit\Projects\XE2\SearchEdit.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="SearchEdit:Make">
+			<MSBuild Projects="SearchEdit\Projects\XE2\SearchEdit.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclSearchEdit">
+			<MSBuild Projects="SearchEdit\Projects\XE2\dclSearchEdit.dproj"/>
+		</Target>
+		<Target Name="dclSearchEdit:Clean">
+			<MSBuild Projects="SearchEdit\Projects\XE2\dclSearchEdit.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclSearchEdit:Make">
+			<MSBuild Projects="SearchEdit\Projects\XE2\dclSearchEdit.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="PSBuzz">
+			<MSBuild Projects="PSBuzz\Projects\XE2\PSBuzz.dproj"/>
+		</Target>
+		<Target Name="PSBuzz:Clean">
+			<MSBuild Projects="PSBuzz\Projects\XE2\PSBuzz.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="PSBuzz:Make">
+			<MSBuild Projects="PSBuzz\Projects\XE2\PSBuzz.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclPSBuzz">
+			<MSBuild Projects="PSBuzz\Projects\XE2\dclPSBuzz.dproj"/>
+		</Target>
+		<Target Name="dclPSBuzz:Clean">
+			<MSBuild Projects="PSBuzz\Projects\XE2\dclPSBuzz.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclPSBuzz:Make">
+			<MSBuild Projects="PSBuzz\Projects\XE2\dclPSBuzz.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="EffectPNG">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNG.dproj"/>
+		</Target>
+		<Target Name="EffectPNG:Clean">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNG.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="EffectPNG:Make">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNG.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="EffectPNGImage">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNGImage.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImage:Clean">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNGImage.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="EffectPNGImage:Make">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNGImage.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclEffectPNGImage">
+			<MSBuild Projects="EffectPNG\Projects\XE2\dclEffectPNGImage.dproj"/>
+		</Target>
+		<Target Name="dclEffectPNGImage:Clean">
+			<MSBuild Projects="EffectPNG\Projects\XE2\dclEffectPNGImage.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclEffectPNGImage:Make">
+			<MSBuild Projects="EffectPNG\Projects\XE2\dclEffectPNGImage.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="EffectPNGEdit">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNGEdit.dproj"/>
+		</Target>
+		<Target Name="EffectPNGEdit:Clean">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNGEdit.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="EffectPNGEdit:Make">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNGEdit.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclEffectPNGEdit">
+			<MSBuild Projects="EffectPNG\Projects\XE2\dclEffectPNGEdit.dproj"/>
+		</Target>
+		<Target Name="dclEffectPNGEdit:Clean">
+			<MSBuild Projects="EffectPNG\Projects\XE2\dclEffectPNGEdit.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclEffectPNGEdit:Make">
+			<MSBuild Projects="EffectPNG\Projects\XE2\dclEffectPNGEdit.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="EffectPNGImageList">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNGImageList.dproj"/>
+		</Target>
+		<Target Name="EffectPNGImageList:Clean">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNGImageList.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="EffectPNGImageList:Make">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNGImageList.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclEffectPNGImageList">
+			<MSBuild Projects="EffectPNG\Projects\XE2\dclEffectPNGImageList.dproj"/>
+		</Target>
+		<Target Name="dclEffectPNGImageList:Clean">
+			<MSBuild Projects="EffectPNG\Projects\XE2\dclEffectPNGImageList.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclEffectPNGImageList:Make">
+			<MSBuild Projects="EffectPNG\Projects\XE2\dclEffectPNGImageList.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="EffectPNGToolbar">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNGToolbar.dproj"/>
+		</Target>
+		<Target Name="EffectPNGToolbar:Clean">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNGToolbar.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="EffectPNGToolbar:Make">
+			<MSBuild Projects="EffectPNG\Projects\XE2\EffectPNGToolbar.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclEffectPNGToolbar">
+			<MSBuild Projects="EffectPNG\Projects\XE2\dclEffectPNGToolbar.dproj"/>
+		</Target>
+		<Target Name="dclEffectPNGToolbar:Clean">
+			<MSBuild Projects="EffectPNG\Projects\XE2\dclEffectPNGToolbar.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclEffectPNGToolbar:Make">
+			<MSBuild Projects="EffectPNG\Projects\XE2\dclEffectPNGToolbar.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="ConsoleTools">
+			<MSBuild Projects="ConsoleTools\Projects\XE2\ConsoleTools.dproj"/>
+		</Target>
+		<Target Name="ConsoleTools:Clean">
+			<MSBuild Projects="ConsoleTools\Projects\XE2\ConsoleTools.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="ConsoleTools:Make">
+			<MSBuild Projects="ConsoleTools\Projects\XE2\ConsoleTools.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclConsoleTools">
+			<MSBuild Projects="ConsoleTools\Projects\XE2\dclConsoleTools.dproj"/>
+		</Target>
+		<Target Name="dclConsoleTools:Clean">
+			<MSBuild Projects="ConsoleTools\Projects\XE2\dclConsoleTools.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclConsoleTools:Make">
+			<MSBuild Projects="ConsoleTools\Projects\XE2\dclConsoleTools.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="GroupListView">
+			<MSBuild Projects="GroupListView\Projects\XE2\GroupListView.dproj"/>
+		</Target>
+		<Target Name="GroupListView:Clean">
+			<MSBuild Projects="GroupListView\Projects\XE2\GroupListView.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="GroupListView:Make">
+			<MSBuild Projects="GroupListView\Projects\XE2\GroupListView.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclGroupListView">
+			<MSBuild Projects="GroupListView\Projects\XE2\dclGroupListView.dproj"/>
+		</Target>
+		<Target Name="dclGroupListView:Clean">
+			<MSBuild Projects="GroupListView\Projects\XE2\dclGroupListView.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclGroupListView:Make">
+			<MSBuild Projects="GroupListView\Projects\XE2\dclGroupListView.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="HTMLEditor">
+			<MSBuild Projects="HTMLEditor\projects\XE2\HTMLEditor.dproj"/>
+		</Target>
+		<Target Name="HTMLEditor:Clean">
+			<MSBuild Projects="HTMLEditor\projects\XE2\HTMLEditor.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="HTMLEditor:Make">
+			<MSBuild Projects="HTMLEditor\projects\XE2\HTMLEditor.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="IBEScriptComponent">
+			<MSBuild Projects="IBEScriptComponent\projects\XE2\IBEScriptComponent.dproj"/>
+		</Target>
+		<Target Name="IBEScriptComponent:Clean">
+			<MSBuild Projects="IBEScriptComponent\projects\XE2\IBEScriptComponent.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="IBEScriptComponent:Make">
+			<MSBuild Projects="IBEScriptComponent\projects\XE2\IBEScriptComponent.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclIBEScriptComponent">
+			<MSBuild Projects="IBEScriptComponent\projects\XE2\dclIBEScriptComponent.dproj"/>
+		</Target>
+		<Target Name="dclIBEScriptComponent:Clean">
+			<MSBuild Projects="IBEScriptComponent\projects\XE2\dclIBEScriptComponent.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclIBEScriptComponent:Make">
+			<MSBuild Projects="IBEScriptComponent\projects\XE2\dclIBEScriptComponent.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="NPipe">
+			<MSBuild Projects="NPipe\packages\XE2\NPipe.dproj"/>
+		</Target>
+		<Target Name="NPipe:Clean">
+			<MSBuild Projects="NPipe\packages\XE2\NPipe.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="NPipe:Make">
+			<MSBuild Projects="NPipe\packages\XE2\NPipe.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Settings">
+			<MSBuild Projects="Settings\Projects\XE2\Settings.dproj"/>
+		</Target>
+		<Target Name="Settings:Clean">
+			<MSBuild Projects="Settings\Projects\XE2\Settings.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="Settings:Make">
+			<MSBuild Projects="Settings\Projects\XE2\Settings.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclSettings">
+			<MSBuild Projects="Settings\Projects\XE2\dclSettings.dproj"/>
+		</Target>
+		<Target Name="dclSettings:Clean">
+			<MSBuild Projects="Settings\Projects\XE2\dclSettings.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclSettings:Make">
+			<MSBuild Projects="Settings\Projects\XE2\dclSettings.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees">
+			<MSBuild Projects="Settings\Projects\XE2\Settings_VirtualTrees.dproj"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees:Clean">
+			<MSBuild Projects="Settings\Projects\XE2\Settings_VirtualTrees.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees:Make">
+			<MSBuild Projects="Settings\Projects\XE2\Settings_VirtualTrees.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclSettings_VirtualTrees">
+			<MSBuild Projects="Settings\Projects\XE2\dclSettings_VirtualTrees.dproj"/>
+		</Target>
+		<Target Name="dclSettings_VirtualTrees:Clean">
+			<MSBuild Projects="Settings\Projects\XE2\dclSettings_VirtualTrees.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclSettings_VirtualTrees:Make">
+			<MSBuild Projects="Settings\Projects\XE2\dclSettings_VirtualTrees.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="VSTSearchEdit">
+			<MSBuild Projects="VSTSearchEdit\Projects\XE2\VSTSearchEdit.dproj"/>
+		</Target>
+		<Target Name="VSTSearchEdit:Clean">
+			<MSBuild Projects="VSTSearchEdit\Projects\XE2\VSTSearchEdit.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="VSTSearchEdit:Make">
+			<MSBuild Projects="VSTSearchEdit\Projects\XE2\VSTSearchEdit.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclVSTSearchEdit">
+			<MSBuild Projects="VSTSearchEdit\Projects\XE2\dclVSTSearchEdit.dproj"/>
+		</Target>
+		<Target Name="dclVSTSearchEdit:Clean">
+			<MSBuild Projects="VSTSearchEdit\Projects\XE2\dclVSTSearchEdit.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclVSTSearchEdit:Make">
+			<MSBuild Projects="VSTSearchEdit\Projects\XE2\dclVSTSearchEdit.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Wiimote">
+			<MSBuild Projects="Wiimote\Projects\XE2\Wiimote.dproj"/>
+		</Target>
+		<Target Name="Wiimote:Clean">
+			<MSBuild Projects="Wiimote\Projects\XE2\Wiimote.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="Wiimote:Make">
+			<MSBuild Projects="Wiimote\Projects\XE2\Wiimote.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclWiimote">
+			<MSBuild Projects="Wiimote\Projects\XE2\dclWiimote.dproj"/>
+		</Target>
+		<Target Name="dclWiimote:Clean">
+			<MSBuild Projects="Wiimote\Projects\XE2\dclWiimote.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclWiimote:Make">
+			<MSBuild Projects="Wiimote\Projects\XE2\dclWiimote.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="YearCalendar">
+			<MSBuild Projects="YearCalendar\Projects\XE2\YearCalendar.dproj"/>
+		</Target>
+		<Target Name="YearCalendar:Clean">
+			<MSBuild Projects="YearCalendar\Projects\XE2\YearCalendar.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="YearCalendar:Make">
+			<MSBuild Projects="YearCalendar\Projects\XE2\YearCalendar.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="PNGUtils;BaseImageList;PNGImageList;dclPNGImageList;dclPNGImageListDesigner;ImageListProvider;dclImageListProvider;SearchEdit;dclSearchEdit;PSBuzz;dclPSBuzz;EffectPNG;EffectPNGImage;dclEffectPNGImage;EffectPNGEdit;dclEffectPNGEdit;EffectPNGImageList;dclEffectPNGImageList;EffectPNGToolbar;dclEffectPNGToolbar;ConsoleTools;dclConsoleTools;GroupListView;dclGroupListView;HTMLEditor;IBEScriptComponent;dclIBEScriptComponent;NPipe;Settings;dclSettings;Settings_VirtualTrees;dclSettings_VirtualTrees;VSTSearchEdit;dclVSTSearchEdit;Wiimote;dclWiimote;YearCalendar"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="PNGUtils:Clean;BaseImageList:Clean;PNGImageList:Clean;dclPNGImageList:Clean;dclPNGImageListDesigner:Clean;ImageListProvider:Clean;dclImageListProvider:Clean;SearchEdit:Clean;dclSearchEdit:Clean;PSBuzz:Clean;dclPSBuzz:Clean;EffectPNG:Clean;EffectPNGImage:Clean;dclEffectPNGImage:Clean;EffectPNGEdit:Clean;dclEffectPNGEdit:Clean;EffectPNGImageList:Clean;dclEffectPNGImageList:Clean;EffectPNGToolbar:Clean;dclEffectPNGToolbar:Clean;ConsoleTools:Clean;dclConsoleTools:Clean;GroupListView:Clean;dclGroupListView:Clean;HTMLEditor:Clean;IBEScriptComponent:Clean;dclIBEScriptComponent:Clean;NPipe:Clean;Settings:Clean;dclSettings:Clean;Settings_VirtualTrees:Clean;dclSettings_VirtualTrees:Clean;VSTSearchEdit:Clean;dclVSTSearchEdit:Clean;Wiimote:Clean;dclWiimote:Clean;YearCalendar:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="PNGUtils:Make;BaseImageList:Make;PNGImageList:Make;dclPNGImageList:Make;dclPNGImageListDesigner:Make;ImageListProvider:Make;dclImageListProvider:Make;SearchEdit:Make;dclSearchEdit:Make;PSBuzz:Make;dclPSBuzz:Make;EffectPNG:Make;EffectPNGImage:Make;dclEffectPNGImage:Make;EffectPNGEdit:Make;dclEffectPNGEdit:Make;EffectPNGImageList:Make;dclEffectPNGImageList:Make;EffectPNGToolbar:Make;dclEffectPNGToolbar:Make;ConsoleTools:Make;dclConsoleTools:Make;GroupListView:Make;dclGroupListView:Make;HTMLEditor:Make;IBEScriptComponent:Make;dclIBEScriptComponent:Make;NPipe:Make;Settings:Make;dclSettings:Make;Settings_VirtualTrees:Make;dclSettings_VirtualTrees:Make;VSTSearchEdit:Make;dclVSTSearchEdit:Make;Wiimote:Make;dclWiimote:Make;YearCalendar:Make"/>
+		</Target>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
+	</Project>

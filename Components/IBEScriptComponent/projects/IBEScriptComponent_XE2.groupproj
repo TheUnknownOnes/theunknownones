@@ -1,0 +1,48 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{8485C84E-9A70-47B0-BCDE-6075FE159996}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="XE2\IBEScriptComponent.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="XE2\dclIBEScriptComponent.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="IBEScriptComponent">
+			<MSBuild Projects="XE2\IBEScriptComponent.dproj"/>
+		</Target>
+		<Target Name="IBEScriptComponent:Clean">
+			<MSBuild Projects="XE2\IBEScriptComponent.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="IBEScriptComponent:Make">
+			<MSBuild Projects="XE2\IBEScriptComponent.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclIBEScriptComponent">
+			<MSBuild Projects="XE2\dclIBEScriptComponent.dproj"/>
+		</Target>
+		<Target Name="dclIBEScriptComponent:Clean">
+			<MSBuild Projects="XE2\dclIBEScriptComponent.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclIBEScriptComponent:Make">
+			<MSBuild Projects="XE2\dclIBEScriptComponent.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="IBEScriptComponent;dclIBEScriptComponent"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="IBEScriptComponent:Clean;dclIBEScriptComponent:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="IBEScriptComponent:Make;dclIBEScriptComponent:Make"/>
+		</Target>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
+	</Project>

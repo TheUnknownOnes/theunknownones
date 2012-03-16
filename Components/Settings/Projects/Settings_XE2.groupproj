@@ -1,0 +1,72 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{5334B726-A094-4D7E-8C44-9761C28EDD51}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="XE2\Settings.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="XE2\dclSettings.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="XE2\Settings_VirtualTrees.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="XE2\dclSettings_VirtualTrees.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="Settings">
+			<MSBuild Projects="XE2\Settings.dproj"/>
+		</Target>
+		<Target Name="Settings:Clean">
+			<MSBuild Projects="XE2\Settings.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="Settings:Make">
+			<MSBuild Projects="XE2\Settings.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclSettings">
+			<MSBuild Projects="XE2\dclSettings.dproj"/>
+		</Target>
+		<Target Name="dclSettings:Clean">
+			<MSBuild Projects="XE2\dclSettings.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclSettings:Make">
+			<MSBuild Projects="XE2\dclSettings.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees">
+			<MSBuild Projects="XE2\Settings_VirtualTrees.dproj"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees:Clean">
+			<MSBuild Projects="XE2\Settings_VirtualTrees.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="Settings_VirtualTrees:Make">
+			<MSBuild Projects="XE2\Settings_VirtualTrees.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dclSettings_VirtualTrees">
+			<MSBuild Projects="XE2\dclSettings_VirtualTrees.dproj"/>
+		</Target>
+		<Target Name="dclSettings_VirtualTrees:Clean">
+			<MSBuild Projects="XE2\dclSettings_VirtualTrees.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dclSettings_VirtualTrees:Make">
+			<MSBuild Projects="XE2\dclSettings_VirtualTrees.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="Settings;dclSettings;Settings_VirtualTrees;dclSettings_VirtualTrees"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="Settings:Clean;dclSettings:Clean;Settings_VirtualTrees:Clean;dclSettings_VirtualTrees:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="Settings:Make;dclSettings:Make;Settings_VirtualTrees:Make;dclSettings_VirtualTrees:Make"/>
+		</Target>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
+	</Project>
