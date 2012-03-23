@@ -518,13 +518,16 @@ begin
 
     if Assigned(iml) then
     begin
-      iml.Draw(PaintInfo.Canvas,
-               round(itemRect.X+4),
-               round(ItemRect.Y + ((ItemRect.Height - icoh) / 2)),
-               imgidx,
-               ds,
-               itImage,
-               actEnabled);
+      try
+        iml.Draw(PaintInfo.Canvas,
+                 round(itemRect.X+4),
+                 round(ItemRect.Y + ((ItemRect.Height - icoh) / 2)),
+                 imgidx,
+                 ds,
+                 itImage,
+                 actEnabled);
+      except
+      end;
     end;
   except
   end;
