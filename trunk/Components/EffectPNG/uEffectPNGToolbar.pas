@@ -77,6 +77,7 @@ procedure TEffectPNGToolButton.Paint;
 var
   PNGToDraw : TPNGObject;
   myEffect : TPngEffects;
+  tb : TToolBar;
 begin
   inherited;
 
@@ -97,9 +98,19 @@ begin
 
     myEffect.ApplyEffects(PNGToDraw);
 
-    Self.Canvas.Draw((Self.Width div 2)-(PNGToDraw.Width div 2),
-                     (Self.Height div 2)-(PNGToDraw.Height div 2),
-                     PNGToDraw);
+    if self.Parent is TToolBar then
+    begin
+      tb := TToolBar(Self.Parent);
+      Self.Canvas.Draw((tb.ButtonWidth div 2)-(PNGToDraw.Width div 2),
+                       (tb.ButtonHeight div 2)-(PNGToDraw.Height div 2),
+                       PNGToDraw);
+    end
+    else
+    begin
+      Self.Canvas.Draw((Self.Width div 2)-(PNGToDraw.Width div 2),
+                       (Self.Height div 2)-(PNGToDraw.Height div 2),
+                       PNGToDraw);
+    end;
 
     PNGToDraw.Free;
   end;
