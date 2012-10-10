@@ -24,14 +24,20 @@ type
     FForceDBP: Boolean;
     FEffects: TPNGEffects;
     FCenter: Boolean;
+    FMouseIsDown : Boolean;
+    FMouseDownEffects: TPNGEffects;
 
     procedure SetForceDBP(const Value: Boolean);
     procedure SetPicture(const Value: TPNGObject);
     procedure SetEffects(const Value: TPNGEffects);
     procedure SetCenter(const Value: Boolean);
+    procedure SetMouseDownEffects(const Value: TPNGEffects);
 
   protected
     procedure Paint(); override;
+
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
 
     procedure OnEffectChange(Sender : TObject);
 
@@ -47,6 +53,7 @@ type
 
     property Effects                    : TPNGEffects read FEffects     write SetEffects;
     property Center                     : Boolean     read FCenter      write SetCenter default true;
+    property MouseDownEffects           : TPNGEffects read FMouseDownEffects     write SetMouseDownEffects;
     property Align;
     property Anchors;
     property AutoSize;
@@ -91,6 +98,8 @@ begin
   FEffects:=TPNGEffects.Create();
   FEffects.OnChange:=OnEffectChange;
   FCenter:=true;
+  FMouseDownEffects := TPNGEffects.Create;
+  FMouseIsDown := false;
 
   inherited;
 end;
@@ -106,6 +115,22 @@ end;
 procedure TEffectPNGImage.DrawTo(ACanvas: TCanvas);
 begin
   DrawTo(ACanvas.Handle);
+end;
+
+procedure TEffectPNGImage.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  inherited;
+  FMouseIsDown := true;
+  Invalidate;
+end;
+
+procedure TEffectPNGImage.MouseUp(Button: TMouseButton; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  inherited;
+  FMouseIsDown := false;
+  Invalidate;
 end;
 
 procedure TEffectPNGImage.OnEffectChange(Sender: TObject);
@@ -145,7 +170,10 @@ begin
 
   if not Result.Empty then
   begin
-    FEffects.ApplyEffects(Result);
+    if FMouseIsDown then
+      FMouseDownEffects.ApplyEffects(Result)
+    else
+      FEffects.ApplyEffects(Result);
 
     if not FCenter then
     begin
@@ -180,6 +208,11 @@ end;
 procedure TEffectPNGImage.SetForceDBP(const Value: Boolean);
 begin
   FForceDBP := Value;
+end;
+
+procedure TEffectPNGImage.SetMouseDownEffects(const Value: TPNGEffects);
+begin
+  FMouseDownEffects.Assign(Value);
 end;
 
 procedure TEffectPNGImage.SetPicture(const Value: TPNGObject);
