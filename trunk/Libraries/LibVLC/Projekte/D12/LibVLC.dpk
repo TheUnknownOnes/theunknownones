@@ -25,7 +25,7 @@ package LibVLC;
 {$DESCRIPTION 'LibVLC for Delphi'}
 {$LIBSUFFIX '_D120'}
 {$RUNONLY}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl;

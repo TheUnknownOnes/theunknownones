@@ -55,7 +55,8 @@ type
 implementation
 
 uses
-  Forms, uVirtualTreeHelpers, Controls {$ifndef DELPHI12_UP}, TntStdCtrls{$endif};
+  Forms, uVirtualTreeHelpers, Controls {$ifndef DELPHI12_UP}, TntStdCtrls{$endif},
+  ExtCtrls;
 
 { TVSTSearchEdit }
 
@@ -214,6 +215,13 @@ begin
       FOldOnChangeProc:=TEdit(FEdit).OnChange;
       TEdit(FEdit).OnChange:=OnEditChange;
     end
+    {$ifdef DELPHI12_UP}
+    else
+    if Value is TButtonedEdit then
+    begin
+      FOldOnChangeProc:=TButtonedEdit(FEdit).OnChange;
+      TButtonedEdit(FEdit).OnChange:=OnEditChange;
+    end;{$endif}
     {$ifndef DELPHI12_UP}else
     if Value is TTntEdit then
     begin

@@ -56,7 +56,7 @@
 //                  to use the standard editor of the tree
 //   - Bug fix: pressing CTRL + PgUp/PgDown no longer leads to an index-out-of-bounds exception if no columns are used
 //   - Bug fix: avoided race condition between TBaseVirtualTree.DeleteNode and the worker thread 
-//   - Bug fix: TBaseVirtualTree.ToggleNode could produce an overflow if range checking was enabled 
+//   - Bug fix: TBaseVirtualTree.ToggleNode could produce an overflow if range checking was enabled
 //   - Bug fix: TWorkerThread will no longer reference the tree after it has been destroyed (Mantis issue #384)
 //   - Improvement: removed support for Delphi versions older than Delphi 7
 //   - Improvement: removed local memory manager
@@ -362,7 +362,8 @@ uses
   {$else}
     oleacc,   // MSAA support in Delphi 2006 or higher
   {$endif COMPILER_10_UP}
-  Messages, SysUtils, Classes, Graphics, Controls, Forms, ImgList, ActiveX, StdCtrls, Menus, Printers,
+  Messages, SysUtils, Classes, Graphics, Controls, Forms, ImgList,
+  ActiveX, StdCtrls, Menus, Printers,
   CommCtrl,   // image lists, common controls tree structures
   Themes, UxTheme
   {$ifdef TntSupport}
@@ -34352,6 +34353,9 @@ var
   S: AnsiString;
   WS: UnicodeString;
   P: Pointer;
+{$ifdef COMPILER_17_UP}
+  fFormatSettings: System.SysUtils.TFormatSettings;
+{$endif COMPILER_17_UP}
 
 begin
   Result := 0;
@@ -34370,7 +34374,14 @@ begin
       end;
   else
     if Format = CF_CSV then
+    begin
+{$ifdef COMPILER_17_UP}
+      fFormatSettings := System.SysUtils.TFormatSettings.Create;
+      S := ContentToText(Source, AnsiChar (fFormatSettings.ListSeparator)) + #0
+{$else COMPILER_17_UP}
       S := ContentToText(Source, AnsiChar (ListSeparator)) + #0
+{$endif COMPILER_17_UP}
+    end
     else
       if (Format = CF_VRTF) or (Format = CF_VRTFNOOBJS) then
         S := ContentToRTF(Source) + #0

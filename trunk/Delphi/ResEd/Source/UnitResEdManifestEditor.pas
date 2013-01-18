@@ -12,7 +12,8 @@ uses
   Dialogs, unitResourceXPManifests, unitResourceElement, StdCtrls,
   unitMSXML2_TLB, StrUtils;
 
-{$I ..\..\Common\Jedi\Jedi.inc}
+// ORGINAL: {$I ..\..\Common\Jedi\Jedi.inc}
+{$I Jedi.inc}
 
 type
   TFormResEdManifestEditor = class(TForm)

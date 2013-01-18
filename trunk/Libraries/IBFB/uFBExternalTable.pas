@@ -68,11 +68,11 @@ begin
           while (Position mod 4) <> 0 do
             Inc(FPos);
         end
-        else
+        {else
         begin
           while (Position mod 2) <> 0 do
             Inc(FPos);
-        end;
+        end;}
       end;
     end;
   end;
