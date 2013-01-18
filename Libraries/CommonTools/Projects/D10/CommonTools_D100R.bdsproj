@@ -170,48 +170,8 @@
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>  <Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JclDebugExpert100.bpl">JCL Package containing common units for JCL Experts</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JclBaseExpert100.bpl">JCL Package containing common units for JCL Experts</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JclSIMDViewExpert100.bpl">JCL Debug Window of XMM registers</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JclProjectAnalysisExpert100.bpl">JCL Project Analyzer</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JclFavoriteFoldersExpert100.bpl">JCL Open and Save IDE dialogs with favorite folders</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JclUsesExpert100.bpl">JCL Uses Wizard</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JclThreadNameExpert100.bpl">JCL Thread Name IDE expert</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvCoreD10D.bpl">JVCL Core Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvUIBD10D.bpl">JVCL Unified Interbase Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvBandsD10D.bpl">JVCL Band Objects</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvDockingD10D.bpl">JVCL Docking Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvDotNetCtrlsD10D.bpl">JVCL DotNet Controls</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvEDID10D.bpl">JVCL EDI Components Designtime Package</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvGlobusD10D.bpl">JVCL Globus Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvHMID10D.bpl">JVCL HMI Controls design time unit</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvJansD10D.bpl">JVCL Jans Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvManagedThreadsD10D.bpl">JVCL Managed Threads</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvPrintPreviewD10D.bpl">JVCL Print Preview Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvRuntimeDesignD10D.bpl">JVCL Runtime Design Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvTimeFrameworkD10D.bpl">JVCL Time Framework</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvValidatorsD10D.bpl">JVCL Validators and Error Provider Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvWizardD10D.bpl">JVCL Wizard Design Time Package</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvXPCtrlsD10D.bpl">JVCL XP Controls</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvAppFrmD10D.bpl">JVCL Application and Form Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvBDED10D.bpl">JVCL BDE Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvDBD10D.bpl">JVCL Database Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvCmpD10D.bpl">JVCL Non-Visual Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvCryptD10D.bpl">JVCL Encryption and Compression</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvCtrlsD10D.bpl">JVCL Visual Controls</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvCustomD10D.bpl">JVCL Custom Controls</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvDlgsD10D.bpl">JVCL Dialog Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvInterpreterD10D.bpl">JVCL Interpreter Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvMMD10D.bpl">JVCL Multimedia and Image Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvNetD10D.bpl">JVCL Network Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvPageCompsD10D.bpl">JVCL Page Style Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvPluginD10D.bpl">JVCL Plugin Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvStdCtrlsD10D.bpl">JVCL Standard Controls</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\JvSystemD10D.bpl">JVCL System Components</Excluded_Packages>
-      <Excluded_Packages Name="C:\Dokumente und Einstellungen\BSchwarze\Eigene Dateien\Borland Studio-Projekte\Bpl\SPPComponents100.bpl">von SPP erstellte Komponenten</Excluded_Packages>
-    </Excluded_Packages>
-  </Delphi.Personality>
+		</VersionInfoKeys>
+	</Delphi.Personality>
 	<StarTeamAssociation></StarTeamAssociation>
 	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
 </BorlandProject>

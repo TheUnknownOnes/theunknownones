@@ -23,3 +23,8 @@
   {$define HavePNGImage}
 	{$define HaveGIFImage}
 {$endif}
+
+{$ifdef VER240}
+  {$define HavePNGImage}
+	{$define HaveGIFImage}
+{$endif}

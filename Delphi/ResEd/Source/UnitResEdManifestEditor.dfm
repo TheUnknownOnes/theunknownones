@@ -105,7 +105,6 @@ object FormResEdManifestEditor: TFormResEdManifestEditor
     Margins.Right = 4
     Margins.Bottom = 4
     Style = csDropDownList
-    ItemHeight = 13
     ItemIndex = 0
     TabOrder = 4
     Text = 'asInvoker'

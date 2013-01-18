@@ -22,7 +22,7 @@ uses
 type
   TCustomSettingsLinkVST = class(TCustomSettingsComponentLink)
   protected
-    FSaveVSTOptions : array[0..11] of Boolean;
+    FSaveVSTOptions : array[0..12] of Boolean;
 
     function GetTree: TVirtualStringTree;
     procedure SetTree(const Value: TVirtualStringTree);
@@ -50,6 +50,7 @@ type
     property SaveColumnFixed : Boolean index 10 read GetSaveVSTOption write SetSaveVSTOption default true;
 
     property SaveColumnTitle : Boolean index 11 read GetSaveVSTOption write SetSaveVSTOption default false;
+    property SaveColumnColor : Boolean index 12 read GetSaveVSTOption write SetSaveVSTOption default false;
   end;
 
 
@@ -78,6 +79,7 @@ type
     property SaveColumnAutoSpring;
     property SaveColumnFixed;
     property SaveColumnTitle;
+    property SaveColumnColor;
   end;
 
 
@@ -105,6 +107,7 @@ begin
     FSaveVSTOptions[idx] := true;
 
   FSaveVSTOptions[11]:=false; // no auto title saving
+  FSaveVSTOptions[12]:=false; // no auto color saving
 end;
 
 procedure TCustomSettingsLinkVST.DoApplySettings(const ARootSetting : TSettingName);
@@ -215,6 +218,9 @@ begin
 
         if SaveColumnTitle then
           Col.Text:=Settings.GetValue(SettingsPath + 'Text', Col.Text);
+
+        if SaveColumnColor then
+          Col.Color:=Settings.GetValue(SettingsPath + 'Color', Col.Color);
       end;
 
 
@@ -287,6 +293,9 @@ begin
 
       if SaveColumnTitle then
           Settings.SetValue(SettingsPath + 'Text', Col.Text);
+
+      if SaveColumnColor then
+          Settings.SetValue(SettingsPath + 'Color', Col.Color);
     end;
   end;
 end;
