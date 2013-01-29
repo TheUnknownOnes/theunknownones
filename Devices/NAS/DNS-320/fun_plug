@@ -3,19 +3,20 @@
 # switch to safe working directory on ramdisk
 cd /
 
-if [ -d /mnt/USB/HD_c1 ]; 
-then
-  FFP_MOUNTPOINT=/mnt/USB/HD_c1
-else
-  FFP_MOUNTPOINT=/mnt/HD/HD_a2
-fi 
+USB_FFP_Mountpoint=`ls /mnt/USB | tail -n 1`
+if [ ${#USB_FFP_Mountpoint} -eq 0 ]; then
+  sleep 5
+  $0 "$@" &
+  exit 0
+fi
+
+FFP_MOUNTPOINT=/mnt/USB/$USB_FFP_Mountpoint
 
 # write a log, in case sth goes wrong
 FFP_LOG=$FFP_MOUNTPOINT/ffp.log
 #FFP_LOG=/dev/null
 exec >>$FFP_LOG 2>&1
 
- 
 # real path to ffp
 FFP_PATH=$FFP_MOUNTPOINT/ffp
 
@@ -27,16 +28,6 @@ FFP_SETUP_SCRIPT=/mnt/HD/HD_a2/.bootstrap/setup.sh
 
 # rc file path
 FFP_RC=/ffp/etc/rc
-
-echo "**** Waiting for mount-point $FFP_MOUNTPOINT ****"
-while [ ! -d $FFP_MOUNTPOINT ];
-do
-  echo "  ... waiting"
-  sleep 2
-done
-
-echo " Found $FFP_MOUNTPOINT"
-
 
 echo "**** fun_plug script for DNS-323 (2008-08-11 tp@fonz.de) ****"
 date
@@ -92,4 +83,3 @@ if [ -x $FFP_RC ]; then
 else
     echo "$FFP_RC: Not found or not executable"
 fi
-
