@@ -530,27 +530,27 @@ begin
 
   if AHandler.TestNotificationTriggered(SERVICE_NOTIFY_START_PENDING) and
      Assigned(FOnServiceStartPending) then
-    FOnServiceStopped(Self, AHandler);
+    FOnServiceStartPending(Self, AHandler);
 
   if AHandler.TestNotificationTriggered(SERVICE_NOTIFY_STOP_PENDING) and
      Assigned(FOnServiceStopPending) then
-    FOnServiceStopped(Self, AHandler);
+    FOnServiceStopPending(Self, AHandler);
 
   if AHandler.TestNotificationTriggered(SERVICE_NOTIFY_RUNNING) and
      Assigned(FOnServiceRunning) then
-    FOnServiceStopped(Self, AHandler);
+    FOnServiceRunning(Self, AHandler);
 
   if AHandler.TestNotificationTriggered(SERVICE_NOTIFY_CONTINUE_PENDING) and
      Assigned(FOnServiceContinuePending) then
-    FOnServiceStopped(Self, AHandler);
+    FOnServiceContinuePending(Self, AHandler);
 
   if AHandler.TestNotificationTriggered(SERVICE_NOTIFY_PAUSE_PENDING) and
      Assigned(FOnServicePausePending) then
-    FOnServiceStopped(Self, AHandler);
+    FOnServicePausePending(Self, AHandler);
 
   if AHandler.TestNotificationTriggered(SERVICE_NOTIFY_PAUSED) and
      Assigned(FOnServicePaused) then
-    FOnServiceStopped(Self, AHandler);
+    FOnServicePaused(Self, AHandler);
 
   if AHandler.TestNotificationTriggered(SERVICE_NOTIFY_DELETE_PENDING) and
      Assigned(FOnServiceDeletePending) then
