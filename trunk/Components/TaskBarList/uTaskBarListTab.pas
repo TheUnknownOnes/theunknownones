@@ -162,7 +162,7 @@ end;
 
 function TTaskbarListFormTab.IsWindowActive: Boolean;
 begin
-  Result:=TCustomForm(Control).Active;
+  Result:=Assigned(Control) and TCustomForm(Control).Active;
 end;
 
 { TTaskbarListTab }

@@ -29,7 +29,7 @@ package VirtualTreeHelpers_D120R;
 requires
   rtl,
   vcl,
-  VirtualTreesD12,
+  VirtualTreesR,
   vclx,
   CommonTools_D120R;
 

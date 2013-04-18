@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   StdCtrls, Themes, Types, uLevenshtein, Math, ComCtrls, uKoelnerPhonetik,
   uSoundEx, uMetaphone, uDoubleMetaphone, uFuzzyMatching, Buttons, uMongeElkan,
-  uDiceSimilarity, uJaroWinkler, uNeedlemanWunch, uSmithWatermanGotoh;
+  uDiceSimilarity, uJaroWinkler, uNeedlemanWunch, uSmithWatermanGotoh, ExtCtrls;
 
 type
   TSuggestMethod = (smDamerauLevenshtein,
@@ -40,11 +40,14 @@ type
 
   TFormEditSuggest = class(TForm)
     ListView1: TListView;
+    Panel1: TPanel;
+    SpeedButton1: TSpeedButton;
     procedure ListView1Compare(Sender: TObject; Item1, Item2: TListItem;
       Data: Integer; var Compare: Integer);
     procedure ListView1DblClick(Sender: TObject);
     procedure ListView1KeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure SpeedButton1Click(Sender: TObject);
   private
     FEdit : TSuggestEdit;
     FSuggestThread : TThreadEditSuggest;
@@ -352,6 +355,11 @@ begin
   end;
 end;
 
+procedure TFormEditSuggest.SpeedButton1Click(Sender: TObject);
+begin
+  Close;
+end;
+
 { TSuggestEdit }
 
 
@@ -380,6 +388,7 @@ end;
 
 destructor TSuggestEdit.Destroy;
 begin
+  FFormEditSuggest.Hide;
   FFormEditSuggest.Free;
   FWordList.Free;
   DeleteCriticalSection(FCS);

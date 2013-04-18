@@ -8,17 +8,16 @@ uses
 type
   TCustomSearchEdit = class(TEdit)
   private
-    FItems : TEnumStringList;
+    FItems : TStringList;
     FAutoComplete: IAutoComplete2;
     procedure SetItems(const Value: TStrings);
     function GetItems: TStrings;
   protected
-    procedure SetParent(AParent: TWinControl); override;
-
     property Items: TStrings read GetItems write SetItems;
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
+    procedure InitAutoComplete;
   end;
 
   TSearchEdit = class(TCustomSearchEdit)
@@ -26,14 +25,34 @@ type
     property Items;
   end;
 
+
+  procedure SetAutoCompleteControl(const AControl : TWinControl; const AList : TStrings);
+
 implementation
 
+procedure SetAutoCompleteControl(
+    const AControl  : TWinControl;
+    const AList     : TStrings
+    );
+var
+  FAutoComplete : IAutoComplete2;
+  FStrings : TEnumString;
+begin
+  FAutoComplete :=
+     CreateComObject(CLSID_AutoComplete)as IAutoComplete2;
+  FStrings :=  TEnumString.Create(AList);
+  OleCheck(FAutoComplete.SetOptions(ACO_AUTOSUGGEST
+    or ACO_AUTOAPPEND or ACO_UPDOWNKEYDROPSLIST or ACO_USETAB));
+  OleCheck(FAutoComplete.Init(AControl.Handle, FStrings, nil, nil));
+end;
+
 { TCustomSearchEdit }
+
 
 constructor TCustomSearchEdit.Create(AOwner: TComponent);
 begin
   inherited;
-  FItems:=TEnumStringList.Create; 
+  FItems:=TStringList.Create;
 end;
 
 destructor TCustomSearchEdit.Destroy;
@@ -49,22 +68,14 @@ begin
   Result:=TStrings(FItems);
 end;
 
+procedure TCustomSearchEdit.InitAutoComplete;
+begin
+  SetAutoCompleteControl(Self, Items);
+end;
+
 procedure TCustomSearchEdit.SetItems(const Value: TStrings);
 begin
   FItems.Text:=Value.Text;
-end;
-
-procedure TCustomSearchEdit.SetParent(AParent: TWinControl);
-begin
-  inherited;
-  if not (csDesigning in Self.ComponentState) and
-     not (csDestroying in Self.ComponentState) and
-     not Assigned(FAutoComplete) then
-  begin
-    FAutoComplete  := CreateComObject(CLSID_AutoComplete) as IAutoComplete2;
-    OleCheck(FAutoComplete.SetOptions(ACO_AUTOSUGGEST or ACO_UPDOWNKEYDROPSLIST));
-    OleCheck(FAutoComplete.Init(self.Handle, FItems.DefaultInterface, nil, nil));
-  end;
 end;
 
 end.

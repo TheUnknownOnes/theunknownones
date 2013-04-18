@@ -55,7 +55,7 @@ type
                         OnConnected     : TNP_OnConnected;
                         OnDisconnected  : TNP_OnDisconnected;
                         ServerComponent : TObject);
-    destructor Destroy(); reintroduce;
+    destructor Destroy(); override;
     procedure Execute; override;
   end;
 
@@ -143,7 +143,7 @@ end;
 
 destructor TNPipeServer.Destroy;
 begin
-  inherited Destroy;
+  inherited;
 end;
 
 procedure TNPipeServer.SendError(AException: Exception);
@@ -293,7 +293,7 @@ destructor TNPipeServerThrd.Destroy;
 begin
   FData.Free;
   FReply.Free;
-  inherited Destroy;
+  inherited;
 end;
 
 procedure TNPipeServerThrd.DoError;
