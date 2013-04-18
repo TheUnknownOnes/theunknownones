@@ -24,12 +24,12 @@ package Settings_VirtualTrees_D120R;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'Settings Support for VirtualTrees - Runtime'}
 {$RUNONLY}
-{$IMPLICITBUILD Off}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,
   Settings_D120R,
-  VirtualTreesD12,
+  VirtualTreesR,
   vcl,
   designide,
   xmlrtl,

@@ -8,7 +8,6 @@ uses
 type
   TSuggestEditLink = class(TCustomEditLink)
   private
-    FExtent: TPoint;
     FControl : TWinControl;
     function GetControl: TSuggestEdit;
     function GetDisplaySimilarity: Boolean;

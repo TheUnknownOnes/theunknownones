@@ -250,26 +250,26 @@ var
   {$ENDREGION}
 begin
   if not IsEditing then
-  begin
-    if AKey=VK_RETURN then
     begin
-      AKey:=0;
-      EditNode(FocusedNode, FocusedColumn);
-    end
-    else
-    begin
-      InputStr:=GetCharFromVirtualKey(AKey);
-      If Length(InputStr)>0 then
-        if Copy(InputStr,1,1)[1]>=#32 then
-        begin
-          if EditNode(FocusedNode, FocusedColumn) and
-             (Length(trim(InputStr))>0) then
-            SendKeys(PAnsiChar(AnsiString(Copy(InputStr,1,1))), True);
+      if AKey=VK_RETURN then
+      begin
+        AKey:=0;
+        EditNode(FocusedNode, FocusedColumn);
+      end
+      else
+      begin
+        InputStr:=GetCharFromVirtualKey(AKey);
+        If Length(InputStr)>0 then
+          if Copy(InputStr,1,1)[1]>=#32 then
+          begin
+            if EditNode(FocusedNode, FocusedColumn) and
+               (Length(trim(InputStr))>0) then
+              SendKeys(PAnsiChar(AnsiString(Copy(InputStr,1,1))), True);
 
-          AKey:=0;
-        end;
+            AKey:=0;
+          end;
+      end;
     end;
-  end;
 end;
 
 procedure TBaseVirtualTreeHelper.SetExpandState(

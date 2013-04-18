@@ -20,8 +20,9 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
 			<DesignOnlyPackage>false</DesignOnlyPackage>
-			<DCC_DependencyCheckOutputName>..\..\..\..\..\..\..\..\..\Public\Documents\RAD Studio\6.0\Bpl\VirtualTreeSuggestEdit_D120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\6.0\Bpl\VirtualTreeSuggestEdit_D120.bpl</DCC_DependencyCheckOutputName>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DllSuffix>_D120</DllSuffix>
 			<GenPackage>true</GenPackage>
@@ -45,18 +46,18 @@
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
-			<DCCReference Include="SuggestEdit.dcp"/>
 			<DCCReference Include="VirtualEditTree120.dcp"/>
+			<DCCReference Include="suggestedit.dcp"/>
 			<DCCReference Include="..\..\uVTSuggestEditLink.pas"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
-			<BuildConfiguration Include="Debug">
-				<Key>Cfg_2</Key>
-				<CfgParent>Base</CfgParent>
-			</BuildConfiguration>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
 			</BuildConfiguration>
 		</ItemGroup>

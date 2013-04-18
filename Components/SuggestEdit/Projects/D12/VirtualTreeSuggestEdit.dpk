@@ -23,13 +23,13 @@ package VirtualTreeSuggestEdit;
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
 {$LIBSUFFIX '_D120'}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,
   vcl,
-  SuggestEdit,
-  VirtualEditTree120;
+  VirtualEditTree120,
+  suggestedit;
 
 contains
   uVTSuggestEditLink in '..\..\uVTSuggestEditLink.pas';
