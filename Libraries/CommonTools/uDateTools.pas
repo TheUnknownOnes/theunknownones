@@ -100,12 +100,42 @@ type
     class operator LessThanOrEqual(ACalendarWeek1, ACalendarWeek2 : TCalendarWeek) : Boolean; overload;
     class operator LessThanOrEqual(ACalendarWeek : TCalendarWeek; ADate : TDateTime) : Boolean; overload;
   end;  }
+  
+function HRTimeDiff(ANow, AThen : TDateTime) : String;  
 
 const
   CW_YEARLEN=4;
   CW_WEEKLEN=2;
 
 implementation
+
+function HRTimeDiff(ANow, AThen : TDateTime) : String;
+var
+  s : Double;
+begin
+  s := DaySpan(ANow, AThen);
+  if s < 1 then
+  begin
+    s := HourSpan(ANow, AThen);
+    if s < 1 then
+    begin
+      s := MinuteSpan(ANow, AThen);
+      if s < 1 then
+      begin
+        s := SecondSpan(ANow, AThen);
+        Result := 's';
+      end
+      else
+        Result := 'min';
+    end
+    else
+      Result := 'h';
+  end
+  else
+    Result := 'd';
+
+  Result := Format('%.1f ', [s]) + Result;
+end;
 
 { TKalenderWoche }
   {
