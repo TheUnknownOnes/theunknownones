@@ -33,7 +33,7 @@ function ZBarcode_Encode(var symbol : zint_symbol; source : AnsiString) : Intege
 implementation
 
 uses zint.dmatrix, zint.code128, zint.gs1, zint.common, zint._2of5,
-  zint.maxicode;
+  zint.maxicode, zint.auspost, zint.aztec, zint.code, zint.medical;
 
 const
   TECHNETIUM : AnsiString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%';
@@ -148,24 +148,24 @@ begin
       uconcat(symbol.text, to_process);
       uconcat(symbol.text, '*');
     end;
-    {BARCODE_HIBC_39:
+    BARCODE_HIBC_39:
     begin
 			symbol.option_2 := 0;
-			error_number := c39(symbol, to_process);
+			error_number := c39(symbol, to_process, _length);
       ustrcpy(symbol.text, '*');
       uconcat(symbol.text, to_process);
       uconcat(symbol.text, '*');
-    end;}
+    end;
     BARCODE_HIBC_DM:
 			error_number := dmatrix(symbol, to_process, _length);
 		{BARCODE_HIBC_QR:
-			error_number := qr_code(symbol, to_process);
+			error_number := qr_code(symbol, to_process, _length);
 		BARCODE_HIBC_PDF:
-			error_number := pdf417enc(symbol, to_process);
+			error_number := pdf417enc(symbol, to_process, _length);
 		BARCODE_HIBC_MICPDF:
-			error_number := micro_pdf417(symbol, to_process);
+			error_number := micro_pdf417(symbol, to_process, _length);}
 		BARCODE_HIBC_AZTEC:
-			error_number := aztec(symbol, to_process);}
+			error_number := aztec(symbol, to_process, _length);
 	end;
 
 	Result := error_number; exit;
@@ -353,20 +353,20 @@ begin
 		//BARCODE_UPCE: error_number := eanx(symbol, preprocessed, _length);
 		//BARCODE_EANX: error_number := eanx(symbol, preprocessed, _length);
 		BARCODE_EAN128: error_number := ean_128(symbol, preprocessed, _length);
-		//BARCODE_CODE39: error_number := c39(symbol, preprocessed, _length);
-		//BARCODE_PZN: error_number := pharmazentral(symbol, preprocessed, _length);
-		//BARCODE_EXCODE39: error_number := ec39(symbol, preprocessed, _length);
-		//BARCODE_CODABAR: error_number := codabar(symbol, preprocessed, _length);
-		//BARCODE_CODE93: error_number := c93(symbol, preprocessed, _length);
-		//BARCODE_LOGMARS: error_number := c39(symbol, preprocessed, _length);
+		BARCODE_CODE39: error_number := c39(symbol, preprocessed, _length);
+		BARCODE_PZN: error_number := pharmazentral(symbol, preprocessed, _length);
+		BARCODE_EXCODE39: error_number := ec39(symbol, preprocessed, _length);
+		BARCODE_CODABAR: error_number := codabar(symbol, preprocessed, _length);
+		BARCODE_CODE93: error_number := c93(symbol, preprocessed, _length);
+	  BARCODE_LOGMARS: error_number := c39(symbol, preprocessed, _length);
 		BARCODE_CODE128: error_number := code_128(symbol, preprocessed, _length);
 		BARCODE_CODE128B: error_number := code_128(symbol, preprocessed, _length);
 		BARCODE_NVE18: error_number := nve_18(symbol, preprocessed, _length);
-		//BARCODE_CODE11: error_number := code_11(symbol, preprocessed, _length);
+		BARCODE_CODE11: error_number := code_11(symbol, preprocessed, _length);
 		//BARCODE_MSI_PLESSEY: error_number := msi_handle(symbol, preprocessed, _length);
 		//BARCODE_TELEPEN: error_number := telepen(symbol, preprocessed, _length);
 		//BARCODE_TELEPEN_NUM: error_number := telepen_num(symbol, preprocessed, _length);
-		//BARCODE_PHARMA: error_number := pharma_one(symbol, preprocessed, _length);
+		BARCODE_PHARMA: error_number := pharma_one(symbol, preprocessed, _length);
 		//BARCODE_PLESSEY: error_number := plessey(symbol, preprocessed, _length);
 		BARCODE_ITF14: error_number := itf14(symbol, preprocessed, _length);
 		//BARCODE_FLAT: error_number := flattermarken(symbol, preprocessed, _length);
@@ -374,12 +374,12 @@ begin
 		//BARCODE_POSTNET: error_number := post_plot(symbol, preprocessed, _length);
 		//BARCODE_PLANET: error_number := planet_plot(symbol, preprocessed, _length);
 		//BARCODE_RM4SCC: error_number := royal_plot(symbol, preprocessed, _length);
-		//BARCODE_AUSPOST: error_number := australia_post(symbol, preprocessed, _length);
-		//BARCODE_AUSREPLY: error_number := australia_post(symbol, preprocessed, _length);
-		//BARCODE_AUSROUTE: error_number := australia_post(symbol, preprocessed, _length);
-		//BARCODE_AUSREDIRECT: error_number := australia_post(symbol, preprocessed, _length);
+		BARCODE_AUSPOST: error_number := australia_post(symbol, preprocessed, _length);
+		BARCODE_AUSREPLY: error_number := australia_post(symbol, preprocessed, _length);
+		BARCODE_AUSROUTE: error_number := australia_post(symbol, preprocessed, _length);
+		BARCODE_AUSREDIRECT: error_number := australia_post(symbol, preprocessed, _length);
 		//BARCODE_CODE16K: error_number := code16k(symbol, preprocessed, _length);
-		//BARCODE_PHARMA_TWO: error_number := pharma_two(symbol, preprocessed, _length);
+		BARCODE_PHARMA_TWO: error_number := pharma_two(symbol, preprocessed, _length);
 		//BARCODE_ONECODE: error_number := imail(symbol, preprocessed, _length);
 		//BARCODE_ISBNX: error_number := eanx(symbol, preprocessed, _length);
 		//BARCODE_RSS14: error_number := rss14(symbol, preprocessed, _length);
@@ -399,10 +399,10 @@ begin
 		//BARCODE_RSS14_OMNI_CC: error_number := composite(symbol, preprocessed, _length);
 		//BARCODE_RSS_EXPSTACK_CC: error_number := composite(symbol, preprocessed, _length);
 		//BARCODE_KIX: error_number := kix_code(symbol, preprocessed, _length);
-		//BARCODE_CODE32: error_number := code32(symbol, preprocessed, _length);
+		BARCODE_CODE32: error_number := code32(symbol, preprocessed, _length);
 		//BARCODE_DAFT: error_number := daft_code(symbol, preprocessed, _length);
 		BARCODE_EAN14: error_number := ean_14(symbol, preprocessed, _length);
-		//BARCODE_AZRUNE: error_number := aztec_runes(symbol, preprocessed, _length);
+		BARCODE_AZRUNE: error_number := aztec_runes(symbol, preprocessed, _length);
 		//BARCODE_KOREAPOST: error_number := korea_post(symbol, preprocessed, _length);
 		BARCODE_HIBC_128: error_number := hibc(symbol, preprocessed, _length);
 		BARCODE_HIBC_39: error_number := hibc(symbol, preprocessed, _length);
@@ -420,7 +420,7 @@ begin
 		//BARCODE_PDF417TRUNC: error_number := pdf417enc(symbol, preprocessed, _length);
 		//BARCODE_MICROPDF417: error_number := micro_pdf417(symbol, preprocessed, _length);
 		BARCODE_MAXICODE: error_number := maxicode(symbol, preprocessed, _length);
-		//BARCODE_AZTEC: error_number := aztec(symbol, preprocessed, _length);
+		BARCODE_AZTEC: error_number := aztec(symbol, preprocessed, _length);
   end;
 
 	result := error_number; exit;

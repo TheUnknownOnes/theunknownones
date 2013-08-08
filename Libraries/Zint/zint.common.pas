@@ -61,9 +61,21 @@ function is_extendable(symbology : Integer) : Integer;
 function istwodigits(const source : AnsiString; position : Integer) : Integer;
 function latin1_process(var symbol : zint_symbol; const source : AnsiString; var preprocessed : AnsiString; var _length : Integer) : Integer;
 
+procedure bscan(var binary : AnsiString; data : Integer; h : Integer);
+
 function nitems(a : TArrayOfInteger) : Integer; overload;
 
 implementation
+
+procedure strcpy(out target : AnsiString; const source : AnsiString);
+begin
+  target := source;
+end;
+
+function strlen(const data : AnsiString) : Integer;
+begin
+  Result := Length(data);
+end;
 
 function ustrlen(data : AnsiString) : Integer;
 { Local replacement for strlen() with uint8_t strings }
@@ -301,19 +313,21 @@ begin
 	result := 0; exit;
 end;
 
+procedure bscan(var binary : AnsiString; data : Integer; h : Integer);
+begin
+  while h <> 0 do
+  begin
+    if (data and h) <> 0 then
+      concat(binary, '1')
+    else
+      concat(binary, '0');
+    h := h shr 1;
+  end;
+end;
+
 function nitems(a : TArrayOfInteger) : Integer; overload;
 begin
   Result := Length(a);
-end;
-
-procedure strcpy(out target : AnsiString; const source : AnsiString);
-begin
-  target := source;
-end;
-
-function strlen(const data : AnsiString) : Integer;
-begin
-  Result := Length(data);
 end;
 
 end.
