@@ -22,14 +22,14 @@ interface
 uses
   zint.zint;
 
-function matrix_two_of_five(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function industrial_two_of_five(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function iata_two_of_five(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function logic_two_of_five(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function interleaved_two_of_five(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function itf14(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function dpleit(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function dpident(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function matrix_two_of_five(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function industrial_two_of_five(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function iata_two_of_five(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function logic_two_of_five(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function interleaved_two_of_five(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function itf14(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function dpleit(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function dpident(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
@@ -51,7 +51,7 @@ begin
 end;
 
 { Code 2 of 5 Standard (Code 2 of 5 Matrix) }
-function matrix_two_of_five(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function matrix_two_of_five(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   i, error_number : Integer;
   dest : AnsiString; { 6 + 80 * 6 + 6 + 1 ~ 512 }
@@ -88,7 +88,7 @@ begin
 end;
 
 { Code 2 of 5 Industrial }
-function industrial_two_of_five(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function industrial_two_of_five(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   error_number : Integer;
   dest : AnsiString; { 6 + 40 * 10 + 6 + 1 }
@@ -123,7 +123,7 @@ begin
 end;
 
 { Code 2 of 5 IATA }
-function iata_two_of_five(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function iata_two_of_five(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   error_number : Integer;
   dest : AnsiString; { 4 + 45 * 10 + 3 + 1 }
@@ -158,7 +158,7 @@ begin
 end;
 
 { Code 2 of 5 Data Logic }
-function logic_two_of_five(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function logic_two_of_five(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   error_number : Integer;
   dest : AnsiString; { 4 + 80 * 6 + 3 + 1 }
@@ -193,7 +193,7 @@ begin
 end;
 
 { Code 2 of 5 Interleaved }
-function interleaved_two_of_five(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function interleaved_two_of_five(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   error_number : Integer;
   bars, spaces, mixed, dest : AnsiString;
@@ -255,7 +255,7 @@ begin
   result := error_number; exit;
 end;
 
-function itf14(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function itf14(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   error_number, zeroes : Integer;
   count : Cardinal;
@@ -303,7 +303,7 @@ begin
 end;
 
 { Deutsche Post Leitcode }
-function dpleit(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function dpleit(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   error_number : Integer;
   count : Cardinal;
@@ -346,7 +346,7 @@ begin
 end;
 
 { Deutsche Post Identcode }
-function dpident(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function dpident(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   error_number, zeroes : Integer;
   count : Cardinal;

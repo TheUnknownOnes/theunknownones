@@ -9,7 +9,6 @@ uses
 type
   TForm46 = class(TForm)
     imgResult: TImage;
-    Label1: TLabel;
     Panel1: TPanel;
     edData: TEdit;
     comType: TComboBox;
@@ -30,7 +29,7 @@ implementation
 
 {$R *.dfm}
 
-uses zint._library, zint.bmp, zint.zint;
+uses zint.zint;
 
 type
   BCTypeEntry = record
@@ -39,7 +38,7 @@ type
   end;
 
 const
-  SupportedTypes : array[0..34] of BCTypeEntry =((N : '2 of 5 Matrix'; T : BARCODE_C25MATRIX),
+  SupportedTypes : array[0..36] of BCTypeEntry =((N : '2 of 5 Matrix'; T : BARCODE_C25MATRIX),
                                                 (N : '2 of 5 Industrial'; T : BARCODE_C25IND),
                                                 (N : '2 of 5 Interleaved'; T : BARCODE_C25INTER),
                                                 (N : '2 of 5 IATA'; T : BARCODE_C25IATA),
@@ -73,7 +72,9 @@ const
                                                 (N : 'HIBC Aztec'; T : BARCODE_HIBC_AZTEC),
                                                 (N : 'Datamatrix'; T : BARCODE_DATAMATRIX),
                                                 (N : 'Maxicode'; T : BARCODE_MAXICODE),
-                                                (N : 'Aztec'; T : BARCODE_AZTEC)
+                                                (N : 'Aztec'; T : BARCODE_AZTEC),
+                                                (N : 'Code 16k'; T : BARCODE_CODE16K),
+                                                (N : 'Code 49'; T : BARCODE_CODE49)
                                                );
 
 procedure TForm46.comTypeChange(Sender: TObject);
@@ -103,28 +104,26 @@ end;
 
 procedure TForm46.GenBarcode;
 var
-  symbol : zint_symbol;
-  bmp : TBitmap;
+  symbol : TZintSymbol;
+  wmf : TZintMetafile;
 begin
-  Label1.Caption := '';
   imgResult.Picture.Graphic := nil;
 
-  symbol := ZBarcode_Create;
+  symbol := TZintSymbol.Create;
   symbol.symbology := SupportedTypes[comType.ItemIndex].T;
   symbol.show_hrt := 0;
   symbol.input_mode := UNICODE_MODE;
-  if ZBarcode_Encode(symbol, UTF8Encode(edData.Text)) = 0 then
-  begin
-    bmp := TBitmap.Create;
-    try
-      bmp_handle(symbol, bmp);
-      imgResult.Picture.Graphic := bmp;
-    finally
-      bmp.Free;
-    end;
-  end
-  else
-    Label1.Caption := symbol.errtxt;
+  symbol.show_hrt := 1;
+  symbol.Encode(UTF8Encode(edData.Text), false);
+  wmf:=TZintMetafile.Create;
+  try
+    symbol.Render(wmf);
+    imgResult.Picture.Graphic := wmf;
+  finally
+    wmf.Free
+  end;
+
+  symbol.Free;
 end;
 
 end.

@@ -22,11 +22,11 @@ interface
 uses
   SysUtils, zint.zint;
 
-function code_11(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function c39(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function pharmazentral(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function ec39(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function c93(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function code_11(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function c39(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function pharmazentral(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function ec39(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function c93(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
@@ -90,7 +90,7 @@ const C93Table : array[0..46] of AnsiString = ('131112', '111213', '111312', '11
 { *********************** CODE 11 ******************** }
 
 { Code 11 }
-function code_11(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function code_11(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   i : Cardinal;
   h, c_digit, c_weight, c_count, k_digit, k_weight, k_count : Integer;
@@ -173,7 +173,7 @@ begin
 end;
 
 { Code 39 }
-function c39(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function c39(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   i : Cardinal;
   counter : Cardinal;
@@ -284,7 +284,7 @@ begin
 end;
 
 { Pharmazentral Nummer (PZN) }
-function pharmazentral(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function pharmazentral(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   i, error_number, zeroes : Integer;
   count, check_digit : Cardinal;
@@ -332,7 +332,7 @@ end;
 { ************** EXTENDED CODE 39 *************** }
 
 { Extended Code 39 - ISO/IEC 16388:2007 Annex A }
-function ec39(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function ec39(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   buffer : AnsiString;
   i : Cardinal;
@@ -374,7 +374,7 @@ end;
 { ******************** CODE 93 ******************* }
 
 { Code 93 is an advancement on Code 39 and the definition is a lot tighter }
-function c93(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function c93(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   { SILVER includes the extra characters a, b, c and d to represent Code 93 specific
      shift characters 1, 2, 3 and 4 respectively. These characters are never used by

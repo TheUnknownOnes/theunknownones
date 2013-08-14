@@ -22,10 +22,10 @@ interface
 uses
   zint.zint;
 
-function code_128(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function ean_128(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function nve_18(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function ean_14(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function code_128(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function ean_128(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function nve_18(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function ean_14(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
@@ -33,17 +33,6 @@ uses
   zint.common, zint.gs1;
 
 const
-  _TRUE = 1;
-  _FALSE = 0;
-  SHIFTA = 90;
-  LATCHA = 91;
-  SHIFTB = 92;
-  LATCHB = 93;
-  SHIFTC = 94;
-  LATCHC = 95;
-  AORB = 96;
-  ABORC = 97;
-
   DPDSET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*';
 
 var
@@ -67,42 +56,19 @@ const
   	'2331112');
   { Code 128 character encodation - Table 1 }
 
-function parunmodd(llyth : AnsiChar) : Integer;
-var
-  modd : Integer;
-  _llyth : Byte absolute llyth;
-begin
-	modd := SHIFTB;
-
-	if (_llyth <= 31) then
-    modd := SHIFTA
-	else if ((_llyth >= 48) and (_llyth <= 57)) then
-    modd := ABORC
-	else if (_llyth <= 95) then
-    modd := AORB
-	else if (_llyth <= 127) then
-    modd := SHIFTB
-	else if (_llyth <= 159) then
-    modd := SHIFTA
-	else if (_llyth <= 223) then
-    modd := AORB;
-
-	result := modd; exit;
-end;
-
  {
  * bring together same type blocks
  }
-procedure grwp(indexliste : PInteger);
+procedure grwp(var indexliste : Integer);
 var
   i, j : Integer;
 begin
-	if (indexliste^ <= 1) then
+	if (indexliste <= 1) then
     exit;
 
   //because i is modified inside the loop, we have to use "while"
   i := 1;
-	while i < indexliste^ do
+	while i < indexliste do
   begin
 		if (list[1][i - 1] = list[1][i]) then
     begin
@@ -110,12 +76,12 @@ begin
 			list[0][i - 1] := list[0][i - 1] + list[0][i];
 
 			{ decreace the list }
-			for j := i + 1 to indexliste^ - 1 do
+			for j := i + 1 to indexliste - 1 do
       begin
 				list[0][j - 1] := list[0][j];
 				list[1][j - 1] := list[1][j];
       end;
-			Dec(indexliste^);
+			Dec(indexliste);
 			Dec(i);
 		end;
     Inc(i);
@@ -125,11 +91,11 @@ end;
  {
  * Implements rules from ISO 15417 Annex E
  }
-procedure dxsmooth(indexliste : PInteger);
+procedure dxsmooth(var indexliste : Integer);
 var
 	i, current, _length, last, next : Integer;
 begin
-	for i := 0  to indexliste^ - 1 do
+	for i := 0  to indexliste - 1 do
   begin
 		current := list[1][i];
 		_length := list[0][i];
@@ -139,14 +105,14 @@ begin
     else
       last := _FALSE;
 
-		if (i <> indexliste^ - 1) then
+		if (i <> indexliste - 1) then
       next := list[1][i + 1]
     else
       next := _FALSE;
 
 		if(i = 0) then
     begin { first block }
-			if ((indexliste^ = 1) and ((_length = 2) and (current = ABORC))) then
+			if ((indexliste = 1) and ((_length = 2) and (current = ABORC))) then
         { Rule 1a }
         list[1][i] := LATCHC;
 
@@ -239,7 +205,7 @@ end;
  * Translate Code 128 Set A characters into barcodes.
  * This set handles all control characters NULL to US.
  }
-procedure c128_set_a(source : AnsiChar; var dest : AnsiString; var values : array of Integer; bar_chars : PInteger);
+procedure c128_set_a(source : AnsiChar; var dest : AnsiString; var values : TArrayOfInteger; var bar_chars : Integer);
 var
   _source : Byte absolute source;
 begin
@@ -252,8 +218,8 @@ begin
 		_source := _source - 32;
 
 	dest := dest + C128Table[_source];
-	values[bar_chars^] := _source;
-  Inc(bar_chars^);
+	values[bar_chars] := _source;
+  Inc(bar_chars);
 end;
 
  {
@@ -261,7 +227,7 @@ end;
  * This set handles all characters which are not part of long numbers and not
  * control characters.
  }
-procedure c128_set_b(source : AnsiChar; var dest : AnsiString; var values : array of Integer; bar_chars : PInteger);
+procedure c128_set_b(source : AnsiChar; var dest : AnsiString; var values : TArrayOfInteger; var bar_chars : Integer);
 var
   _source : Byte absolute source;
 begin
@@ -270,31 +236,31 @@ begin
 	_source := _source - 32;
 
 	dest := dest + C128Table[_source];
-	values[bar_chars^] := _source;
-  Inc(bar_chars^);
+	values[bar_chars] := _source;
+  Inc(bar_chars);
 end;
 
  {
  * Translate Code 128 Set C characters into barcodes.
  * This set handles numbers in a compressed form.
  }
-procedure c128_set_c(source_a : AnsiChar; source_b : AnsiChar; var dest : AnsiString; var values : array of Integer; bar_chars : PInteger);
+procedure c128_set_c(source_a : AnsiChar; source_b : AnsiChar; var dest : AnsiString; var values : TArrayOfInteger; var bar_chars : Integer);
 var
   weight : Integer;
  begin
 	weight := (10 * ctoi(source_a)) + ctoi(source_b);
 	dest := dest + C128Table[weight];
-	values[bar_chars^] := weight;
-	Inc(bar_chars^);
+	values[bar_chars] := weight;
+	Inc(bar_chars);
 end;
 
  {
  * Handle Code 128 and NVE-18.
  }
-function code_128(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function code_128(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   i, j, k, bar_characters, read, total_sum : Integer;
-  values : array[0..169] of Integer;
+  values : TArrayOfInteger;
   error_number, indexchaine, indexliste, sourcelen, f_state : Integer;
   _set, fset : AnsiString;
   last_set, current_set : AnsiChar;
@@ -302,7 +268,8 @@ var
   glyph_count : Single;
   dest : AnsiString;
 begin
-  FillChar(values, Length(values), 0);
+  SetLength(values, 170);
+  FillChar(values[1], Length(values), 0);
   current_set := ' ';
   //Filling with spaces is done later
 	error_number := 0;
@@ -400,7 +367,7 @@ begin
 		Inc(indexliste);
 	until not (indexchaine <= sourcelen);
 
-	dxsmooth(@indexliste);
+	dxsmooth(indexliste);
 
 	{ Resolve odd length LATCHC blocks }
 	if ((list[1][0] = LATCHC) and ((list[0][0] and 1) <> 0)) then
@@ -700,18 +667,18 @@ begin
 		  'a',
 			'A':
       begin
-        c128_set_a(source[read], dest, values, @bar_characters);
+        c128_set_a(source[read], dest, values, bar_characters);
 				Inc(read);
 			end;
 			'b',
 			'B':
       begin
-        c128_set_b(source[read], dest, values, @bar_characters);
+        c128_set_b(source[read], dest, values, bar_characters);
 				Inc(read);
 			end;
 			'C':
       begin
-        c128_set_c(source[read], source[read + 1], dest, values, @bar_characters);
+        c128_set_c(source[read], source[read + 1], dest, values, bar_characters);
 				Inc(read, 2);
       end;
     end;
@@ -734,10 +701,10 @@ begin
 	result := error_number; exit;
 end;
 
-function ean_128(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 { Handle EAN-128 (Now known as GS1-128) }
+function ean_128(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
-  values : array[0..169] of Integer;
+  values : TArrayOfInteger;
   bar_characters, read, total_sum : Integer;
   error_number, indexchaine, indexliste : Integer;
   _set : AnsiString;
@@ -749,6 +716,7 @@ var
   reduced : AnsiString;
   i, j : Integer;
 begin
+  SetLength(values, 170);
 	error_number := 0;
 	dest := '';
 	linkage_flag := 0;
@@ -817,7 +785,7 @@ begin
 		Inc(indexliste);
 	until not (indexchaine <= strlen(reduced));
 
-	dxsmooth(@indexliste);
+	dxsmooth(indexliste);
 
 	{ Put set data into _set[] }
 	read := 1;
@@ -983,18 +951,18 @@ begin
 				'A',
 				'a':
         begin
-					c128_set_a(reduced[read], dest, values, @bar_characters);
+					c128_set_a(reduced[read], dest, values, bar_characters);
 					Inc(read);
 				end;
 				'B',
 				'b':
         begin
-					c128_set_b(reduced[read], dest, values, @bar_characters);
+					c128_set_b(reduced[read], dest, values, bar_characters);
 					Inc(read);
 				end;
 				'C':
         begin
-					c128_set_c(reduced[read], reduced[read + 1], dest, values, @bar_characters);
+					c128_set_c(reduced[read], reduced[read + 1], dest, values, bar_characters);
 					Inc(read, 2);
 				end;
 			end;
@@ -1087,7 +1055,7 @@ begin
 	result := error_number; exit;
 end;
 
-function nve_18(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function nve_18(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 { Add check digit if encoding an NVE18 symbol }
 var
   error_number, zeroes, nve_check, total_sum, sourcelen : Integer;
@@ -1133,7 +1101,7 @@ begin
 	result := error_number; exit;
 end;
 
-function ean_14(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function ean_14(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 { EAN-14 - A version of EAN-128 }
 var
   count, check_digit : Integer;

@@ -22,8 +22,8 @@ interface
 uses
   SysUtils, zint.common, zint.zint;
 
-function gs1_verify(var symbol : zint_symbol; source : AnsiString; var reduced : AnsiString) : Integer;
-function ugs1_verify(var symbol : zint_symbol; source : AnsiString; var reduced : AnsiString) : Integer;
+function gs1_verify(symbol : zint_symbol; source : AnsiString; var reduced : AnsiString) : Integer;
+function ugs1_verify(symbol : zint_symbol; source : AnsiString; var reduced : AnsiString) : Integer;
 
 implementation
 
@@ -48,7 +48,7 @@ begin
 	ai_string := ai_string + ')';
 end;
 
-function gs1_verify(var symbol : zint_symbol; source : AnsiString; var reduced : AnsiString) : Integer;
+function gs1_verify(symbol : zint_symbol; source : AnsiString; var reduced : AnsiString) : Integer;
 var
   i, j, last_ai, ai_latch : Integer;
   ai_string : AnsiString;
@@ -301,7 +301,7 @@ begin
 	result := 0; exit;
 end;
 
-function ugs1_verify(var symbol : zint_symbol; source : AnsiString; var reduced : AnsiString) : Integer;
+function ugs1_verify(symbol : zint_symbol; source : AnsiString; var reduced : AnsiString) : Integer;
 var
   temp : AnsiString;
   error_number : Integer;
