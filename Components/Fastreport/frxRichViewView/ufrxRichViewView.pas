@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Classes, frxClass, frxDsgnIntf, fs_iinterpreter, Graphics, frxPrinter,
-  Dialogs, RichView, RVReport, Forms, Math, ZLib, Printers, StrUtils;
+  Dialogs, RichView, RVReport, Forms, Math, ZLib, Printers, StrUtils, CRVData,
+  RVTable, RVItem;
 
 type
   TfrxCustomRichViewView = class(TfrxStretcheable)
@@ -16,6 +17,8 @@ type
     FContent: String;
     FExpressionDelimiters: String;
     procedure DoDrawMetafile;
+    procedure HandleRVTable(DelimStart: string; DelimEnd: string; lenDelimStart: Integer; lenDelimEnd: Integer; ARVTable: TRVTableItemInfo);
+    procedure HandleRVData(DelimStart: string; DelimEnd: string; lenDelimStart: Integer; lenDelimEnd: Integer; RVData: TCustomRVData);
 //    function UsePrinterCanvas: Boolean;
   protected
     procedure DefineProperties(Filer: TFiler); override;
@@ -204,12 +207,7 @@ end;
 
 procedure TfrxCustomRichViewView.EvaluateContent;
 var
-  ItemText : string;
-  EvaluateText : string;
-  EvaluateResult : string;
   RVData : TRichViewRVData;
-  i : Integer;
-  StartPos, EndPos : Integer;
   Delims : TStringList;
   DelimStart, DelimEnd : String;
   lenDelimStart, lenDelimEnd: integer;
@@ -234,33 +232,61 @@ begin
   lenDelimEnd:=Length(DelimEnd);
 
   RVData:=ReportHelper.RichView.RVData;
+  HandleRVData(DelimStart, DelimEnd, lenDelimStart, lenDelimEnd, RVData);
+end;
 
+procedure TfrxCustomRichViewView.HandleRVTable(DelimStart: string; DelimEnd: string; lenDelimStart: Integer; lenDelimEnd: Integer; ARVTable: TRVTableItemInfo);
+var
+  row: Integer;
+  col: Integer;
+begin
+  for row := 0 to ARVTable.RowCount - 1 do
+    for col := 0 to ARVTable.ColCount - 1 do
+      HandleRVData(DelimStart, DelimEnd, lenDelimStart, lenDelimEnd, ARVTable.Cells[row, col].GetRVData);
+end;
+
+procedure TfrxCustomRichViewView.HandleRVData(DelimStart: string; DelimEnd: string; lenDelimStart: Integer; lenDelimEnd: Integer; RVData: TCustomRVData);
+var
+  i: Integer;
+  EndPos: Integer;
+  EvaluateResult: string;
+  StartPos: Integer;
+  EvaluateText: string;
+  ItemText: string;
+  Item : TCustomRVItemInfo;
+begin
   for I := 0 to RVData.Items.Count - 1 do
   begin
-    ItemText:=RVData.GetItemText(i);
+    Item:=RVData.GetItem(i);
 
-    StartPos:=1;
-
-    repeat
-      StartPos:=PosEx(DelimStart, ItemText, StartPos);
-      if StartPos>0 then
-      begin
-        EndPos:=PosEx(DelimEnd, ItemText, StartPos+lenDelimStart);
-        if EndPos> 0 then
+    if Item is TRVTableItemInfo then
+    begin
+      HandleRVTable(DelimStart, DelimEnd, lenDelimStart, lenDelimEnd, TRVTableItemInfo(item))
+    end
+    else
+    if Item is TRVTextItemInfo then
+    begin
+      ItemText := RVData.GetItemText(i);
+      StartPos := 1;
+      repeat
+        StartPos := PosEx(DelimStart, ItemText, StartPos);
+        if StartPos > 0 then
         begin
-          EvaluateText:=copy(ItemText, StartPos+lenDelimStart, EndPos-(StartPos+lenDelimStart));
-          Delete(ItemText, StartPos, EndPos-StartPos+lenDelimEnd);
-          EvaluateResult:=Report.Script.Evaluate(EvaluateText);
-          Insert(EvaluateResult, ItemText, StartPos);
-          Inc(StartPos, Length(EvaluateResult));
-        end
-        else
-          break;
-      end;
-    until StartPos=0;
-
-    RVData.SetItemText(i,ItemText);
-    RVData.Refresh;
+          EndPos := PosEx(DelimEnd, ItemText, StartPos + lenDelimStart);
+          if EndPos > 0 then
+          begin
+            EvaluateText := copy(ItemText, StartPos + lenDelimStart, EndPos - (StartPos + lenDelimStart));
+            Delete(ItemText, StartPos, EndPos - StartPos + lenDelimEnd);
+            EvaluateResult := Report.Script.Evaluate(EvaluateText);
+            Insert(EvaluateResult, ItemText, StartPos);
+            Inc(StartPos, Length(EvaluateResult));
+          end
+          else
+            break;
+        end;
+      until StartPos = 0;
+      RVData.SetItemText(i, ItemText);
+    end;
   end;
 end;
 
