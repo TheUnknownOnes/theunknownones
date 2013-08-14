@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Classes, frxClass, frxDsgnIntf, fs_iinterpreter, Graphics, frxPrinter,
-  Dialogs, RichView, RVReport, Forms, Math, ZLib, Printers;
+  Dialogs, RichView, RVReport, Forms, Math, ZLib, Printers, StrUtils;
 
 type
   TfrxCustomRichViewView = class(TfrxStretcheable)
@@ -14,6 +14,7 @@ type
     FReportHelper: TRVReportHelper;
     FFileName: String;
     FContent: String;
+    FExpressionDelimiters: String;
     procedure DoDrawMetafile;
 //    function UsePrinterCanvas: Boolean;
   protected
@@ -36,6 +37,9 @@ type
 
     procedure LoadFromFile(AFileName: String);
     procedure LoadContentFromStream(AStream: TStream);
+    procedure EvaluateContent;
+
+    property ExpressionDelimiters : String read FExpressionDelimiters write FExpressionDelimiters;
     property ReportHelper : TRVReportHelper read FReportHelper;
 
     property FileName : String read FFileName write FFileName;
@@ -52,13 +56,15 @@ type
 
     property FileName;
     property Content;
+
+    property ExpressionDelimiters;
   end;
 
 
 implementation
 
 uses
-  RVStyle, RVScroll, SysUtils, Variants;
+  RVStyle, RVScroll, SysUtils, Variants, RVRVData;
 
 { TfrxCustomRichViewView }
 
@@ -136,6 +142,8 @@ begin
   FReportHelper.RichView.LeftMargin:=0;
   FReportHelper.RichView.BottomMargin:=0;
   FReportHelper.RichView.RightMargin:=0;
+
+  FExpressionDelimiters:='[,]';
 end;
 
 procedure TfrxCustomRichViewView.DefineProperties(Filer: TFiler);
@@ -191,6 +199,68 @@ begin
     end
     else
       Result:=0;
+  end;
+end;
+
+procedure TfrxCustomRichViewView.EvaluateContent;
+var
+  ItemText : string;
+  EvaluateText : string;
+  EvaluateResult : string;
+  RVData : TRichViewRVData;
+  i : Integer;
+  StartPos, EndPos : Integer;
+  Delims : TStringList;
+  DelimStart, DelimEnd : String;
+  lenDelimStart, lenDelimEnd: integer;
+begin
+  Delims := TStringList.Create;
+  Delims.StrictDelimiter:=True;
+  Delims.Delimiter:=',';
+  Delims.DelimitedText:=FExpressionDelimiters;
+  if Delims.Count>=2 then
+  begin
+    DelimStart:=Delims[0];
+    DelimEnd:=Delims[1];
+  end
+  else
+  begin
+    DelimStart:=#0;
+    DelimEnd:=#0;
+  end;
+  Delims.Free;
+
+  lenDelimStart:=Length(DelimStart);
+  lenDelimEnd:=Length(DelimEnd);
+
+  RVData:=ReportHelper.RichView.RVData;
+
+  for I := 0 to RVData.Items.Count - 1 do
+  begin
+    ItemText:=RVData.GetItemText(i);
+
+    StartPos:=1;
+
+    repeat
+      StartPos:=PosEx(DelimStart, ItemText, StartPos);
+      if StartPos>0 then
+      begin
+        EndPos:=PosEx(DelimEnd, ItemText, StartPos+lenDelimStart);
+        if EndPos> 0 then
+        begin
+          EvaluateText:=copy(ItemText, StartPos+lenDelimStart, EndPos-(StartPos+lenDelimStart));
+          Delete(ItemText, StartPos, EndPos-StartPos+lenDelimEnd);
+          EvaluateResult:=Report.Script.Evaluate(EvaluateText);
+          Insert(EvaluateResult, ItemText, StartPos);
+          Inc(StartPos, Length(EvaluateResult));
+        end
+        else
+          break;
+      end;
+    until StartPos=0;
+
+    RVData.SetItemText(i,ItemText);
+    RVData.Refresh;
   end;
 end;
 
@@ -257,12 +327,14 @@ procedure TfrxCustomRichViewView.LoadFromFile(AFileName: String);
 begin
   ReportHelper.RichView.Clear;
   ReportHelper.RichView.LoadRVF(AFileName);
+  EvaluateContent;
 end;
 
 procedure TfrxCustomRichViewView.LoadContentFromStream(AStream: TStream);
 begin
   ReportHelper.RichView.Clear;
   ReportHelper.RichView.LoadRVFFromStream(AStream);
+  EvaluateContent;
 end;
 
 procedure TfrxCustomRichViewView.DoDrawMetafile;
