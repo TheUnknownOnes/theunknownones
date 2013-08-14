@@ -1,0 +1,54 @@
+object formZintTest: TformZintTest
+  Left = 454
+  Height = 277
+  Top = 143
+  Width = 617
+  Caption = 'formZintTest'
+  ClientHeight = 277
+  ClientWidth = 617
+  OnCreate = FormCreate
+  OnShow = FormShow
+  LCLVersion = '1.1'
+  object Panel1: TPanel
+    Left = 0
+    Height = 23
+    Top = 0
+    Width = 617
+    Align = alTop
+    BevelOuter = bvNone
+    ClientHeight = 23
+    ClientWidth = 617
+    TabOrder = 0
+    object edData: TEdit
+      Left = 0
+      Height = 23
+      Top = 0
+      Width = 408
+      Align = alClient
+      OnChange = edDataChange
+      TabOrder = 0
+      Text = '123456'
+    end
+    object comType: TComboBox
+      Left = 408
+      Height = 23
+      Top = 0
+      Width = 209
+      Align = alRight
+      ItemHeight = 15
+      OnChange = comTypeChange
+      Style = csDropDownList
+      TabOrder = 1
+    end
+  end
+  object imgResult: TImage
+    Left = 0
+    Height = 254
+    Top = 23
+    Width = 617
+    Align = alClient
+    Center = True
+    Proportional = True
+    Stretch = True
+  end
+end
