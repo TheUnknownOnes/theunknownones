@@ -22,10 +22,10 @@ interface
 uses
   SysUtils, zint.zint;
 
-function pharma_one(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function pharma_two(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function codabar(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function code32(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function pharma_one(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function pharma_two(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function codabar(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function code32(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
@@ -38,7 +38,7 @@ const CodaTable : array[0..19] of AnsiString = ('11111221', '11112211', '1112112
 	'12111121', '12112111', '12211111', '21121111', '11122111', '11221111', '21112121', '21211121',
 	'21212111', '11212121', '11221211', '12121121', '11121221', '11122211');
 
-function pharma_one(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function pharma_one(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
   { 'Pharmacode can represent only a single integer from 3 to 131070. Unlike other
      commonly used one-dimensional barcode schemes, pharmacode does not store the data in a
      form corresponding to the human-readable digits; the number is encoded in binary, rather
@@ -106,7 +106,7 @@ begin
   result := error_number; exit;
 end;
 
-function pharma_two_calc(var symbol : zint_symbol; source : AnsiString; out dest : AnsiString) : Integer;
+function pharma_two_calc(symbol : zint_symbol; source : AnsiString; out dest : AnsiString) : Integer;
   { This code uses the Two Track Pharamacode defined in the document at
      http://www.laetus.com/laetus.php?request=file&id=69 and using a modified
      algorithm from the One Track system. This standard accepts integet values
@@ -154,7 +154,7 @@ begin
 end;
 
 { Draws the patterns for two track pharmacode }
-function pharma_two(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function pharma_two(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   height_pattern : AnsiString;
   loopey, h : Cardinal;
@@ -203,7 +203,7 @@ begin
 end;
 
 { The Codabar system consisting of simple substitution }
-function codabar(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function codabar(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   i, error_number : Integer;
   dest : AnsiString;
@@ -246,7 +246,7 @@ begin
 end;
 
 { Italian Pharmacode }
-function code32(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function code32(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   i, zeroes, error_number, checksum, checkpart, checkdigit : Integer;
   localstr, risultante : AnsiString;

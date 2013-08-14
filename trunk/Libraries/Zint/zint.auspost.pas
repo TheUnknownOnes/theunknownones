@@ -22,7 +22,7 @@ interface
 uses
   SysUtils, zint.zint;
 
-function australia_post(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function australia_post(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
@@ -88,7 +88,7 @@ begin
 end;
 
 { Handles Australia Posts's 4 State Codes }
-function australia_post(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function australia_post(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 { Customer Standard Barcode, Barcode 2 or Barcode 3 system determined automatically
    (i.e. the FCC doesn't need to be specified by the user) dependent
    on the _length of the input string }

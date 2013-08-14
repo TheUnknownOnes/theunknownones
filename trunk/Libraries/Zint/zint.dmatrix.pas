@@ -22,7 +22,7 @@ interface
 uses
   zint.zint;
 
-function dmatrix(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function dmatrix(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
@@ -416,7 +416,7 @@ begin
   result := best_scheme; exit;
 end;
 
-function dm200encode(var symbol : zint_symbol; source : AnsiString; var target : TArrayOfByte; var last_mode : Integer; _length : Integer) : Integer;
+function dm200encode(symbol : zint_symbol; source : AnsiString; var target : TArrayOfByte; var last_mode : Integer; _length : Integer) : Integer;
 { Encodes data using ASCII, C40, Text, X12, EDIFACT or Base 256 modes as appropriate }
 { Supports encoding FNC1 in supporting systems }
 var
@@ -439,13 +439,13 @@ begin
 
   sp := 1;
   tp := 0;
-  FillChar(c40_buffer, Length(c40_buffer), 0);
+  FillChar(c40_buffer[0], Length(c40_buffer), 0);
   c40_p := 0;
-  FillChar(text_buffer, Length(text_buffer), 0);
+  FillChar(text_buffer[0], Length(text_buffer), 0);
   text_p := 0;
-  FillChar(x12_buffer, Length(x12_buffer), 0);
+  FillChar(x12_buffer[0], Length(x12_buffer), 0);
   x12_p := 0;
-  FillChar(edifact_buffer, Length(edifact_buffer), 0);
+  FillChar(edifact_buffer[0], Length(edifact_buffer), 0);
   edifact_p := 0;
   strcpy(binary, '');
 
@@ -884,7 +884,7 @@ begin
   end;
 end;
 
-function data_matrix_200(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function data_matrix_200(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   skew : Integer;
   binary : TArrayOfByte;
@@ -1028,7 +1028,7 @@ begin
   result := error_number; exit;
 end;
 
-function dmatrix(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function dmatrix(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   error_number : Integer;
 begin

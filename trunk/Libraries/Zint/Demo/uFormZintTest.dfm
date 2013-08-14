@@ -2,8 +2,8 @@ object Form46: TForm46
   Left = 0
   Top = 0
   Caption = 'ZintTest'
-  ClientHeight = 248
-  ClientWidth = 459
+  ClientHeight = 522
+  ClientWidth = 958
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,8 +19,8 @@ object Form46: TForm46
     AlignWithMargins = True
     Left = 3
     Top = 44
-    Width = 453
-    Height = 182
+    Width = 952
+    Height = 475
     Align = alClient
     Center = True
     Proportional = True
@@ -30,33 +30,21 @@ object Form46: TForm46
     ExplicitWidth = 459
     ExplicitHeight = 198
   end
-  object Label1: TLabel
-    AlignWithMargins = True
-    Left = 3
-    Top = 232
-    Width = 453
-    Height = 13
-    Align = alBottom
-    Alignment = taCenter
-    ExplicitWidth = 3
-  end
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 459
+    Width = 958
     Height = 41
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 72
-    ExplicitTop = -3
     object edData: TEdit
       Left = 8
       Top = 8
       Width = 296
       Height = 21
       TabOrder = 0
-      Text = '12345'
+      Text = '1234598756'
       OnChange = edDataChange
     end
     object comType: TComboBox

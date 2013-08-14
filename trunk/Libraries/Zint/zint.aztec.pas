@@ -23,8 +23,8 @@ interface
 uses
   SysUtils, zint.zint;
 
-function aztec_runes(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function aztec(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function aztec_runes(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function aztec(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
@@ -922,7 +922,7 @@ begin
   result := 0; exit;
 end;
 
-function aztec(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function aztec(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   x, y, i, j, data_blocks, ecc_blocks, layers, total_bits : Integer;
   binary_string : AnsiString;
@@ -1555,7 +1555,7 @@ begin
   result := err_code; exit;
 end;
 
-function aztec_runes(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function aztec_runes(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   input_value, error_number : Integer;
   binary_string : AnsiString;

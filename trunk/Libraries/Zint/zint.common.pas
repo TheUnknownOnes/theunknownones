@@ -28,6 +28,16 @@ uses
 const
   _TRUE = 1;
   _FALSE = 0;
+  SHIFTA = 90;
+  LATCHA = 91;
+  SHIFTB = 92;
+  LATCHB = 93;
+  SHIFTC = 94;
+  LATCHC = 95;
+  AORB = 96;
+  ABORC = 97;
+  CANDB = 98;
+  CANDBB = 99;
 
   { The most commonly used set }
   NEON : AnsiString = '0123456789';
@@ -52,14 +62,15 @@ procedure to_upper(var source : AnsiString);
 function is_sane(const test_string : AnsiString; const source : AnsiString; _length : Integer) : Integer;
 function posn(const set_string : AnsiString; const data : AnsiString) : Integer;
 procedure lookup(const set_string : AnsiString; const table : array of AnsiString; const data : AnsiChar; var dest : AnsiString);
-function module_is_set(var symbol : zint_symbol; y_coord : Integer; x_coord : Integer) : Integer;
-procedure set_module(var symbol : zint_symbol; y_coord : Integer; x_coord : Integer);
-procedure unset_module(var symbol : zint_symbol; y_coord : Integer; x_coord : Integer);
-procedure expand(var symbol : zint_symbol; data : AnsiString);
+function module_is_set(symbol : zint_symbol; y_coord : Integer; x_coord : Integer) : Integer;
+procedure set_module(symbol : zint_symbol; y_coord : Integer; x_coord : Integer);
+procedure unset_module(symbol : zint_symbol; y_coord : Integer; x_coord : Integer);
+procedure expand(symbol : zint_symbol; data : AnsiString);
 function is_stackable(symbology : Integer) : Integer;
 function is_extendable(symbology : Integer) : Integer;
 function istwodigits(const source : AnsiString; position : Integer) : Integer;
-function latin1_process(var symbol : zint_symbol; const source : AnsiString; var preprocessed : AnsiString; var _length : Integer) : Integer;
+function parunmodd(llyth : AnsiChar) : Integer;
+function latin1_process(symbol : zint_symbol; const source : AnsiString; var preprocessed : AnsiString; var _length : Integer) : Integer;
 
 procedure bscan(var binary : AnsiString; data : Integer; h : Integer);
 
@@ -173,23 +184,23 @@ begin
 end;
 
 
-function module_is_set(var symbol : zint_symbol; y_coord : Integer; x_coord : Integer) : Integer;
+function module_is_set(symbol : zint_symbol; y_coord : Integer; x_coord : Integer) : Integer;
 begin
   result := (Ord(symbol.encoded_data[y_coord][x_coord div 7]) shr (x_coord mod 7)) and 1;
 end;
 
 
-procedure set_module(var symbol : zint_symbol; y_coord : Integer; x_coord : Integer);
+procedure set_module(symbol : zint_symbol; y_coord : Integer; x_coord : Integer);
 begin
 	symbol.encoded_data[y_coord][x_coord div 7] := ((symbol.encoded_data[y_coord][x_coord div 7]) or (1 shl (x_coord mod 7)));
 end;
 
-procedure unset_module(var symbol : zint_symbol; y_coord : Integer; x_coord : Integer);
+procedure unset_module(symbol : zint_symbol; y_coord : Integer; x_coord : Integer);
 begin
 	symbol.encoded_data[y_coord][x_coord div 7] := ((symbol.encoded_data[y_coord][x_coord div 7]) or (not (1 shl (x_coord mod 7))));
 end;
 
-procedure expand(var symbol : zint_symbol; data : AnsiString);
+procedure expand(symbol : zint_symbol; data : AnsiString);
 { Expands from a width pattern to a bit pattern */ }
 var
   reader, n : Cardinal;
@@ -270,7 +281,30 @@ begin
   result := 0; exit;
 end;
 
-function latin1_process(var symbol : zint_symbol; const source : AnsiString; var preprocessed : AnsiString; var _length : Integer) : Integer;
+function parunmodd(llyth : AnsiChar) : Integer;
+var
+  modd : Integer;
+  _llyth : Byte absolute llyth;
+begin
+	modd := SHIFTB;
+
+	if (_llyth <= 31) then
+    modd := SHIFTA
+	else if ((_llyth >= 48) and (_llyth <= 57)) then
+    modd := ABORC
+	else if (_llyth <= 95) then
+    modd := AORB
+	else if (_llyth <= 127) then
+    modd := SHIFTB
+	else if (_llyth <= 159) then
+    modd := SHIFTA
+	else if (_llyth <= 223) then
+    modd := AORB;
+
+	result := modd; exit;
+end;
+
+function latin1_process(symbol : zint_symbol; const source : AnsiString; var preprocessed : AnsiString; var _length : Integer) : Integer;
 { Convert Unicode to Latin-1 for those symbologies which only support Latin-1 }
 var
   i, next : Integer;

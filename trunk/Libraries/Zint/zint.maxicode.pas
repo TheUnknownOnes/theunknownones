@@ -22,7 +22,7 @@ interface
 uses
   SysUtils, zint.zint;
 
-function maxicode(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function maxicode(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
@@ -573,7 +573,7 @@ begin
     begin
       { Number compression }
       substring := '';
-      for j := 0 to 9 do
+      for j := 0 to 8 do //chaosben: original it counts up to 9, but i thinks thats a bug, because there are only 9 digits (0..8)
         substring := substring + AnsiChar(character[i + j]);
       value := StrToInt(substring);
 
@@ -691,7 +691,7 @@ begin
   maxi_codeword[9] := ((service and $3f0) shr 4);
 end;
 
-function maxicode(var symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function maxicode(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 var
   i, j, block, bit, mode, countrycode, service, lp : Integer;
   bit_pattern : TArrayOfInteger;
