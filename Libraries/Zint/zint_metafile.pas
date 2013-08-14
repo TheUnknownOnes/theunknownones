@@ -1,4 +1,4 @@
-unit zint.metafile;
+unit zint_metafile;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -23,14 +23,14 @@ unit zint.metafile;
 interface
 
 uses
-  Classes, SysUtils, Graphics, Types, zint.zint;
+  Classes, SysUtils, Graphics, Types, zint;
 
 function RenderSymbol(symbol : zint_symbol; ATarget : TZintMetafile) : Integer;
 
 implementation
 
 uses
-  zint.common;
+  zint_common;
 
 const SSET : AnsiString = '0123456789ABCDEF';
 

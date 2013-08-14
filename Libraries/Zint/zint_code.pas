@@ -1,4 +1,4 @@
-unit zint.code;
+unit zint_code;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -20,7 +20,7 @@ unit zint.code;
 interface
 
 uses
-  SysUtils, zint.zint;
+  SysUtils, zint;
 
 function code_11(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 function c39(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
@@ -31,7 +31,7 @@ function c93(symbol : zint_symbol; source : AnsiString; _length : Integer) : Int
 implementation
 
 uses
-  zint.common;
+  zint_common;
 
 const SODIUM : AnsiString	= '0123456789-';
 const SILVER : AnsiString =	'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%abcd';

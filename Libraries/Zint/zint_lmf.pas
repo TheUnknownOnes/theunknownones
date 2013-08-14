@@ -1,4 +1,4 @@
-unit zint.lmf;
+unit zint_lmf;
 
 // Source: http://bugs.freepascal.org/view.php?id=14333
 

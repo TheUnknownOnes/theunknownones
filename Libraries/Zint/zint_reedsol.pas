@@ -1,4 +1,4 @@
-unit zint.reedsol;
+unit zint_reedsol;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -20,7 +20,7 @@ unit zint.reedsol;
 interface
 
 uses
-  zint.common;
+  zint_common;
 
 procedure rs_init_gf(poly : Integer);
 procedure rs_init_code(nsym : Integer; index : Integer);

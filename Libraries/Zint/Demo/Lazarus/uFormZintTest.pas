@@ -34,7 +34,7 @@ implementation
 
 {$R *.lfm}
 
-uses zint.zint, zint.lmf;
+uses zint, zint_lmf;
 
 type
   BCTypeEntry = record

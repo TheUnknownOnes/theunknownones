@@ -1,4 +1,4 @@
-unit zint.medical;
+unit zint_medical;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -20,7 +20,7 @@ unit zint.medical;
 interface
 
 uses
-  SysUtils, zint.zint;
+  SysUtils, zint;
 
 function pharma_one(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 function pharma_two(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
@@ -30,7 +30,7 @@ function code32(symbol : zint_symbol; source : AnsiString; _length : Integer) : 
 implementation
 
 uses
-  zint.common, zint.code;
+  zint_common, zint_code;
 
 const CALCIUM	: AnsiString = '0123456789-$:/.+ABCD';
 

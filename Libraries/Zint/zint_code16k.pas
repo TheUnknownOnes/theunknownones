@@ -1,4 +1,4 @@
-unit zint.code16k;
+unit zint_code16k;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -20,13 +20,13 @@ unit zint.code16k;
 interface
 
 uses
-  SysUtils, zint.zint;
+  SysUtils, zint;
 
 function code16k(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
-uses zint.common;
+uses zint_common;
 
 var
   list : array[0..1] of array[0..169] of Integer;

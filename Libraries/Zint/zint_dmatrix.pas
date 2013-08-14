@@ -1,4 +1,4 @@
-unit zint.dmatrix;
+unit zint_dmatrix;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -20,14 +20,14 @@ unit zint.dmatrix;
 interface
 
 uses
-  zint.zint;
+  zint;
 
 function dmatrix(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
 uses
-  zint.reedsol, zint.common;
+  zint_reedsol, zint_common;
 
 const
   MAXBARCODE = 3116;
