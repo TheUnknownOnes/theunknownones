@@ -299,6 +299,8 @@ begin
       ss.Free;
     end;
   end;
+
+  EvaluateContent;
 end;
 
 class function TfrxCustomRichViewView.GetDescription: String;
