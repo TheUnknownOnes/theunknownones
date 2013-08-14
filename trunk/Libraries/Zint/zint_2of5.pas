@@ -1,4 +1,4 @@
-unit zint._2of5;
+unit zint_2of5;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -20,7 +20,7 @@ unit zint._2of5;
 interface
 
 uses
-  zint.zint;
+  zint;
 
 function matrix_two_of_five(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 function industrial_two_of_five(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
@@ -33,7 +33,7 @@ function dpident(symbol : zint_symbol; source : AnsiString; _length : Integer) :
 
 implementation
 
-uses zint.common;
+uses zint_common;
 
 const
   C25MatrixTable : array[0..9] of AnsiString = ('113311', '311131', '131131', '331111', '113131', '313111',

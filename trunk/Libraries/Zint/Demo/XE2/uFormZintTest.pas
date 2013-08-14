@@ -29,7 +29,7 @@ implementation
 
 {$R *.dfm}
 
-uses zint.zint;
+uses zint;
 
 type
   BCTypeEntry = record

@@ -1,4 +1,4 @@
-unit zint.auspost;
+unit zint_auspost;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -20,14 +20,14 @@ unit zint.auspost;
 interface
 
 uses
-  SysUtils, zint.zint;
+  SysUtils, zint;
 
 function australia_post(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
 uses
-  zint.reedsol, zint.common;
+  zint_reedsol, zint_common;
 
 const GDSET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz #';
 

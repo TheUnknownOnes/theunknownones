@@ -1,4 +1,4 @@
-unit zint.maxicode;
+unit zint_maxicode;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -20,14 +20,14 @@ unit zint.maxicode;
 interface
 
 uses
-  SysUtils, zint.zint;
+  SysUtils, zint;
 
 function maxicode(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
 uses
-  zint.common, zint.reedsol;
+  zint_common, zint_reedsol;
 
 var
   maxi_codeword : array[0..143] of Integer;

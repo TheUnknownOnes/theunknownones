@@ -43,6 +43,7 @@
         <Filename Value="uFormZintTest.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="formZintTest"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uFormZintTest"/>
       </Unit1>

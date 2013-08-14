@@ -1,4 +1,4 @@
-unit zint.zint;
+unit zint;
 {
   Based on Zint (done by Robin Stuart and the Zint team)
   http://github.com/zint/zint
@@ -23,7 +23,7 @@ unit zint.zint;
 interface
 
 uses
-  Classes, Graphics, SysUtils {$IFDEF FPC}, zint.lmf{$ENDIF};
+  Classes, Graphics, SysUtils {$IFDEF FPC}, zint_lmf{$ENDIF};
 
 const
   ZINT_ROWS_MAX = 178;
@@ -199,9 +199,9 @@ const
 
 implementation
 
-uses zint.dmatrix, zint.code128, zint.gs1, zint.common, zint._2of5,
-  zint.maxicode, zint.auspost, zint.aztec, zint.code, zint.medical,
-  zint.code16k, zint.code49, zint.metafile;
+uses zint_dmatrix, zint_code128, zint_gs1, zint_common, zint_2of5,
+  zint_maxicode, zint_auspost, zint_aztec, zint_code, zint_medical,
+  zint_code16k, zint_code49, zint_metafile;
 
 const
   TECHNETIUM : AnsiString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%';

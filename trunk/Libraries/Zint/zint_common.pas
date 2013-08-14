@@ -1,4 +1,4 @@
-unit zint.common;
+unit zint_common;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -23,7 +23,7 @@ unit zint.common;
 interface
 
 uses
- SysUtils, zint.zint;
+ SysUtils, zint;
 
 const
   _TRUE = 1;

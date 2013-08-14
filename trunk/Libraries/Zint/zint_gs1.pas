@@ -1,4 +1,4 @@
-unit zint.gs1;
+unit zint_gs1;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -20,7 +20,7 @@ unit zint.gs1;
 interface
 
 uses
-  SysUtils, zint.common, zint.zint;
+  SysUtils, zint_common, zint;
 
 function gs1_verify(symbol : zint_symbol; source : AnsiString; var reduced : AnsiString) : Integer;
 function ugs1_verify(symbol : zint_symbol; source : AnsiString; var reduced : AnsiString) : Integer;

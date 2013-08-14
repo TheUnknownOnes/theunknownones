@@ -1,4 +1,4 @@
-unit zint.code49;
+unit zint_code49;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -20,13 +20,13 @@ unit zint.code49;
 interface
 
 uses
-  SysUtils, zint.zint;
+  SysUtils, zint;
 
 function code_49(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
-uses zint.common;
+uses zint_common;
 
 { Table 7: Code 49 ASCII Chart }
 const c49_table7 : array[0..127] of AnsiString = (

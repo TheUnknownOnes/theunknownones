@@ -1,4 +1,4 @@
-unit zint.code128;
+unit zint_code128;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -20,7 +20,7 @@ unit zint.code128;
 interface
 
 uses
-  zint.zint;
+  zint;
 
 function code_128(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 function ean_128(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
@@ -30,7 +30,7 @@ function ean_14(symbol : zint_symbol; source : AnsiString; _length : Integer) : 
 implementation
 
 uses
-  zint.common, zint.gs1;
+  zint_common, zint_gs1;
 
 const
   DPDSET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*';

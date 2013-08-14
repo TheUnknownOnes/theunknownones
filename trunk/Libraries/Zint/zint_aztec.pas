@@ -1,4 +1,4 @@
-unit zint.aztec;
+unit zint_aztec;
 
 {
   Based on Zint (done by Robin Stuart and the Zint team)
@@ -21,14 +21,14 @@ unit zint.aztec;
 interface
 
 uses
-  SysUtils, zint.zint;
+  SysUtils, zint;
 
 function aztec_runes(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 function aztec(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
 
 implementation
 
-uses zint.common, zint.reedsol;
+uses zint_common, zint_reedsol;
 
 const
   UPPER	= 1;
@@ -951,7 +951,7 @@ begin
     result := ZERROR_INVALID_OPTION; exit;
   end;
 
-  //chaosben: imho, the following is a bug, because its done the second time (1st one in zint._library -> reduced_charset)
+  //chaosben: imho, the following is a bug, because its done the second time (1st one in zint__library -> reduced_charset)
   {case symbol.input_mode of
     DATA_MODE:
     GS1_MODE:
