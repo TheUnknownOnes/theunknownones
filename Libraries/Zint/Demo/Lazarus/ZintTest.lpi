@@ -33,7 +33,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="2">
+    <Units Count="3">
       <Unit0>
         <Filename Value="ZintTest.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -47,6 +47,11 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uFormZintTest"/>
       </Unit1>
+      <Unit2>
+        <Filename Value="..\..\zint_render_bmp.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_render_bmp"/>
+      </Unit2>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -23,20 +23,51 @@ unit zint;
 interface
 
 uses
-  Classes, Graphics, SysUtils {$IFDEF FPC}, zint_lmf{$ENDIF};
+  Classes,
+  SysUtils;
 
 const
   ZINT_ROWS_MAX = 178;
   ZINT_COLS_MAX = 178;
 
 type
-  {$IFDEF FPC}
-  TZintMetafile = TlmfImage;
-  TZintMetafileCanvas = TlmfCanvas;
-  {$ELSE}
-  TZintMetafile = TMetafile;
-  TZintMetafileCanvas = TMetafileCanvas;
-  {$ENDIF}
+  Pzint_render_line = ^zint_render_line;
+  zint_render_line = record
+    x, y, length, width : Single;
+    next : Pzint_render_line;      { Pointer to next line }
+  end;
+
+  Pzint_render_string = ^zint_render_string;
+  zint_render_string = record
+    x, y, fsize : Single;
+    width : Single;                { Suggested string width, may be 0 if none recommended }
+    length : Integer;
+    text : AnsiString;
+    next : Pzint_render_string;    { Pointer to next character }
+  end;
+
+  Pzint_render_ring = ^zint_render_ring;
+  zint_render_ring  = record
+    x, y, radius, line_width : Single;
+    next : Pzint_render_ring;      { Pointer to next ring }
+  end;
+
+  Pzint_render_hexagon = ^zint_render_hexagon;
+  zint_render_hexagon = record
+    x, y, width, height : Single;
+    next : Pzint_render_hexagon;   { Pointer to next hexagon }
+  end;
+
+  Pzint_render = ^zint_render;
+  zint_render = record
+    width, height : Single;
+    lines : Pzint_render_line;          { Pointer to first line }
+    strings : Pzint_render_string;      { Pointer to first string }
+    rings : Pzint_render_ring;          { Pointer to first ring }
+    hexagons : Pzint_render_hexagon;    { Pointer to first hexagon }
+  end;
+
+  TZintCustomRenderTarget = class;
 
   zint_symbol = class(TPersistent)
   public
@@ -45,13 +76,10 @@ type
     whitespace_width : Integer;
     border_width : Integer;
     output_options : Integer;
-    fgcolor : TColor;
-    bgcolor : TColor;
     option_1 : Integer;
     option_2 : Integer;
     option_3 : Integer;
     show_hrt : Integer;
-    hrt_font : TFont;
     input_mode : Integer;
     text : AnsiString;
     rows : Integer;
@@ -60,15 +88,16 @@ type
     errtxt : AnsiString;
     encoded_data : array[0..ZINT_ROWS_MAX - 1] of array[0..ZINT_COLS_MAX - 1] of Byte;
     row_height : array[0..ZINT_ROWS_MAX - 1] of Integer; { Largest symbol is 177x177 QR Code }
-    x, y : Integer; //defines, where to render the result
+    rendered : Pzint_render;
 
     constructor Create(); virtual;
     destructor Destroy; override;
 
     procedure Clear; virtual;
+    procedure ClearRendered; virtual;
 
-    procedure Encode(AData : AnsiString; ARaiseExceptions : Boolean = true);
-    procedure Render(ATarget : TZintMetafile; ARaiseExceptions : Boolean = true); overload;
+    procedure Encode(AData : AnsiString; ARaiseExceptions : Boolean = true); virtual;
+    procedure Render(ATarget : TZintCustomRenderTarget); virtual;
 
     //These are the functions from library.c
     class function gs1_compliant(_symbology : Integer) : Integer;
@@ -80,6 +109,31 @@ type
   end;
 
   TZintSymbol = zint_symbol;
+
+  TZintRenderAdjustMode = (ramNone, ramScaleBarcode, ramInflateImage);
+
+  TZintCustomRenderTarget = class(TObject)
+  protected
+    FHexagonScale: Single;
+    FTransparent: Boolean;
+    FRenderAdjustMode : TZintRenderAdjustMode;
+    FHeightDesired : Single;
+    FWidthDesired  : Single;
+    FTop           : Single;
+    FLeft          : Single;
+    FMultiplikator : Single;
+  public
+    constructor Create(); virtual;
+    destructor Destroy; override;
+    procedure Render(ASymbol : TZintSymbol); virtual;
+    property Top: Single read FTop write FTop;
+    property Left: Single read FLeft write FLeft;
+    property HeightDesired: Single read FHeightDesired write FHeightDesired;
+    property WidthDesired: Single read FWidthDesired write FWidthDesired;
+    property RenderAdjustMode : TZintRenderAdjustMode read FRenderAdjustMode write FRenderAdjustMode;
+    property Transparent : Boolean read FTransparent write FTransparent;
+    property HexagonScale : Single read FHexagonScale write FHexagonScale;
+  end;
 
 const
   BARCODE_CODE11 = 1;
@@ -201,7 +255,7 @@ implementation
 
 uses zint_dmatrix, zint_code128, zint_gs1, zint_common, zint_2of5,
   zint_maxicode, zint_auspost, zint_aztec, zint_code, zint_medical,
-  zint_code16k, zint_code49, zint_metafile;
+  zint_code16k, zint_code49, zint_render_;
 
 const
   TECHNETIUM : AnsiString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%';
@@ -222,6 +276,52 @@ begin
 	errtxt := '';
 end;
 
+procedure zint_symbol.ClearRendered;
+var
+  current_line, next_line : Pzint_render_line;
+  current_string, next_string : Pzint_render_string;
+  current_ring, next_ring : Pzint_render_ring;
+  current_hexagon, next_hexagon : Pzint_render_hexagon;
+begin
+  if Assigned(rendered) then
+  begin
+    next_line := rendered^.lines;
+    while Assigned(next_line) do
+    begin
+      current_line := next_line;
+      next_line := current_line^.next;
+      Dispose(current_line);
+    end;
+
+    next_string := rendered^.strings;
+    while Assigned(next_string) do
+    begin
+      current_string := next_string;
+      next_string := current_string^.next;
+      current_string^.text := '';
+      Dispose(current_string);
+    end;
+
+    next_ring := rendered^.rings;
+    while Assigned(next_ring) do
+    begin
+      current_ring := next_ring;
+      next_ring := current_ring^.next;
+      Dispose(current_ring);
+    end;
+
+    next_hexagon := rendered^.hexagons;
+    while Assigned(next_hexagon) do
+    begin
+      current_hexagon := next_hexagon;
+      next_hexagon := current_hexagon^.next;
+      Dispose(current_hexagon);
+    end;
+
+    Dispose(rendered);
+  end;
+end;
+
 constructor zint_symbol.Create;
 begin
   inherited;
@@ -230,28 +330,23 @@ begin
 	height := 0;
 	whitespace_width := 0;
 	border_width := 0;
-	output_options := 0;
+  output_options := 0;
 	rows := 0;
 	width := 0;
-	fgcolor := clBlack;
-  bgcolor := clWhite;
 	option_1 := -1;
 	option_2 := 0;
 	option_3 := 928; // PDF_MAX
 	show_hrt := 1; // Show human readable text
 	input_mode := DATA_MODE;
 	primary := '';
-  hrt_font := TFont.Create;
-  hrt_font.Name := 'Courier New';
-  hrt_font.Size := 10;
-  x := 0;
-  y := 0;
+  rendered := nil;
 end;
 
 destructor zint_symbol.Destroy;
 begin
-  hrt_font.Free;
-
+  Clear;
+  ClearRendered;
+  
   inherited;
 end;
 
@@ -522,11 +617,11 @@ begin
 	result := error_number; exit;
 end;
 
-procedure zint_symbol.Render(ATarget: TZintMetafile; ARaiseExceptions : Boolean);
+procedure zint_symbol.Render(ATarget : TZintCustomRenderTarget);
 begin
-  if (RenderSymbol(self, ATarget) >= ZERROR_TOO_LONG) and
-     (ARaiseExceptions) then
-    raise Exception.Create(errtxt);
+  ClearRendered;
+  render_plot(Self, ATarget.FWidthDesired, ATarget.FHeightDesired);
+  ATarget.Render(Self);
 end;
 
 class function zint_symbol.ZBarcode_Encode(symbol : zint_symbol; source : AnsiString) : Integer;
@@ -645,6 +740,32 @@ begin
 	error_tag(symbol.errtxt, error_number);
 	{printf('%s\n',symbol.text);}
 	result := error_number; exit;
+end;
+
+{ TZintCustomRenderTarget }
+
+constructor TZintCustomRenderTarget.Create();
+begin
+  FTransparent:=False;
+  FHexagonScale:=0.9;
+end;
+
+destructor TZintCustomRenderTarget.Destroy;
+begin
+  inherited;
+end;
+
+procedure TZintCustomRenderTarget.Render(ASymbol: TZintSymbol);
+begin
+  if FRenderAdjustMode=ramScaleBarcode then
+  begin
+    FMultiplikator:=FHeightDesired/ASymbol.rendered^.height;
+
+    if FMultiplikator*ASymbol.rendered^.width>FWidthDesired then
+      FMultiplikator:=FWidthDesired/ASymbol.rendered^.width;
+  end
+  else
+    FMultiplikator := 1;
 end;
 
 end.
