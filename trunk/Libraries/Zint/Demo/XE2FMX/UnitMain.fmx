@@ -1,0 +1,43 @@
+object FormMain: TFormMain
+  Left = 0
+  Top = 0
+  Caption = 'Zint FMX Test'
+  ClientHeight = 490
+  ClientWidth = 772
+  Visible = False
+  OnCreate = FormCreate
+  StyleLookup = 'backgroundstyle'
+  object imgResult: TImage
+    Align = alClient
+    Position.Point = '(0,33)'
+    Width = 772.000000000000000000
+    Height = 457.000000000000000000
+  end
+  object Panel1: TPanel
+    Align = alTop
+    Width = 772.000000000000000000
+    Height = 33.000000000000000000
+    TabOrder = 2
+    object comType: TComboBox
+      Align = alRight
+      Position.Point = '(400,0)'
+      Width = 372.000000000000000000
+      Height = 33.000000000000000000
+      Margins.Rect = '(4,4,4,4)'
+      TabOrder = 1
+      ItemIndex = -1
+      OnChange = comTypeChange
+    end
+    object edData: TEdit
+      Align = alClient
+      Width = 400.000000000000000000
+      Height = 33.000000000000000000
+      Margins.Rect = '(4,4,4,4)'
+      OnKeyUp = edDataKeyUp
+      TabOrder = 2
+      KeyboardType = vktDefault
+      Password = False
+      Text = '123456'
+    end
+  end
+end

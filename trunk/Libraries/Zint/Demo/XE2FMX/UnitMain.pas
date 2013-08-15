@@ -1,36 +1,38 @@
-unit uFormZintTest;
+unit UnitMain;
 
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.Edit, FMX.ListBox,
+  FMX.Objects;
 
 type
-  TForm46 = class(TForm)
+  TFormMain = class(TForm)
     imgResult: TImage;
     Panel1: TPanel;
-    edData: TEdit;
     comType: TComboBox;
-    lblError: TLabel;
-    procedure FormCreate(Sender: TObject);
-    procedure edDataChange(Sender: TObject);
+    edData: TEdit;
+
     procedure comTypeChange(Sender: TObject);
-    procedure FormShow(Sender: TObject);
-  private
+    procedure FormCreate(Sender: TObject);
     procedure GenBarcode;
+    procedure edDataKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
+      Shift: TShiftState);
+    { Private-Deklarationen }
   public
     { Public-Deklarationen }
   end;
 
 var
-  Form46: TForm46;
+  FormMain: TFormMain;
 
 implementation
 
-{$R *.dfm}
+{$R *.fmx}
 
-uses zint, zint_render_wmf;
+
+uses zint, zint_render_fmx_bmp;
 
 type
   BCTypeEntry = record
@@ -78,17 +80,18 @@ const
                                                 (N : 'Code 49'; T : BARCODE_CODE49)
                                                );
 
-procedure TForm46.comTypeChange(Sender: TObject);
+procedure TFormMain.comTypeChange(Sender: TObject);
 begin
   GenBarcode;
 end;
 
-procedure TForm46.edDataChange(Sender: TObject);
+procedure TFormMain.edDataKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
+  Shift: TShiftState);
 begin
-  GenBarcode;
+  genBarcode
 end;
 
-procedure TForm46.FormCreate(Sender: TObject);
+procedure TFormMain.FormCreate(Sender: TObject);
 var
   i : Integer;
 begin
@@ -98,44 +101,31 @@ begin
   comType.ItemIndex := 0;
 end;
 
-procedure TForm46.FormShow(Sender: TObject);
-begin
-  GenBarcode;
-end;
-
-procedure TForm46.GenBarcode;
+procedure TFormMain.GenBarcode;
 var
   symbol : TZintSymbol;
-  wmf : TMetafile;
-  rt  : TZintWMFRenderTarget;
+  bmp : TBitmap;
+  rt  : TZintBMPRenderTarget;
 begin
-  imgResult.Picture.Graphic := nil;
-  lblError.Caption := '';
-
   symbol := TZintSymbol.Create;
   symbol.symbology := SupportedTypes[comType.ItemIndex].T;
   symbol.input_mode := UNICODE_MODE;
   symbol.show_hrt := 1;
-  try
-    symbol.Encode(UTF8Encode(edData.Text), true);
+  symbol.output_options:=symbol.output_options or BARCODE_BOX;
+  symbol.border_width:=1;
+  symbol.whitespace_width:=10;
+  symbol.Encode(UTF8Encode(edData.Text), true);
 
-    wmf:=TMetafile.Create;
-    wmf.SetSize(imgResult.Width, imgResult.Height);
-    rt:=TZintWMFRenderTarget.Create(wmf);
-    rt.RenderAdjustMode:=ramScaleBarcode;
-    try
-      Symbol.Render(rt);
-      imgResult.Picture.Graphic:=wmf;
-    finally
-      rt.Free;
-      wmf.Free;
-    end;
+   bmp:=TBitmap.Create(round(imgResult.Width), round(imgResult.Height));
+   rt:=TZintBMPRenderTarget.Create(bmp);
+   rt.RenderAdjustMode:=ramScaleBarcode;
+   rt.Font.Family:='Courier New';
+   Symbol.Render(rt);
+   rt.Free;
+   imgResult.Bitmap:=bmp;
+   bmp.Free;
 
-  except
-    on E : Exception do
-      lblError.Caption := e.Message;
-  end;
-  symbol.Free;
+   symbol.Free;
 end;
 
 end.

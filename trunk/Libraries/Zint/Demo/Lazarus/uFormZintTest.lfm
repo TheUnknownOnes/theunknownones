@@ -1,11 +1,11 @@
 object formZintTest: TformZintTest
   Left = 454
-  Height = 277
+  Height = 324
   Top = 143
-  Width = 617
+  Width = 600
   Caption = 'formZintTest'
-  ClientHeight = 277
-  ClientWidth = 617
+  ClientHeight = 324
+  ClientWidth = 600
   OnCreate = FormCreate
   OnShow = FormShow
   LCLVersion = '1.1'
@@ -13,24 +13,24 @@ object formZintTest: TformZintTest
     Left = 0
     Height = 23
     Top = 0
-    Width = 617
+    Width = 600
     Align = alTop
     BevelOuter = bvNone
     ClientHeight = 23
-    ClientWidth = 617
+    ClientWidth = 600
     TabOrder = 0
     object edData: TEdit
       Left = 0
       Height = 23
       Top = 0
-      Width = 408
+      Width = 391
       Align = alClient
       OnChange = edDataChange
       TabOrder = 0
       Text = '123456'
     end
     object comType: TComboBox
-      Left = 408
+      Left = 391
       Height = 23
       Top = 0
       Width = 209
@@ -43,12 +43,23 @@ object formZintTest: TformZintTest
   end
   object imgResult: TImage
     Left = 0
-    Height = 254
+    Height = 300
     Top = 23
-    Width = 617
+    Width = 600
     Align = alClient
     Center = True
     Proportional = True
     Stretch = True
+  end
+  object lblError: TLabel
+    Left = 0
+    Height = 1
+    Top = 323
+    Width = 600
+    Align = alBottom
+    Alignment = taCenter
+    Font.Color = clRed
+    ParentColor = False
+    ParentFont = False
   end
 end
