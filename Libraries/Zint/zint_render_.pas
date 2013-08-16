@@ -450,11 +450,12 @@ begin
     render^.height := 26.86 * scaler;
 
     { Central bullseye pattern }
-    ring := render_plot_create_ring(13.64 * scaler, 13.43 * scaler, 0.85 * scaler, 0.67 * scaler);
+
+    ring := render_plot_create_ring(13.64 * scaler, 13.43 * scaler, 3.54 * scaler, 0.67 * scaler);
     render_plot_add_ring(symbol, ring, last_ring);
     ring := render_plot_create_ring(13.64 * scaler, 13.43 * scaler, 2.20 * scaler, 0.67 * scaler);
     render_plot_add_ring(symbol, ring, last_ring);
-    ring := render_plot_create_ring(13.64 * scaler, 13.43 * scaler, 3.54 * scaler, 0.67 * scaler);
+    ring := render_plot_create_ring(13.64 * scaler, 13.43 * scaler, 0.85 * scaler, 0.67 * scaler);
     render_plot_add_ring(symbol, ring, last_ring);
 
     { Hexagons }

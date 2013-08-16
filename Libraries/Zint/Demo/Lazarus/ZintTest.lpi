@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <CONFIG>
   <ProjectOptions>
     <Version Value="9"/>
@@ -33,7 +33,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="3">
+    <Units Count="4">
       <Unit0>
         <Filename Value="ZintTest.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -52,6 +52,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="zint_render_bmp"/>
       </Unit2>
+      <Unit3>
+        <Filename Value="..\..\zint_render_tadrawer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_render_tadrawer"/>
+      </Unit3>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -62,7 +67,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="..\.."/>
+      <OtherUnitFiles Value="..\..;$(LazarusDir)\components\tachart"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
