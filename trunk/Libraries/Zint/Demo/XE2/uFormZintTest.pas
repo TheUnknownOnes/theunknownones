@@ -16,11 +16,28 @@ type
     lblError: TLabel;
     btPrint: TButton;
     comPrinter: TComboBox;
+    Panel2: TPanel;
+    GroupBox1: TGroupBox;
+    edWhitespaceWidth: TEdit;
+    Label2: TLabel;
+    Label1: TLabel;
+    edFrameWidth: TEdit;
+    rbBox: TRadioButton;
+    rbBind: TRadioButton;
+    rbNone: TRadioButton;
+    cbHRT: TCheckBox;
+    cbRAM: TComboBox;
+    Label3: TLabel;
+    edMHS: TEdit;
+    Label4: TLabel;
+    FontDialog1: TFontDialog;
+    ButtonFont: TButton;
     procedure FormCreate(Sender: TObject);
     procedure edDataChange(Sender: TObject);
     procedure comTypeChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btPrintClick(Sender: TObject);
+    procedure ButtonFontClick(Sender: TObject);
   private
     procedure GenBarcode;
     function GenSymbol: TZintSymbol;
@@ -97,7 +114,9 @@ begin
     Printer.PrinterIndex:=comPrinter.ItemIndex;
     Printer.BeginDoc;
     rt:=TZintCanvasRenderTarget.Create(Printer.Canvas);
-    rt.RenderAdjustMode:=ramScaleBarcode;
+    rt.RenderAdjustMode:=TZintRenderAdjustMode(cbRAM.ItemIndex);
+    rt.Font.Assign(ButtonFont.Font);
+    rt.HexagonScale:=StrToFloatDef(edMHS.Text, 1);
     rt.Left:=Printer.Canvas.ClipRect.Width/3;
     rt.Top:=Printer.Canvas.ClipRect.Height/3;
     rt.WidthDesired:=Printer.Canvas.ClipRect.Width/3;
@@ -114,6 +133,14 @@ begin
       lblError.Caption := e.Message;
   end;
   symbol.Free;
+end;
+
+procedure TForm46.ButtonFontClick(Sender: TObject);
+begin
+  if FontDialog1.Execute() then
+    ButtonFont.Font.Assign(FontDialog1.Font);
+  ButtonFont.Font.Size:=14;
+  GenBarcode;
 end;
 
 procedure TForm46.comTypeChange(Sender: TObject);
@@ -149,7 +176,19 @@ begin
   Result := TZintSymbol.Create;
   Result.symbology := SupportedTypes[comType.ItemIndex].T;
   Result.input_mode := UNICODE_MODE;
-  Result.show_hrt := 1;
+
+  if rbBox.Checked then
+    Result.output_options:=Result.output_options or BARCODE_BOX
+  else
+  if rbBind.Checked then
+    Result.output_options:=Result.output_options or BARCODE_BIND;
+
+  Result.whitespace_width:=StrToIntDef(edWhitespaceWidth.Text, 0);
+  Result.border_width:=StrToIntDef(edFrameWidth.Text, 0);
+  if cbHRT.Checked then
+    Result.show_hrt:= 1
+  else
+    Result.show_hrt:= 0;
 end;
 
 procedure TForm46.GenBarcode;
@@ -168,7 +207,9 @@ begin
     wmf:=TMetafile.Create;
     wmf.SetSize(imgResult.Width, imgResult.Height);
     rt:=TZintWMFRenderTarget.Create(wmf);
-    rt.RenderAdjustMode:=ramScaleBarcode;
+    rt.HexagonScale:=StrToFloatDef(edMHS.Text, 1);
+    rt.Font.Assign(ButtonFont.Font);
+    rt.RenderAdjustMode:=TZintRenderAdjustMode(cbRAM.ItemIndex);
     try
       Symbol.Render(rt);
       imgResult.Picture.Graphic:=wmf;
