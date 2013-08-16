@@ -7,7 +7,7 @@ unit zint_render_canvas;
   Translation by TheUnknownOnes
   http://theunknownones.net
 
-  License: DWYWBDBU (do what you want, but dont blame us)
+  License: Apache License 2.0
 }
 
 {$IFDEF FPC}

@@ -7,7 +7,7 @@ unit zint_dmatrix;
   Translation by TheUnknownOnes
   http://theunknownones.net
 
-  License: DWYWBDBU (do what you want, but dont blame us)
+  License: Apache License 2.0
 
   Status:
     3432bc9aff311f2aea40f0e9883abfe6564c080b complete

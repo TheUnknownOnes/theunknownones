@@ -6,13 +6,13 @@ unit zint;
   Translation by TheUnknownOnes
   http://theunknownones.net
 
-  License: DWYWBDBU (do what you want, but dont blame us)
+  License: Apache License 2.0
 
   Status:
     3432bc9aff311f2aea40f0e9883abfe6564c080b complete
 
   Notes:
-    - char-array are implemented as AnsiStrings -> take care of then 1-based index!
+    - char-arrays are implemented as AnsiStrings -> take care of then 1-based index!
     - the code of library.c is implemented here as part of TZintSymbol
 }
 

@@ -7,7 +7,7 @@ unit uVSTSearchEdit;
 
 interface
 
-{$I JEDI.inc}
+{$I ..\..\Common\Jedi\JEDI.inc}
 
 uses
   SysUtils, Classes, VirtualTrees, StdCtrls, ComCtrls, StrUtils;

@@ -1,4 +1,4 @@
-// (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
+// (c) by TheUnknownOnes under Apache License 2.0
 
 {
   What you need:

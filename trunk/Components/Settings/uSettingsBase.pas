@@ -3,14 +3,14 @@
  Purpose: Contains the base classes for working with Settings
  Created: 21.05.2008 14:40:48
 
- (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
+ (c) by TheUnknownOnes under Apache License 2.0
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 unit uSettingsBase;
 
 interface
 
-{$I JEDI.inc}
+{$I ..\..\Common\Jedi\JEDI.inc}
 
 uses
   Classes,
