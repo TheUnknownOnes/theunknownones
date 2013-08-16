@@ -1,7 +1,7 @@
 {-----------------------------------------------------------------------------
  Purpose: The config dialog of the custom help expert 
  
- (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
+ (c) by TheUnknownOnes under Apache License 2.0
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 
