@@ -99,7 +99,6 @@ begin
       else
         Matches := true;
 
-        
       FTree.FullyVisible[Node] := Matches;
 
       if not Matches then

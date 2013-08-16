@@ -3,8 +3,9 @@ unit uFormZintTest;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics, zint, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  Vcl.StdCtrls, Vcl.ExtCtrls;
 
 type
   TForm46 = class(TForm)
@@ -13,12 +14,16 @@ type
     edData: TEdit;
     comType: TComboBox;
     lblError: TLabel;
+    btPrint: TButton;
+    comPrinter: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure edDataChange(Sender: TObject);
     procedure comTypeChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure btPrintClick(Sender: TObject);
   private
     procedure GenBarcode;
+    function GenSymbol: TZintSymbol;
   public
     { Public-Deklarationen }
   end;
@@ -30,7 +35,7 @@ implementation
 
 {$R *.dfm}
 
-uses zint, zint_render_wmf;
+uses zint_render_wmf, zint_render_canvas, Printers;
 
 type
   BCTypeEntry = record
@@ -78,6 +83,39 @@ const
                                                 (N : 'Code 49'; T : BARCODE_CODE49)
                                                );
 
+procedure TForm46.btPrintClick(Sender: TObject);
+var
+  symbol : TZintSymbol;
+  rt  : TZintCanvasRenderTarget;
+begin
+  lblError.Caption := '';
+
+  symbol:=GenSymbol;
+  try
+    symbol.Encode(UTF8Encode(edData.Text), true);
+
+    Printer.PrinterIndex:=comPrinter.ItemIndex;
+    Printer.BeginDoc;
+    rt:=TZintCanvasRenderTarget.Create(Printer.Canvas);
+    rt.RenderAdjustMode:=ramScaleBarcode;
+    rt.Left:=Printer.Canvas.ClipRect.Width/3;
+    rt.Top:=Printer.Canvas.ClipRect.Height/3;
+    rt.WidthDesired:=Printer.Canvas.ClipRect.Width/3;
+    rt.HeightDesired:=Printer.Canvas.ClipRect.Height/3;
+    try
+      Symbol.Render(rt);
+    finally
+      rt.Free;
+      Printer.EndDoc;
+    end;
+
+  except
+    on E : Exception do
+      lblError.Caption := e.Message;
+  end;
+  symbol.Free;
+end;
+
 procedure TForm46.comTypeChange(Sender: TObject);
 begin
   GenBarcode;
@@ -96,11 +134,22 @@ begin
     comType.Items.Add(SupportedTypes[i].N);
 
   comType.ItemIndex := 0;
+
+  comPrinter.Items.Assign(Printer.Printers);
+  comPrinter.ItemIndex:=0;
 end;
 
 procedure TForm46.FormShow(Sender: TObject);
 begin
   GenBarcode;
+end;
+
+function TForm46.GenSymbol: TZintSymbol;
+begin
+  Result := TZintSymbol.Create;
+  Result.symbology := SupportedTypes[comType.ItemIndex].T;
+  Result.input_mode := UNICODE_MODE;
+  Result.show_hrt := 1;
 end;
 
 procedure TForm46.GenBarcode;
@@ -112,10 +161,7 @@ begin
   imgResult.Picture.Graphic := nil;
   lblError.Caption := '';
 
-  symbol := TZintSymbol.Create;
-  symbol.symbology := SupportedTypes[comType.ItemIndex].T;
-  symbol.input_mode := UNICODE_MODE;
-  symbol.show_hrt := 1;
+  symbol:=GenSymbol;
   try
     symbol.Encode(UTF8Encode(edData.Text), true);
 

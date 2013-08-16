@@ -17,27 +17,44 @@ object FormMain: TFormMain
     Align = alTop
     Width = 772.000000000000000000
     Height = 33.000000000000000000
-    TabOrder = 2
+    TabOrder = 1
     object comType: TComboBox
       Align = alRight
-      Position.Point = '(400,0)'
-      Width = 372.000000000000000000
+      Position.Point = '(208,0)'
+      Width = 216.000000000000000000
       Height = 33.000000000000000000
       Margins.Rect = '(4,4,4,4)'
-      TabOrder = 1
+      TabOrder = 0
       ItemIndex = -1
       OnChange = comTypeChange
     end
     object edData: TEdit
       Align = alClient
-      Width = 400.000000000000000000
+      Width = 208.000000000000000000
       Height = 33.000000000000000000
       Margins.Rect = '(4,4,4,4)'
-      OnKeyUp = edDataKeyUp
-      TabOrder = 2
+      TabOrder = 1
       KeyboardType = vktDefault
+      OnChange = edDataChange
       Password = False
       Text = '123456'
+    end
+    object comPrinter: TComboBox
+      Align = alRight
+      Position.Point = '(424,0)'
+      Width = 268.000000000000000000
+      Height = 33.000000000000000000
+      TabOrder = 2
+      ItemIndex = -1
+    end
+    object btPrint: TButton
+      Align = alRight
+      Position.Point = '(692,0)'
+      Width = 80.000000000000000000
+      Height = 33.000000000000000000
+      OnClick = btPrintClick
+      TabOrder = 3
+      Text = 'Print'
     end
   end
 end

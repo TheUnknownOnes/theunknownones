@@ -6,7 +6,7 @@ uses
   VirtualTrees, Classes;
 
 type
-  TCustomNodeData = class
+  TCustomNodeData = class(TInterfacedPersistent)
   protected
     FNode : PVirtualNode;
     FTree : TBaseVirtualTree;

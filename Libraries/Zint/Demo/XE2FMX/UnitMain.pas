@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.Edit, FMX.ListBox,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.Edit, FMX.ListBox, zint,
   FMX.Objects;
 
 type
@@ -13,13 +13,15 @@ type
     Panel1: TPanel;
     comType: TComboBox;
     edData: TEdit;
+    comPrinter: TComboBox;
+    btPrint: TButton;
 
     procedure comTypeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure GenBarcode;
-    procedure edDataKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
-      Shift: TShiftState);
-    { Private-Deklarationen }
+    procedure btPrintClick(Sender: TObject);
+    procedure edDataChange(Sender: TObject);
+    function  GenSymbol: TZintSymbol;
   public
     { Public-Deklarationen }
   end;
@@ -32,7 +34,7 @@ implementation
 {$R *.fmx}
 
 
-uses zint, zint_render_fmx_bmp;
+uses zint_render_fmx_bmp, zint_render_fmx_canvas, fmx.printer;
 
 type
   BCTypeEntry = record
@@ -80,13 +82,44 @@ const
                                                 (N : 'Code 49'; T : BARCODE_CODE49)
                                                );
 
+procedure TFormMain.btPrintClick(Sender: TObject);
+var
+  symbol : TZintSymbol;
+  rt  : TZintCanvasRenderTarget;
+begin
+
+  symbol := GenSymbol;
+
+  try
+    symbol.Encode(UTF8Encode(edData.Text), true);
+
+    Printer.ActivePrinter:=TPrinterDevice(comPrinter.Items.Objects[comPrinter.ItemIndex]);
+    Printer.ActivePrinter.SelectDPI(1200, 1200);
+    Printer.BeginDoc;
+    rt:=TZintCanvasRenderTarget.Create(Printer.Canvas);
+    rt.RenderAdjustMode:=ramScaleBarcode;
+    rt.Left:=Printer.Canvas.Width/3;
+    rt.Top:=Printer.Canvas.Height/3;
+    rt.WidthDesired:=Printer.Canvas.Width/3;
+    rt.HeightDesired:=Printer.Canvas.Height/3;
+    try
+      Symbol.Render(rt);
+    finally
+      rt.Free;
+      Printer.EndDoc;
+    end;
+
+  except
+  end;
+  symbol.Free;
+end;
+
 procedure TFormMain.comTypeChange(Sender: TObject);
 begin
   GenBarcode;
 end;
 
-procedure TFormMain.edDataKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
-  Shift: TShiftState);
+procedure TFormMain.edDataChange(Sender: TObject);
 begin
   genBarcode
 end;
@@ -99,6 +132,22 @@ begin
     comType.Items.Add(SupportedTypes[i].N);
 
   comType.ItemIndex := 0;
+
+  for i := 0 to Printer.Count-1 do
+    comPrinter.Items.AddObject(Printer.Printers[i].Title, Printer.Printers[i]);
+  comPrinter.ItemIndex:=0;
+end;
+
+function  TFormMain.GenSymbol: TZintSymbol;
+begin
+  Result := TZintSymbol.Create;
+  Result.symbology := SupportedTypes[comType.ItemIndex].T;
+  Result.input_mode := UNICODE_MODE;
+  Result.show_hrt := 1;
+  Result.output_options:=Result.output_options or BARCODE_BOX;
+  Result.border_width:=1;
+  Result.whitespace_width:=10;
+  Result.Encode(UTF8Encode(edData.Text), true);
 end;
 
 procedure TFormMain.GenBarcode;
@@ -107,14 +156,7 @@ var
   bmp : TBitmap;
   rt  : TZintBMPRenderTarget;
 begin
-  symbol := TZintSymbol.Create;
-  symbol.symbology := SupportedTypes[comType.ItemIndex].T;
-  symbol.input_mode := UNICODE_MODE;
-  symbol.show_hrt := 1;
-  symbol.output_options:=symbol.output_options or BARCODE_BOX;
-  symbol.border_width:=1;
-  symbol.whitespace_width:=10;
-  symbol.Encode(UTF8Encode(edData.Text), true);
+  symbol := GenSymbol;
 
    bmp:=TBitmap.Create(round(imgResult.Width), round(imgResult.Height));
    rt:=TZintBMPRenderTarget.Create(bmp);
