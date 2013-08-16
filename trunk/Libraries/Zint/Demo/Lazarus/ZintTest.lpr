@@ -7,7 +7,7 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, uFormZintTest, zint_render_bmp;
+  Forms, uFormZintTest, zint_render_bmp, zint_render_tadrawer;
 
 {$R *.res}
 
