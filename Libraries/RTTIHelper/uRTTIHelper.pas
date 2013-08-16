@@ -3,7 +3,7 @@
  Purpose: Helper functions for working with RTTI 
  Created: 06.11.2008 09:02:38
  
- (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
+ (c) by TheUnknownOnes under Apache License 2.0
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 

@@ -2,7 +2,7 @@
  Purpose: Useful classes and components to work with the zint library
  Created: 03.12.2009 14:29:10
 
- (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
+ (c) by TheUnknownOnes under Apache License 2.0
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 

@@ -3,7 +3,7 @@
  Purpose: Contains Settings support for the VirtualTree components 
  Created: 21.05.2008 14:47:02
  
- (c) by TheUnknownOnes under dwywbdbu license - see http://theunknownones.googlecode.com/svn/ for the license
+ (c) by TheUnknownOnes under Apache License 2.0
  see http://www.TheUnknownOnes.net
 -----------------------------------------------------------------------------}
 
