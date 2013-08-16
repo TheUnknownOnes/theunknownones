@@ -141,6 +141,7 @@ begin
     end;
 
     FCanvas.Pen.Style:=psClear;
+    FCanvas.Brush.Style:=bsSolid;
     FCanvas.Brush.Color:=ffgcolor;
     hexagon:=ASymbol.rendered^.hexagons;
     while Assigned(hexagon) do
