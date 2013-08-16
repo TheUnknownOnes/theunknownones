@@ -9,6 +9,9 @@
 			<Projects Include="D12\VSTSearchEdit_D120D.dproj">
 				<Dependencies/>
 			</Projects>
+			<Projects Include="C:\Users\MaWarm\Development\SPPDesk\trunk\SPPDesk\SPPDesk.dproj">
+				<Dependencies/>
+			</Projects>
 		</ItemGroup>
 		<ProjectExtensions>
 			<Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +38,23 @@
 		<Target Name="VSTSearchEdit_D120D:Make">
 			<MSBuild Targets="Make" Projects="D12\VSTSearchEdit_D120D.dproj"/>
 		</Target>
+		<Target Name="SPPDesk">
+			<MSBuild Projects="C:\Users\MaWarm\Development\SPPDesk\trunk\SPPDesk\SPPDesk.dproj"/>
+		</Target>
+		<Target Name="SPPDesk:Clean">
+			<MSBuild Targets="Clean" Projects="C:\Users\MaWarm\Development\SPPDesk\trunk\SPPDesk\SPPDesk.dproj"/>
+		</Target>
+		<Target Name="SPPDesk:Make">
+			<MSBuild Targets="Make" Projects="C:\Users\MaWarm\Development\SPPDesk\trunk\SPPDesk\SPPDesk.dproj"/>
+		</Target>
 		<Target Name="Build">
-			<CallTarget Targets="VSTSearchEdit_D120R;VSTSearchEdit_D120D"/>
+			<CallTarget Targets="VSTSearchEdit_D120R;VSTSearchEdit_D120D;SPPDesk"/>
 		</Target>
 		<Target Name="Clean">
-			<CallTarget Targets="VSTSearchEdit_D120R:Clean;VSTSearchEdit_D120D:Clean"/>
+			<CallTarget Targets="VSTSearchEdit_D120R:Clean;VSTSearchEdit_D120D:Clean;SPPDesk:Clean"/>
 		</Target>
 		<Target Name="Make">
-			<CallTarget Targets="VSTSearchEdit_D120R:Make;VSTSearchEdit_D120D:Make"/>
+			<CallTarget Targets="VSTSearchEdit_D120R:Make;VSTSearchEdit_D120D:Make;SPPDesk:Make"/>
 		</Target>
 		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 	</Project>

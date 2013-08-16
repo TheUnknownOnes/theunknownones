@@ -25,24 +25,19 @@ type
     property Items;
   end;
 
-
   procedure SetAutoCompleteControl(const AControl : TWinControl; const AList : TStrings);
 
 implementation
 
-procedure SetAutoCompleteControl(
-    const AControl  : TWinControl;
-    const AList     : TStrings
-    );
+procedure SetAutoCompleteControl(const AControl  : TWinControl;
+    const AList     : TStrings);
 var
   FAutoComplete : IAutoComplete2;
   FStrings : TEnumString;
 begin
-  FAutoComplete :=
-     CreateComObject(CLSID_AutoComplete)as IAutoComplete2;
-  FStrings :=  TEnumString.Create(AList);
-  OleCheck(FAutoComplete.SetOptions(ACO_AUTOSUGGEST
-    or ACO_AUTOAPPEND or ACO_UPDOWNKEYDROPSLIST or ACO_USETAB));
+  FAutoComplete := CreateComObject(CLSID_AutoComplete) as IAutoComplete2;
+  FStrings := TEnumString.Create(AList);
+  OleCheck(FAutoComplete.SetOptions(ACO_AUTOSUGGEST or ACO_AUTOAPPEND or ACO_UPDOWNKEYDROPSLIST));
   OleCheck(FAutoComplete.Init(AControl.Handle, FStrings, nil, nil));
 end;
 
