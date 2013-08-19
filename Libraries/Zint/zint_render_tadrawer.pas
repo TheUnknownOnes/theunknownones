@@ -169,9 +169,9 @@ begin
       FFont.Size:=Round(FMultiplikator*S^.fsize);
       FDrawer.Font:=FFont;
       FTextOut.SimpleTextOut(CalcLeft(s^.x)-FDrawer.TextExtent(s^.text).x div 2, CalcTop(s^.y), s^.text);
+      s:=s^.next;
     end;
 
-      s:=s^.next;
   end;
   FDrawer.DrawingEnd;
 end;
