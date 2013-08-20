@@ -1,6 +1,6 @@
 //**********************************************************
 // Developed by TheUnkownOnes.net
-// 
+//
 // for more information look at www.TheUnknownOnes.net
 //**********************************************************
 unit UnitResEdMain;
@@ -12,7 +12,7 @@ uses
   Dialogs, Menus, EditIntf, ToolsApi, StdCtrls, RESEDRegExpr, unitResourceGraphics,
   resed_unitExIcon, UnitResFile, ImgList, unitResourceJPEG, resx,
   unitResourceGIF, unitResourcePNG, UnitResourceElement, unitResourceRCData,
-  ExtCtrls, Buttons, DockForm, ResEdVirtualTrees;
+  ExtCtrls, Buttons, DockForm, ResEdVirtualTrees, ActiveX, ShellAPI;
 
 type
   TResType = (rtICON, rtBITMAP, rtCURSOR, rtJPEG, rtGIF, rtRCDATA, rtPNG, rtSTRING,
@@ -111,12 +111,16 @@ type
       var NodeDataSize: Integer);
     procedure FormShow(Sender: TObject);
     procedure SetResLang(Sender: TObject);
-  private      
+    procedure TVDragOver(Sender: TBaseVirtualTree; Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint;
+        Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
+    procedure TVDragDrop(Sender: TBaseVirtualTree; Source: TObject; DataObject: IDataObject; Formats: TFormatArray; Shift:
+        TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+  private
     FProjectPath : String;
     FResFileList : TStrings;
+    FFiles       : TStrings;
     procedure TVFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure CreateTreeView;
-
     procedure LoadResources;
     procedure ClearResFileList;
     function CreateResource(ParentNode : PVirtualNode;
@@ -131,6 +135,9 @@ type
                               IsDotNet   : Boolean);
     procedure RenameResource(Node : PVirtualNode; NewName : String);
     procedure CreateLanguageMIs;
+    // GetFileNames returns the HDROP Filenames. (same as TJvDragDrop).
+    // Return value: number of filenames
+    function GetFileNames(DataObject: IDataObject; List: TStrings): Integer;
   public
     TV               : TVirtualStringTree;
     ExtDotNetSupport : Boolean;                    //Flag wheth
@@ -683,7 +690,7 @@ var
   NodeData      : PNodeData;
 begin
   if ((RD.ClassType = TRCDataResourceElement) or
-      (RD.ClassType = TResourceElement) or
+      //(RD.ClassType = TResourceElement) or
       (RD.ClassType = TPngResourceElement) or
       (RD.ClassType = TBitmapResourceElement) or
       (RD.ClassType = TIconGroupResourceElement) or
@@ -702,7 +709,7 @@ begin
       (GetGroupName(RD.ResourceType)<>'VERSION')} then
   begin
     rt:=RD.ResourceType;
-    
+
     NodeGroup:=TV.GetFirstChild(ParentNode);
     while NodeGroup<>nil do
     begin
@@ -974,6 +981,9 @@ begin
   TV.OnGetNodeDataSize := TVGetNodeDataSize;
   TV.OnNewText := TVNewText;
   //TV.OnFreeNode := TVFreeNode;
+//  TV.OnDragAllowed := TVDragAllowed;
+  TV.OnDragOver := TVDragOver;
+  TV.OnDragDrop := TVDragDrop;
   TV.BorderStyle := bsNone;
   TV.BevelKind := bkSoft;
   TV.BevelInner := bvLowered;
@@ -1046,7 +1056,6 @@ begin
   CreateLanguageMIs;
   CreateTreeView;
   TV.Images:=GlobalImageList;
-
   ExtDotNetSupport:=False;
 
   ResXLib:=LoadLibrary('ResXEd.dll');
@@ -1068,7 +1077,7 @@ begin
 
   SaveStateNecessary := True;
 
-  TV.Free;
+// Create(Self)? TV.Free;
   FResFileList.Free;
   inherited;
 end;
@@ -1409,10 +1418,6 @@ begin
     Group:='';
   end;
 
-  dlgOpen:=TOpenDialog.Create(nil);
-  dlgOpen.Filter:=GetFilters(rt);
-  dlgOpen.Options:=dlgOpen.Options + [ofAllowMultiSelect];
-
   if (rt = rtVERSIONINFO) then
   begin
     CreateResource(Node,rt,Group,'1');
@@ -1430,12 +1435,22 @@ begin
   else
   if not (rt in [rtSTRING, rtMESSAGETABLE]) then
   begin
-    if dlgOpen.Execute(self.Handle) then
+    if (FFiles = nil) then
     begin
-      for i:=0 to dlgOpen.Files.Count-1 do
-        CreateResource(Node,rt,Group,dlgOpen.Files[i]);
-      if (Node.ChildCount>0) then
-        Tv.Expanded[Tv.GetFirstChild(Node)]:=true;
+      dlgOpen := TOpenDialog.Create(nil);
+      dlgOpen.Filter := GetFilters(rt);
+      dlgOpen.Options := dlgOpen.Options + [ofAllowMultiSelect];
+    end
+    else
+      dlgOpen := nil;
+    if (dlgOpen = nil) or dlgOpen.Execute(Self.Handle) then
+    begin
+      if Assigned(dlgOpen) then
+        FFiles := dlgOpen.Files;
+      for i := 0 to FFiles.Count - 1 do
+        CreateResource(Node, rt, Group, FFiles[i]);
+      if (Node.ChildCount > 0) then
+        TV.Expanded[TV.GetFirstChild(Node)] := True;
     end;
   end
   else
@@ -1459,10 +1474,10 @@ begin
         raise Exception.Create('No name specified');
     end;
 
-    CreateResource(Node,rt,'',NewName);
+    CreateResource(Node, rt, '', NewName);
 
-    if (Node.ChildCount>0) then
-        Tv.Expanded[Tv.GetFirstChild(Node)]:=true;
+    if (Node.ChildCount > 0) then
+        TV.Expanded[TV.GetFirstChild(Node)] := True;
   end;
 end;
 {$EndRegion}
@@ -1730,7 +1745,7 @@ begin
     ActiveControl.Perform(WM_KEYDOWN, VK_DELETE, 0);
     Exit;
   end;
-    
+
   myNode:=TV.GetFirstSelected;
 
   if myNode<>nil then
@@ -1767,6 +1782,112 @@ begin
     end;
   end;
 end;
+
+procedure TFormWizardResEd.TVDragOver(Sender: TBaseVirtualTree; Source: TObject; Shift: TShiftState; State: TDragState;
+    Pt: TPoint; Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
+begin
+  Accept := (TV.RootNodeCount > 0);
+  if Accept then Effect := DROPEFFECT_COPY else Effect := DROPEFFECT_NONE;
+end;
+
+procedure TFormWizardResEd.TVDragDrop(Sender: TBaseVirtualTree; Source: TObject; DataObject: IDataObject; Formats:
+    TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+var
+  L: TStringList;
+  I: Integer;
+  Ext: string;
+begin
+  Effect := DROPEFFECT_NONE;
+  if (DataObject = nil) or (TV.RootNodeCount = 0) then
+    Exit;
+  Effect := DROPEFFECT_COPY;
+
+  if (FFiles = nil) then
+    FFiles := TStringList.Create;
+  L := TStringList.Create;
+  try
+    GetFileNames(DataObject, L);
+    for I := 0 to L.Count - 1 do
+    begin
+      FFiles.Text := L[I];
+      Ext := LowerCase(ExtractFileExt(L[I]));
+      if (Ext = '.ico') then
+        CreateResourceClick(miICON)
+      else if (Ext = '.bmp') then
+        CreateResourceClick(miBITMAP)
+      else if (Ext = '.cur') then
+        CreateResourceClick(miCURSOR)
+      else if (Ext = '.gif') then
+        CreateResourceClick(miGIF)
+      else if (Ext = '.jpg') then
+        CreateResourceClick(miJPEG)
+      else if (Ext = '.png') then
+        CreateResourceClick(miPNG)
+//      else if (Ext = '.bin') then
+//        CreateResourceClick(miRCDATA)
+//      else if (Ext = '.bin') then
+//        CreateResourceClick(miUserData)
+//      else if (Ext = '.rc') then
+//        CreateResourceClick(miStringTable)
+//      else if (Ext = '.rc') then
+//        CreateResourceClick(miMessageTable)
+//      else if (Ext = '.rc') then
+//        CreateResourceClick(miVersionInfo)
+//      else if (Ext = '') then
+//        CreateResourceClick(miDotNetCustomData)
+      else if (Ext = '.manifest') then
+        CreateResourceClick(miManifest)
+    end;
+  finally
+    FreeAndNil(L);
+    FreeAndNil(FFiles);
+  end;
+end;
+
+function TFormWizardResEd.GetFileNames(DataObject: IDataObject; List: TStrings): Integer;
+var
+  FileDropFormatEtc: TFormatEtc;
+  DragH: Integer;
+  Medium: TStgMedium;
+  Name: string;
+  I, Count, Len: Integer;
+begin
+  Result := 0;
+  FileDropFormatEtc.cfFormat := CF_HDROP;
+  FileDropFormatEtc.ptd := nil;
+  FileDropFormatEtc.dwAspect := DVASPECT_CONTENT;
+  FileDropFormatEtc.lindex := 0;
+  FileDropFormatEtc.tymed := TYMED_HGLOBAL;
+  if DataObject.GetData(FileDropFormatEtc, Medium) = S_OK then
+    try
+      try
+        DragH := Integer(GlobalLock(Medium.hGlobal));
+        try
+          Count := DragQueryFile(DragH, Cardinal(-1), nil, 0);
+          if List <> nil then
+            for I := 0 to Count - 1 do
+            begin
+              Len := DragQueryFile(DragH, I, nil, 0);
+              if Len > 0 then
+              begin
+                SetLength(Name, Len + 1);
+                DragQueryFile(DragH, I, PChar(Name), Len + 1);
+                SetLength(Name, Len);
+                List.Add(Name);
+              end;
+            end;
+          Result := Count;
+        finally
+          GlobalUnlock(Medium.hGlobal);
+        end;
+      finally
+        ReleaseStgMedium(Medium);
+      end;
+    except
+      Result := 0;
+    end;
+end;
+
 {$EndRegion}
 
 end.
