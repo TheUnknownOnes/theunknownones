@@ -15,7 +15,7 @@ unit zint_render_tadrawer;
 interface
 
 uses
-  Classes, SysUtils, TADrawerSVG, zint, TAChartUtils, Graphics, TADrawUtils;
+  Classes, SysUtils, zint, TAChartUtils, Graphics, TADrawUtils;
 
 type
 
