@@ -91,7 +91,6 @@
 			<DCCReference Include="..\..\zint_gs1.pas"/>
 			<DCCReference Include="..\..\zint_maxicode.pas"/>
 			<DCCReference Include="..\..\zint_medical.pas"/>
-			<DCCReference Include="..\..\zint_metafile.pas"/>
 			<DCCReference Include="..\..\zint_reedsol.pas"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
