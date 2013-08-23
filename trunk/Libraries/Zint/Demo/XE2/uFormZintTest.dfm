@@ -91,6 +91,15 @@ object Form46: TForm46
       Style = csDropDownList
       TabOrder = 3
     end
+    object btSVG: TButton
+      Left = 694
+      Top = 4
+      Width = 75
+      Height = 25
+      Caption = 'Save SVG'
+      TabOrder = 4
+      OnClick = btSVGClick
+    end
   end
   object Panel2: TPanel
     Left = 0
@@ -241,6 +250,13 @@ object Form46: TForm46
     Font.Name = 'Tahoma'
     Font.Style = []
     Left = 384
+    Top = 256
+  end
+  object FileSaveDialog1: TFileSaveDialog
+    FavoriteLinks = <>
+    FileTypes = <>
+    Options = []
+    Left = 456
     Top = 256
   end
 end

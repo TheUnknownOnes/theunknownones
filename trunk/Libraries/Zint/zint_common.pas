@@ -39,81 +39,156 @@ const
   CANDB = 98;
   CANDBB = 99;
 
-  { The most commonly used set }
-  NEON : AnsiString = '0123456789';
-
 // Pascal-specific things
-procedure strcpy(out target : AnsiString; const source : AnsiString);
-function strlen(const data : AnsiString) : Integer;
-type
-  TArrayOfByte = array of Byte;
-  TArrayOfInteger = array of Integer;
-  TArrayOfCardinal = array of Cardinal;
+function strlen(const AString : TArrayOfChar) : Integer;
+procedure strcpy(var target : TArrayOfChar; const source : TArrayOfChar); overload;
+procedure strcpy(var ATarget : TArrayOfChar; const ASource : String; AEncoding : TEncoding = nil); overload;
 
+{ The most commonly used set }
+const NEON = '0123456789';
 
-
-function ustrlen(data : AnsiString) : Integer;
-procedure ustrcpy(var target : AnsiString; const source : AnsiString);
-procedure concat(var dest : AnsiString; const source : AnsiString);
-procedure uconcat(var dest : AnsiString; const source : AnsiString);
-function ctoi(source : AnsiChar) : Integer;
-function itoc(source : Integer) : AnsiChar;
-procedure to_upper(var source : AnsiString);
-function is_sane(const test_string : AnsiString; const source : AnsiString; _length : Integer) : Integer;
-function posn(const set_string : AnsiString; const data : AnsiString) : Integer;
-procedure lookup(const set_string : AnsiString; const table : array of AnsiString; const data : AnsiChar; var dest : AnsiString);
+function ustrlen(const data : TArrayOfByte) : Integer;
+procedure ustrcpy(var target : TArrayOfByte; const source : TArrayOfByte); overload;
+procedure ustrcpy(var ATarget : TArrayOfByte; const ASource : String; AEncoding : TEncoding = nil); overload;
+procedure uconcat(var dest : TArrayOfByte; const source : TArrayOfByte); overload;
+procedure uconcat(var ADest : TArrayOfByte; const ASource : TArrayOfChar); overload;
+procedure uconcat(var ADest : TArrayOfByte; const ASource : String; AEncoding : TEncoding = nil); overload;
+procedure concat(var dest : TArrayOfChar; const source : TArrayOfChar); overload;
+procedure concat(var ADest: TArrayOfChar; const ASource: String; AEncoding : TEncoding = nil); overload;
+procedure concat(var ADest: TArrayOfChar; const ASource: TArrayOfByte); overload;
+function ctoi(source : Char) : Integer;
+function itoc(source : Integer) : Char;
+procedure to_upper(var source : TArrayOfByte);
+function is_sane(const test_string : TArrayOfChar; const source : TArrayOfByte; _length : Integer) : Integer; overload;
+function is_sane(const ATest_string : String; const ASource : TArrayOfByte; ALength : Integer; AEncoding : TEncoding = nil) : Integer; overload;
+function posn(const set_string : TArrayOfChar; const data : Char) : Integer; overload;
+function posn(const ASet_string : String; const AData : Byte; AEncoding : TEncoding = nil) : Integer; overload;
+function posn(const ASet_string : String; const AData : Char; AEncoding : TEncoding = nil) : Integer; overload;
+procedure lookup(const set_string : TArrayOfChar; const table : array of String; const data : Char; var dest : TArrayOfChar); overload;
+procedure lookup(const set_string : TArrayOfChar; const table : array of String; const data : Byte; var dest : TArrayOfChar); overload;
+procedure lookup(const ASet_string : String; const ATable : array of String; const AData : Byte; var ADest : TArrayOfChar); overload;
+procedure lookup(const ASet_string : String; const ATable : array of String; const AData : Char; var ADest : TArrayOfChar); overload;
 function module_is_set(symbol : zint_symbol; y_coord : Integer; x_coord : Integer) : Integer;
 procedure set_module(symbol : zint_symbol; y_coord : Integer; x_coord : Integer);
 procedure unset_module(symbol : zint_symbol; y_coord : Integer; x_coord : Integer);
-procedure expand(symbol : zint_symbol; data : AnsiString);
+procedure expand(symbol : zint_symbol; data : TArrayOfChar);
 function is_stackable(symbology : Integer) : Integer;
 function is_extendable(symbology : Integer) : Integer;
-function istwodigits(const source : AnsiString; position : Integer) : Integer;
-function parunmodd(llyth : AnsiChar) : Integer;
-function latin1_process(symbol : zint_symbol; const source : AnsiString; var preprocessed : AnsiString; var _length : Integer) : Integer;
+function istwodigits(const source : TArrayOfByte; position : Integer) : Integer;
+function parunmodd(llyth : Byte) : Integer; overload;
+function parunmodd(llyth : Char) : Integer; overload;
+function latin1_process(symbol : zint_symbol; const source : TArrayOfByte; var preprocessed : TArrayOfByte; var _length : Integer) : Integer;
 
-procedure bscan(var binary : AnsiString; data : Integer; h : Integer);
+procedure bscan(var binary : TArrayOfChar; data : Integer; h : Integer);
 
 function nitems(a : TArrayOfInteger) : Integer; overload;
 
 implementation
 
-procedure strcpy(out target : AnsiString; const source : AnsiString);
+uses zint_helper;
+
+function strlen(const AString: TArrayOfChar): Integer;
+var
+  i : Integer;
 begin
-  target := source;
+  Result := High(AString);
+  for i := Low(AString) to High(AString) do
+    if AString[i] = #0 then
+    begin
+      Result := i;
+      break;
+    end;
 end;
 
-function strlen(const data : AnsiString) : Integer;
+procedure strcpy(var target: TArrayOfChar; const source: TArrayOfChar);
+var
+  i, len : Integer;
 begin
-  Result := Length(data);
+  len := strlen(source);
+  for i := 0 to len - 1 do
+    target[i] := source[i];
+  target[len] := #0;
 end;
 
-function ustrlen(data : AnsiString) : Integer;
+procedure strcpy(var ATarget : TArrayOfChar; const ASource : String; AEncoding : TEncoding);
+begin
+  strcpy(ATarget, StrToArrayOfChar(ASource, AEncoding));
+end;
+
 { Local replacement for strlen() with uint8_t strings }
+function ustrlen(const data : TArrayOfByte) : Integer;
+var
+  i : Integer;
 begin
-  Result := Length(data);
+  Result := High(data);
+  for i := Low(data) to High(data) do
+    if data[i] = 0 then
+    begin
+      Result := i;
+      break;
+    end;
 end;
 
-procedure ustrcpy(var target : AnsiString; const source : AnsiString);
 { Local replacement for strcpy() with uint8_t strings }
+procedure ustrcpy(var target : TArrayOfByte; const source : TArrayOfByte);
+var
+  i, len : Integer;
 begin
-  target := source;
+  len := ustrlen(source);
+  for i := 0 to len - 1 do
+    target[i] := source[i];
+  target[len] := 0;
 end;
 
-procedure concat(var dest : AnsiString; const source : AnsiString);
+procedure ustrcpy(var ATarget: TArrayOfByte; const ASource : String; AEncoding : TEncoding);
+begin
+  ustrcpy(ATarget, StrToArrayOfByte(ASource, AEncoding));
+end;
+
+procedure uconcat(var ADest: TArrayOfByte; const ASource: TArrayOfChar);
+begin
+  uconcat(ADest, ArrayOfCharToArrayOfByte(ASource));
+end;
+
+procedure uconcat(var ADest: TArrayOfByte; const ASource: String; AEncoding : TEncoding);
+begin
+  uconcat(ADest, StrToArrayOfByte(ASource, AEncoding));
+end;
+
+procedure concat(var dest: TArrayOfChar; const source: TArrayOfChar);
+var
+  i, j, n : Integer;
+begin
+  j := strlen(dest);
+  n := strlen(source);
+  for i := 0 to n do
+    dest[i + j] := source[i];
+end;
+
 { Concatinates dest[] with the contents of source[], copying /0 as well }
+procedure uconcat(var dest : TArrayOfByte; const source : TArrayOfByte);
+var
+  i, j, n : Integer;
 begin
-  dest := dest + source;
+  j := ustrlen(dest);
+  n := ustrlen(source);
+  for i := 0 to n do
+    dest[i + j] := source[i];
 end;
 
-procedure uconcat(var dest : AnsiString; const source : AnsiString);
-{ Concatinates dest[] with the contents of source[], copying /0 as well }
+procedure concat(var ADest: TArrayOfChar; const ASource: String;
+  AEncoding: TEncoding);
 begin
-  dest := dest + source;
+  concat(ADest, StrToArrayOfChar(ASource, AEncoding));
 end;
 
-function ctoi(source : AnsiChar) : Integer;
+procedure concat(var ADest: TArrayOfChar; const ASource: TArrayOfByte);
+begin
+  concat(ADest, ArrayOfByteToString(ASource));
+end;
+
 { Converts a character 0-9 to its equivalent integer value }
+function ctoi(source : Char) : Integer;
 begin
 	if (source >= '0') and (source <= '9') then
 		result := Ord(source) - Ord('0')
@@ -121,35 +196,40 @@ begin
 	  result := Ord(source) - Ord('A') + 10;
 end;
 
-function itoc(source : Integer) : AnsiChar;
 { Converts an integer value to its hexadecimal character }
+function itoc(source : Integer) : Char;
 begin
   if (source >= 0) and (source <= 9) then
-    Result := AnsiChar(Ord('0') + source)
+    Result := Chr(Ord('0') + source)
   else
-    Result := AnsiChar(Ord('A') + (source - 10));
+    Result := Chr(Ord('A') + (source - 10));
 end;
 
-procedure to_upper(var source : AnsiString);
+procedure to_upper(var source : TArrayOfByte);
+var
+  src_len, i : Integer;
 begin
-  source := UpperCase(source);
+  src_len := ustrlen(source);
+  for i := 0 to src_len - 1 do
+    if (source[i] >= Ord('a')) and (source[i] <= Ord('z')) then
+      source[i] := (source[i] - Ord('a')) + Ord('A');
 end;
 
-function is_sane(const test_string : AnsiString; const source : AnsiString; _length : Integer) : Integer;
 { Verifies that a string only uses valid characters }
+function is_sane(const test_string : TArrayOfChar; const source : TArrayOfByte; _length : Integer) : Integer;
 var
   latch : Cardinal;
   i,j : Cardinal;
   lt : Integer;
 begin
-  lt := strlen(test_string);
+  lt := Length(test_string);
 
-	for i := 1 to _length do
+	for i := 0 to _length - 1 do
   begin
 		latch := _FALSE;
-		for j:= 1 to lt do
+		for j:= 0 to lt - 1 do
     begin
-			if (source[i] = test_string[j]) then
+			if (source[i] = Ord(test_string[j])) then
       begin
 				latch := _TRUE;
 				break;
@@ -164,25 +244,67 @@ begin
 	result := 0; exit;
 end;
 
-function posn(const set_string : AnsiString; const data : AnsiString) : Integer;
-{ Returns the position of data in set_string }
+function is_sane(const ATest_string: String; const ASource: TArrayOfByte;
+  ALength: Integer; AEncoding : TEncoding): Integer;
 begin
-  Result := Pos(data, set_string);
+  Result := is_sane(StrToArrayOfChar(ATest_string, AEncoding), ASource, ALength);
 end;
 
-{ Replaces huge switch statements for looking up in tables }
-procedure lookup(const set_string : AnsiString; const table : array of AnsiString; const data : AnsiChar; var dest : AnsiString);
+{ Returns the position of data in set_string}
+function posn(const set_string : TArrayOfChar; const data : Char) : Integer;
 var
-  n : Cardinal;
-  i : Cardinal;
+  n, i : Integer;
 begin
   n := strlen(set_string);
 
-	for i := 1 to n do
-		if (data = set_string[i]) then
-			dest := dest + table[i - 1];
+  for i := 0 to n - 1 do
+    if (data = set_string[i]) then
+    begin
+      result := i; exit;
+    end;
+  result := 0; exit;
 end;
 
+function posn(const ASet_string: String; const AData: Byte; AEncoding : TEncoding): Integer;
+begin
+  Result := posn(StrToArrayOfChar(ASet_string, AEncoding), Chr(AData));
+end;
+
+function posn(const ASet_string: String; const AData: Char; AEncoding: TEncoding
+  ): Integer;
+begin
+  Result := posn(StrToArrayOfChar(ASet_string, AEncoding), AData);
+end;
+
+{ Replaces huge switch statements for looking up in tables }
+procedure lookup(const set_string : TArrayOfChar; const table : array of String; const data : Char; var dest : TArrayOfChar);
+var
+  n : Integer;
+  i : Integer;
+begin
+  n := strlen(set_string);
+
+	for i := 0 to n - 1 do
+		if (data = set_string[i]) then
+			concat(dest, StrToArrayOfChar(table[i]));
+end;
+
+procedure lookup(const set_string: TArrayOfChar; const table: array of String;
+  const data: Byte; var dest: TArrayOfChar);
+begin
+  lookup(set_string, table, Chr(data), dest);
+end;
+
+procedure lookup(const ASet_string : String; const ATable : array of String; const AData : Byte; var ADest : TArrayOfChar);
+begin
+  lookup(StrToArrayOfChar(ASet_string), ATable, AData, ADest);
+end;
+
+procedure lookup(const ASet_string: String; const ATable: array of String;
+  const AData: Char; var ADest: TArrayOfChar);
+begin
+  lookup(ASet_string, ATable, Ord(AData), ADest);
+end;
 
 function module_is_set(symbol : zint_symbol; y_coord : Integer; x_coord : Integer) : Integer;
 begin
@@ -200,18 +322,18 @@ begin
 	symbol.encoded_data[y_coord][x_coord div 7] := ((symbol.encoded_data[y_coord][x_coord div 7]) or (not (1 shl (x_coord mod 7))));
 end;
 
-procedure expand(symbol : zint_symbol; data : AnsiString);
 { Expands from a width pattern to a bit pattern */ }
+procedure expand(symbol : zint_symbol; data : TArrayOfChar);
 var
   reader, n : Cardinal;
   writer, i : Integer;
-  latch : AnsiChar;
+  latch : Char;
 begin
   n := strlen(data);
 	writer := 0;
 	latch := '1';
 
-	for reader := 1 to n do
+	for reader := 0 to n - 1 do
   begin
     for i := 0 to ctoi(data[reader]) - 1 do
     begin
@@ -237,8 +359,8 @@ begin
 	symbol.rows := symbol.rows + 1;
 end;
 
-function is_stackable(symbology : Integer) : Integer;
 { Indicates which symbologies can have row binding }
+function is_stackable(symbology : Integer) : Integer;
 begin
   Result := 0;
 
@@ -254,8 +376,8 @@ begin
 	if(symbology = BARCODE_CODE32) then Result := 1;
 end;
 
-function is_extendable(symbology : Integer) : Integer;
 { Indicates which symbols can have addon }
+function is_extendable(symbology : Integer) : Integer;
 begin
   Result := 0;
 
@@ -268,11 +390,11 @@ begin
 	if (symbology = BARCODE_EANX_CC) then result := 1;
 end;
 
-function istwodigits(const source : AnsiString; position : Integer) : Integer;
+function istwodigits(const source : TArrayOfByte; position : Integer) : Integer;
 begin
-  if ((source[position] >= '0') and (source[position] <= '9')) then
+  if ((source[position] >= Ord('0')) and (source[position] <= Ord('9'))) then
   begin
-    if ((source[position + 1] >= '0') and (source[position + 1] <= '9')) then
+    if ((source[position + 1] >= Ord('0')) and (source[position + 1] <= Ord('9'))) then
     begin
       result := 1; exit;
     end;
@@ -281,56 +403,63 @@ begin
   result := 0; exit;
 end;
 
-function parunmodd(llyth : AnsiChar) : Integer;
+
+function parunmodd(llyth : Char) : Integer;
+begin
+  Result:=parunmodd(Ord(llyth));
+end;
+
+function parunmodd(llyth : Byte) : Integer;
 var
   modd : Integer;
-  _llyth : Byte absolute llyth;
 begin
 	modd := SHIFTB;
 
-	if (_llyth <= 31) then
+	if (llyth <= 31) then
     modd := SHIFTA
-	else if ((_llyth >= 48) and (_llyth <= 57)) then
+	else if ((llyth >= 48) and (llyth <= 57)) then
     modd := ABORC
-	else if (_llyth <= 95) then
+	else if (llyth <= 95) then
     modd := AORB
-	else if (_llyth <= 127) then
+	else if (llyth <= 127) then
     modd := SHIFTB
-	else if (_llyth <= 159) then
+	else if (llyth <= 159) then
     modd := SHIFTA
-	else if (_llyth <= 223) then
+	else if (llyth <= 223) then
     modd := AORB;
 
 	result := modd; exit;
 end;
 
-function latin1_process(symbol : zint_symbol; const source : AnsiString; var preprocessed : AnsiString; var _length : Integer) : Integer;
 { Convert Unicode to Latin-1 for those symbologies which only support Latin-1 }
+function latin1_process(symbol : zint_symbol; const source : TArrayOfByte; var preprocessed : TArrayOfByte; var _length : Integer) : Integer;
 var
-  i, next : Integer;
+  i, j, next : Integer;
 begin
-  i := 1;
-
-  preprocessed := '';
+  i := 0;
+  j := 0;
 
 	repeat
 		next := -1;
-		if (source[i] < #128) then
+		if (source[i] < 128) then
     begin
-			preprocessed := preprocessed + source[i];
+			preprocessed[j] := source[i];
+      Inc(j);
 			next := i + 1;
     end
     else
     begin
-			if (source[i] = #$C2) then
+			if (source[i] = $C2) then
       begin
-				preprocessed := preprocessed + source[i + 1];
+				preprocessed[j] := source[i + 1];
+        Inc(j);
 				next := i + 2;
       end;
 
-			if(source[i] = #$C3) then
+			if(source[i] = $C3) then
       begin
-				preprocessed := preprocessed + Chr(Ord(source[i + 1]) + 64);
+				preprocessed[j] := source[i + 1] + 64;
+        Inc(j);
 				next := i + 2;
       end;
 		end;
@@ -340,14 +469,14 @@ begin
 			result := ZERROR_INVALID_DATA; exit;
     end;
 		i := next;
-	until not (i <= _length);
-
-  _length := Length(preprocessed);
+	until not (i < _length);
+  preprocessed[j] := 0;
+  _length := j;
 
 	result := 0; exit;
 end;
 
-procedure bscan(var binary : AnsiString; data : Integer; h : Integer);
+procedure bscan(var binary : TArrayOfChar; data : Integer; h : Integer);
 begin
   while h <> 0 do
   begin

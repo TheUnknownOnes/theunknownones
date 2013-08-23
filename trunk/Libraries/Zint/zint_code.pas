@@ -22,27 +22,27 @@ interface
 uses
   SysUtils, zint;
 
-function code_11(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function c39(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function pharmazentral(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function ec39(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function c93(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function code_11(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
+function c39(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
+function pharmazentral(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
+function ec39(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
+function c93(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 
 implementation
 
 uses
-  zint_common;
+  zint_common, zint_helper;
 
-const SODIUM : AnsiString	= '0123456789-';
-const SILVER : AnsiString =	'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%abcd';
+const SODIUM : String	= '0123456789-';
+const SILVER : String =	'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%abcd';
 
-const C11Table : array[0..10] of AnsiString = ('111121', '211121', '121121', '221111', '112121', '212111', '122111',
+const C11Table : array[0..10] of String = ('111121', '211121', '121121', '221111', '112121', '212111', '122111',
 	'111221', '211211', '211111', '112111');
 
 { Code 39 tables checked against ISO/IEC 16388:2007 }
 
 { Incorporates Table A1 }
-const C39Table : array[0..42] of AnsiString = ( '1112212111', '2112111121', '1122111121', '2122111111', '1112211121',
+const C39Table : array[0..42] of String = ( '1112212111', '2112111121', '1122111121', '2122111111', '1112211121',
 	'2112211111', '1122211111', '1112112121', '2112112111', '1122112111', '2111121121',
 	'1121121121', '2121121111', '1111221121', '2111221111', '1121221111', '1111122121',
 	'2111122111', '1121122111', '1111222111', '2111111221', '1121111221', '2121111211',
@@ -52,7 +52,7 @@ const C39Table : array[0..42] of AnsiString = ( '1112212111', '2112111121', '112
 	'1211121211', '1112121211');
 { Code 39 character assignments (Table 1) }
 
-const EC39Ctrl : array[0..127] of AnsiString = ('%U', '$A', '$B', '$C', '$D', '$E', '$F', '$G', '$H', '$I', '$J', '$K',
+const EC39Ctrl : array[0..127] of String = ('%U', '$A', '$B', '$C', '$D', '$E', '$F', '$G', '$H', '$I', '$J', '$K',
 	'$L', '$M', '$N', '$O', '$P', '$Q', '$R', '$S', '$T', '$U', '$V', '$W', '$X', '$Y', '$Z',
 	'%A', '%B', '%C', '%D', '%E', ' ', '/A', '/B', '/C', '/D', '/E', '/F', '/G', '/H', '/I', '/J',
 	'/K', '/L', '-', '.', '/O', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '/Z', '%F',
@@ -62,7 +62,7 @@ const EC39Ctrl : array[0..127] of AnsiString = ('%U', '$A', '$B', '$C', '$D', '$
 	'+P', '+Q', '+R', '+S', '+T', '+U', '+V', '+W', '+X', '+Y', '+Z', '%P', '%Q', '%R', '%S', '%T');
 { Encoding the full ASCII character set in Code 39 (Table A2) }
 
-const C93Ctrl : array[0..127] of AnsiString = ('bU', 'aA', 'aB', 'aC', 'aD', 'aE', 'aF', 'aG', 'aH', 'aI', 'aJ', 'aK',
+const C93Ctrl : array[0..127] of String = ('bU', 'aA', 'aB', 'aC', 'aD', 'aE', 'aF', 'aG', 'aH', 'aI', 'aJ', 'aK',
 	'aL', 'aM', 'aN', 'aO', 'aP', 'aQ', 'aR', 'aS', 'aT', 'aU', 'aV', 'aW', 'aX', 'aY', 'aZ',
 	'bA', 'bB', 'bC', 'bD', 'bE', ' ', 'cA', 'cB', 'cC', 'cD', 'cE', 'cF', 'cG', 'cH', 'cI', 'cJ',
 	'cK', 'cL', 'cM', 'cN', 'cO', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'cZ', 'bF',
@@ -71,7 +71,7 @@ const C93Ctrl : array[0..127] of AnsiString = ('bU', 'aA', 'aB', 'aC', 'aD', 'aE
 	'bW', 'dA', 'dB', 'dC', 'dD', 'dE', 'dF', 'dG', 'dH', 'dI', 'dJ', 'dK', 'dL', 'dM', 'dN', 'dO',
 	'dP', 'dQ', 'dR', 'dS', 'dT', 'dU', 'dV', 'dW', 'dX', 'dY', 'dZ', 'bP', 'bQ', 'bR', 'bS', 'bT');
 
-const C93Table : array[0..46] of AnsiString = ('131112', '111213', '111312', '111411', '121113', '121212', '121311',
+const C93Table : array[0..46] of String = ('131112', '111213', '111312', '111411', '121113', '121212', '121311',
 	'111114', '131211', '141111', '211113', '211212', '211311', '221112', '221211', '231111',
 	'112113', '112212', '112311', '122112', '132111', '111123', '111222', '111321', '121122',
 	'131121', '212112', '212211', '211122', '211221', '221121', '222111', '112122', '112221',
@@ -90,15 +90,17 @@ const C93Table : array[0..46] of AnsiString = ('131112', '111213', '111312', '11
 { *********************** CODE 11 ******************** }
 
 { Code 11 }
-function code_11(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function code_11(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   i : Cardinal;
   h, c_digit, c_weight, c_count, k_digit, k_weight, k_count : Integer;
   weight : array[0..127] of Integer;
   error_number : Integer;
-  dest : AnsiString; { 6 +  121 * 6 + 2 * 6 + 5 + 1 ~ 1024}
-  checkstr : array[0..2] of AnsiChar;
+  dest : TArrayOfChar; { 6 +  121 * 6 + 2 * 6 + 5 + 1 ~ 1024}
+  checkstr : TArrayOfChar;
 begin
+  SetLength(dest, 1024);
+  SetLength(checkstr, 3);
   error_number := 0;
 
   if (_length > 121) then
@@ -121,13 +123,13 @@ begin
   strcpy(dest, '112211');
 
   { Draw main body of barcode }
-  for i := 1 to _length do
+  for i := 0 to _length - 1 do
   begin
     lookup(SODIUM, C11Table, source[i], dest);
-    if (source[i] = '-') then
-      weight[i - 1] := 10
+    if (source[i] = Ord('-')) then
+      weight[i] := 10
     else
-      weight[i - 1] := ctoi(source[i]);
+      weight[i] := ctoi(Chr(source[i]));
   end;
 
   { Calculate C checksum }
@@ -168,20 +170,22 @@ begin
   expand(symbol, dest);
 
   ustrcpy(symbol.text, source);
-  uconcat(symbol.text, checkstr);
+  uconcat(symbol.text, ArrayOfCharToArrayOfByte(checkstr));
   result := error_number; exit;
 end;
 
 { Code 39 }
-function c39(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function c39(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   i : Cardinal;
   counter : Cardinal;
-  check_digit : AnsiChar;
+  check_digit : Char;
   error_number : Integer;
-  dest : AnsiString;
-  localstr : AnsiString;
+  dest : TArrayOfChar;
+  localstr : TArrayOfChar;
 begin
+  SetLength(dest, 755);
+  SetLength(localstr, 2); FillChar(localstr[0], Length(localstr), #0);
   error_number := 0;
   counter := 0;
 
@@ -209,7 +213,7 @@ begin
   { Start character }
   strcpy(dest, '1211212111');
 
-  for i := 1 to _length do
+  for i := 0 to _length - 1 do
   begin
     lookup(SILVER, C39Table, source[i], dest);
     Inc(counter, posn(SILVER, source[i]));
@@ -226,7 +230,7 @@ begin
     begin
       if (counter < 36) then
       begin
-        check_digit := AnsiChar((counter - 10) + Ord('A'));
+        check_digit := Char((counter - 10) + Ord('A'));
       end
       else
       begin
@@ -249,7 +253,8 @@ begin
     if (check_digit = ' ') then
       check_digit := '_';
 
-    localstr := check_digit;
+    localstr[0] := check_digit;
+    localstr[1] := #0;
   end;
 
   { Stop character }
@@ -259,7 +264,7 @@ begin
   begin
     { LOGMARS uses wider 'wide' bars than normal Code 39 }
     counter := strlen(dest);
-    for i := 1 to counter do
+    for i := 0 to counter - 1 do
     begin
       if (dest[i] = '2') then
         dest[i] := '3';
@@ -284,12 +289,13 @@ begin
 end;
 
 { Pharmazentral Nummer (PZN) }
-function pharmazentral(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function pharmazentral(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   i, error_number, zeroes : Integer;
   count, check_digit : Cardinal;
-  localstr : AnsiString;
+  localstr : TArrayOfChar;
 begin
+  SetLength(localstr, 10);
   error_number := 0;
 
   count := 0;
@@ -305,25 +311,27 @@ begin
     result := error_number; exit;
   end;
 
-  localstr := '-';
+  localstr[0] := '-';
   zeroes := 6 - _length + 1;
   for i := 1 to zeroes - 1 do
-    localstr := localstr + '0';
-  localstr := localstr + source;
+    localstr[i] := '0';
+  localstr[zeroes] := #0;
+  concat(localstr, source);
 
   for i := 1 to 6 do
-    Inc(count, (i + 1) * ctoi(localstr[i + 1]));
+    Inc(count, (i + 1) * ctoi(localstr[i]));
 
   check_digit := count  mod 11;
   if (check_digit = 11) then check_digit := 0;
-  localstr := localstr + itoc(check_digit);
+  localstr[7] := itoc(check_digit);
+  localstr[8] := #0;
 
   if (localstr[7] = 'A') then
   begin
     strcpy(symbol.errtxt, 'Invalid PZN Data');
     result := ZERROR_INVALID_DATA; exit;
   end;
-  error_number := c39(symbol, localstr, strlen(localstr));
+  error_number := c39(symbol, ArrayOfCharToArrayOfByte(localstr), strlen(localstr));
   ustrcpy(symbol.text, 'PZN');
   uconcat(symbol.text, localstr);
   result := error_number; exit;
@@ -332,12 +340,13 @@ end;
 { ************** EXTENDED CODE 39 *************** }
 
 { Extended Code 39 - ISO/IEC 16388:2007 Annex A }
-function ec39(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function ec39(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
-  buffer : AnsiString;
+  buffer : TArrayOfByte;
   i : Cardinal;
   error_number : Integer;
 begin
+  SetLength(buffer, 150); buffer[0] := 0;
   error_number := 0;
 
   if (_length > 74) then
@@ -347,26 +356,26 @@ begin
   end;
 
   { Creates a buffer string and places control characters into it }
-  for i := 1 to _length do
+  for i := 0 to _length - 1 do
   begin
-    if (source[i] > #127) then
+    if (source[i] > 127) then
     begin
       { Cannot encode extended ASCII }
       strcpy(symbol.errtxt, 'Invalid characters in input data');
       result := ZERROR_INVALID_DATA; exit;
     end;
-    concat(buffer, EC39Ctrl[Ord(source[i])]);
+    uconcat(buffer, EC39Ctrl[source[i]]);
   end;
 
   { Then sends the buffer to the C39 function }
   error_number := c39(symbol, buffer, ustrlen(buffer));
 
-  symbol.text := '';
-  for i := 1 to _length do
-    if source[i] <> #0 then
-    symbol.text := symbol.text + source[i]
+  for i := 0 to _length - 1 do
+    if source[i] <> 0 then
+    symbol.text[i] := source[i]
   else
-    symbol.text := symbol.text + ' ';
+    symbol.text[i] := Ord(' ');
+  symbol.text[_length] := 0;
 
   result := error_number; exit;
 end;
@@ -374,7 +383,7 @@ end;
 { ******************** CODE 93 ******************* }
 
 { Code 93 is an advancement on Code 39 and the definition is a lot tighter }
-function c93(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function c93(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   { SILVER includes the extra characters a, b, c and d to represent Code 93 specific
      shift characters 1, 2, 3 and 4 respectively. These characters are never used by
@@ -383,11 +392,13 @@ var
   i : Integer;
   h, weight, c, k, error_number : Integer;
   values : array[0..127] of Integer;
-  buffer : AnsiString;
-  dest : AnsiString;
-  set_copy : AnsiString;
+  buffer : TArrayOfChar;
+  dest : TArrayOfChar;
+  set_copy : TArrayOfChar;
 begin
-  set_copy := SILVER;
+  SetLength(buffer, 220);
+  SetLength(dest, 670);
+  set_copy := StrToArrayOfChar(SILVER);
   error_number := 0;
   strcpy(buffer, '');
 
@@ -397,22 +408,21 @@ begin
     result := ZERROR_TOO_LONG; exit;
   end;
 
-  symbol.text := '';
   { Message Content }
-  for i := 1 to _length do
+  for i := 0 to _length - 1 do
   begin
-    if (source[i] > #127) then
+    if (source[i] > 127) then
     begin
       { Cannot encode extended ASCII }
       strcpy(symbol.errtxt, 'Invalid characters in input data');
       result := ZERROR_INVALID_DATA; exit;
     end;
-    concat(buffer, C93Ctrl[Ord(source[i])]);
+    concat(buffer, C93Ctrl[source[i]]);
 
-    if source[i] <> #0 then
-      symbol.text := symbol.text + source[i]
+    if source[i] <> 0 then
+      symbol.text[i] := source[i]
     else
-      symbol.text := symbol.text + ' ';
+      symbol.text[i] := Ord(' ');
   end;
 
   { Now we can check the true _length of the barcode }
@@ -424,7 +434,7 @@ begin
   end;
 
   for i := 0 to h - 1 do
-    values[i] := posn(SILVER, buffer[i + 1]) - 1;
+    values[i] := posn(SILVER, buffer[i]);
 
   { Putting the data into dest[] is not done until after check digits are calculated }
 
@@ -440,7 +450,7 @@ begin
   end;
   c := c mod 47;
   values[h] := c;
-  buffer := buffer + set_copy[c + 1] ;
+  buffer[h] := set_copy[c] ;
 
   { Check digit K }
   k := 0;
@@ -454,21 +464,23 @@ begin
   end;
   k := k mod 47;
   Inc(h);
-  buffer := buffer + set_copy[k + 1];
+  buffer[h] := set_copy[k];
   Inc(h);
+  buffer[h] := #0;
 
   { Start character }
   strcpy(dest, '111141');
 
-  for i := 1 to h do
+  for i := 0 to h - 1 do
     lookup(SILVER, C93Table, buffer[i], dest);
 
   { Stop character }
   concat(dest, '1111411');
   expand(symbol, dest);
 
-  symbol.text := symbol.text + set_copy[c + 1];
-  symbol.text := symbol.text + set_copy[k + 1];
+  symbol.text[_length] := Ord(set_copy[c]);
+  symbol.text[_length + 1] := Ord(set_copy[k]);
+  symbol.text[_length + 2] := 0;
 
   result := error_number; exit;
 end;

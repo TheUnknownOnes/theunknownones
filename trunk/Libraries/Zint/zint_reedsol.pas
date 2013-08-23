@@ -20,7 +20,7 @@ unit zint_reedsol;
 interface
 
 uses
-  zint_common;
+  zint, zint_common;
 
 procedure rs_init_gf(poly : Integer);
 procedure rs_init_code(nsym : Integer; index : Integer);

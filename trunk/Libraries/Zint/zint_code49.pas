@@ -22,14 +22,14 @@ interface
 uses
   SysUtils, zint;
 
-function code_49(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function code_49(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 
 implementation
 
 uses zint_common;
 
 { Table 7: Code 49 ASCII Chart }
-const c49_table7 : array[0..127] of AnsiString = (
+const c49_table7 : array[0..127] of String = (
 	'! ', '!A', '!B', '!C', '!D', '!E', '!F', '!G', '!H', '!I', '!J', '!K', '!L',
 	'!M', '!N', '!O', '!P', '!Q', '!R', '!S', '!T', '!U', '!V', '!W', '!X', '!Y',
 	'!Z', '!1', '!2', '!3', '!4', '!5', ' ', '!6', '!7', '!8', '$', '%', '!9', '!0',
@@ -59,12 +59,12 @@ const c49_z_weight : array[0..31] of Integer = (
 );
 
 { Table 4: Row Parity Pattern for Code 49 Symbols }
-const c49_table4 : array[0..7] of AnsiString = (
+const c49_table4 : array[0..7] of String = (
 	'OEEO', 'EOEO', 'OOEE', 'EEOO', 'OEOE', 'EOOE', 'OOOO', 'EEEE'
 );
 
 { Appendix E - Code 49 Encodation Patterns (Even Symbol Character Parity) }
-const c49_appxe_even : array[0..2400] of AnsiString = (
+const c49_appxe_even : array[0..2400] of String = (
 	{ Column 1 }
 	'11521132',
 	'25112131', '14212132', '25121221', '14221222', '12412132',
@@ -623,7 +623,7 @@ const c49_appxe_even : array[0..2400] of AnsiString = (
 );
 
 { Appendix E - Code 49 Encodation Patterns (Odd Symbol Character Parity) }
-const c49_appxe_odd : array[0..2400] of AnsiString = (
+const c49_appxe_odd : array[0..2400] of String = (
 	{ Column 1 }
 	'22121116',
 	'42121114', '31221115', '51221113', '32112115', '52112113',
@@ -1181,23 +1181,25 @@ const c49_appxe_odd : array[0..2400] of AnsiString = (
 	'12221611', '11131162', '21122161', '21131251', '11113162'
 );
 
-const INSET : AnsiString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%!&*';
+const INSET : String = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%!&*';
 { "!" represents Shift 1 and "&" represents Shift 2, "*" represents FNC1 }
 
-function code_49(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function code_49(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   i, j, rows, M, x_count, y_count, z_count, posn_val, local_value, h : Integer;
-  intermediate : AnsiString;
+  intermediate : TArrayOfChar;
   codewords : array[0..169] of Integer;
   codeword_count : Integer;
   c_grid : array[0..7] of array[0..7] of Integer; { Refers to table 3 }
   w_grid : array[0..7] of array[0..3] of Integer; { Refets to table 2 }
   pad_count : Integer;
-  pattern : AnsiString;
+  pattern : TArrayOfChar;
   gs1 : Integer;
   block_count, c, block_remain, block_value : Integer;
   row_sum : Integer;
 begin
+  SetLength(intermediate, 170);
+  SetLength(pattern, 40);
   pad_count := 0;
   if (_length > 81) then
   begin
@@ -1208,21 +1210,21 @@ begin
 
   if (gs1 <> 0) then strcpy(intermediate, '*') else strcpy(intermediate, ''); { FNC1 }
 
-  for i := 1 to _length do
+  for i := 0 to _length - 1 do
   begin
-    if (source[i] > #127) then
+    if (source[i] > 127) then
     begin
       strcpy(symbol.errtxt, 'Invalid characters in input data');
       result := ZERROR_INVALID_DATA; exit;
     end;
-    if (gs1 <> 0) and (source[i] = '[') then
+    if (gs1 <> 0) and (source[i] = Ord('[')) then
       concat(intermediate, '*') { FNC1 }
     else
-      concat(intermediate, c49_table7[Ord(source[i])]);
+      concat(intermediate, c49_table7[source[i]]);
   end;
 
   codeword_count := 0;
-  i := 1;
+  i := 0;
   h := strlen(intermediate);
   repeat
     if ((intermediate[i] >= '0') and (intermediate[i] <= '9')) then
@@ -1293,7 +1295,7 @@ begin
           1:
           begin
             { Rule (a) }
-            codewords[codeword_count] := posn(INSET, intermediate[i]) - 1;
+            codewords[codeword_count] := posn(INSET, intermediate[i]);
             Inc(codeword_count);
             Inc(i);
           end;
@@ -1340,18 +1342,18 @@ begin
       end
       else
       begin
-        codewords[codeword_count] := posn(INSET, intermediate[i]) - 1;
+        codewords[codeword_count] := posn(INSET, intermediate[i]);
         Inc(codeword_count);
         Inc(i);
       end;
     end
     else
     begin
-      codewords[codeword_count] := posn(INSET, intermediate[i]) - 1;
+      codewords[codeword_count] := posn(INSET, intermediate[i]);
       Inc(codeword_count);
       Inc(i);
     end;
-  until not (i <= h);
+  until not (i < h);
 
   case codewords[0] of { Set starting mode value }
     48: M := 2;
