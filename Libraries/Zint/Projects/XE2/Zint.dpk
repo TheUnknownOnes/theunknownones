@@ -48,7 +48,6 @@ contains
   zint_gs1 in '..\..\zint_gs1.pas',
   zint_maxicode in '..\..\zint_maxicode.pas',
   zint_medical in '..\..\zint_medical.pas',
-  zint_metafile in '..\..\zint_metafile.pas',
   zint_reedsol in '..\..\zint_reedsol.pas';
 
 end.
