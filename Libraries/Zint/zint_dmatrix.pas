@@ -22,12 +22,12 @@ interface
 uses
   zint;
 
-function dmatrix(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function dmatrix(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 
 implementation
 
 uses
-  zint_reedsol, zint_common;
+  SysUtils, zint_reedsol, zint_common;
 
 const
   MAXBARCODE = 3116;
@@ -271,21 +271,19 @@ begin
   rs_free();
 end;
 
-function isx12(source : AnsiChar) : Integer;
-var
-  _source : Byte absolute source;
+function isx12(source : Byte) : Integer;
 begin
-  if (_source = 13) then begin result := 1; exit; end;
-  if (_source = 42) then begin result := 1; exit; end;
-  if (_source = 62) then begin result := 1; exit; end;
-  if (_source = 32) then begin result := 1; exit; end;
-  if ((source >= '0') and (source <= '9')) then begin result := 1; exit; end;
-  if ((source >= 'A') and (source <= 'Z')) then begin result := 1; exit; end;
+  if (source = 13) then begin result := 1; exit; end;
+  if (source = 42) then begin result := 1; exit; end;
+  if (source = 62) then begin result := 1; exit; end;
+  if (source = 32) then begin result := 1; exit; end;
+  if ((source >= ord('0')) and (source <= ord('9'))) then begin result := 1; exit; end;
+  if ((source >= ord('A')) and (source <= ord('Z'))) then begin result := 1; exit; end;
 
   result := 0; exit;
 end;
 
-procedure dminsert(var binary_string : AnsiString; posn : Integer; newbit : AnsiChar);
+procedure dminsert(var binary_string : TArrayOfChar; posn : Integer; newbit : Char);
 { Insert a character into the middle of a string at position posn }
 var
   i, _end : Integer;
@@ -308,13 +306,13 @@ begin
   binary_stream[posn] := newbit;
 end;
 
-function look_ahead_test(source : AnsiString; sourcelen : Integer; position : Integer; current_mode : Integer; gs1 : Integer) : Integer;
+function look_ahead_test(source : TArrayOfByte; sourcelen : Integer; position : Integer; current_mode : Integer; gs1 : Integer) : Integer;
 { A custom version of the 'look ahead test' from Annex P }
 { This version is deliberately very reluctant to end a data stream with EDIFACT encoding }
 var
   ascii_count, c40_count, text_count, x12_count, edf_count, b256_count, best_count : Single;
   sp, done, best_scheme : Integer;
-  reduced_char : AnsiChar;
+  reduced_char : Byte;
 begin
   { step (j) }
   if (current_mode = DM_ASCII) then
@@ -347,35 +345,35 @@ begin
   sp := position;
   while (sp <= sourcelen) and (sp <= (position + 8)) do
   begin
-    if (source[sp] <= #127) then reduced_char := source[sp] else reduced_char := AnsiChar(Ord(source[sp]) - 127);
+    if (source[sp] <= 127) then reduced_char := source[sp] else reduced_char := Ord(source[sp]) - 127;
 
-    if ((source[sp] >= '0') and (source[sp] <= '9')) then ascii_count := ascii_count + 0.5 else ascii_count := ascii_count + 1.0;
-    if (source[sp] > #127) then ascii_count := ascii_count+ 1.0;
+    if ((source[sp] >= ord('0')) and (source[sp] <= Ord('9'))) then ascii_count := ascii_count + 0.5 else ascii_count := ascii_count + 1.0;
+    if (source[sp] > 127) then ascii_count := ascii_count+ 1.0;
 
     done := 0;
-    if (reduced_char = ' ') then begin c40_count := c40_count+ (2.0 / 3.0); done := 1; end;
-    if ((reduced_char >= '0') and (reduced_char <= '9')) then begin c40_count := c40_count + (2.0 / 3.0); done := 1; end;
-    if ((reduced_char >= 'A') and (reduced_char <= 'Z')) then begin c40_count := c40_count + (2.0 / 3.0); done := 1; end;
-    if (source[sp] > #127) then c40_count := c40_count + (4.0 / 3.0);
+    if (reduced_char = ord(' ')) then begin c40_count := c40_count+ (2.0 / 3.0); done := 1; end;
+    if ((reduced_char >= ord('0')) and (reduced_char <= ord('9'))) then begin c40_count := c40_count + (2.0 / 3.0); done := 1; end;
+    if ((reduced_char >= ord('A')) and (reduced_char <= ord('Z'))) then begin c40_count := c40_count + (2.0 / 3.0); done := 1; end;
+    if (source[sp] > 127) then c40_count := c40_count + (4.0 / 3.0);
     if (done = 0) then c40_count := c40_count + (4.0 / 3.0);
 
     done := 0;
-    if (reduced_char = ' ') then begin text_count := text_count + (2.0 / 3.0); done := 1; end;
-    if ((reduced_char >= '0') and (reduced_char <= '9')) then begin text_count := text_count + (2.0 / 3.0); done := 1; end;
-    if ((reduced_char >= 'a') and (reduced_char <= 'z')) then begin text_count := text_count + (2.0 / 3.0); done := 1; end;
-    if (source[sp] > #127) then text_count := text_count + (4.0 / 3.0);
+    if (reduced_char = ord(' ')) then begin text_count := text_count + (2.0 / 3.0); done := 1; end;
+    if ((reduced_char >= ord('0')) and (reduced_char <= ord('9'))) then begin text_count := text_count + (2.0 / 3.0); done := 1; end;
+    if ((reduced_char >= ord('a')) and (reduced_char <= ord('z'))) then begin text_count := text_count + (2.0 / 3.0); done := 1; end;
+    if (source[sp] > 127) then text_count := text_count + (4.0 / 3.0);
     if (done = 0) then text_count := text_count + (4.0 / 3.0);
 
     if (isx12(source[sp]) <> 0) then x12_count := x12_count + (2.0 / 3.0) else x12_count := x12_count + 4.0;
 
     { step (p) }
     done := 0;
-    if ((source[sp] >= ' ') and (source[sp] <= '^')) then edf_count := edf_count + (3.0 / 4.0) else edf_count := edf_count + 6.0;
-    if ((gs1 <> 0) and (source[sp] = '[')) then edf_count := edf_count + 6.0;
+    if ((source[sp] >= ord(' ')) and (source[sp] <= ord('^'))) then edf_count := edf_count + (3.0 / 4.0) else edf_count := edf_count + 6.0;
+    if ((gs1 <> 0) and (source[sp] = ord('['))) then edf_count := edf_count + 6.0;
     if (sp >= (sourcelen - 5)) then edf_count := edf_count + 6.0; { MMmmm fudge! }
 
     { step (q) }
-    if ((gs1 <> 0) and (source[sp] = '[')) then b256_count := b256_count + 4.0 else b256_count := b256_count + 1.0;
+    if ((gs1 <> 0) and (source[sp] = ord('['))) then b256_count := b256_count + 4.0 else b256_count := b256_count + 1.0;
 
     Inc(sp);
   end;
@@ -416,7 +414,7 @@ begin
   result := best_scheme; exit;
 end;
 
-function dm200encode(symbol : zint_symbol; source : AnsiString; var target : TArrayOfByte; var last_mode : Integer; _length : Integer) : Integer;
+function dm200encode(symbol : zint_symbol; source : TArrayOfByte; var target : TArrayOfByte; var last_mode : Integer; _length : Integer) : Integer;
 { Encodes data using ASCII, C40, Text, X12, EDIFACT or Base 256 modes as appropriate }
 { Supports encoding FNC1 in supporting systems }
 var
@@ -429,15 +427,16 @@ var
   c40_p, text_p, x12_p : Integer;
   edifact_buffer : array[0..7] of Integer;
   edifact_p : Integer;
-  binary : AnsiString;
+  binary : TArrayOfChar;
   shift_set, value : Integer;
   iv : Integer;
   binary_count : Integer;
   prn, temp : Integer;
 begin
   inputlen := _length;
+  SetLength(binary, inputlen * 2);
 
-  sp := 1;
+  sp := 0;
   tp := 0;
   FillChar(c40_buffer[0], Length(c40_buffer), 0);
   c40_p := 0;
@@ -487,7 +486,7 @@ begin
 
       if (((sp + 1) <= inputlen) and (istwodigits(source, sp) <> 0)) then
       begin
-        target[tp] := (10 * ctoi(source[sp])) + ctoi(source[sp + 1]) + 130;
+        target[tp] := (10 * StrToInt(Chr(source[sp]))) + StrToInt(Chr(source[sp + 1])) + 130;
         Inc(tp); concat(binary, ' ');
         Inc(sp, 2);
       end
@@ -507,7 +506,7 @@ begin
         end
         else
         begin
-          if (source[sp] > #127) then
+          if (source[sp] > 127) then
           begin
             target[tp] := 235; { FNC4 }
             Inc(tp);
@@ -516,7 +515,7 @@ begin
           end
           else
           begin
-            if ((gs1 <> 0) and (source[sp] = '[')) then
+            if ((gs1 <> 0) and (source[sp] = ord('['))) then
               target[tp] := 232 { FNC1 }
             else
               target[tp] := Ord(source[sp]) + 1;
@@ -543,7 +542,7 @@ begin
       end
       else
       begin
-        if (source[sp] > #127) then
+        if (source[sp] > 127) then
         begin
           c40_buffer[c40_p] := 1; Inc(c40_p);
           c40_buffer[c40_p] := 30; Inc(c40_p); { Upper Shift }
@@ -556,7 +555,7 @@ begin
           value := c40_value[Ord(source[sp])];
         end;
 
-        if ((gs1 <> 1) and (source[sp] = '[')) then
+        if ((gs1 <> 1) and (source[sp] = ord('['))) then
         begin
           shift_set := 2;
           value := 27; { FNC1 }
@@ -601,7 +600,7 @@ begin
       end
       else
       begin
-        if (source[sp] > #127) then
+        if (source[sp] > 127) then
         begin
           text_buffer[text_p] := 1; Inc(text_p);
           text_buffer[text_p] := 30; Inc(text_p); { Upper Shift }
@@ -614,7 +613,7 @@ begin
           value := text_value[Ord(source[sp])];
         end;
 
-        if ((gs1 <> 0) and (source[sp] = '[')) then
+        if ((gs1 <> 0) and (source[sp] = ord('['))) then
         begin
           shift_set := 2;
           value := 27; { FNC1 }
@@ -661,12 +660,12 @@ begin
       end
       else
       begin
-        if (source[sp] = #13) then value := 0;
-        if (source[sp] = '*') then value := 1;
-        if (source[sp] = '>') then value := 2;
-        if (source[sp] = ' ') then value := 3;
-        if ((source[sp] >= '0') and (source[sp] <= '9')) then value := (Ord(source[sp]) - Ord('0')) + 4;
-        if ((source[sp] >= 'A') and (source[sp] <= 'Z')) then value := (Ord(source[sp]) - Ord('A')) + 14;
+        if (source[sp] = 13) then value := 0;
+        if (source[sp] = ord('*')) then value := 1;
+        if (source[sp] = ord('>')) then value := 2;
+        if (source[sp] = ord(' ')) then value := 3;
+        if ((source[sp] >= ord('0')) and (source[sp] <= ord('9'))) then value := (Ord(source[sp]) - Ord('0')) + 4;
+        if ((source[sp] >= ord('A')) and (source[sp] <= ord('Z'))) then value := (Ord(source[sp]) - Ord('A')) + 14;
 
         x12_buffer[x12_p] := value; Inc(x12_p);
 
@@ -705,8 +704,8 @@ begin
       end
       else
       begin
-        if ((source[sp] >= '@') and (source[sp] <= '^')) then value := Ord(source[sp]) - Ord('@');
-        if ((source[sp] >= ' ') and (source[sp] <= '?')) then value := Ord(source[sp]);
+        if ((source[sp] >= ord('@')) and (source[sp] <= ord('^'))) then value := Ord(source[sp]) - Ord('@');
+        if ((source[sp] >= ord(' ')) and (source[sp] <= ord('?'))) then value := Ord(source[sp]);
 
         edifact_buffer[edifact_p] := value; Inc(edifact_p);
         Inc(sp);
@@ -884,7 +883,7 @@ begin
   end;
 end;
 
-function data_matrix_200(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function data_matrix_200(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   skew : Integer;
   binary : TArrayOfByte;
@@ -1028,7 +1027,7 @@ begin
   result := error_number; exit;
 end;
 
-function dmatrix(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function dmatrix(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   error_number : Integer;
 begin

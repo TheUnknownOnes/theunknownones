@@ -53,7 +53,7 @@ type
 implementation
 
 uses
-  Types, System.SysUtils;
+  Types, SysUtils, zint_helper;
 
 
 { TZintSVGRenderTarget }
@@ -106,7 +106,7 @@ begin
   begin
     fs:=FormatSettings;
     fs.DecimalSeparator:='.';
-    ResultStr:='<g><title>'+ASymbol.text+'</title><desc>Barcode generated using Zint</desc>';
+    ResultStr:='<g><title>' + ArrayOfByteToString(ASymbol.text) + '</title><desc>Barcode generated using Zint</desc>';
 
     //clear Background
     if not FTransparent then

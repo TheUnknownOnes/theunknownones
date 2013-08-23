@@ -22,12 +22,12 @@ interface
 uses
   SysUtils, zint;
 
-function maxicode(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function maxicode(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 
 implementation
 
 uses
-  zint_common, zint_reedsol;
+  zint_common, zint_reedsol, zint_helper;
 
 var
   maxi_codeword : array[0..143] of Integer;
@@ -200,16 +200,17 @@ begin
 end;
 
 { Format text according to Appendix A }
-function maxi_text_process(mode : Integer; source : AnsiString; _length : Integer) : Integer;
+function maxi_text_process(mode : Integer; source : TArrayOfChar; _length : Integer) : Integer;
 var
   _set, character : TArrayOfInteger;
   i : Integer;
   count : Integer;
   current_set : Integer;
-  substring : AnsiString;
+  substring : TArrayOfChar;
   value : Integer;
   j : Integer;
 begin
+  SetLength(substring, 10);
   SetLength(_set, 144);
   SetLength(character, 144);
   { This code doesn't make use of [Lock in C], [Lock in D]
@@ -231,8 +232,8 @@ begin
   begin
     { Look up characters in table from Appendix A - this gives
      value and code set for most characters }
-    _set[i] := maxiCodeset[Ord(source[i + 1])];
-    character[i] := maxiSymbolChar[Ord(source[i + 1])];
+    _set[i] := maxiCodeset[Ord(source[i])];
+    character[i] := maxiSymbolChar[Ord(source[i])];
   end;
 
   { If a character can be represented in more than one code set,
@@ -572,10 +573,11 @@ begin
     if (_set[i] = 6) then
     begin
       { Number compression }
-      substring := '';
+      substring[0] := #0;
       for j := 0 to 8 do //chaosben: original it counts up to 9, but i thinks thats a bug, because there are only 9 digits (0..8)
-        substring := substring + AnsiChar(character[i + j]);
-      value := StrToInt(substring);
+        substring[j] := Chr(character[i + j]);
+      substring[9] := #0;
+      value := StrToInt(ArrayOfCharToString(substring));
 
       character[i] := 31; { NS }
       character[i + 1] := (value and $3f000000) shr 24;
@@ -634,17 +636,17 @@ begin
 end;
 
 { Format structured primary for Mode 2 }
-procedure maxi_do_primary_2(postcode : AnsiString; country : Integer; service : Integer);
+procedure maxi_do_primary_2(postcode : TArrayOfChar; country : Integer; service : Integer);
 var
   postcode_length, postcode_num : Integer;
   i : Integer;
 begin
-  for i := 1 to 10 do
+  for i := 0 to 9 do
     if ((postcode[i] < '0') or (postcode[i] > '9')) then
-      Delete(postcode, i, 1);
+      postcode[i] := #0;
 
   postcode_length := strlen(postcode);
-  postcode_num := StrToInt(postcode);
+  postcode_num := StrToInt(zint_helper.ArrayOfCharToString(postcode));
 
   maxi_codeword[0] := ((postcode_num and $03) shl 4) or 2;
   maxi_codeword[1] := ((postcode_num and $fc) shr 2);
@@ -659,21 +661,21 @@ begin
 end;
 
 { Format structured primary for Mode 3 }
-procedure maxi_do_primary_3(postcode : AnsiString; country : Cardinal; service : Integer);
+procedure maxi_do_primary_3(postcode : TArrayOfByte; country : Cardinal; service : Integer);
 var
   i, h : Integer;
 begin
-  h := strlen(postcode);
+  h := ustrlen(postcode);
   to_upper(postcode);
   for i := 1 to h do
   begin
-    if ((postcode[i] >= 'A') and (postcode[i] <= 'Z')) then
+    if ((Chr(postcode[i]) >= 'A') and (Chr(postcode[i]) <= 'Z')) then
       { (Capital) letters shifted to Code Set A values }
       Dec(postcode[i], 64);
 
-    if (((postcode[i] = #27) or (postcode[i] = #31)) or ((postcode[i] = #33) or (postcode[i] >= #59))) then
+    if (postcode[i] = 27) or (postcode[i] = 31) or (postcode[i] = 33) or (postcode[i] >= 59) then
       { Not a valid postcode character }
-      postcode[i] := ' ';
+      postcode[i] := 32;
 
     { Input characters lower than 27 (NUL - SUB) in postcode are
     interpreted as capital letters in Code Set A (e.g. LF becomes 'J') }
@@ -691,14 +693,18 @@ begin
   maxi_codeword[9] := ((service and $3f0) shr 4);
 end;
 
-function maxicode(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function maxicode(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   i, j, block, bit, mode, countrycode, service, lp : Integer;
   bit_pattern : TArrayOfInteger;
   internal_error, eclen, error_number : Integer;
-  postcode, countrystr, servicestr : AnsiString;
-  local_source : AnsiString;
+  postcode, countrystr, servicestr : TArrayOfChar;
+  local_source : TArrayOfChar;
 begin
+  SetLength(local_source, _length + 1);
+  SetLength(postcode, 12);
+  SetLength(countrystr, 4);
+  SetLength(servicestr, 4);
   countrycode := 0; service :=0; lp := 0;
   internal_error := 0;
   SetLength(bit_pattern, 7);
@@ -710,9 +716,9 @@ begin
 
   { The following to be replaced by ECI handling }
   {
-  chaosben: i think this is a bug, because it was already done in before and
+  chaosben: i think this is a bug, because it was already done before and
             when calling latin1_process a second time error "ZERROR_INVALID_DATA" is raised
-            thats why it commented out
+            thats why its commented out
   case symbol.input_mode of
     DATA_MODE,
     GS1_MODE:
@@ -724,7 +730,8 @@ begin
     end;
   end;
   chaosben: instead, we assign local_source directly}
-  local_source := source;
+  ArrayCopy(local_source, source);
+  local_source[_length] := #0;
 
   FillChar(maxi_codeword[0], SizeOf(maxi_codeword), 0);
 
@@ -736,8 +743,8 @@ begin
     else
     begin
       mode := 2;
-      i := 1;
-      while (i <= 10) and (i <= lp)do
+      i := 0;
+      while (i < 10) and (i < lp)do
       begin
         if ((symbol.primary[i] < #48) or (symbol.primary[i] > #57)) then
         begin
@@ -787,20 +794,26 @@ begin
     else if (mode = 3) then
       postcode[7] := #0;
 
-    countrystr := symbol.primary[9] + symbol.primary[10] + symbol.primary[11];
+    countrystr[0] := symbol.primary[9];
+	  countrystr[1] := symbol.primary[10];
+	  countrystr[2] := symbol.primary[11];
+	  countrystr[3] := #0;
 
-    servicestr := symbol.primary[12] + symbol.primary[13] + symbol.primary[14];
+    servicestr[0] := symbol.primary[12];
+	  servicestr[1] := symbol.primary[13];
+	  servicestr[2] := symbol.primary[14];
+	  servicestr[3] := #0;
 
-    countrycode := StrToInt(countrystr);
-    service := StrToInt(servicestr);
+    countrycode := StrToInt(ArrayOfCharToString(countrystr));
+    service := StrToInt(ArrayOfCharToString(servicestr));
 
-    if (mode = 2) then maxi_do_primary_2(postcode, countrycode, service);
-    if (mode = 3) then maxi_do_primary_3(postcode, countrycode, service);
+    if (mode = 2) then maxi_do_primary_2( postcode, countrycode, service);
+    if (mode = 3) then maxi_do_primary_3( ArrayOfCharToArrayOfByte(postcode), countrycode, service);
   end
   else
     maxi_codeword[0] := mode;
 
-  i := maxi_text_process(mode, local_source, _length);
+  i := maxi_text_process(mode,  local_source, _length);
   if (i = ZERROR_TOO_LONG ) then
   begin
     strcpy(symbol.errtxt, 'Input data too long');

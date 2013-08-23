@@ -32,12 +32,15 @@ type
     Label4: TLabel;
     FontDialog1: TFontDialog;
     ButtonFont: TButton;
+    btSVG: TButton;
+    FileSaveDialog1: TFileSaveDialog;
     procedure FormCreate(Sender: TObject);
     procedure edDataChange(Sender: TObject);
     procedure comTypeChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btPrintClick(Sender: TObject);
     procedure ButtonFontClick(Sender: TObject);
+    procedure btSVGClick(Sender: TObject);
   private
     procedure GenBarcode;
     function GenSymbol: TZintSymbol;
@@ -52,7 +55,7 @@ implementation
 
 {$R *.dfm}
 
-uses zint_render_wmf, zint_render_canvas, Printers;
+uses zint_render_wmf, zint_render_canvas, Printers, zint_render_svg, zint_helper;
 
 type
   BCTypeEntry = record
@@ -133,6 +136,50 @@ begin
       lblError.Caption := e.Message;
   end;
   symbol.Free;
+end;
+
+procedure TForm46.btSVGClick(Sender: TObject);
+var
+  sl : TStringList;
+  symbol : TZintSymbol;
+  rt  : TZintSVGRenderTarget;
+begin
+  if FileSaveDialog1.Execute then
+  begin
+    sl:=TStringList.Create;
+    try
+      lblError.Caption := '';
+
+      symbol:=GenSymbol;
+      try
+        rt:=TZintSVGRenderTarget.Create(sl);
+        rt.ForegroundColor:='black';
+        rt.BackgroundColor:='white';
+        rt.Transparent:=false;
+        rt.RenderAdjustMode:=TZintRenderAdjustMode(cbRAM.ItemIndex);
+        rt.Font:=ButtonFont.Font.Name;
+        rt.HexagonScale:=StrToFloatDef(edMHS.Text, 1);
+        rt.Left:=0;
+        rt.Top:=0;
+        rt.WidthDesired:=300;
+        rt.HeightDesired:=300;
+        try
+          Symbol.Render(rt);
+        finally
+          rt.Free;
+        end;
+
+      except
+        on E : Exception do
+          lblError.Caption := e.Message;
+      end;
+      symbol.Free;
+
+      sl.SaveToFile(FileSaveDialog1.FileName);
+    finally
+      sl.free;
+    end;
+  end;
 end;
 
 procedure TForm46.ButtonFontClick(Sender: TObject);

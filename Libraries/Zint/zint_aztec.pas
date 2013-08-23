@@ -21,10 +21,10 @@ unit zint_aztec;
 interface
 
 uses
-  SysUtils, zint;
+  SysUtils, zint, zint_helper;
 
-function aztec_runes(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function aztec(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function aztec_runes(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
+function aztec(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 
 implementation
 
@@ -248,16 +248,16 @@ const AztecSymbolChar : array[0..127] of Integer = ( { From Table 2 }
 	302: Full Stop (ASCII 46)
 }
 
-const hexbit : array[0..31] of AnsiString = ('00000', '00001', '00010', '00011', '00100', '00101', '00110', '00111', '01000', '01001',
+const hexbit : array[0..31] of String = ('00000', '00001', '00010', '00011', '00100', '00101', '00110', '00111', '01000', '01001',
 	'01010', '01011', '01100', '01101', '01110', '01111', '10000', '10001', '10010', '10011', '10100', '10101',
 	'10110', '10111', '11000', '11001', '11010', '11011', '11100', '11101', '11110', '11111'
 );
 
-const pentbit : array[0..15] of AnsiString = ('0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111', '1000', '1001',
+const pentbit : array[0..15] of String = ('0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111', '1000', '1001',
 	'1010', '1011', '1100', '1101', '1110', '1111'
 );
 
-const tribit : array[0..7] of AnsiString = ('000', '001', '010', '011', '100', '101', '110', '111');
+const tribit : array[0..7] of String = ('000', '001', '010', '011', '100', '101', '110', '111');
 
 const AztecSizes : array[0..31] of Integer = ( { Codewords per symbol }
 	21, 48, 60, 88, 120, 156, 196, 240, 230, 272, 316, 364, 416, 470, 528, 588, 652, 720, 790,
@@ -311,13 +311,12 @@ end;
 {*
  * Insert a character into the middle of a string at position posn
  }
-{procedure insert(var binary_string : AnsiString; posn : Integer; newbit : AnsiChar);
+{procedure insert(var binary_string : TArrayOfChar; posn : Integer; newbit : Char);
 var
   i, _end : Integer;
 begin
-  SetLength(binary_string, Length(binary_string) + 1);
   _end := strlen(binary_string);
-  for i := _end downto posn + 1 do
+  for i := _end downto posn + 1  do
     binary_string[i] := binary_string[i - 1];
 
   binary_string[posn] := newbit;
@@ -326,7 +325,7 @@ end;}
 {*
  * Encode input data into a binary string
  }
-function aztec_text_process(source : AnsiString; const src_len : Cardinal; out binary_string : AnsiString; gs1 : Integer) : Integer;
+function aztec_text_process(source : TArrayOfChar; const src_len : Cardinal; var binary_string : TArrayOfChar; gs1 : Integer) : Integer;
 var
   bytes : Integer;
   curtable, newtable, lasttable, chartype, map_length, blocks : Integer;
@@ -341,7 +340,7 @@ begin
   { Lookup input string in encoding table }
   map_length := 0;
 
-  for i := 1 to src_len do
+  for i := 0 to src_len - 1 do
   begin
     if (gs1 <> 0) and (i = 1) then
     begin
@@ -559,7 +558,7 @@ begin
       end;
     end;
   end;
-  binary_string  := '';
+  binary_string[0]  := #0;
 
   curtable := UPPER; { start with UPPER table }
   lasttable := UPPER;
@@ -922,26 +921,31 @@ begin
   result := 0; exit;
 end;
 
-function aztec(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function aztec(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   x, y, i, j, data_blocks, ecc_blocks, layers, total_bits : Integer;
-  binary_string : AnsiString;
-  bit_pattern : array[0..20044] of AnsiChar;
-  descriptor : array[0..41] of AnsiChar;
-  adjusted_string : AnsiString;
+  binary_string : TArrayOfChar;
+  bit_pattern : TArrayOfChar;
+  descriptor : TArrayOfChar;
+  adjusted_string : TArrayOfChar;
   desc_data, desc_ecc : TArrayOfByte;
   err_code, ecc_level, compact, data_length, data_maxsize, codeword_size, adjusted_length : Integer;
   remainder, padbits, count, gs1, adjustment_size : Integer;
   reader : Integer;
   comp_loop : Integer;
-  local_source : AnsiString;
+  local_source : TArrayOfChar;
   t, done, v : Integer;
   data_part, ecc_part : TArrayOfCardinal;
 begin
+  SetLength(binary_string, 20000);
+  SetLength(adjusted_string, 20000);
+  SetLength(bit_pattern, 20045);
+  SetLength(descriptor, 42);
   SetLength(desc_data, 4);
   SetLength(desc_ecc, 6);
   reader := 0;
   comp_loop := 4;
+  SetLength(local_source, _length + 1);
 
   if (symbol.input_mode = GS1_MODE) then gs1 := 1 else gs1 := 0;
   if (symbol.output_options and READER_INIT) <> 0 then begin reader := 1; comp_loop := 1; end;
@@ -964,7 +968,8 @@ begin
       break;
   end;}
 
-  local_source := source;
+  ArrayCopy(local_source, source);
+  local_source[_length] := #0;
 
   err_code := aztec_text_process(local_source, _length, binary_string, gs1);
 
@@ -1099,8 +1104,8 @@ begin
       if ((layers >= 9) and (layers <= 22)) then codeword_size := 10;
       if (layers >= 23) then codeword_size := 12;
 
-      adjusted_string := '';
-      j := 0; i := 1;
+      adjusted_string[0] := #0;
+      j := 0; i := 0;
       repeat
         if ((j + 1) mod codeword_size) = 0 then
         begin
@@ -1116,32 +1121,32 @@ begin
 
           if (count = (codeword_size - 1)) then
           begin
-            adjusted_string := adjusted_string + '0';
+            adjusted_string[j] := '0';
             Inc(j);
             done := 1;
           end;
 
           if (count = 0) then
           begin
-            adjusted_string := adjusted_string + '1';
+						adjusted_string[j] := '1';
             Inc(j);
             done := 1;
           end;
 
           if (done = 0) then
           begin
-            adjusted_string := adjusted_string + binary_string[i];
+						adjusted_string[j] := binary_string[i];
             Inc(j);
             Inc(i);
           end;
         end
         else
         begin
-          adjusted_string := adjusted_string + binary_string[i];
+						adjusted_string[j] := binary_string[i];
           Inc(j);
           Inc(i);
         end;
-      until not (i <= data_length);
+      until not (i <= data_length + 1);
       adjusted_length := strlen(adjusted_string);
       adjustment_size := adjusted_length - data_length;
 
@@ -1156,11 +1161,11 @@ begin
       adjusted_length := strlen(adjusted_string);
 
       count := 0;
-      for i := (adjusted_length - codeword_size) + 1 to adjusted_length do
+      for i := (adjusted_length - codeword_size) to adjusted_length - 1 do
       begin
         if (adjusted_string[i] = '1') then Inc(count);
       end;
-      if (count = codeword_size) then adjusted_string[adjusted_length] := '0';
+      if (count = codeword_size) then adjusted_string[adjusted_length - 1] := '0';
 
     until not (adjusted_length > data_maxsize);
     { This loop will only repeat on the rare occasions when the rule about not having all 1s or all 0s
@@ -1194,8 +1199,8 @@ begin
     if ((layers >= 9) and (layers <= 22)) then codeword_size := 10;
     if (layers >= 23) then codeword_size := 12;
 
-    adjusted_string := '';
-    j := 0; i := 1;
+    adjusted_string[0] := #0;
+    j := 0; i := 0;
     repeat
       if ((j + 1) mod codeword_size = 0) then
       begin
@@ -1211,33 +1216,33 @@ begin
 
         if (count = (codeword_size - 1)) then
         begin
-          adjusted_string := adjusted_string + '0';
+          adjusted_string[j] := '0';
           Inc(j);
           done := 1;
         end;
 
         if (count = 0) then
         begin
-          adjusted_string := adjusted_string + '1';
+          adjusted_string[j] := '1';
           Inc(j);
           done := 1;
         end;
 
         if (done = 0) then
         begin
-          adjusted_string := adjusted_string + binary_string[i];
+          adjusted_string[j] := binary_string[i];
           Inc(j);
           Inc(i);
         end;
       end
       else
       begin
-        adjusted_string := adjusted_string + binary_string[i];
+        adjusted_string[j] := binary_string[i];
         Inc(j);
         Inc(i);
       end;
 
-    until not (i <= data_length);
+    until not (i <= data_length + 1);
     adjusted_length := strlen(adjusted_string);
 
     remainder := adjusted_length mod codeword_size;
@@ -1250,11 +1255,11 @@ begin
     adjusted_length := strlen(adjusted_string);
 
     count := 0;
-    for i := (adjusted_length - codeword_size) to adjusted_length do
+    for i := (adjusted_length - codeword_size) to adjusted_length - 1 do
     begin
       if (adjusted_string[i] = '1') then Inc(count);
     end;
-    if (count = codeword_size) then adjusted_string[adjusted_length] := '0';
+    if (count = codeword_size) then adjusted_string[adjusted_length - 1] := '0';
 
     { Check if the data actually fits into the selected symbol size }
     if (compact <> 0) then
@@ -1295,12 +1300,12 @@ begin
     begin
       for i := 0 to data_blocks - 1 do
       begin
-        if (adjusted_string[i * codeword_size + 1] = '1') then Inc(data_part[i], 32);
-        if (adjusted_string[(i * codeword_size) + 2] = '1') then Inc(data_part[i], 16);
-        if (adjusted_string[(i * codeword_size) + 3] = '1') then Inc(data_part[i], 8);
-        if (adjusted_string[(i * codeword_size) + 4] = '1') then Inc(data_part[i], 4);
-        if (adjusted_string[(i * codeword_size) + 5] = '1') then Inc(data_part[i], 2);
-        if (adjusted_string[(i * codeword_size) + 6] = '1') then Inc(data_part[i], 1);
+        if (adjusted_string[i * codeword_size] = '1') then Inc(data_part[i], 32);
+        if (adjusted_string[(i * codeword_size) + 1] = '1') then Inc(data_part[i], 16);
+        if (adjusted_string[(i * codeword_size) + 2] = '1') then Inc(data_part[i], 8);
+        if (adjusted_string[(i * codeword_size) + 3] = '1') then Inc(data_part[i], 4);
+        if (adjusted_string[(i * codeword_size) + 4] = '1') then Inc(data_part[i], 2);
+        if (adjusted_string[(i * codeword_size) + 5] = '1') then Inc(data_part[i], 1);
       end;
       rs_init_gf($43);
       rs_init_code(ecc_blocks, 1);
@@ -1313,14 +1318,14 @@ begin
     begin
       for i := 0 to data_blocks - 1 do
       begin
-        if (adjusted_string[i * codeword_size + 1] = '1') then Inc(data_part[i], 128);
-        if (adjusted_string[(i * codeword_size) + 2] = '1') then Inc(data_part[i], 64);
-        if (adjusted_string[(i * codeword_size) + 3] = '1') then Inc(data_part[i], 32);
-        if (adjusted_string[(i * codeword_size) + 4] = '1') then Inc(data_part[i], 16);
-        if (adjusted_string[(i * codeword_size) + 5] = '1') then Inc(data_part[i], 8);
-        if (adjusted_string[(i * codeword_size) + 6] = '1') then Inc(data_part[i], 4);
-        if (adjusted_string[(i * codeword_size) + 7] = '1') then Inc(data_part[i], 2);
-        if (adjusted_string[(i * codeword_size) + 8] = '1') then Inc(data_part[i], 1);
+        if (adjusted_string[i * codeword_size] = '1') then Inc(data_part[i], 128);
+        if (adjusted_string[(i * codeword_size) + 1] = '1') then Inc(data_part[i], 64);
+        if (adjusted_string[(i * codeword_size) + 2] = '1') then Inc(data_part[i], 32);
+        if (adjusted_string[(i * codeword_size) + 3] = '1') then Inc(data_part[i], 16);
+        if (adjusted_string[(i * codeword_size) + 4] = '1') then Inc(data_part[i], 8);
+        if (adjusted_string[(i * codeword_size) + 5] = '1') then Inc(data_part[i], 4);
+        if (adjusted_string[(i * codeword_size) + 6] = '1') then Inc(data_part[i], 2);
+        if (adjusted_string[(i * codeword_size) + 7] = '1') then Inc(data_part[i], 1);
       end;
       rs_init_gf($12d);
       rs_init_code(ecc_blocks, 1);
@@ -1333,16 +1338,16 @@ begin
     begin
       for i := 0 to data_blocks - 1 do
       begin
-        if (adjusted_string[i * codeword_size + 1] = '1') then Inc(data_part[i], 512);
-        if (adjusted_string[(i * codeword_size) + 2] = '1') then Inc(data_part[i], 256);
-        if (adjusted_string[(i * codeword_size) + 3] = '1') then Inc(data_part[i], 128);
-        if (adjusted_string[(i * codeword_size) + 4] = '1') then Inc(data_part[i], 64);
-        if (adjusted_string[(i * codeword_size) + 5] = '1') then Inc(data_part[i], 32);
-        if (adjusted_string[(i * codeword_size) + 6] = '1') then Inc(data_part[i], 16);
-        if (adjusted_string[(i * codeword_size) + 7] = '1') then Inc(data_part[i], 8);
-        if (adjusted_string[(i * codeword_size) + 8] = '1') then Inc(data_part[i], 4);
-        if (adjusted_string[(i * codeword_size) + 9] = '1') then Inc(data_part[i], 2);
-        if (adjusted_string[(i * codeword_size) + 10] = '1') then Inc(data_part[i], 1);
+        if (adjusted_string[i * codeword_size] = '1') then Inc(data_part[i], 512);
+        if (adjusted_string[(i * codeword_size) + 1] = '1') then Inc(data_part[i], 256);
+        if (adjusted_string[(i * codeword_size) + 2] = '1') then Inc(data_part[i], 128);
+        if (adjusted_string[(i * codeword_size) + 3] = '1') then Inc(data_part[i], 64);
+        if (adjusted_string[(i * codeword_size) + 4] = '1') then Inc(data_part[i], 32);
+        if (adjusted_string[(i * codeword_size) + 5] = '1') then Inc(data_part[i], 16);
+        if (adjusted_string[(i * codeword_size) + 6] = '1') then Inc(data_part[i], 8);
+        if (adjusted_string[(i * codeword_size) + 7] = '1') then Inc(data_part[i], 4);
+        if (adjusted_string[(i * codeword_size) + 8] = '1') then Inc(data_part[i], 2);
+        if (adjusted_string[(i * codeword_size) + 9] = '1') then Inc(data_part[i], 1);
       end;
       rs_init_gf($409);
       rs_init_code(ecc_blocks, 1);
@@ -1355,18 +1360,18 @@ begin
     begin
       for  i := 0 to data_blocks - 1 do
       begin
-        if (adjusted_string[i * codeword_size + 1] = '1') then Inc(data_part[i], 2048);
-        if (adjusted_string[(i * codeword_size) + 2] = '1') then Inc(data_part[i], 1024);
-        if (adjusted_string[(i * codeword_size) + 3] = '1') then Inc(data_part[i], 512);
-        if (adjusted_string[(i * codeword_size) + 4] = '1') then Inc(data_part[i], 256);
-        if (adjusted_string[(i * codeword_size) + 5] = '1') then Inc(data_part[i], 128);
-        if (adjusted_string[(i * codeword_size) + 6] = '1') then Inc(data_part[i], 64);
-        if (adjusted_string[(i * codeword_size) + 7] = '1') then Inc(data_part[i], 32);
-        if (adjusted_string[(i * codeword_size) + 8] = '1') then Inc(data_part[i], 16);
-        if (adjusted_string[(i * codeword_size) + 9] = '1') then Inc(data_part[i], 8);
-        if (adjusted_string[(i * codeword_size) + 10] = '1') then Inc(data_part[i], 4);
-        if (adjusted_string[(i * codeword_size) + 11] = '1') then Inc(data_part[i], 2);
-        if (adjusted_string[(i * codeword_size) + 12] = '1') then Inc(data_part[i], 1);
+        if (adjusted_string[i * codeword_size] = '1') then Inc(data_part[i], 2048);
+        if (adjusted_string[(i * codeword_size) + 1] = '1') then Inc(data_part[i], 1024);
+        if (adjusted_string[(i * codeword_size) + 2] = '1') then Inc(data_part[i], 512);
+        if (adjusted_string[(i * codeword_size) + 3] = '1') then Inc(data_part[i], 256);
+        if (adjusted_string[(i * codeword_size) + 4] = '1') then Inc(data_part[i], 128);
+        if (adjusted_string[(i * codeword_size) + 5] = '1') then Inc(data_part[i], 64);
+        if (adjusted_string[(i * codeword_size) + 6] = '1') then Inc(data_part[i], 32);
+        if (adjusted_string[(i * codeword_size) + 7] = '1') then Inc(data_part[i], 16);
+        if (adjusted_string[(i * codeword_size) + 8] = '1') then Inc(data_part[i], 8);
+        if (adjusted_string[(i * codeword_size) + 9] = '1') then Inc(data_part[i], 4);
+        if (adjusted_string[(i * codeword_size) + 10] = '1') then Inc(data_part[i], 2);
+        if (adjusted_string[(i * codeword_size) + 11] = '1') then Inc(data_part[i], 1);
       end;
       rs_init_gf($1069);
       rs_init_code(ecc_blocks, 1);
@@ -1383,7 +1388,7 @@ begin
   total_bits := (data_blocks + ecc_blocks) * codeword_size;
   for i := 0 to total_bits - 1 do
   begin
-    bit_pattern[i] := adjusted_string[total_bits - i];
+    bit_pattern[i] := adjusted_string[total_bits - i - 1];
   end;
 
   { Now add the symbol descriptor }
@@ -1555,10 +1560,10 @@ begin
   result := err_code; exit;
 end;
 
-function aztec_runes(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function aztec_runes(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   input_value, error_number : Integer;
-  binary_string : AnsiString;
+  binary_string : TArrayOfChar;
   data_codewords, ecc_codewords : TArrayOfByte;
   i, j, v, x, y : Integer;
 begin
@@ -1584,16 +1589,16 @@ begin
   case _length of
     3:
     begin
-      input_value := 100 * ctoi(source[1]);
-      Inc(input_value, 10 * ctoi(source[2]));
-      Inc(input_value, ctoi(source[3]));
+      input_value := 100 * StrToInt(Chr(source[0]));
+      Inc(input_value, 10 * StrToInt(Chr(source[1])));
+      Inc(input_value, StrToInt(Chr(source[2])));
     end;
     2:
     begin
-      input_value := 10 * ctoi(source[1]);
-      Inc(input_value, ctoi(source[2]));
+      input_value := 10 * StrToInt(Chr(source[0]));
+      Inc(input_value, StrToInt(Chr(source[1])));
     end;
-    1: input_value := ctoi(source[1]);
+    1: input_value := StrToInt(Chr(source[0]));
   end;
 
   if (input_value > 255) then
@@ -1615,7 +1620,7 @@ begin
     v := 8;
     while v <> 0 do
     begin
-      if (binary_string[j + 1] = '1') then
+      if (binary_string[j] = '1') then
         Inc(data_codewords[i], v);
       Inc(j);
       v := v shr 1;
@@ -1627,7 +1632,7 @@ begin
   rs_encode(2, data_codewords, ecc_codewords);
   rs_free();
 
-  binary_string[1] := #0;
+  strcpy(binary_string, '');
 
   for i := 0 to 4 do
   begin
@@ -1635,14 +1640,14 @@ begin
     v := 8;
     while v <> 0 do
     begin
-      if (ecc_codewords[4 - i] and v) <> 0 then binary_string[j + 1] := '1' else binary_string[j + 1] := '0';
+      if (ecc_codewords[4 - i] and v) <> 0 then binary_string[j] := '1' else binary_string[j + 1] := '0';
       Inc(j);
       v := v shr 1;
     end;
   end;
 
-  i := 1;
-  while i <= 28 do
+  i := 0;
+  while i < 28 do
   begin
     if (binary_string[i] = '1') then binary_string[i] := '0' else binary_string[i] := '1';
     Inc(i, 2);
@@ -1658,7 +1663,7 @@ begin
       end;
       if (CompactAztecMap[(y * 27) + x] >= 2) then
       begin
-        if (binary_string[CompactAztecMap[(y * 27) + x] - 2000 + 1] = '1') then
+        if (binary_string[CompactAztecMap[(y * 27) + x] - 2000] = '1') then
         begin
           set_module(symbol, y - 8, x - 8);
         end;

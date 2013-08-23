@@ -8,7 +8,7 @@ object formZintTest: TformZintTest
   ClientWidth = 646
   OnCreate = FormCreate
   OnShow = FormShow
-  LCLVersion = '1.0.10.0'
+  LCLVersion = '1.1'
   object Panel1: TPanel
     Left = 0
     Height = 23
@@ -31,11 +31,11 @@ object formZintTest: TformZintTest
     end
     object comType: TComboBox
       Left = 362
-      Height = 24
+      Height = 23
       Top = 0
       Width = 209
       Align = alRight
-      ItemHeight = 16
+      ItemHeight = 15
       OnChange = comTypeChange
       Style = csDropDownList
       TabOrder = 1
@@ -52,10 +52,10 @@ object formZintTest: TformZintTest
     end
   end
   object imgResult: TImage
-    Left = 0
-    Height = 490
-    Top = 23
-    Width = 646
+    Left = 10
+    Height = 470
+    Top = 33
+    Width = 626
     Align = alClient
     Center = True
     Proportional = True
@@ -71,6 +71,42 @@ object formZintTest: TformZintTest
     Font.Color = clRed
     ParentColor = False
     ParentFont = False
+  end
+  object Panel2: TPanel
+    Left = 0
+    Height = 10
+    Top = 23
+    Width = 646
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 1
+  end
+  object Panel3: TPanel
+    Left = 0
+    Height = 10
+    Top = 503
+    Width = 646
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 2
+  end
+  object Panel4: TPanel
+    Left = 0
+    Height = 470
+    Top = 33
+    Width = 10
+    Align = alLeft
+    BevelOuter = bvNone
+    TabOrder = 3
+  end
+  object Panel5: TPanel
+    Left = 636
+    Height = 470
+    Top = 33
+    Width = 10
+    Align = alRight
+    BevelOuter = bvNone
+    TabOrder = 4
   end
   object SaveDialog1: TSaveDialog
     left = 89

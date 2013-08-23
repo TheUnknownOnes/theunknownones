@@ -22,15 +22,15 @@ interface
 uses
   zint;
 
-function code_128(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function ean_128(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function nve_18(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-function ean_14(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function code_128(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
+function ean_128(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
+function nve_18(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
+function ean_14(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 
 implementation
 
 uses
-  zint_common, zint_gs1;
+  SysUtils, zint_common, zint_gs1, zint_helper;
 
 const
   DPDSET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*';
@@ -41,7 +41,7 @@ var
 const
   {Code 128 tables checked against ISO/IEC 15417:2007 }
 
-  C128Table : array[0..106] of AnsiString = ('212222', '222122', '222221', '121223', '121322', '131222', '122213',
+  C128Table : array[0..106] of String = ('212222', '222122', '222221', '121223', '121322', '131222', '122213',
   	'122312', '132212', '221213', '221312', '231212', '112232', '122132', '122231', '113222',
   	'123122', '123221', '223211', '221132', '221231', '213212', '223112', '312131', '311222',
   	'321122', '321221', '312212', '322112', '322211', '212123', '212321', '232121', '111323',
@@ -205,20 +205,18 @@ end;
  * Translate Code 128 Set A characters into barcodes.
  * This set handles all control characters NULL to US.
  }
-procedure c128_set_a(source : AnsiChar; var dest : AnsiString; var values : TArrayOfInteger; var bar_chars : Integer);
-var
-  _source : Byte absolute source;
+procedure c128_set_a(source : Byte; var dest : TArrayOfChar; var values : TArrayOfInteger; var bar_chars : Integer);
 begin
   { limit the range to 0-127 }
-  _source := _source and 127;
+  source := source and 127;
 
-	if (_source < 32) then
-		_source := _source + 64
+	if (source < 32) then
+		source := source + 64
 	else
-		_source := _source - 32;
+		source := source - 32;
 
-	dest := dest + C128Table[_source];
-	values[bar_chars] := _source;
+	concat(dest, C128Table[source]);
+	values[bar_chars] := source;
   Inc(bar_chars);
 end;
 
@@ -227,16 +225,14 @@ end;
  * This set handles all characters which are not part of long numbers and not
  * control characters.
  }
-procedure c128_set_b(source : AnsiChar; var dest : AnsiString; var values : TArrayOfInteger; var bar_chars : Integer);
-var
-  _source : Byte absolute source;
+procedure c128_set_b(source : Byte; var dest : TArrayOfChar; var values : TArrayOfInteger; var bar_chars : Integer);
 begin
 	{ limit the range to 0-127 }
-	_source := _source and 127;
-	_source := _source - 32;
+	source := source and 127;
+	source := source - 32;
 
-	dest := dest + C128Table[_source];
-	values[bar_chars] := _source;
+	concat(dest, C128Table[source]);
+	values[bar_chars] := source;
   Inc(bar_chars);
 end;
 
@@ -244,12 +240,12 @@ end;
  * Translate Code 128 Set C characters into barcodes.
  * This set handles numbers in a compressed form.
  }
-procedure c128_set_c(source_a : AnsiChar; source_b : AnsiChar; var dest : AnsiString; var values : TArrayOfInteger; var bar_chars : Integer);
+procedure c128_set_c(source_a : Byte; source_b : Byte; var dest : TArrayOfChar; var values : TArrayOfInteger; var bar_chars : Integer);
 var
   weight : Integer;
  begin
-	weight := (10 * ctoi(source_a)) + ctoi(source_b);
-	dest := dest + C128Table[weight];
+	weight := (10 * StrToInt(Chr(source_a))) + StrToInt(Chr(source_b));
+	concat(dest, C128Table[weight]);
 	values[bar_chars] := weight;
 	Inc(bar_chars);
 end;
@@ -257,21 +253,25 @@ end;
  {
  * Handle Code 128 and NVE-18.
  }
-function code_128(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function code_128(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   i, j, k, bar_characters, read, total_sum : Integer;
   values : TArrayOfInteger;
   error_number, indexchaine, indexliste, sourcelen, f_state : Integer;
-  _set, fset : AnsiString;
-  last_set, current_set : AnsiChar;
+  _set, fset : TArrayOfChar;
+  last_set, current_set : Char;
   mode : Integer;
   glyph_count : Single;
-  dest : AnsiString;
+  dest : TArrayOfChar;
 begin
+  SetLength(_set, 170);
+  Fill(_set, Length(_set), ' ');
+  SetLength(fset, 170);
+  Fill(fset, Length(fset), ' ');
+  SetLength(dest, 1000);
   SetLength(values, 170);
-  FillChar(values[1], Length(values), 0);
+  FillChar(values[0], Length(values), 0);
   current_set := ' ';
-  //Filling with spaces is done later
 	error_number := 0;
 	strcpy(dest, '');
 
@@ -288,22 +288,17 @@ begin
 		result := ZERROR_TOO_LONG; exit;
 	end;
 
-  SetLength(_set, sourcelen);
-  SetLength(fset, sourcelen);
-  FillChar(_set[1], sourcelen, ' ');
-  FillChar(fset[1], sourcelen, ' ');
-
 	{ Detect extended ASCII characters }
-	for i := 1 to sourcelen do
+	for i := 0 to sourcelen - 1 do
   begin
-		if (Ord(source[i]) >= 128) then
+		if (source[i] >= 128) then
 			fset[i] := 'f';
 	end;
-
+  fset[sourcelen] := #0;
 
 	{ Decide when to latch to extended mode - Annex E note 3 }
 	j := 0;
-	for i := 1 to sourcelen do
+	for i := 0 to sourcelen - 1 do
   begin
 		if (fset[i] = 'f') then
 			Inc(j)
@@ -316,7 +311,7 @@ begin
 				fset[k] := 'F';
 		end;
 
-		if ((j >= 3) and (i = sourcelen)) then
+		if ((j >= 3) and (i = sourcelen - 1)) then
     begin
 			for k := i downto i - 2 do
 				fset[k] := 'F';
@@ -325,16 +320,16 @@ begin
 
 	{ Decide if it is worth reverting to 646 encodation for a few
 	   characters as described in 4.3.4.2 (d) }
-	for i := 2 to sourcelen do
+	for i := 1 to sourcelen - 1 do
   begin
 		if ((fset[i - 1] = 'F') and (fset[i] = ' ')) then
     begin
 			{ Detected a change from 8859-1 to 646 - count how long for }
       j := 0;
-      while (fset[i + j] = ' ') and ((i + j) <= sourcelen) do
+      while (fset[i + j] = ' ') and ((i + j) < sourcelen) do
         Inc(j);
 
-			if ((j < 5) or ((j < 3) and ((i + j) = sourcelen))) then
+			if ((j < 5) or ((j < 3) and ((i + j) = sourcelen - 1))) then
       begin
 				{ Uses the same figures recommended by Annex E note 3 }
 				{ Change to shifting back rather than latching back }
@@ -346,7 +341,7 @@ begin
 
 	{ Decide on mode using same system as PDF417 and rules of ISO 15417 Annex E }
 	indexliste := 0;
-	indexchaine := 1;
+	indexchaine := 0;
 
 	mode := parunmodd(source[indexchaine]);
 	if((symbol.symbology = BARCODE_CODE128B) and (mode = ABORC)) then
@@ -355,8 +350,8 @@ begin
   FillChar(list[0], 170, 0);
 
 	repeat
-		list[1][indexliste] := Ord(mode);
-		while ((list[1][indexliste] = mode) and (indexchaine <= sourcelen)) do
+		list[1][indexliste] := mode;
+		while ((list[1][indexliste] = mode) and (indexchaine < sourcelen)) do
     begin
 			Inc(list[0][indexliste]);
 			Inc(indexchaine);
@@ -365,7 +360,7 @@ begin
 				mode := AORB;
 		end;
 		Inc(indexliste);
-	until not (indexchaine <= sourcelen);
+	until not (indexchaine < sourcelen);
 
 	dxsmooth(indexliste);
 
@@ -397,7 +392,7 @@ begin
 
 	{ Put set data into set[] }
 
-	read := 1;
+	read := 0;
 	for i := 0 to indexliste - 1 do
   begin
 		for j := 0 to list[0][i] - 1 do
@@ -414,14 +409,14 @@ begin
 	end;
 
 	{ Adjust for strings which start with shift characters - make them latch instead }
-  i := 1;
+  i := 0;
   while _set[i] = 'a' do
   begin
     _set[i] := 'A';
     Inc(i);
   end;
 
-  i := 1;
+  i := 0;
   while _set[i] = 'b' do
   begin
     _set[i] := 'B';
@@ -432,7 +427,7 @@ begin
 	   being too long }
 	last_set := ' ';
 	glyph_count := 0.0;
-	for i := 1 to sourcelen do
+	for i := 0 to sourcelen - 1 do
   begin
 		if ((_set[i] = 'a') or (_set[i] = 'b')) then
 			glyph_count := glyph_count + 1.0;
@@ -477,7 +472,7 @@ begin
 	if (symbol.output_options and READER_INIT) <> 0 then
   begin
 		{ Reader Initialisation mode }
-		case _set[1] of
+		case _set[0] of
 			'A': { Start A }
       begin
 			  concat(dest, C128Table[103]);
@@ -512,7 +507,7 @@ begin
 	else
   begin
 		{ Normal mode }
-		case _set[1] of
+		case _set[0] of
 			'A': { Start A }
       begin
 				concat(dest, C128Table[103]);
@@ -534,9 +529,9 @@ begin
 		end;
 	end;
 	Inc(bar_characters);
-	last_set := _set[1];
+	last_set := _set[0];
 
-	if(fset[1] = 'F') then
+	if(fset[0] = 'F') then
   begin
 		case current_set of
 			'A':
@@ -559,9 +554,9 @@ begin
 	end;
 
 	{ Encode the data }
-	read := 1;
+	read := 0;
 	repeat
-		if ((read <> 1) and (_set[read] <> current_set)) then
+		if ((read <> 0) and (_set[read] <> current_set)) then
 		begin { Latch different code set }
 			case _set[read] of
 				'A':
@@ -588,7 +583,7 @@ begin
 			end;
 		end;
 
-		if (read <> 1) then
+		if (read <> 0) then
     begin
 			if ((fset[read] = 'F') and (f_state = 0)) then
       begin
@@ -682,7 +677,7 @@ begin
 				Inc(read, 2);
       end;
     end;
-	until not (read <= sourcelen);
+	until not (read < sourcelen);
 
 	{ check digit calculation }
 	total_sum := 0;
@@ -702,31 +697,33 @@ begin
 end;
 
 { Handle EAN-128 (Now known as GS1-128) }
-function ean_128(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function ean_128(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   values : TArrayOfInteger;
   bar_characters, read, total_sum : Integer;
   error_number, indexchaine, indexliste : Integer;
-  _set : AnsiString;
+  _set : TArrayOfChar;
   mode : Integer;
-  last_set : AnsiChar;
+  last_set : Char;
   glyph_count : Single;
-  dest : AnsiString;
+  dest : TArrayOfChar;
   separator_row, linkage_flag, c_count : Integer;
-  reduced : AnsiString;
+  reduced : TArrayOfChar;
   i, j : Integer;
 begin
+  SetLength(dest, 1000);
   SetLength(values, 170);
+  SetLength(_set, 170);
+  SetLength(reduced, _length + 1);
 	error_number := 0;
-	dest := '';
+  strcpy(dest, '');
 	linkage_flag := 0;
 
 	bar_characters := 0;
 	separator_row := 0;
 
   FillChar(values[0], Length(Values), 0);
-  SetLength(_set, Length(source));
-	FillChar(_set[1], Length(source), ' ');
+  Fill(_set, Length(_set), ' ');
 
 	if(_length > 160) then
   begin
@@ -736,9 +733,9 @@ begin
 		result := ZERROR_TOO_LONG; exit;
 	end;
 
-	for i := 1 to _length do
+	for i := 0 to _length - 1 do
   begin
-		if (source[i] = #0) then
+		if (source[i] = 0) then
     begin
 			{ Null characters not allowed! }
 			strcpy(symbol.errtxt, 'NULL character in input data');
@@ -757,15 +754,15 @@ begin
 	if(symbol.input_mode <> GS1_MODE) then
   begin
 		{ GS1 data has not been checked yet }
-		error_number := gs1_verify(symbol, source, reduced);
+		error_number := gs1_verify(symbol, source, _length, reduced);
 		if (error_number <> 0) then begin result := error_number; exit; end;
 	end;
 
 	{ Decide on mode using same system as PDF417 and rules of ISO 15417 Annex E }
 	indexliste := 0;
-	indexchaine := 1;
+	indexchaine := 0;
 
-	mode := parunmodd(reduced[indexchaine]);
+	mode := parunmodd(Ord(reduced[indexchaine]));
 	if(reduced[indexchaine] = '[') then
   begin
 		mode := ABORC;
@@ -775,20 +772,20 @@ begin
 
 	repeat
 		list[1][indexliste] := mode;
-		while ((list[1][indexliste] = mode) and (indexchaine <= strlen(reduced))) do
+		while ((list[1][indexliste] = mode) and (indexchaine < zint_common.strlen(reduced))) do
     begin
 			Inc(list[0][indexliste]);
 			Inc(indexchaine);
-			mode := parunmodd(reduced[indexchaine + 1]);
-			if (reduced[indexchaine + 1] = '[') then mode := ABORC;
+			mode := parunmodd(reduced[indexchaine]);
+			if (reduced[indexchaine] = '[') then mode := ABORC;
 		end;
 		Inc(indexliste);
-	until not (indexchaine <= strlen(reduced));
+	until not (indexchaine < zint_common.strlen(reduced));
 
 	dxsmooth(indexliste);
 
 	{ Put set data into _set[] }
-	read := 1;
+	read := 0;
 	for i := 0 to indexliste - 1 do
   begin
 		for j := 0 to list[0][i] - 1 do
@@ -811,7 +808,7 @@ begin
 
 	{ Watch out for odd-Length(source) Mode C blocks }
 	c_count := 0;
-	for i := 1 to read do
+	for i := 0 to read - 1 do
   begin
 		if (_set[i] = 'C') then
     begin
@@ -850,7 +847,7 @@ begin
 			_set[read - 1] := 'B';
 	end;
 
-	for i := 2 to read - 1 do
+	for i := 1 to read - 2 do
   begin
 		if ((_set[i] = 'C') and ((_set[i - 1] = 'B') and (_set[i + 1] = 'B'))) then
 			_set[i] := 'B';
@@ -860,7 +857,7 @@ begin
 	   being too long }
 	last_set := ' ';
 	glyph_count := 0.0;
-	for i := 1 to length(reduced) do
+	for i := 0 to strlen(reduced) - 1 do
   begin
 		if ((_set[i] = 'a') or (_set[i] = 'b')) then
 			glyph_count := glyph_count + 1.0;
@@ -910,9 +907,9 @@ begin
 	Inc(bar_characters);
 
 	{ Encode the data }
-	read := 1;
+	read := 0;
 	repeat
-		if ((read <> 1) and (_set[read] <> _set[read - 1])) then
+		if ((read <> 0) and (_set[read] <> _set[read - 1])) then
 		begin { Latch different code set }
 			case (_set[read]) of
 			  'A':
@@ -951,18 +948,18 @@ begin
 				'A',
 				'a':
         begin
-					c128_set_a(reduced[read], dest, values, bar_characters);
+					c128_set_a(Ord(reduced[read]), dest, values, bar_characters);
 					Inc(read);
 				end;
 				'B',
 				'b':
         begin
-					c128_set_b(reduced[read], dest, values, bar_characters);
+					c128_set_b(Ord(reduced[read]), dest, values, bar_characters);
 					Inc(read);
 				end;
 				'C':
         begin
-					c128_set_c(reduced[read], reduced[read + 1], dest, values, bar_characters);
+					c128_set_c(Ord(reduced[read]), Ord(reduced[read + 1]), dest, values, bar_characters);
 					Inc(read, 2);
 				end;
 			end;
@@ -974,7 +971,7 @@ begin
 			Inc(bar_characters);
 			Inc(read);
 		end;
-  until not (read <= strlen(reduced));
+  until not (read < strlen(reduced));
 
 	{ "...note that the linkage flag is an extra code set character between
 	   the last data character and the Symbol Check Character"
@@ -987,7 +984,7 @@ begin
 		2:
     begin
 			{ CC-A or CC-B 2D component }
-			case _set[Length(reduced)] of
+			case _set[strlen(reduced )- 1] of
 				'A': linkage_flag := 100;
 				'B': linkage_flag := 99;
 				'C': linkage_flag := 101;
@@ -996,7 +993,7 @@ begin
 		3:
     begin
 			{ CC-C 2D component }
-			case _set[Length(reduced)] of
+			case _set[strlen(reduced) - 1] of
 				'A': linkage_flag := 99;
 				'B': linkage_flag := 101;
 				'C': linkage_flag := 100;
@@ -1039,29 +1036,31 @@ begin
 		end;
 	end;
 
-  symbol.text := '';
-	for i := 1 to _length do
+  symbol.text[0] := 0;
+	for i := 0 to _length - 1 do
   begin
-		if ((source[i] <> '[') and (source[i] <> ']')) then
-			symbol.text := symbol.text + source[i];
+		if ((source[i] <> Ord('[')) and (source[i] <> Ord(']'))) then
+			symbol.text[i] := source[i];
 
-		if (source[i] = '[') then
-			symbol.text := symbol.text + '(';
+		if (source[i] = Ord('[')) then
+			symbol.text[i] := Ord('(');
 
-		if (source[i] = ']') then
-			symbol.text := symbol.text + ')';
+		if (source[i] = Ord(']')) then
+			symbol.text[i] := Ord(')');
 	end;
 
 	result := error_number; exit;
 end;
 
-function nve_18(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function nve_18(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 { Add check digit if encoding an NVE18 symbol }
 var
   error_number, zeroes, nve_check, total_sum, sourcelen : Integer;
-  ean128_equiv : AnsiString;
+  ean128_equiv : TArrayOfByte;
   i : Integer;
 begin
+  SetLength(ean128_equiv, 25);
+  FillChar(ean128_equiv[0], 25, 0);
 	sourcelen := _length;
 
 	if (sourcelen > 17) then
@@ -1078,37 +1077,40 @@ begin
 	end;
 
 	zeroes := 17 - sourcelen;
-	strcpy(ean128_equiv, '[00]');
-  for i := 1 to zeroes do
-    ean128_equiv := ean128_equiv + '0';
-  ean128_equiv := ean128_equiv + source;
+	ustrcpy(ean128_equiv, '[00]');
+  FillChar(ean128_equiv[4], zeroes, Ord('0'));
+  ean128_equiv[4 + zeroes] := 0;
+  uconcat(ean128_equiv, source);
 
 	total_sum := 0;
-	for i := sourcelen downto 1 do
+	for i := sourcelen - 1 downto 0 do
   begin
-		Inc(total_sum, ctoi(source[i]));
+		Inc(total_sum, StrToInt(Chr(source[i])));
 
-		if((i and 1) = 0) then
-			Inc(total_sum, 2 * ctoi(source[i]));
+		if((i and 1) <> 0) then
+			Inc(total_sum, 2 * StrToInt(Chr(source[i])));
 	end;
 	nve_check := 10 - total_sum mod 10;
 
   if (nve_check = 10) then nve_check := 0;
-	ean128_equiv := ean128_equiv + itoc(nve_check);
+  ean128_equiv[21] := Ord(itoc(nve_check));
+  ean128_equiv[22] := 0;
 
-	error_number := ean_128(symbol, ean128_equiv, _length);
+	error_number := ean_128(symbol, ean128_equiv, ustrlen(ean128_equiv));
 
 	result := error_number; exit;
 end;
 
-function ean_14(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+function ean_14(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 { EAN-14 - A version of EAN-128 }
 var
   count, check_digit : Integer;
   error_number, zeroes : Integer;
-  ean128_equiv : AnsiString;
+  ean128_equiv : TArrayOfByte;
   i : Integer;
 begin
+  SetLength(ean128_equiv, 20);
+
 	if (_length > 13) then
   begin
 		strcpy(symbol.errtxt, 'Input wrong length');
@@ -1122,25 +1124,26 @@ begin
 		result := error_number; exit;
 	end;
 
-	zeroes := 13 - Length(source);
-	strcpy(ean128_equiv, '[01]');
-	for i := 1 to zeroes do
-    ean128_equiv := ean128_equiv + '0';
-  ean128_equiv := ean128_equiv + source;
+	zeroes := 13 - _length;
+	ustrcpy(ean128_equiv, '[01]');
+  FillChar(ean128_equiv[4], zeroes, Ord('0'));
+  ean128_equiv[4 + zeroes] := 0;
+  uconcat(ean128_equiv, source);
 
 	count := 0;
-	for i := Length(source) downto 1 do
+	for i := _length -1 downto 0 do
   begin
-		Inc(count, ctoi(source[i]));
+		Inc(count, StrToInt(Chr(source[i])));
 
-		if ((i and 1) = 0) then
-			Inc(count, 2 * ctoi(source[i]));
+		if ((i and 1) <> 0) then
+			Inc(count, 2 * StrToInt(Chr(source[i])));
 	end;
 	check_digit := 10 - (count mod 10);
   if (check_digit = 10) then check_digit := 0;
-	ean128_equiv := ean128_equiv + itoc(check_digit);
+	ean128_equiv[17] := Ord(itoc(check_digit));
+  ean128_equiv[18] := 0;
 
-	error_number := ean_128(symbol, ean128_equiv, _length);
+	error_number := ean_128(symbol, ean128_equiv, ustrlen(ean128_equiv));
 
 	result := error_number; exit;
 end;

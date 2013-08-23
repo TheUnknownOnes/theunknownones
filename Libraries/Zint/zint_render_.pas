@@ -27,7 +27,7 @@ uses
 implementation
 
 uses
-  zint_common;
+  zint_common, zint_helper;
 
 const GL_CONST = 2.8346;
 
@@ -109,7 +109,7 @@ end;
  * Coordinates assumed to be from top-center.
  }
 function render_plot_add_string(symbol : zint_symbol;
-    text : AnsiString; x, y, fsize, width : Single;
+    const text : TArrayOfChar; x, y, fsize, width : Single;
     var last_string : Pzint_render_string) : Integer;
 var
   _string : Pzint_render_string;
@@ -120,8 +120,8 @@ begin
   _string^.y := y;
   _string^.width := width;
   _string^.fsize := fsize;
-  _string^.length := ustrlen(text);
-  ustrcpy(_string^.text, text);
+  _string^.length := strlen(text);
+  _string^.text := ArrayOfCharToString(text);
 
   if Assigned(last_string) then
     last_string^.next := _string
@@ -143,7 +143,7 @@ var
   i, r, block_width, latch, this_row : Integer;
   textpos, textwidth, large_bar_height, preset_height, row_height, row_posn : Single;
   text_offset, text_height, xoffset, yoffset, textdone, main_symbol_width_x, addon_width_x : Integer;
-  addon, textpart : AnsiString;
+  addon, textpart : TArrayOfChar;
   large_bar_count, symbol_lead_in, total_symbol_width_x, total_area_width_x : Integer;
   addon_text_posn : Single;
   default_text_posn : Single;
@@ -155,6 +155,8 @@ var
   upceanflag : Integer;
   addon_latch : Integer;
 begin
+  SetLength(addon, 6);
+  SetLength(textpart, 10);
   line := nil;
   last_line := nil;
   last_string := nil;
@@ -197,17 +199,18 @@ begin
   { Isolate add-on text }
   if (is_extendable(symbol.symbology) <> 0) then
   begin
-    for i := 1 to ustrlen(symbol.text) do
+    for i := 0 to ustrlen(symbol.text) - 1 do
     begin
       if (latch = 1) then
       begin
-        addon := addon + symbol.text[i];
+        addon[r] := Chr(symbol.text[i]);
         Inc(r);
       end;
-      if (symbol.text[i] = '+') then
+      if (symbol.text[i] = Ord('+')) then
         latch := 1;
     end;
   end;
+  addon[r] := #0;
 
   if ((symbol.show_hrt = 0) or (ustrlen(symbol.text) = 0)) then
   begin
@@ -362,85 +365,85 @@ begin
   x_dimension := render^.width / total_area_width_x;
   x_dimension := x_dimension / GL_CONST;
 
-  { Set minimum size of symbol }
-  { Barcode must be at least 2mm high by 2mm across }
-  if (render^.height < ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 2.0) * GL_CONST) then
-    render^.height := ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 2.0) * GL_CONST;
-
-  if (render^.width < (2.0 * GL_CONST)) then
-    render^.width := (2.0 * GL_CONST);
-
-  if (symbol.symbology = BARCODE_CODABAR) then
-  begin
-    { The minimum X-dimension of Codabar is 0.191mm. The minimum bar height is 5mm }
-    if (x_dimension < 0.191) then
-      render^.width := 0.191 * GL_CONST * total_area_width_x;
-    if (render^.height < ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 5.0) * GL_CONST) then
-      render^.height := ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 5.0) * GL_CONST;
-  end;
-
-  if (symbol.symbology = BARCODE_CODE49) then
-  begin
-    { The minimum X-dimension of Code 49 is 0.191mm }
-    if (x_dimension < 0.191) then
-    begin
-      render^.width := 0.191 * GL_CONST * total_area_width_x;
-      render^.height := render^.width / symbol_aspect;
-    end;
-  end;
-
-  if (upceanflag <> 0) then
-  begin
-    { The X-dimension of UPC/EAN symbols is fixed at 0.330mm }
-    { NOTE: This code will need adjustment before it correctly deals with composite symbols }
-    render^.width := 0.330 * GL_CONST * total_area_width_x;
-    { The height is also fixed }
-    case upceanflag of
-      6,
-      12,
-      13:
-        { UPC-A, UPC-E and EAN-13 }
-        { Height of bars should be 22.85mm }
-        render^.height := ((0.330 * ((2 * symbol.border_width) + text_offset + text_height)) + 22.85) * GL_CONST;
-      8:
-        { EAN-8 }
-        { Height of bars should be 18.23mm }
-        render^.height := ((0.330 * ((2 * symbol.border_width) + text_offset + text_height)) + 18.23) * GL_CONST;
-      else
-        { EAN-2 and EAN-5 }
-        { Height of bars should be 21.10mm }
-        render^.height := ((0.330 * ((2 * symbol.border_width) + text_offset + text_height)) + 21.10) * GL_CONST;
-    end;
-  end;
-
-  if (symbol.symbology = BARCODE_ONECODE) then
-  begin
-    { The size of USPS Intelligent Mail barcode is fixed }
-    render^.width := 0.508 * GL_CONST * total_area_width_x;
-    render^.height := 4.064 * GL_CONST;
-  end;
-
-  if ((symbol.symbology = BARCODE_POSTNET) or (symbol.symbology = BARCODE_PLANET)) then
-  begin
-    { The size of PostNet and PLANET are fized }
-    render^.width := 0.508 * GL_CONST * total_area_width_x;
-    render^.height := 2.921 * GL_CONST;
-  end;
-
-  if (((symbol.symbology = BARCODE_AUSPOST) or (symbol.symbology = BARCODE_AUSREPLY)) or
-    ((symbol.symbology = BARCODE_AUSROUTE) or (symbol.symbology = BARCODE_AUSREDIRECT))) then
-  begin
-    { Australia Post use the same sizes as USPS }
-    render^.width := 0.508 * GL_CONST * total_area_width_x;
-    render^.height := 4.064 * GL_CONST;
-  end;
-
-  if ((symbol.symbology = BARCODE_RM4SCC) or (symbol.symbology = BARCODE_KIX)) then
-  begin
-    { Royal Mail and KIX Code uses 22 bars per inch }
-    render^.width := 0.577 * GL_CONST * total_area_width_x;
-    render^.height := 5.22 * GL_CONST;
-  end;
+  //{ Set minimum size of symbol }
+  //{ Barcode must be at least 2mm high by 2mm across }
+  //if (render^.height < ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 2.0) * GL_CONST) then
+  //  render^.height := ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 2.0) * GL_CONST;
+  //
+  //if (render^.width < (2.0 * GL_CONST)) then
+  //  render^.width := (2.0 * GL_CONST);
+  //
+  //if (symbol.symbology = BARCODE_CODABAR) then
+  //begin
+  //  { The minimum X-dimension of Codabar is 0.191mm. The minimum bar height is 5mm }
+  //  if (x_dimension < 0.191) then
+  //    render^.width := 0.191 * GL_CONST * total_area_width_x;
+  //  if (render^.height < ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 5.0) * GL_CONST) then
+  //    render^.height := ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 5.0) * GL_CONST;
+  //end;
+  //
+  //if (symbol.symbology = BARCODE_CODE49) then
+  //begin
+  //  { The minimum X-dimension of Code 49 is 0.191mm }
+  //  if (x_dimension < 0.191) then
+  //  begin
+  //    render^.width := 0.191 * GL_CONST * total_area_width_x;
+  //    render^.height := render^.width / symbol_aspect;
+  //  end;
+  //end;
+  //
+  //if (upceanflag <> 0) then
+  //begin
+  //  { The X-dimension of UPC/EAN symbols is fixed at 0.330mm }
+  //  { NOTE: This code will need adjustment before it correctly deals with composite symbols }
+  //  render^.width := 0.330 * GL_CONST * total_area_width_x;
+  //  { The height is also fixed }
+  //  case upceanflag of
+  //    6,
+  //    12,
+  //    13:
+  //      { UPC-A, UPC-E and EAN-13 }
+  //      { Height of bars should be 22.85mm }
+  //      render^.height := ((0.330 * ((2 * symbol.border_width) + text_offset + text_height)) + 22.85) * GL_CONST;
+  //    8:
+  //      { EAN-8 }
+  //      { Height of bars should be 18.23mm }
+  //      render^.height := ((0.330 * ((2 * symbol.border_width) + text_offset + text_height)) + 18.23) * GL_CONST;
+  //    else
+  //      { EAN-2 and EAN-5 }
+  //      { Height of bars should be 21.10mm }
+  //      render^.height := ((0.330 * ((2 * symbol.border_width) + text_offset + text_height)) + 21.10) * GL_CONST;
+  //  end;
+  //end;
+  //
+  //if (symbol.symbology = BARCODE_ONECODE) then
+  //begin
+  //  { The size of USPS Intelligent Mail barcode is fixed }
+  //  render^.width := 0.508 * GL_CONST * total_area_width_x;
+  //  render^.height := 4.064 * GL_CONST;
+  //end;
+  //
+  //if ((symbol.symbology = BARCODE_POSTNET) or (symbol.symbology = BARCODE_PLANET)) then
+  //begin
+  //  { The size of PostNet and PLANET are fized }
+  //  render^.width := 0.508 * GL_CONST * total_area_width_x;
+  //  render^.height := 2.921 * GL_CONST;
+  //end;
+  //
+  //if (((symbol.symbology = BARCODE_AUSPOST) or (symbol.symbology = BARCODE_AUSREPLY)) or
+  //  ((symbol.symbology = BARCODE_AUSROUTE) or (symbol.symbology = BARCODE_AUSREDIRECT))) then
+  //begin
+  //  { Australia Post use the same sizes as USPS }
+  //  render^.width := 0.508 * GL_CONST * total_area_width_x;
+  //  render^.height := 4.064 * GL_CONST;
+  //end;
+  //
+  //if ((symbol.symbology = BARCODE_RM4SCC) or (symbol.symbology = BARCODE_KIX)) then
+  //begin
+  //  { Royal Mail and KIX Code uses 22 bars per inch }
+  //  render^.width := 0.577 * GL_CONST * total_area_width_x;
+  //  render^.height := 5.22 * GL_CONST;
+  //end;
 
   if (symbol.symbology = BARCODE_MAXICODE) then
   begin
@@ -564,17 +567,17 @@ begin
         line := line^.next
       end;
 
-      textpart := '';
-      for i := 1 to 4 do
-        textpart := textpart + symbol.text[i];
 
+      for i := 0 to 3 do
+        textpart[i] := Chr(symbol.text[i]);
+      textpart[4] := #0;
       textpos := 17;
       textwidth := 4.0 * 8.5;
       render_plot_add_string(symbol, textpart, (textpos + xoffset) * scaler, default_text_posn, 11.0 * scaler, textwidth * scaler, last_string);
-      textpart := '';
-      for i := 1 to 4 do
-        textpart := textpart + symbol.text[i + 4];
 
+      for i := 0 to 3 do
+        textpart[i] := Chr(symbol.text[i + 4]);
+      textpart[4] := #0;
       textpos := 50;
       render_plot_add_string(symbol, textpart, (textpos + xoffset) * scaler, default_text_posn, 11.0 * scaler, textwidth * scaler, last_string);
       textdone := 1;
@@ -615,21 +618,22 @@ begin
         line := line^.next
       end;
 
-      textpart := symbol.text[1];
+      textpart[0] := Chr(symbol.text[0]);
+      textpart[1] := #0;
       textpos := -5; // 7
       textwidth := 8.5;
       render_plot_add_string(symbol, textpart, (textpos + xoffset) * scaler, default_text_posn, 11.0 * scaler, textwidth * scaler, last_string);
 
-      textpart := '';
-      for i := 1 to 6 do
-        textpart := textpart + symbol.text[i + 1];
+      for i := 0 to 5 do
+        textpart[i] := Chr(symbol.text[i + 1]);
+      textpart[6] := #0;
       textpos := 25;
       textwidth := 6.0 * 8.5;
       render_plot_add_string(symbol, textpart, (textpos + xoffset) * scaler, default_text_posn, 11.0 * scaler, textwidth * scaler, last_string);
 
-      textpart := '';
-      for i := 1 to 6 do
-        textpart[i] := symbol.text[i + 7];
+      for i := 0 to 5 do
+        textpart[i] := Chr(symbol.text[i + 7]);
+      textpart[6] := #0;
       textpos := 72;
       render_plot_add_string(symbol, textpart, (textpos + xoffset) * scaler, default_text_posn, 11.0 * scaler, textwidth * scaler, last_string);
 
@@ -674,25 +678,26 @@ begin
         line := line^.next
       end;
 
-      textpart := symbol.text[1];
+      textpart[0] := Chr(symbol.text[0]);
+      textpart[1] := #0;
       textpos := -5;
       textwidth := 6.2;
       render_plot_add_string(symbol, textpart, (textpos + xoffset) * scaler, default_text_posn + (2.0 * scaler), 8.0 * scaler, textwidth * scaler, last_string);
 
-      textpart := '';
-      for i := 1 to 5 do
-        textpart := textpart + symbol.text[i + 1];
+      for i := 0 to 4 do
+        textpart[i] := Chr(symbol.text[i + 1]);
+      textpart[5] := #0;
       textpos := 27;
       textwidth := 5.0 * 8.5;
       render_plot_add_string(symbol, textpart, (textpos + xoffset) * scaler, default_text_posn, 11.0 * scaler, textwidth * scaler, last_string);
 
-      textpart := '';
-      for i := 1 to 5 do
-        textpart := textpart + symbol.text[i + 6];
+      for i := 0 to 4 do
+        textpart[i] := Chr(symbol.text[i + 6]);
       textpos := 68;
       render_plot_add_string(symbol, textpart, (textpos + xoffset) * scaler, default_text_posn, 11.0 * scaler, textwidth * scaler, last_string);
 
-      textpart := symbol.text[12];
+      textpart[0] := Chr(symbol.text[11]);
+      textpart[1] := #0;
       textpos := 100;
       textwidth := 6.2;
       render_plot_add_string(symbol, textpart, (textpos + xoffset) * scaler, default_text_posn + (2.0 * scaler), 8.0 * scaler, textwidth * scaler, last_string);
@@ -732,19 +737,21 @@ begin
         line := line^.next
       end;
 
-      textpart := symbol.text[1];
+      textpart[0] := Chr(symbol.text[0]);
+      textpart[1] := #0;
       textpos := -5;
       textwidth := 6.2;
       render_plot_add_string(symbol, textpart, (textpos + xoffset) * scaler, default_text_posn + (2.0 * scaler), 8.0 * scaler, textwidth * scaler, last_string);
 
-      textpart := '';
-      for i := 1 to 6 do
-        textpart := textpart + symbol.text[i + 1];
+      for i := 0 to 5 do
+        textpart[i] := Chr(symbol.text[i + 1]);
+      textpart[6] := #0;
       textpos := 24;
       textwidth := 6.0 * 8.5;
       render_plot_add_string(symbol, textpart, (textpos + xoffset) * scaler, default_text_posn, 11.0 * scaler, textwidth * scaler, last_string);
 
-      textpart := symbol.text[8];
+      textpart[0] := Chr(symbol.text[7]);
+      textpart[1] := #0;
       textpos := 55;
       textwidth := 6.2;
       render_plot_add_string(symbol, textpart, (textpos + xoffset) * scaler, default_text_posn + (2.0 * scaler), 8.0 * scaler, textwidth * scaler, last_string);
@@ -769,7 +776,7 @@ begin
     if (textdone = 0) then
     begin
       // caculate start xoffset to center text
-      render_plot_add_string(symbol, symbol.text, ((symbol.width / 2.0) + xoffset) * scaler, default_text_posn, 9.0 * scaler, 0.0, last_string);
+      render_plot_add_string(symbol, StrToArrayOfChar(ArrayOfByteToString(symbol.text)), ((symbol.width / 2.0) + xoffset) * scaler, default_text_posn, 9.0 * scaler, 0.0, last_string);
     end;
   end;
 

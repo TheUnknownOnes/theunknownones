@@ -12,7 +12,6 @@ unit zint;
     3432bc9aff311f2aea40f0e9883abfe6564c080b complete
 
   Notes:
-    - char-array are implemented as AnsiStrings -> take care of then 1-based index!
     - the code of library.c is implemented here as part of TZintSymbol
 }
 
@@ -31,6 +30,13 @@ const
   ZINT_COLS_MAX = 178;
 
 type
+  TArrayOfByte = TBytes;
+  TArrayOfInteger = array of Integer;
+  TArrayOfCardinal = array of Cardinal;
+  TArrayOfWord = array of Word;
+  TArrayOfChar = array of Char;
+
+type
   Pzint_render_line = ^zint_render_line;
   zint_render_line = record
     x, y, length, width : Single;
@@ -42,7 +48,7 @@ type
     x, y, fsize : Single;
     width : Single;                { Suggested string width, may be 0 if none recommended }
     length : Integer;
-    text : AnsiString;
+    text : String;
     next : Pzint_render_string;    { Pointer to next character }
   end;
 
@@ -69,6 +75,8 @@ type
 
   TZintCustomRenderTarget = class;
 
+  { zint_symbol }
+
   zint_symbol = class(TPersistent)
   public
     symbology : Integer;
@@ -81,11 +89,11 @@ type
     option_3 : Integer;
     show_hrt : Integer;
     input_mode : Integer;
-    text : AnsiString;
+    text : TArrayOfByte;
     rows : Integer;
     width : Integer;
-    primary : AnsiString;
-    errtxt : AnsiString;
+    primary : TArrayOfChar;
+    errtxt : TArrayOfChar;
     encoded_data : array[0..ZINT_ROWS_MAX - 1] of array[0..ZINT_COLS_MAX - 1] of Byte;
     row_height : array[0..ZINT_ROWS_MAX - 1] of Integer; { Largest symbol is 177x177 QR Code }
     rendered : Pzint_render;
@@ -96,16 +104,17 @@ type
     procedure Clear; virtual;
     procedure ClearRendered; virtual;
 
-    procedure Encode(AData : AnsiString; ARaiseExceptions : Boolean = true); virtual;
+    procedure Encode(AData : TArrayOfByte; ALength : Integer; ARaiseExceptions : Boolean = true); overload; virtual;
+    procedure Encode(AData : String; ARaiseExceptions : Boolean = true); overload; virtual;
     procedure Render(ATarget : TZintCustomRenderTarget); virtual;
 
     //These are the functions from library.c
     class function gs1_compliant(_symbology : Integer) : Integer;
-    class procedure error_tag(var error_string : AnsiString; error_number : Integer);
-    class function hibc(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-    class function extended_charset(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-    class function reduced_charset(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
-    class function ZBarcode_Encode(symbol : zint_symbol; source : AnsiString) : Integer;
+    class procedure error_tag(var error_string : TArrayOfChar; error_number : Integer);
+    class function hibc(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
+    class function extended_charset(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
+    class function reduced_charset(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
+    class function ZBarcode_Encode(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
   end;
 
   TZintSymbol = zint_symbol;
@@ -254,11 +263,12 @@ const
 implementation
 
 uses zint_dmatrix, zint_code128, zint_gs1, zint_common, zint_2of5,
-  zint_maxicode, zint_auspost, zint_aztec, zint_code, zint_medical,
-  zint_code16k, zint_code49, zint_render_;
+  zint_render_, zint_helper, zint_aztec,
+  zint_maxicode, zint_auspost, zint_code, {zint_medical,}
+  zint_code16k, zint_code49, zint_pdf417, zint_composite;
 
 const
-  TECHNETIUM : AnsiString = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%';
+  TECHNETIUM : String = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%';
 
 { TZintSymbol }
 
@@ -272,8 +282,8 @@ begin
 
 	rows := 0;
 	width := 0;
-	text := '';
-	errtxt := '';
+	ustrcpy(text, '');
+	strcpy(errtxt, '');
 end;
 
 procedure zint_symbol.ClearRendered;
@@ -326,6 +336,10 @@ constructor zint_symbol.Create;
 begin
   inherited;
 
+  SetLength(text, 128);
+  SetLength(primary, 128);
+  SetLength(errtxt, 100);
+
   symbology := BARCODE_CODE128;
 	height := 0;
 	whitespace_width := 0;
@@ -338,7 +352,7 @@ begin
 	option_3 := 928; // PDF_MAX
 	show_hrt := 1; // Show human readable text
 	input_mode := DATA_MODE;
-	primary := '';
+	strcpy(primary, '');
   rendered := nil;
 end;
 
@@ -350,29 +364,47 @@ begin
   inherited;
 end;
 
-procedure zint_symbol.Encode(AData: AnsiString; ARaiseExceptions: Boolean);
+procedure zint_symbol.Encode(AData: TArrayOfByte; ALength : Integer; ARaiseExceptions : Boolean);
 begin
-  if (ZBarcode_Encode(Self, AData) >= ZERROR_TOO_LONG) and ARaiseExceptions then
-    raise Exception.Create(self.errtxt);
+  if (ZBarcode_Encode(Self, AData, ALength) >= ZERROR_TOO_LONG) and ARaiseExceptions then
+    raise Exception.Create(PChar(@self.errtxt[0]));
 end;
 
-class procedure zint_symbol.error_tag(var error_string : AnsiString; error_number : Integer);
+procedure zint_symbol.Encode(AData: String; ARaiseExceptions: Boolean);
+var
+  b : TArrayOfByte;
 begin
-	if (error_number <> 0) then
+  b := StrToArrayOfByte(AData);
+  Encode(b, ustrlen(b), ARaiseExceptions);
+end;
+
+class procedure zint_symbol.error_tag(var error_string : TArrayOfChar; error_number : Integer);
+var
+  error_buffer : TArrayOfChar;
+begin
+  SetLength(error_buffer, 100);
+
+  if (error_number <> 0) then
   begin
-		if(error_number > 4) then
-			error_string := 'error: ' + error_string
-		else
-			error_string := 'warning: ' + error_string
+    strcpy(error_buffer, error_string);
+
+    if (error_number > 4) then
+      strcpy(error_string, 'error: ')
+    else
+      strcpy(error_string, 'warning: ');
+
+    concat(error_string, error_buffer);
   end;
 end;
 
-class function zint_symbol.hibc(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+class function zint_symbol.hibc(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   counter, error_number, i : Integer;
-  to_process, temp : AnsiString;
-  check_digit : AnsiChar;
+  to_process, temp : TArrayOfChar;
+  check_digit : Char;
 begin
+  SetLength(to_process, 40); SetLength(temp, 2);
+
 	if (_length > 36) then
   begin
 		strcpy(symbol.errtxt, 'Data too long for HIBC LIC');
@@ -389,7 +421,7 @@ begin
 	strcpy(to_process, '+');
 	counter := 41;
 	for i := 1 to _length do
-		Inc(counter, Pos(source[i], TECHNETIUM) - 1);
+		Inc(counter, posn(TECHNETIUM, source[i])) ;
 
 	counter := counter mod 43;
 
@@ -401,7 +433,7 @@ begin
   begin
 		if (counter < 36) then
     begin
-			check_digit := AnsiChar((counter - 10) + Ord('A'));
+			check_digit := Chr((counter - 10) + Ord('A'));
 		end
     else
     begin
@@ -418,15 +450,16 @@ begin
 		end;
 	end;
 
-	temp := check_digit;
+	temp[0] := check_digit;
+  temp[1] := #0;
   concat(to_process, source);
-  concat(to_process, temp);
+	concat(to_process, temp);
   _length := strlen(to_process);
 
 	case symbol.symbology of
 		BARCODE_HIBC_128:
     begin
-			error_number := code_128(symbol, to_process, _length);
+			error_number := code_128(symbol, ArrayOfCharToArrayOfByte(to_process), _length);
       ustrcpy(symbol.text, '*');
       uconcat(symbol.text, to_process);
       uconcat(symbol.text, '*');
@@ -434,21 +467,21 @@ begin
     BARCODE_HIBC_39:
     begin
 			symbol.option_2 := 0;
-			error_number := c39(symbol, to_process, _length);
+			error_number := c39(symbol, ArrayOfCharToArrayOfByte(to_process), _length);
       ustrcpy(symbol.text, '*');
       uconcat(symbol.text, to_process);
       uconcat(symbol.text, '*');
     end;
     BARCODE_HIBC_DM:
-			error_number := dmatrix(symbol, to_process, _length);
-		{BARCODE_HIBC_QR:
-			error_number := qr_code(symbol, to_process, _length);
+			error_number := dmatrix(symbol, ArrayOfCharToArrayOfByte(to_process), _length);{
+		BARCODE_HIBC_QR:
+			error_number := qr_code(symbol, to_process, _length);   }
 		BARCODE_HIBC_PDF:
-			error_number := pdf417enc(symbol, to_process, _length);
+			error_number := pdf417enc(symbol, ArrayOfCharToArrayOfByte(to_process), _length);
 		BARCODE_HIBC_MICPDF:
-			error_number := micro_pdf417(symbol, to_process, _length);}
+			error_number := micro_pdf417(symbol, ArrayOfCharToArrayOfByte(to_process), _length);
 		BARCODE_HIBC_AZTEC:
-			error_number := aztec(symbol, to_process, _length);
+			error_number := aztec(symbol, ArrayOfCharToArrayOfByte(to_process), _length);
 	end;
 
 	Result := error_number; exit;
@@ -483,7 +516,7 @@ begin
 	end;
 end;
 
-class function zint_symbol.extended_charset(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+class function zint_symbol.extended_charset(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
   error_number : Integer;
 begin
@@ -499,12 +532,13 @@ begin
 	Result := error_number; exit;
 end;
 
-class function zint_symbol.reduced_charset(symbol : zint_symbol; source : AnsiString; _length : Integer) : Integer;
+class function zint_symbol.reduced_charset(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 { These are the "norm" standards which only support Latin-1 at most }
 var
   error_number : Integer;
-  preprocessed : AnsiString;
+  preprocessed : TArrayOfByte;
 begin
+  SetLength(preprocessed, _length + 1);
   error_number := 0;
 
 	if (symbol.symbology = BARCODE_CODE16K) then
@@ -547,7 +581,7 @@ begin
 		BARCODE_CODE39: error_number := c39(symbol, preprocessed, _length);
 		BARCODE_PZN: error_number := pharmazentral(symbol, preprocessed, _length);
 		BARCODE_EXCODE39: error_number := ec39(symbol, preprocessed, _length);
-		BARCODE_CODABAR: error_number := codabar(symbol, preprocessed, _length);
+		//BARCODE_CODABAR: error_number := codabar(symbol, preprocessed, _length);
 		BARCODE_CODE93: error_number := c93(symbol, preprocessed, _length);
 	  BARCODE_LOGMARS: error_number := c39(symbol, preprocessed, _length);
 		BARCODE_CODE128: error_number := code_128(symbol, preprocessed, _length);
@@ -557,7 +591,7 @@ begin
 		//BARCODE_MSI_PLESSEY: error_number := msi_handle(symbol, preprocessed, _length);
 		//BARCODE_TELEPEN: error_number := telepen(symbol, preprocessed, _length);
 		//BARCODE_TELEPEN_NUM: error_number := telepen_num(symbol, preprocessed, _length);
-		BARCODE_PHARMA: error_number := pharma_one(symbol, preprocessed, _length);
+		//BARCODE_PHARMA: error_number := pharma_one(symbol, preprocessed, _length);
 		//BARCODE_PLESSEY: error_number := plessey(symbol, preprocessed, _length);
 		BARCODE_ITF14: error_number := itf14(symbol, preprocessed, _length);
 		//BARCODE_FLAT: error_number := flattermarken(symbol, preprocessed, _length);
@@ -570,7 +604,7 @@ begin
 		BARCODE_AUSROUTE: error_number := australia_post(symbol, preprocessed, _length);
 		BARCODE_AUSREDIRECT: error_number := australia_post(symbol, preprocessed, _length);
 		BARCODE_CODE16K: error_number := code16k(symbol, preprocessed, _length);
-		BARCODE_PHARMA_TWO: error_number := pharma_two(symbol, preprocessed, _length);
+		//BARCODE_PHARMA_TWO: error_number := pharma_two(symbol, preprocessed, _length);
 		//BARCODE_ONECODE: error_number := imail(symbol, preprocessed, _length);
 		//BARCODE_ISBNX: error_number := eanx(symbol, preprocessed, _length);
 		//BARCODE_RSS14: error_number := rss14(symbol, preprocessed, _length);
@@ -579,37 +613,37 @@ begin
 		//BARCODE_RSS_LTD: error_number := rsslimited(symbol, preprocessed, _length);
 		//BARCODE_RSS_EXP: error_number := rssexpanded(symbol, preprocessed, _length);
 		//BARCODE_RSS_EXPSTACK: error_number := rssexpanded(symbol, preprocessed, _length);
-		//BARCODE_EANX_CC: error_number := composite(symbol, preprocessed, _length);
-		//BARCODE_EAN128_CC: error_number := composite(symbol, preprocessed, _length);
-		//BARCODE_RSS14_CC: error_number := composite(symbol, preprocessed, _length);
-		//BARCODE_RSS_LTD_CC: error_number := composite(symbol, preprocessed, _length);
-		//BARCODE_RSS_EXP_CC: error_number := composite(symbol, preprocessed, _length);
-		//BARCODE_UPCA_CC: error_number := composite(symbol, preprocessed, _length);
-		//BARCODE_UPCE_CC: error_number := composite(symbol, preprocessed, _length);
-		//BARCODE_RSS14STACK_CC: error_number := composite(symbol, preprocessed, _length);
-		//BARCODE_RSS14_OMNI_CC: error_number := composite(symbol, preprocessed, _length);
-		//BARCODE_RSS_EXPSTACK_CC: error_number := composite(symbol, preprocessed, _length);
+		BARCODE_EANX_CC: error_number := composite(symbol, preprocessed, _length);
+		BARCODE_EAN128_CC: error_number := composite(symbol, preprocessed, _length);
+		BARCODE_RSS14_CC: error_number := composite(symbol, preprocessed, _length);
+		BARCODE_RSS_LTD_CC: error_number := composite(symbol, preprocessed, _length);
+		BARCODE_RSS_EXP_CC: error_number := composite(symbol, preprocessed, _length);
+		BARCODE_UPCA_CC: error_number := composite(symbol, preprocessed, _length);
+		BARCODE_UPCE_CC: error_number := composite(symbol, preprocessed, _length);
+		BARCODE_RSS14STACK_CC: error_number := composite(symbol, preprocessed, _length);
+		BARCODE_RSS14_OMNI_CC: error_number := composite(symbol, preprocessed, _length);
+		BARCODE_RSS_EXPSTACK_CC: error_number := composite(symbol, preprocessed, _length);
 		//BARCODE_KIX: error_number := kix_code(symbol, preprocessed, _length);
-		BARCODE_CODE32: error_number := code32(symbol, preprocessed, _length);
+		//BARCODE_CODE32: error_number := code32(symbol, preprocessed, _length);
 		//BARCODE_DAFT: error_number := daft_code(symbol, preprocessed, _length);
 		BARCODE_EAN14: error_number := ean_14(symbol, preprocessed, _length);
 		BARCODE_AZRUNE: error_number := aztec_runes(symbol, preprocessed, _length);
 		//BARCODE_KOREAPOST: error_number := korea_post(symbol, preprocessed, _length);
-		BARCODE_HIBC_128: error_number := hibc(symbol, preprocessed, _length);
-		BARCODE_HIBC_39: error_number := hibc(symbol, preprocessed, _length);
+		//BARCODE_HIBC_128: error_number := hibc(symbol, preprocessed, _length);
+		//BARCODE_HIBC_39: error_number := hibc(symbol, preprocessed, _length);
 		BARCODE_HIBC_DM: error_number := hibc(symbol, preprocessed, _length);
-		BARCODE_HIBC_QR: error_number := hibc(symbol, preprocessed, _length);
-		BARCODE_HIBC_PDF: error_number := hibc(symbol, preprocessed, _length);
-		BARCODE_HIBC_MICPDF: error_number := hibc(symbol, preprocessed, _length);
+		//BARCODE_HIBC_QR: error_number := hibc(symbol, preprocessed, _length);
+		//BARCODE_HIBC_PDF: error_number := hibc(symbol, preprocessed, _length);
+		//BARCODE_HIBC_MICPDF: error_number := hibc(symbol, preprocessed, _length);
 		BARCODE_HIBC_AZTEC: error_number := hibc(symbol, preprocessed, _length);
 		//BARCODE_JAPANPOST: error_number := japan_post(symbol, preprocessed, _length);
 		BARCODE_CODE49: error_number := code_49(symbol, preprocessed, _length);
 		//BARCODE_CHANNEL: error_number := channel_code(symbol, preprocessed, _length);
 		//BARCODE_CODEONE: error_number := code_one(symbol, preprocessed, _length);
 		BARCODE_DATAMATRIX: error_number := dmatrix(symbol, preprocessed, _length);
-		//BARCODE_PDF417: error_number := pdf417enc(symbol, preprocessed, _length);
-		//BARCODE_PDF417TRUNC: error_number := pdf417enc(symbol, preprocessed, _length);
-		//BARCODE_MICROPDF417: error_number := micro_pdf417(symbol, preprocessed, _length);
+		BARCODE_PDF417: error_number := pdf417enc(symbol, preprocessed, _length);
+		BARCODE_PDF417TRUNC: error_number := pdf417enc(symbol, preprocessed, _length);
+		BARCODE_MICROPDF417: error_number := micro_pdf417(symbol, preprocessed, _length);
 		BARCODE_MAXICODE: error_number := maxicode(symbol, preprocessed, _length);
 		BARCODE_AZTEC: error_number := aztec(symbol, preprocessed, _length);
   end;
@@ -624,18 +658,16 @@ begin
   ATarget.Render(Self);
 end;
 
-class function zint_symbol.ZBarcode_Encode(symbol : zint_symbol; source : AnsiString) : Integer;
+class function zint_symbol.ZBarcode_Encode(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
-  _length : Integer;
   error_number, error_buffer, i : Integer;
-  local_source : AnsiString;
+  local_source : TArrayOfByte;
 begin
-  _length := Length(source);
   error_number := 0;
 
 	if (_length = 0) then
   begin
-		symbol.errtxt := 'No input data';
+		strcpy(symbol.errtxt, 'No input data');
 		error_tag(symbol.errtxt, ZERROR_INVALID_DATA);
 		Result := ZERROR_INVALID_DATA; exit;
 	end;
@@ -693,7 +725,7 @@ begin
   begin
 		for i := 1 to _length do
     begin
-			if (source[i] = #0) then
+			if (source[i] = 0) then
       begin
 				strcpy(symbol.errtxt, 'NULL characters not permitted in GS1 mode');
 				result := ZERROR_INVALID_DATA; exit;
@@ -701,7 +733,7 @@ begin
 		end;
 		if (gs1_compliant(symbol.symbology) = 1) then
     begin
-			error_number := ugs1_verify(symbol, source, local_source);
+			error_number := ugs1_verify(symbol, source, _length, local_source);
 			if (error_number <> 0) then begin result := error_number; exit; end;
 			_length := ustrlen(local_source);
 		end
@@ -725,12 +757,12 @@ begin
 
 	if ((symbol.symbology = BARCODE_CODE128) or (symbol.symbology = BARCODE_CODE128B)) then
   begin
-		for i := 1 to _length do
+		for i := 0 to _length - 1 do
     begin
-			if (local_source[i] = #0) then
-				symbol.text := symbol.text + ' '
+			if (local_source[i] = 0) then
+				symbol.text[i] := 32
       else
-				symbol.text := symbol.text + local_source[i];
+				symbol.text[i] := local_source[i];
 		end;
 	end;
 

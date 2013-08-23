@@ -19,6 +19,10 @@ type
     imgResult: TImage;
     lblError: TLabel;
     Panel1: TPanel;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    Panel4: TPanel;
+    Panel5: TPanel;
     SaveDialog1: TSaveDialog;
     procedure btnSaveSVGClick(Sender: TObject);
     procedure comTypeChange(Sender: TObject);
@@ -39,7 +43,7 @@ implementation
 {$R *.lfm}
 
 uses zint, zint_lmf, zint_render_lmf, zint_render_bmp, TADrawerSVG,
-  zint_render_tadrawer, TADrawUtils;
+  zint_render_tadrawer, zint_helper, TADrawUtils;
 
 type
   BCTypeEntry = record
@@ -47,25 +51,19 @@ type
     T: integer;
   end;
 const
-  SupportedTypes: array[0..36] of
-    BCTypeEntry = ((N: '2 of 5 Matrix'; T: BARCODE_C25MATRIX),
-    (N: '2 of 5 Industrial';
-    T: BARCODE_C25IND),
-    (N: '2 of 5 Interleaved';
-    T: BARCODE_C25INTER),
+  SupportedTypes: array[0..39] of
+    BCTypeEntry = (
+    (N: '2 of 5 Matrix'; T: BARCODE_C25MATRIX),
+    (N: '2 of 5 Industrial'; T: BARCODE_C25IND),
+    (N: '2 of 5 Interleaved'; T: BARCODE_C25INTER),
     (N: '2 of 5 IATA'; T: BARCODE_C25IATA),
-    (N: '2 of 5 Datalogic';
-    T: BARCODE_C25LOGIC),
-    (N: 'Deutsche Post Leitcode';
-    T: BARCODE_DPLEIT),
-    (N: 'Deutsche Post Identcode';
-    T: BARCODE_DPIDENT),
+    (N: '2 of 5 Datalogic'; T: BARCODE_C25LOGIC),
+    (N: 'Deutsche Post Leitcode'; T: BARCODE_DPLEIT),
+    (N: 'Deutsche Post Identcode'; T: BARCODE_DPIDENT),
     (N: 'EAN 128'; T: BARCODE_EAN128),
     (N: 'Code 39'; T: BARCODE_CODE39),
-    (N: 'Pharmazentral PZN';
-    T: BARCODE_PZN),
-    (N: 'Extended Code 39';
-    T: BARCODE_EXCODE39),
+    (N: 'Pharmazentral PZN'; T: BARCODE_PZN),
+    (N: 'Extended Code 39'; T: BARCODE_EXCODE39),
     (N: 'Codabar'; T: BARCODE_CODABAR),
     (N: 'Code 93'; T: BARCODE_CODE93),
     (N: 'Logmars'; T: BARCODE_LOGMARS),
@@ -75,32 +73,26 @@ const
     (N: 'Code 11'; T: BARCODE_CODE11),
     (N: 'Pharmacode'; T: BARCODE_PHARMA),
     (N: 'ITF 14'; T: BARCODE_ITF14),
-    (N: 'Australian Post Code';
-    T: BARCODE_AUSPOST),
-    (N: 'Australian Post Reply';
-    T: BARCODE_AUSREPLY),
-    (N: 'Australian Post Route';
-    T: BARCODE_AUSROUTE),
-    (N: 'Australian Post Redirect';
-    T: BARCODE_AUSREDIRECT),
-    (N: 'Pharma 2-track';
-    T: BARCODE_PHARMA_TWO),
-    (N: 'Code 32 / Italian Pharmacode';
-    T: BARCODE_CODE32),
+    (N: 'Australian Post Code'; T: BARCODE_AUSPOST),
+    (N: 'Australian Post Reply'; T: BARCODE_AUSREPLY),
+    (N: 'Australian Post Route'; T: BARCODE_AUSROUTE),
+    (N: 'Australian Post Redirect'; T: BARCODE_AUSREDIRECT),
+    (N: 'Pharma 2-track'; T: BARCODE_PHARMA_TWO),
+    (N: 'Code 32 / Italian Pharmacode'; T: BARCODE_CODE32),
     (N: 'EAN 14'; T: BARCODE_EAN14),
     (N: 'Azrune'; T: BARCODE_AZRUNE),
     (N: 'HIBC 128'; T: BARCODE_HIBC_128),
     (N: 'HIBC 39'; T: BARCODE_HIBC_39),
-    (N: 'HIBC Datamatrix';
-    T: BARCODE_HIBC_DM),
-    (N: 'HIBC Aztec';
-    T: BARCODE_HIBC_AZTEC),
-    (N: 'Datamatrix';
-    T: BARCODE_DATAMATRIX),
+    (N: 'HIBC Datamatrix'; T: BARCODE_HIBC_DM),
+    (N: 'HIBC Aztec'; T: BARCODE_HIBC_AZTEC),
+    (N: 'Datamatrix'; T: BARCODE_DATAMATRIX),
     (N: 'Maxicode'; T: BARCODE_MAXICODE),
     (N: 'Aztec'; T: BARCODE_AZTEC),
     (N: 'Code 16k'; T: BARCODE_CODE16K),
-    (N: 'Code 49'; T: BARCODE_CODE49)
+    (N: 'Code 49'; T: BARCODE_CODE49),
+    (N: 'PDF417'; T: BARCODE_PDF417),
+    (N: 'PDF417 Truncated'; T: BARCODE_PDF417TRUNC),
+    (N: 'MicroPDF417'; T: BARCODE_MICROPDF417)
     );
 
 { TformZintTest }
@@ -136,7 +128,6 @@ begin
   begin
     symbol := TZintSymbol.Create;
     symbol.symbology := SupportedTypes[comType.ItemIndex].T;
-    symbol.input_mode := UNICODE_MODE;
     symbol.show_hrt := 1;
     fs := TFileStream.Create(SaveDialog1.FileName, fmCreate);
 
@@ -166,7 +157,7 @@ begin
   GenBarcode;
 end;
 
-{$DEFINE RenderBMP}
+//{$DEFINE RenderBMP}
 
 procedure TformZintTest.GenBarcode;
 var
