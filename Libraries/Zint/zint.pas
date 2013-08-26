@@ -105,7 +105,7 @@ type
     procedure ClearRendered; virtual;
 
     procedure Encode(AData : TArrayOfByte; ALength : Integer; ARaiseExceptions : Boolean = true); overload; virtual;
-    procedure Encode(AData : String; ARaiseExceptions : Boolean = true); overload; virtual;
+    procedure Encode(AData : String; ARaiseExceptions : Boolean = true; AEncoding: TEncoding = nil); overload; virtual;
     procedure Render(ATarget : TZintCustomRenderTarget); virtual;
 
     //These are the functions from library.c
@@ -263,8 +263,8 @@ const
 implementation
 
 uses zint_dmatrix, zint_code128, zint_gs1, zint_common, zint_2of5,
-  zint_render_, zint_helper, zint_aztec,
-  zint_maxicode, zint_auspost, zint_code, {zint_medical,}
+  zint_render_, zint_helper, zint_aztec, zint_qr,
+  zint_maxicode, zint_auspost, zint_code, zint_medical,
   zint_code16k, zint_code49, zint_pdf417, zint_composite;
 
 const
@@ -370,11 +370,11 @@ begin
     raise Exception.Create(PChar(@self.errtxt[0]));
 end;
 
-procedure zint_symbol.Encode(AData: String; ARaiseExceptions: Boolean);
+procedure zint_symbol.Encode(AData: String; ARaiseExceptions: Boolean; AEncoding: TEncoding);
 var
   b : TArrayOfByte;
 begin
-  b := StrToArrayOfByte(AData);
+  b := StrToArrayOfByte(AData, AEncoding);
   Encode(b, ustrlen(b), ARaiseExceptions);
 end;
 
@@ -473,9 +473,9 @@ begin
       uconcat(symbol.text, '*');
     end;
     BARCODE_HIBC_DM:
-			error_number := dmatrix(symbol, ArrayOfCharToArrayOfByte(to_process), _length);{
+			error_number := dmatrix(symbol, ArrayOfCharToArrayOfByte(to_process), _length);
 		BARCODE_HIBC_QR:
-			error_number := qr_code(symbol, to_process, _length);   }
+			error_number := qr_code(symbol, ArrayOfCharToArrayOfByte(to_process), _length);
 		BARCODE_HIBC_PDF:
 			error_number := pdf417enc(symbol, ArrayOfCharToArrayOfByte(to_process), _length);
 		BARCODE_HIBC_MICPDF:
@@ -523,11 +523,11 @@ begin
   error_number := 0;
 
 	{ These are the "elite" standards which can support multiple character sets }
-	{case symbol.symbology of
-		BARCODE_QRCODE: error_number = qr_code(symbol, source, _length);
-		BARCODE_MICROQR: error_number = microqr(symbol, source, _length);
-		BARCODE_GRIDMATRIX: error_number = grid_matrix(symbol, source, _length);
-	end;}
+	case symbol.symbology of
+		BARCODE_QRCODE: error_number := qr_code(symbol, source, _length);
+	 //	BARCODE_MICROQR: error_number = microqr(symbol, source, _length);
+	 //	BARCODE_GRIDMATRIX: error_number = grid_matrix(symbol, source, _length);
+	end;
 
 	Result := error_number; exit;
 end;
@@ -632,7 +632,7 @@ begin
 		//BARCODE_HIBC_128: error_number := hibc(symbol, preprocessed, _length);
 		//BARCODE_HIBC_39: error_number := hibc(symbol, preprocessed, _length);
 		BARCODE_HIBC_DM: error_number := hibc(symbol, preprocessed, _length);
-		//BARCODE_HIBC_QR: error_number := hibc(symbol, preprocessed, _length);
+		BARCODE_HIBC_QR: error_number := hibc(symbol, preprocessed, _length);
 		//BARCODE_HIBC_PDF: error_number := hibc(symbol, preprocessed, _length);
 		//BARCODE_HIBC_MICPDF: error_number := hibc(symbol, preprocessed, _length);
 		BARCODE_HIBC_AZTEC: error_number := hibc(symbol, preprocessed, _length);
