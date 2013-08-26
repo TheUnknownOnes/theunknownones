@@ -474,7 +474,7 @@ begin
     end;
   end;
 
-  while (sp <= inputlen) do
+  while (sp < inputlen) do
   begin
 
     current_mode := next_mode;
