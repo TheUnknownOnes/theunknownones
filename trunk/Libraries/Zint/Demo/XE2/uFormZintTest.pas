@@ -64,7 +64,7 @@ type
   end;
 
 const
-  SupportedTypes : array[0..36] of BCTypeEntry =((N : '2 of 5 Matrix'; T : BARCODE_C25MATRIX),
+  SupportedTypes : array[0..37] of BCTypeEntry =((N : '2 of 5 Matrix'; T : BARCODE_C25MATRIX),
                                                 (N : '2 of 5 Industrial'; T : BARCODE_C25IND),
                                                 (N : '2 of 5 Interleaved'; T : BARCODE_C25INTER),
                                                 (N : '2 of 5 IATA'; T : BARCODE_C25IATA),
@@ -100,7 +100,8 @@ const
                                                 (N : 'Maxicode'; T : BARCODE_MAXICODE),
                                                 (N : 'Aztec'; T : BARCODE_AZTEC),
                                                 (N : 'Code 16k'; T : BARCODE_CODE16K),
-                                                (N : 'Code 49'; T : BARCODE_CODE49)
+                                                (N : 'Code 49'; T : BARCODE_CODE49),
+                                                (N : 'QR Code'; T : BARCODE_QRCODE)
                                                );
 
 procedure TForm46.btPrintClick(Sender: TObject);
@@ -249,7 +250,7 @@ begin
 
   symbol:=GenSymbol;
   try
-    symbol.Encode(UTF8Encode(edData.Text), true);
+    symbol.Encode(UTF8Encode(edData.Text), true, TEncoding.UTF8);
 
     wmf:=TMetafile.Create;
     wmf.SetSize(imgResult.Width, imgResult.Height);

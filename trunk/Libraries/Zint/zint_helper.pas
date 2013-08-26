@@ -38,7 +38,7 @@ uses
 function StrToArrayOfByte(const AString: String; AEncoding: TEncoding): TArrayOfByte;
 begin
   if not Assigned(AEncoding) then
-    AEncoding := TEncoding.ANSI;
+    AEncoding := TEncoding.ASCII;
   Result := AEncoding.GetBytes(AString);
   SetLength(Result, Length(Result) + 1);
   Result[High(Result)] := 0;
@@ -47,7 +47,7 @@ end;
 function ArrayOfByteToString(const AArray: TArrayOfByte; AEncoding: TEncoding): String;
 begin
   if not Assigned(AEncoding) then
-    AEncoding := TEncoding.ANSI;
+    AEncoding := TEncoding.ASCII;
   Result := AEncoding.GetString(AArray, 0, ustrlen(AArray));
 end;
 

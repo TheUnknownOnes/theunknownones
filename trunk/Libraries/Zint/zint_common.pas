@@ -13,7 +13,7 @@ unit zint_common;
     3432bc9aff311f2aea40f0e9883abfe6564c080b work in progress
 
   Notes:
-    - currently missing: roundup, froundup, utf8toutf16 (maybe not all have to be implemented)
+    - currently missing: roundup, froundup (maybe not all have to be implemented)
 }
 
 {$IFDEF FPC}
@@ -78,6 +78,8 @@ function istwodigits(const source : TArrayOfByte; position : Integer) : Integer;
 function parunmodd(llyth : Byte) : Integer; overload;
 function parunmodd(llyth : Char) : Integer; overload;
 function latin1_process(symbol : zint_symbol; const source : TArrayOfByte; var preprocessed : TArrayOfByte; var _length : Integer) : Integer;
+
+function utf8toutf16(symbol : zint_symbol; source: TArrayOfByte; vals: TArrayOfInteger; var _length : Integer): Integer;
 
 procedure bscan(var binary : TArrayOfChar; data : Integer; h : Integer);
 
@@ -492,6 +494,72 @@ function nitems(a : TArrayOfInteger) : Integer; overload;
 begin
   Result := Length(a);
 end;
+
+function utf8toutf16(symbol : zint_symbol; source: TArrayOfByte; vals: TArrayOfInteger; var _length : Integer): Integer;
+var
+  bpos, jpos, error_number : Integer;
+  next : Integer;
+begin
+	bpos := 0;
+	jpos := 0;
+	error_number := 0;
+	next := 0;
+	repeat
+		if source[bpos] <= $7f then
+    begin
+			// 1 byte mode (7-bit ASCII)
+			vals[jpos] := source[bpos];
+			next := bpos + 1;
+			inc(jpos);
+		end
+    else
+    begin
+			if((source[bpos] >= $80) and (source[bpos] <= $bf)) then
+      begin
+				strcpy(symbol.errtxt, 'Corrupt Unicode data');
+				Result:=ZERROR_INVALID_DATA;
+        Exit;
+			end;
+			if((source[bpos] >= $c0) and (source[bpos] <= $c1)) then
+      begin
+				strcpy(symbol.errtxt, 'Overlong encoding not supported');
+				Result:=ZERROR_INVALID_DATA;
+        Exit;
+			end;
+
+			if((source[bpos] >= $c2) and (source[bpos] <= $df)) then
+      begin
+				// 2 byte mode
+				vals[jpos] := ((source[bpos] and $1f) shl 6) + (source[bpos + 1] and $3f);
+				next := bpos + 2;
+				inc(jpos);
+			end
+      else
+			if((source[bpos] >= $e0) and (source[bpos] <= $ef)) then
+      begin
+				// 3 byte mode
+				vals[jpos] := ((source[bpos] and $0f) shl 12) + ((source[bpos + 1] and $3f) shl 6) + (source[bpos + 2] and $3f);
+				next := bpos + 3;
+				inc(jpos);
+			end
+      else
+			if(source[bpos] >= $f0) then
+      begin
+				strcpy(symbol.errtxt, 'Unicode sequences of more than 3 bytes not supported');
+				Result:= ZERROR_INVALID_DATA;
+        Exit;
+			end;
+		end;
+
+		bpos := next;
+
+	until not (bpos < _length);
+
+	_length := jpos;
+
+	Result:=error_number;
+end;
+
 
 end.
 

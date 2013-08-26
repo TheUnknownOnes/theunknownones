@@ -1,7 +1,7 @@
 program ZintTest;
 
 uses
-  Vcl.Forms,
+  Forms,
   uFormZintTest in 'uFormZintTest.pas' {Form46};
 
 {$R *.res}
