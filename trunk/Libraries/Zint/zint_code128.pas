@@ -35,7 +35,7 @@ uses
 const
   DPDSET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*';
 
-var
+threadvar
   list : array[0..1] of array[0..169] of Integer;
 
 const

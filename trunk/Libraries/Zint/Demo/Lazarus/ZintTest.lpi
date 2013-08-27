@@ -33,7 +33,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="15">
+    <Units Count="18">
       <Unit0>
         <Filename Value="ZintTest.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -112,6 +112,21 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="zint_code49"/>
       </Unit14>
+      <Unit15>
+        <Filename Value="..\..\zint_reedsol.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_reedsol"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="..\..\zint_gridmtx.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_gridmtx"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="..\..\zint_gb2312.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_gb2312"/>
+      </Unit17>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -28,7 +28,7 @@ implementation
 
 uses zint_common, zint_helper;
 
-var
+threadvar
   list : array[0..1] of array[0..169] of Integer;
 
 { EN 12323 Table 1 - "Code 16K" character encodations }
