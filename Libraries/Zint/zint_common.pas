@@ -114,7 +114,7 @@ end;
 
 procedure strcpy(var ATarget : TArrayOfChar; const ASource : String; AEncoding : TEncoding);
 begin
-  strcpy(ATarget, StrToArrayOfChar(ASource, AEncoding));
+  strcpy(ATarget, StrToArrayOfChar(ASource));
 end;
 
 { Local replacement for strlen() with uint8_t strings }
@@ -144,7 +144,7 @@ end;
 
 procedure ustrcpy(var ATarget: TArrayOfByte; const ASource : String; AEncoding : TEncoding);
 begin
-  ustrcpy(ATarget, StrToArrayOfByte(ASource, AEncoding));
+  ustrcpy(ATarget, StrToArrayOfByte(ASource));
 end;
 
 procedure uconcat(var ADest: TArrayOfByte; const ASource: TArrayOfChar);
@@ -154,7 +154,7 @@ end;
 
 procedure uconcat(var ADest: TArrayOfByte; const ASource: String; AEncoding : TEncoding);
 begin
-  uconcat(ADest, StrToArrayOfByte(ASource, AEncoding));
+  uconcat(ADest, StrToArrayOfByte(ASource));
 end;
 
 procedure concat(var dest: TArrayOfChar; const source: TArrayOfChar);
@@ -181,7 +181,7 @@ end;
 procedure concat(var ADest: TArrayOfChar; const ASource: String;
   AEncoding: TEncoding);
 begin
-  concat(ADest, StrToArrayOfChar(ASource, AEncoding));
+  concat(ADest, StrToArrayOfChar(ASource));
 end;
 
 procedure concat(var ADest: TArrayOfChar; const ASource: TArrayOfByte);
@@ -249,7 +249,7 @@ end;
 function is_sane(const ATest_string: String; const ASource: TArrayOfByte;
   ALength: Integer; AEncoding : TEncoding): Integer;
 begin
-  Result := is_sane(StrToArrayOfChar(ATest_string, AEncoding), ASource, ALength);
+  Result := is_sane(StrToArrayOfChar(ATest_string), ASource, ALength);
 end;
 
 { Returns the position of data in set_string}
@@ -269,13 +269,13 @@ end;
 
 function posn(const ASet_string: String; const AData: Byte; AEncoding : TEncoding): Integer;
 begin
-  Result := posn(StrToArrayOfChar(ASet_string, AEncoding), Chr(AData));
+  Result := posn(StrToArrayOfChar(ASet_string), Chr(AData));
 end;
 
 function posn(const ASet_string: String; const AData: Char; AEncoding: TEncoding
   ): Integer;
 begin
-  Result := posn(StrToArrayOfChar(ASet_string, AEncoding), AData);
+  Result := posn(StrToArrayOfChar(ASet_string), AData);
 end;
 
 { Replaces huge switch statements for looking up in tables }
@@ -321,7 +321,7 @@ end;
 
 procedure unset_module(symbol : zint_symbol; y_coord : Integer; x_coord : Integer);
 begin
-	symbol.encoded_data[y_coord][x_coord div 7] := ((symbol.encoded_data[y_coord][x_coord div 7]) or (not (1 shl (x_coord mod 7))));
+	symbol.encoded_data[y_coord][x_coord div 7] := ((symbol.encoded_data[y_coord][x_coord div 7]) and (not (1 shl (x_coord mod 7))));
 end;
 
 { Expands from a width pattern to a bit pattern */ }

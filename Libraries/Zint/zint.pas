@@ -105,7 +105,7 @@ type
     procedure ClearRendered; virtual;
 
     procedure Encode(AData : TArrayOfByte; ALength : Integer; ARaiseExceptions : Boolean = true); overload; virtual;
-    procedure Encode(AData : String; ARaiseExceptions : Boolean = true; AEncoding: TEncoding = nil); overload; virtual;
+    procedure Encode(AData : String; ARaiseExceptions : Boolean = true); overload; virtual;
     procedure Render(ATarget : TZintCustomRenderTarget); virtual;
 
     //These are the functions from library.c
@@ -260,12 +260,15 @@ const
   ZERROR_FILE_ACCESS = 10;
   ZERROR_MEMORY = 11;
 
+threadvar
+  debug : Integer;
+
 implementation
 
 uses zint_dmatrix, zint_code128, zint_gs1, zint_common, zint_2of5,
   zint_render_, zint_helper, zint_aztec, zint_qr,
   zint_maxicode, zint_auspost, zint_code, zint_medical,
-  zint_code16k, zint_code49, zint_pdf417, zint_composite;
+  zint_code16k, zint_code49, zint_pdf417, zint_composite, zint_gridmtx;
 
 const
   TECHNETIUM : String = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%';
@@ -370,11 +373,23 @@ begin
     raise Exception.Create(PChar(@self.errtxt[0]));
 end;
 
-procedure zint_symbol.Encode(AData: String; ARaiseExceptions: Boolean; AEncoding: TEncoding);
+procedure zint_symbol.Encode(AData: String; ARaiseExceptions: Boolean);
 var
   b : TArrayOfByte;
+  e : TEncoding;
 begin
-  b := StrToArrayOfByte(AData, AEncoding);
+  if (input_mode and UNICODE_MODE) <> 0 then
+    {$IFDEF FPC}
+    e := TEncoding.ANSI
+    {$ELSE}
+    e := TEncoding.UTF8
+    {$ENDIF}
+  else
+    e := TEncoding.ASCII;
+
+  b := e.GetBytes(AData);
+  SetLength(b, Length(b) + 1);
+  b[High(b)] := 0;
   Encode(b, ustrlen(b), ARaiseExceptions);
 end;
 
@@ -524,9 +539,9 @@ begin
 
 	{ These are the "elite" standards which can support multiple character sets }
 	case symbol.symbology of
-		BARCODE_QRCODE: error_number := qr_code(symbol, source, _length);
-	 //	BARCODE_MICROQR: error_number = microqr(symbol, source, _length);
-	 //	BARCODE_GRIDMATRIX: error_number = grid_matrix(symbol, source, _length);
+	  BARCODE_QRCODE: error_number := qr_code(symbol, source, _length);
+	 	BARCODE_MICROQR: error_number := microqr(symbol, source, _length);
+		BARCODE_GRIDMATRIX: error_number := grid_matrix(symbol, source, _length);
 	end;
 
 	Result := error_number; exit;
@@ -799,6 +814,9 @@ begin
   else
     FMultiplikator := 1;
 end;
+
+initialization
+  debug := 0;
 
 end.
 

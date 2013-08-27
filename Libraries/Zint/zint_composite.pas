@@ -69,7 +69,7 @@ const aRAPTable : array[0..67] of Integer = (
 	6, 0, 3, 3, 3, 0, 3, 3, 0, 3, 6, 6, 0, 0, 0, 0, 3
 );
 
-var
+threadvar
   pwr928 : array[0..68] of array[0..6] of Word;
 
 function _min(first : Integer; second : Integer) : Integer;
@@ -2058,11 +2058,9 @@ begin
     for j := 0 to linear.width do
     begin
       if (module_is_set(linear, i, j) <> 0) then
-        set_module(symbol, i + symbol.rows, j + bottom_shift);
-      // MarcoWarm 23.08.2013 - let's assume the symbol row bit is initialized unset - if we don't we would have to check symbol.row before unsetting!!!
-      //else
-      //  if (module_is_set(symbol, i + symbol.rows, j + bottom_shift)<>0) then
-      //    unset_module(symbol, i + symbol.rows, j + bottom_shift);
+        set_module(symbol, i + symbol.rows, j + bottom_shift)
+      else
+        unset_module(symbol, i + symbol.rows, j + bottom_shift);
     end;
   end;
   if ((linear.width + bottom_shift) > symbol.width) then
@@ -2073,8 +2071,6 @@ begin
 
   Inc(symbol.rows, linear.rows);
   ustrcpy(symbol.text, linear.text);
-
-//  symbol.encoded_data:=linear.encoded_data;
 
   linear.Free;
 

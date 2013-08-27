@@ -37,6 +37,7 @@ object formZintTest: TformZintTest
       Align = alRight
       ItemHeight = 15
       OnChange = comTypeChange
+      Sorted = True
       Style = csDropDownList
       TabOrder = 1
     end

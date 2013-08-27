@@ -30,6 +30,7 @@ const
 
 
 function qr_code(symbol : zint_symbol; source : TArrayOfByte; _length : Integer): Integer;
+function microqr(symbol : zint_symbol; source : TArrayOfByte; _length : Integer): Integer;
 
 implementation
 
@@ -314,7 +315,7 @@ end;
 
 procedure qr_binary(var datastream: TArrayOfInteger; version: Integer; target_binlen : Integer; mode : TArrayOfChar; jisdata : TArrayOfInteger; _length : Integer; gs1 : Integer; est_binlen : Integer);
 var
-  position, debug : Integer;
+  position: Integer;
   short_data_block_length, i, scheme : Integer;
   data_block : Char;
   padbits : Integer;
@@ -329,7 +330,6 @@ var
 begin
   // Convert input data to a binary stream and add padding
 	position := 0;
-  debug := 0;
   scheme := 1;
   SetLength(binary, est_binlen + 12);
 	strcpy(binary, '');
@@ -640,7 +640,7 @@ var
   qty_long_blocks : Integer;
   qty_short_blocks : Integer;
   ecc_block_length : Integer;
-  i, j, length_this_block, posn, debug : Integer;
+  i, j, length_this_block, posn : Integer;
   data_block : TArrayOfByte;
   ecc_block : TArrayOfByte;
   interleaved_data :  TArrayOfInteger;
@@ -652,8 +652,7 @@ begin
 	qty_long_blocks := data_cw mod blocks;
 	qty_short_blocks := blocks - qty_long_blocks;
 	ecc_block_length := ecc_cw div blocks;
-	debug := 0;
-
+	
   SetLength(data_block, short_data_block_length + 2);
 	SetLength(ecc_block, ecc_block_length + 2);
 	SetLength(interleaved_data, data_cw + 2);
@@ -1376,6 +1375,1166 @@ begin
 end;
 
 // NOTE: From this point forward concerns Micro QR Code only
-// todo : Implement this ;-)
+
+function micro_qr_intermediate(var binary : TArrayOfChar; jisdata : TArrayOfInteger; mode : TArrayOfChar; _length : Integer; var kanji_used : integer; var alphanum_used : Integer; var byte_used : Integer) : Integer;
+var
+  position : Integer;
+  short_data_block_length, i : Integer;
+  data_block : Char;
+  buffer : TArrayOfChar;
+  jis, _byte : Integer;
+  msb, lsb, prod : Integer;
+  count, first, second, third : Integer;
+begin
+	// Convert input data to an 'intermediate stage' where data is binary encoded but control information is not
+	position := 0;
+  SetLength(buffer, 2);
+
+	strcpy(binary, '');
+
+	if (debug<>0) then
+  begin
+		for i := 0 to _length - 1 do
+    	write(Format('%s', [mode[i]]));
+		writeln;
+	end;
+
+	repeat
+		if(strlen(binary) > 128) then
+    begin
+			Result:=ZERROR_TOO_LONG;
+      Exit;
+		end;
+
+		data_block := mode[position];
+		short_data_block_length := 0;
+		repeat
+			inc(short_data_block_length);
+		until not (((short_data_block_length + position) < _length) and (mode[position + short_data_block_length] = data_block));
+
+		case (data_block) of
+			'K': begin
+            // Kanji mode
+            // Mode indicator
+            concat(binary, 'K');
+            kanji_used := 1;
+
+            // Character count indicator
+            buffer[0] := Chr(short_data_block_length);
+            buffer[1] := #0;
+            concat(binary, buffer);
+
+            if debug<>0 then writeln(Format('Kanji block (length %d)', [short_data_block_length]));
+
+            // Character representation
+            for i := 0 to short_data_block_length - 1 do
+            begin
+              jis := jisdata[position + i];
+
+              if(jis > $9fff) then dec(jis, $c140);
+              msb := (jis and $ff00) shr 4;
+              lsb := (jis and $ff);
+              prod := (msb * $c0) + lsb;
+
+              bscan(binary, prod, $1000);
+
+              if debug<>0 then write(Format('$%4X ', [prod]));
+
+              if(strlen(binary) > 128) then
+              begin
+                Result:= ZERROR_TOO_LONG;
+                Exit;
+              end;
+            end;
+
+            if debug<>0 then begin writeln; end;
+				end;
+			'B': begin
+				// Byte mode
+				// Mode indicator
+				concat(binary, 'B');
+				byte_used := 1;
+
+				// Character count indicator
+				buffer[0] := Chr(short_data_block_length);
+				buffer[1] := #0;
+				concat(binary, buffer);
+
+				if debug<>0 then writeln(Format('Byte block (length %d)', [short_data_block_length]));
+
+				// Character representation
+				for i := 0 to short_data_block_length - 1 do
+        begin
+					_byte := jisdata[position + i];
+
+					bscan(binary, _byte, $80);
+
+					if debug<>0 then write(Format('$%4X ', [_byte]));
+
+					if(strlen(binary) > 128) then
+          begin
+						Result := ZERROR_TOO_LONG;
+            Exit;
+					end;
+				end;
+
+				if debug<>0 then begin writeln; end;
+
+				end;
+			'A': begin
+            // Alphanumeric mode
+            // Mode indicator
+            concat(binary, 'A');
+            alphanum_used := 1;
+
+            // Character count indicator
+            buffer[0] := Chr(short_data_block_length);
+            buffer[1] := #0;
+            concat(binary, buffer);
+
+            if debug<>0 then writeln(Format('Alpha block (length %d)', [short_data_block_length]));
+
+            // Character representation
+            i := 0;
+            while ( i < short_data_block_length ) do
+            begin
+              first := 0;
+              second := 0;
+
+              first := posn(RHODIUM, Chr(jisdata[position + i]));
+              count := 1;
+              prod := first;
+
+              if(mode[position + i + 1] = 'A') then
+              begin
+                second := posn(RHODIUM, Chr(jisdata[position + i + 1]));
+                count := 2;
+                prod := (first * 45) + second;
+              end;
+
+              bscan(binary, prod, 1 shl (5 * count)); // count := 1..2
+
+              if debug<>0 then write(Format('$%4X ', [prod]));
+
+              if(strlen(binary) > 128) then
+              begin
+                Result:=ZERROR_TOO_LONG;
+                Exit;
+              end;
+
+              inc(i, 2);
+            end;
+
+            if debug<>0 then writeln;
+				end;
+			'N': begin
+            // Numeric mode
+            // Mode indicator
+            concat(binary, 'N');
+
+            // Character count indicator
+            buffer[0] := Chr(short_data_block_length);
+            buffer[1] := #0;
+            concat(binary, buffer);
+
+            if debug<>0 then writeln(Format('Number block (length %d)', [short_data_block_length]));
+
+            // Character representation
+            i := 0;
+            while ( i < short_data_block_length ) do
+            begin
+               first := 0;
+               second := 0;
+               third := 0;
+
+              first := posn(NEON, Chr(jisdata[position + i]));
+              count := 1;
+              prod := first;
+
+              if(mode[position + i + 1] = 'N') then
+              begin
+                second := posn(NEON, Chr(jisdata[position + i + 1]));
+                count := 2;
+                prod := (prod * 10) + second;
+              end;
+
+              if(mode[position + i + 2] = 'N') then
+              begin
+                third := posn(NEON, Chr(jisdata[position + i + 2]));
+                count := 3;
+                prod := (prod * 10) + third;
+              end;
+
+              bscan(binary, prod, 1 shl (3 * count)); // count := 1..3
+
+              if debug<>0 then write(Format('$%4X (%d)', [prod, prod]));
+
+              if(strlen(binary) > 128) then
+              begin
+                Result:=ZERROR_TOO_LONG;
+                Exit;
+              end;
+
+              inc(i, 3);
+            end;
+
+            if debug<>0 then writeln;
+				end;
+		end;
+		inc(position, short_data_block_length);
+	until not (position < _length - 1) ;
+
+	Result:=0;
+end;
+
+procedure get_bitlength(var count : TArrayOfInteger; stream : TArrayOfChar);
+var
+  _length, i : Integer;
+begin
+	_length := strlen(stream);
+
+	for i := 0 to 3 do
+  begin
+		count[i] := 0;
+	end;
+
+	i := 0;
+	repeat
+		if((stream[i] = '0') or (stream[i] = '1')) then
+    begin
+			inc(count[0]);
+			inc(count[1]);
+			inc(count[2]);
+			inc(count[3]);
+			inc(i);
+		end
+    else
+    begin
+			case(stream[i]) of
+				'K': begin
+					inc(count[2], 5);
+					inc(count[3], 7);
+					inc(i, 2);
+					end;
+				'B': begin
+					inc(count[2], 6);
+					inc(count[3], 8);
+					inc(i, 2);
+					end;
+				'A': begin
+					inc(count[1], 4);
+					inc(count[2], 6);
+					inc(count[3], 8);
+					inc(i, 2);
+					end;
+				'N': begin
+					inc(count[0], 3);
+					inc(count[1], 5);
+					inc(count[2], 7);
+					inc(count[3], 9);
+					inc(i, 2);
+					end;
+			end;
+		end;
+	until not (i < _length);
+end;
+
+procedure microqr_expand_binary(var binary_stream : TArrayOfChar; var full_stream : TArrayOfChar; version : Integer);
+var
+   i, _length : Integer;
+begin
+	_length := strlen(binary_stream);
+
+	i := 0;
+	repeat
+		case(binary_stream[i]) of
+			 '1': begin concat(full_stream, '1'); inc(i); end;
+			 '0': begin concat(full_stream, '0'); inc(i); end;
+			 'N': begin
+            // Numeric Mode
+            // Mode indicator
+            case(version) of
+               1: concat(full_stream, '0');
+               2: concat(full_stream, '00');
+               3: concat(full_stream, '000');
+            end;
+
+            // Character count indicator
+            bscan(full_stream, ord(binary_stream[i + 1]), 4 shl version); // version := 0..3
+
+            inc(i, 2);
+				end;
+			 'A': begin
+            // Alphanumeric Mode
+            // Mode indicator
+            case(version) of
+               1: concat(full_stream, '1');
+               2: concat(full_stream, '01');
+               3: concat(full_stream, '001');
+            end;
+
+            // Character count indicator
+            bscan(full_stream, Ord(binary_stream[i + 1]), 2 shl version); // version := 1..3
+
+            inc(i, 2);
+				end;
+			 'B': begin
+          // Byte Mode
+          // Mode indicator
+          case(version) of
+             2: concat(full_stream, '10');
+             3: concat(full_stream, '010');
+          end;
+
+          // Character count indicator
+          bscan(full_stream, Ord(binary_stream[i + 1]), 2 shl version); // version := 2..3
+
+          inc(i, 2);
+          end;
+         'K': begin
+          // Kanji Mode
+          // Mode indicator
+          case(version) of
+             2: concat(full_stream, '11');
+             3: concat(full_stream, '011');
+          end;
+
+          // Character count indicator
+          bscan(full_stream, Ord(binary_stream[i + 1]), 1 shl version); // version := 2..3
+
+          inc(i, 2);
+				end;
+		end;
+	until not (i < _length);
+end;
+
+procedure micro_qr_m1(var binary_data : TArrayOfChar);
+var
+	i, latch : Integer;
+	bits_total, bits_left, remainder : Integer;
+	data_codewords, ecc_codewords : Integer;
+	data_blocks, ecc_blocks : TArrayOfByte;
+begin
+	SetLength(data_blocks, 4);
+  SetLength(ecc_blocks, 3);
+
+	bits_total := 20;
+	latch := 0;
+
+	// Add terminator
+	bits_left := bits_total - strlen(binary_data);
+	if(bits_left <= 3) then
+  begin
+		for i := 0 to bits_left - 1 do
+    	concat(binary_data, '0');
+		latch := 1;
+	end
+  else
+		concat(binary_data, '000');
+
+	if(latch = 0) then
+  begin
+		// Manage last (4-bit) block
+		bits_left := bits_total - strlen(binary_data);
+		if(bits_left <= 4) then
+    begin
+			for i := 0 to bits_left - 1 do
+      	concat(binary_data, '0');
+			latch := 1;
+		end;
+	end;
+
+	if(latch = 0) then
+  begin
+		// Complete current byte
+		remainder := 8 - (strlen(binary_data) mod 8);
+		if (remainder = 8) then remainder := 0;
+		for i := 0 to remainder - 1 do
+			concat(binary_data, '0');
+
+		// Add padding
+		bits_left := bits_total - strlen(binary_data);
+		if (bits_left > 4) then
+    begin
+			remainder := (bits_left - 4) div 8;
+			for i := 0 to remainder - 1 do
+        if (i and 1)<>0 then
+				  concat(binary_data, '00010001')
+        else
+          concat(binary_data, '11101100');
+		end;
+		concat(binary_data, '0000');
+	end;
+
+	data_codewords := 3;
+	ecc_codewords := 2;
+
+	// Copy data into codewords
+	for i := 0 to (data_codewords - 1) - 1 do
+  begin
+		data_blocks[i] := 0;
+		if(binary_data[i * 8] = '1') then inc( data_blocks[i], $80);
+		if(binary_data[(i * 8) + 1] = '1') then inc( data_blocks[i], $40);
+		if(binary_data[(i * 8) + 2] = '1') then inc( data_blocks[i], $20);
+		if(binary_data[(i * 8) + 3] = '1') then inc( data_blocks[i], $10);
+		if(binary_data[(i * 8) + 4] = '1') then inc( data_blocks[i], $08);
+		if(binary_data[(i * 8) + 5] = '1') then inc( data_blocks[i], $04);
+		if(binary_data[(i * 8) + 6] = '1') then inc( data_blocks[i], $02);
+		if(binary_data[(i * 8) + 7] = '1') then inc( data_blocks[i], $01);
+	end;
+	data_blocks[2] := 0;
+	if(binary_data[16] = '1') then inc( data_blocks[2], $08);
+	if(binary_data[17] = '1') then inc( data_blocks[2], $04);
+	if(binary_data[18] = '1') then inc( data_blocks[2], $02);
+	if(binary_data[19] = '1') then inc( data_blocks[2], $01);
+
+	// Calculate Reed-Solomon error codewords
+	rs_init_gf($11d);
+	rs_init_code(ecc_codewords, 0);
+	rs_encode(data_codewords,data_blocks,ecc_blocks);
+	rs_free();
+
+	// Add Reed-Solomon codewords to binary data
+	for i := 0 to ecc_codewords - 1 do
+		bscan(binary_data, ecc_blocks[ecc_codewords - i - 1], $80);
+end;
+
+procedure micro_qr_m2(var binary_data: TArrayOfChar; ecc_mode : Integer);
+var
+	i, latch : Integer;
+	bits_total, bits_left, remainder : Integer;
+	data_codewords, ecc_codewords : Integer;
+	data_blocks, ecc_blocks : TArrayOfByte;
+begin
+	SetLength(data_blocks, 6);
+  SetLength(ecc_blocks, 7);
+
+	latch := 0;
+
+	if(ecc_mode = LEVEL_L) then bits_total := 40;
+	if(ecc_mode = LEVEL_M) then bits_total := 32;
+
+	// Add terminator
+	bits_left := bits_total - strlen(binary_data);
+	if(bits_left <= 5) then
+  begin
+		for i := 0 to bits_left - 1 do
+			concat(binary_data, '0');
+		latch := 1;
+	end
+  else
+		concat(binary_data, '00000');
+
+	if(latch = 0) then
+  begin
+		// Complete current byte
+		remainder := 8 - (strlen(binary_data) mod 8);
+		if(remainder = 8) then remainder := 0;
+		for i := 0 to remainder - 1 do
+			concat(binary_data, '0');
+
+		// Add padding
+		bits_left := bits_total - strlen(binary_data);
+		remainder := bits_left div 8;
+		for i := 0 to remainder - 1 do
+      if (i and 1)<>0 then
+      	concat(binary_data, '00010001' )
+      else
+        concat(binary_data, '11101100');
+	end;
+
+	if(ecc_mode = LEVEL_L) then begin data_codewords := 5; ecc_codewords := 5; end;
+	if(ecc_mode = LEVEL_M) then begin data_codewords := 4; ecc_codewords := 6; end;
+
+	// Copy data into codewords
+	for i := 0 to data_codewords - 1 do
+  begin
+		data_blocks[i] := 0;
+		if(binary_data[i * 8] = '1') then inc(data_blocks[i], $80);
+		if(binary_data[(i * 8) + 1] = '1') then inc(data_blocks[i], $40);
+		if(binary_data[(i * 8) + 2] = '1') then inc(data_blocks[i], $20);
+		if(binary_data[(i * 8) + 3] = '1') then inc(data_blocks[i], $10);
+		if(binary_data[(i * 8) + 4] = '1') then inc(data_blocks[i], $08);
+		if(binary_data[(i * 8) + 5] = '1') then inc(data_blocks[i], $04);
+		if(binary_data[(i * 8) + 6] = '1') then inc(data_blocks[i], $02);
+		if(binary_data[(i * 8) + 7] = '1') then inc(data_blocks[i], $01);
+	end;
+
+	// Calculate Reed-Solomon error codewords
+	rs_init_gf($11d);
+	rs_init_code(ecc_codewords, 0);
+	rs_encode(data_codewords,data_blocks,ecc_blocks);
+	rs_free();
+
+	// Add Reed-Solomon codewords to binary data
+  for i := 0 to ecc_codewords - 1 do
+   	bscan(binary_data, ecc_blocks[ecc_codewords - i - 1], $80);
+end;
+
+procedure micro_qr_m3(var binary_data : TArrayOfChar; ecc_mode : Integer);
+var
+	i, latch : Integer;
+	bits_total, bits_left, remainder : Integer;
+	data_codewords, ecc_codewords : Integer;
+	data_blocks, ecc_blocks : TArrayOfByte;
+begin
+	SetLength(data_blocks, 12);
+  SetLength(ecc_blocks, 9);
+
+	latch := 0;
+
+	if(ecc_mode = LEVEL_L) then bits_total := 84;
+	if(ecc_mode = LEVEL_M) then bits_total := 68;
+
+	// Add terminator
+	bits_left := bits_total - strlen(binary_data);
+	if(bits_left <= 7) then
+  begin
+		for i := 0 to bits_left-1 do
+      concat(binary_data, '0');
+		latch := 1;
+	end
+  else
+		concat(binary_data, '0000000');
+
+	if(latch = 0) then
+  begin
+		// Manage last (4-bit) block
+		bits_left := bits_total - strlen(binary_data);
+		if(bits_left <= 4) then
+    begin
+			for i := 0 to bits_left - 1 do
+				concat(binary_data, '0');
+			latch := 1;
+		end;
+	end;
+
+	if(latch = 0) then
+  begin
+		// Complete current byte
+		remainder := 8 - (strlen(binary_data) mod 8);
+		if (remainder = 8) then remainder := 0;
+		for i := 0 to remainder - 1 do
+			concat(binary_data, '0');
+
+		// Add padding
+		bits_left := bits_total - strlen(binary_data);
+		if(bits_left > 4) then
+    begin
+			remainder := (bits_left - 4) div 8;
+			for i := 0 to remainder - 1 do
+        if (i and 1) <> 0  then
+          concat(binary_data, '00010001')
+        else
+          concat(binary_data, '11101100');
+		end;
+		concat(binary_data, '0000');
+	end;
+
+	if(ecc_mode = LEVEL_L) then begin data_codewords := 11; ecc_codewords := 6; end;
+	if(ecc_mode = LEVEL_M) then begin data_codewords := 9; ecc_codewords := 8; end;
+
+	// Copy data into codewords
+	for i := 0 to (data_codewords - 1) - 1 do
+  begin
+		data_blocks[i] := 0;
+		if(binary_data[i * 8] = '1') then inc(data_blocks[i], $80);
+		if(binary_data[(i * 8) + 1] = '1') then inc(data_blocks[i], $40);
+		if(binary_data[(i * 8) + 2] = '1') then inc(data_blocks[i], $20);
+		if(binary_data[(i * 8) + 3] = '1') then inc(data_blocks[i], $10);
+		if(binary_data[(i * 8) + 4] = '1') then inc(data_blocks[i], $08);
+		if(binary_data[(i * 8) + 5] = '1') then inc(data_blocks[i], $04);
+		if(binary_data[(i * 8) + 6] = '1') then inc(data_blocks[i], $02);
+		if(binary_data[(i * 8) + 7] = '1') then inc(data_blocks[i], $01);
+	end;
+
+	if(ecc_mode = LEVEL_L) then
+  begin
+		data_blocks[11] := 0;
+		if(binary_data[80] = '1') then inc(data_blocks[2], $08);
+		if(binary_data[81] = '1') then inc(data_blocks[2], $04);
+		if(binary_data[82] = '1') then inc(data_blocks[2], $02);
+		if(binary_data[83] = '1') then inc(data_blocks[2], $01);
+	end;
+
+	if(ecc_mode = LEVEL_M) then
+  begin
+		data_blocks[9] := 0;
+		if(binary_data[64] = '1') then inc(data_blocks[2], $08);
+		if(binary_data[65] = '1') then inc(data_blocks[2], $04);
+		if(binary_data[66] = '1') then inc(data_blocks[2], $02);
+		if(binary_data[67] = '1') then inc(data_blocks[2], $01);
+	end;
+
+	// Calculate Reed-Solomon error codewords
+	rs_init_gf($11d);
+	rs_init_code(ecc_codewords, 0);
+	rs_encode(data_codewords,data_blocks,ecc_blocks);
+	rs_free();
+
+	// Add Reed-Solomon codewords to binary data
+	for i := 0 to ecc_codewords - 1 do
+  begin
+		bscan(binary_data, ecc_blocks[ecc_codewords - i - 1], $80);
+	end;
+end;
+
+procedure micro_qr_m4(var binary_data : TArrayOfChar; ecc_mode : Integer);
+var
+	i, latch : Integer;
+	bits_total, bits_left, remainder : Integer;
+	data_codewords, ecc_codewords : Integer;
+	data_blocks, ecc_blocks : TArrayOfByte;
+begin
+  SetLength(data_blocks,17);
+  SetLength(ecc_blocks,15);
+
+	latch := 0;
+
+	if(ecc_mode = LEVEL_L) then bits_total := 128;
+	if(ecc_mode = LEVEL_M) then bits_total := 112;
+	if(ecc_mode = LEVEL_Q) then bits_total := 80;
+
+	// Add terminator
+	bits_left := bits_total - strlen(binary_data);
+	if (bits_left <= 9) then
+  begin
+		for i := 0 to bits_left - 1 do
+    	concat(binary_data, '0');
+		latch := 1;
+	end
+  else
+  	concat(binary_data, '000000000');
+
+	if(latch = 0) then
+  begin
+		// Complete current byte
+		remainder := 8 - (strlen(binary_data) mod 8);
+		if(remainder = 8) then remainder := 0;
+		for i := 0 to remainder - 1 do
+    	concat(binary_data, '0');
+
+		// Add padding
+		bits_left := bits_total - strlen(binary_data);
+		remainder := bits_left div 8;
+		for i := 0 to remainder - 1 do
+    begin
+      if (i and 1)<>0 then
+        concat(binary_data, '00010001')
+      else
+        concat(binary_data, '11101100');
+		end;
+  end;
+
+	if(ecc_mode = LEVEL_L) then begin data_codewords := 16; ecc_codewords := 8; end;
+	if(ecc_mode = LEVEL_M) then begin data_codewords := 14; ecc_codewords := 10; end;
+	if(ecc_mode = LEVEL_Q) then begin data_codewords := 10; ecc_codewords := 14; end;
+
+	// Copy data into codewords
+	for i := 0 to data_codewords - 1 do
+  begin
+		data_blocks[i] := 0;
+		if(binary_data[i * 8] = '1') then inc(data_blocks[i], $80);
+		if(binary_data[(i * 8) + 1] = '1') then inc( data_blocks[i], $40);
+		if(binary_data[(i * 8) + 2] = '1') then inc( data_blocks[i], $20);
+		if(binary_data[(i * 8) + 3] = '1') then inc( data_blocks[i], $10);
+		if(binary_data[(i * 8) + 4] = '1') then inc( data_blocks[i], $08);
+		if(binary_data[(i * 8) + 5] = '1') then inc( data_blocks[i], $04);
+		if(binary_data[(i * 8) + 6] = '1') then inc( data_blocks[i], $02);
+		if(binary_data[(i * 8) + 7] = '1') then inc( data_blocks[i], $01);
+	end;
+
+	// Calculate Reed-Solomon error codewords
+	rs_init_gf($11d);
+	rs_init_code(ecc_codewords, 0);
+	rs_encode(data_codewords,data_blocks,ecc_blocks);
+	rs_free();
+
+	// Add Reed-Solomon codewords to binary data
+	for i := 0 to ecc_codewords - 1 do
+		bscan(binary_data, ecc_blocks[ecc_codewords - i - 1], $80);
+end;
+
+procedure micro_setup_grid(var grid : TArrayOfByte; size : Integer);
+var
+  i : Integer;
+  toggle: Integer;
+begin
+	toggle := 1;
+
+	// Add timing patterns
+	for i := 0 to size - 1 do
+  begin
+		if(toggle = 1) then
+    begin
+			grid[i] := $21;
+			grid[(i * size)] := $21;
+			toggle := 0;
+		end
+    else
+    begin
+			grid[i] := $20;
+			grid[(i * size)] := $20;
+			toggle := 1;
+		end;
+	end;
+
+	// Add finder patterns
+	place_finder(grid, size, 0, 0);
+
+	// Add separators
+	for i := 0 to 6 do
+  begin
+		grid[(7 * size) + i] := $10;
+		grid[(i * size) + 7] := $10;
+	end;
+	grid[(7 * size) + 7] := $10;
+
+
+	// Reserve space for format information
+	for i := 0 to 7 do
+  begin
+		inc(grid[(8 * size) + i], $20);
+		inc(grid[(i * size) + 8], $20);
+	end;
+	inc(grid[(8 * size) + 8], 20);
+end;
+
+procedure micro_populate_grid(var grid : TArrayOfByte; size : Integer; full_stream: TArrayOfChar);
+var
+  direction : Integer;
+  row : Integer;
+  i, n, x, y : Integer;
+begin
+	direction := 1; // up
+	row := 0; // right hand side
+
+	n := strlen(full_stream);
+	y := size - 1;
+	i := 0;
+	repeat
+    x := (size - 2) - (row * 2);
+
+		if not((grid[(y * size) + (x + 1)] and $f0)<>0) then
+    begin
+			if (full_stream[i] = '1') then
+      	grid[(y * size) + (x + 1)] := $01
+			else
+      	grid[(y * size) + (x + 1)] := $00;
+			inc(i);
+		end;
+
+		if(i < n) then
+    begin
+			if not((grid[(y * size) + x] and $f0)<>0) then
+      begin
+				if (full_stream[i] = '1') then
+					grid[(y * size) + x] := $01
+				else
+					grid[(y * size) + x] := $00;
+				inc(i);
+			end;
+		end;
+
+		if(direction<>0) then dec(y) else inc(y);
+		if(y = 0) then
+    begin
+			// reached the top
+			inc(row);
+			y := 1;
+			direction := 0;
+		end;
+		if(y = size) then
+    begin
+			// reached the bottom
+			inc(row);
+			y := size - 1;
+			direction := 1;
+		end;
+	until not (i < n);
+end;
+
+function micro_evaluate(var grid : TArrayOfByte; size : Integer; pattern : Integer): Integer;
+var
+  sum1, sum2, i, filter, retval: Integer;
+begin
+	filter := 0;
+
+	case(pattern) of
+		 0: filter := $01;
+		 1: filter := $02;
+		 2: filter := $04;
+		 3: filter := $08;
+	end;
+
+	sum1 := 0;
+	sum2 := 0;
+	for i := 1 to size - 1 do
+  begin
+		if(grid[(i * size) + size - 1] and filter)<>0 then inc(sum1);
+		if(grid[((size - 1) * size) + i] and filter)<>0 then inc(sum2);
+	end;
+
+	if(sum1 <= sum2) then
+    retval := (sum1 * 16) + sum2
+  else
+    retval := (sum2 * 16) + sum1;
+
+	Result:=retval;
+end;
+
+function micro_apply_bitmask(var grid : TArrayOfByte; size: Integer): Integer;
+var
+	x, y: Integer;
+	p : Byte;
+	pattern : Integer;
+  value : TArrayOfInteger;
+	best_val, best_pattern: Integer;
+	bit : Integer;
+	mask : TArrayOfByte;
+	eval : TArrayOfByte;
+begin
+  SetLength(value,8);
+	SetLength(mask, size * size);
+	SetLength(eval, size * size);
+
+	// Perform data masking
+	for x := 0 to size -1 do
+  begin
+		for y := 0 to size - 1 do
+    begin
+			mask[(y * size) + x] := $00;
+			if not((grid[(y * size) + x] and $f0)<>0) then
+      begin
+				if((y and 1) = 0) then
+					inc(mask[(y * size) + x], $01);
+
+				if((((y div 2) + (x div 3)) and 1) = 0) then
+				  inc(mask[(y * size) + x], $02);
+
+				if(((((y * x) and 1) + ((y * x) mod 3)) and 1) = 0) then
+					inc(mask[(y * size) + x], $04);
+
+				if(((((y + x) and 1) + ((y * x) mod 3)) and 1) = 0) then
+					inc(mask[(y * size) + x], $08);
+			end;
+		end;
+	end;
+
+	for x := 0 to size - 1 do
+  begin
+		for y := 0 to size - 1 do
+    begin
+			if(grid[(y * size) + x] and $01)<>0 then p := $ff else p := $00;
+
+			eval[(y * size) + x] := mask[(y * size) + x] xor p;
+		end;
+	end;
+
+	// Evaluate result
+	for pattern := 0 to 7 do
+		value[pattern] := micro_evaluate(eval, size, pattern);
+
+	best_pattern := 0;
+	best_val := value[0];
+	for pattern := 1 to 3 do
+  begin
+		if(value[pattern] > best_val) then
+    begin
+			best_pattern := pattern;
+			best_val := value[pattern];
+		end;
+	end;
+
+	// Apply mask
+	for x := 0 to size - 1 do
+  begin
+		for y := 0 to size - 1 do
+    begin
+			bit := 0;
+			case(best_pattern) of
+				 0: if(mask[(y * size) + x] and $01)<>0 then bit := 1;
+				 1: if(mask[(y * size) + x] and $02)<>0 then bit := 1;
+				 2: if(mask[(y * size) + x] and $04)<>0 then bit := 1;
+				 3: if(mask[(y * size) + x] and $08)<>0 then bit := 1;
+			end;
+			if(bit = 1) then
+      begin
+				if(grid[(y * size) + x] and $01)<>0 then
+        	grid[(y * size) + x] := $00
+				else
+					grid[(y * size) + x] := $01;
+			end;
+		end;
+	end;
+
+	Result:=best_pattern;
+end;
+
+function microqr(symbol : zint_symbol; source : TArrayOfByte; _length : Integer): Integer;
+var
+	i, j, glyph, size: Integer;
+	binary_stream: TArrayOfChar;
+	full_stream: TArrayOfChar;
+	utfdata: TArrayOfInteger;
+	jisdata: TArrayOfInteger;
+	mode: TArrayOfChar;
+	error_number, kanji_used, alphanum_used, byte_used: Integer;
+	version_valid: TArrayOfInteger;
+	binary_count: TArrayOfInteger;
+	ecc_level, autoversion, version: Integer;
+	n_count, a_count, bitmask, format, format_full: Integer;
+  grid: TArrayOfByte;
+begin
+	SetLength(binary_stream, 200);
+	SetLength(full_stream, 200);
+	SetLength(utfdata, 40);
+	SetLength(jisdata, 40);
+	SetLength(mode, 40);
+	kanji_used := 0;
+  alphanum_used := 0;
+  byte_used := 0;
+	SetLength(version_valid,4);
+	SetLength(binary_count,4);
+
+	if(_length > 35) then
+  begin
+		strcpy(symbol.errtxt, 'Input data too long');
+		Result:=ZERROR_TOO_LONG;
+    exit;
+	end;
+
+	for i := 0 to 3 do
+  	version_valid[i] := 1;
+
+	case(symbol.input_mode) of
+		 DATA_MODE:
+			for i := 0 to _length - 1 do
+      	jisdata[i] := source[i];
+     else
+      begin
+			// Convert Unicode input to Shift-JIS
+			error_number := utf8toutf16(symbol, source, utfdata, _length);
+			if(error_number <> 0) then begin Result:=error_number; Exit end;
+
+			for i := 0 to _length - 1 do
+      begin
+				if(utfdata[i] <= $ff) then
+					jisdata[i] := utfdata[i]
+				else
+        begin
+					j := 0;
+					glyph := 0;
+					repeat
+						if(sjis_lookup[j * 2] = utfdata[i]) then
+							glyph := sjis_lookup[(j * 2) + 1];
+
+						inc(j);
+					until not ((j < 6843) and (glyph = 0));
+					if(glyph = 0) then
+          begin
+						strcpy(symbol.errtxt, 'Invalid character in input data');
+						Result:=ZERROR_INVALID_DATA;
+            Exit;
+					end;
+					jisdata[i] := glyph;
+				end;
+			end;
+	end;
+
+	define_mode(mode, jisdata, _length, 0);
+
+	n_count := 0;
+	a_count := 0;
+	for i := 0 to _length - 1 do
+  begin
+		if((jisdata[i] >= Ord('0')) and (jisdata[i] <= Ord('9'))) then inc(n_count);
+		if(in_alpha(jisdata[i])<>0) then Inc(a_count);
+	end;
+
+	if (a_count = _length) then  	// All data can be encoded in Alphanumeric mode
+		for i := 0 to _length - 1 do
+			mode[i] := 'A';
+
+	if (n_count = _length) then   // All data can be encoded in Numeric mode
+		for i := 0 to _length - 1 do
+			mode[i] := 'N';
+	end;
+
+	error_number := micro_qr_intermediate(binary_stream, jisdata, mode, _length, kanji_used, alphanum_used, byte_used);
+	if (error_number <> 0) then
+  begin
+		strcpy(symbol.errtxt, 'Input data too long');
+		Result:=error_number;
+    Exit;
+	end;
+
+	get_bitlength(binary_count, binary_stream);
+
+	// Eliminate possivle versions depending on type of content
+	if (byte_used<>0) then
+  begin
+		version_valid[0] := 0;
+		version_valid[1] := 0;
+	end;
+
+	if (alphanum_used<>0) then
+  begin
+		version_valid[0] := 0;
+	end;
+
+	if (kanji_used<>0) then
+  begin
+		version_valid[0] := 0;
+		version_valid[1] := 0;
+	end;
+
+	// Eliminate possible versions depending on _length of binary data
+	if(binary_count[0] > 20) then version_valid[0] := 0;
+	if(binary_count[1] > 40) then version_valid[1] := 0;
+	if(binary_count[2] > 84) then version_valid[2] := 0;
+	if(binary_count[3] > 128) then
+  begin
+		strcpy(symbol.errtxt, 'Input data too long');
+		Result:=ZERROR_TOO_LONG;
+    Exit;
+	end;
+
+	// Eliminate possible versions depending on error correction level specified
+	ecc_level := LEVEL_L;
+	if((symbol.option_1 >= 1) and (symbol.option_2 <= 4)) then
+  	ecc_level := symbol.option_1;
+
+	if(ecc_level = LEVEL_H) then
+  begin
+		strcpy(symbol.errtxt, 'Error correction level H not available');
+		Result:= ZERROR_INVALID_OPTION;
+    Exit;
+	end;
+
+	if(ecc_level = LEVEL_Q) then
+  begin
+		version_valid[0] := 0;
+		version_valid[1] := 0;
+		version_valid[2] := 0;
+		if(binary_count[3] > 80) then
+    begin
+			strcpy(symbol.errtxt, 'Input data too long');
+			Result:= ZERROR_TOO_LONG;
+      Exit;
+		end;
+	end;
+
+	if(ecc_level = LEVEL_M) then
+  begin
+		version_valid[0] := 0;
+		if(binary_count[1] > 32) then version_valid[1] := 0;
+		if(binary_count[2] > 68) then version_valid[2] := 0;
+		if(binary_count[3] > 112) then
+    begin
+			strcpy(symbol.errtxt, 'Input data too long');
+			Result:=ZERROR_TOO_LONG;
+      Exit;
+		end;
+	end;
+
+	autoversion := 3;
+	if(version_valid[2]<>0) then autoversion := 2;
+	if(version_valid[1]<>0) then autoversion := 1;
+	if(version_valid[0]<>0) then autoversion := 0;
+
+	version := autoversion;
+	// Get version from user
+	if((symbol.option_2 >= 1) and (symbol.option_2 <= 4)) then
+  begin
+		if(symbol.option_2 >= autoversion) then
+			version := symbol.option_2;
+	end;
+
+	// If there is enough unused space then increase the error correction level
+	if(version = 3) then
+  begin
+		if(binary_count[3] <= 112) then ecc_level := LEVEL_M;
+		if(binary_count[3] <= 80) then ecc_level := LEVEL_Q;
+	end;
+
+	if(version = 2) then
+		if(binary_count[2] <= 68) then ecc_level := LEVEL_M;
+
+	if(version = 1) then
+		if(binary_count[1] <= 32) then ecc_level := LEVEL_M;
+
+	strcpy(full_stream, '');
+	microqr_expand_binary(binary_stream, full_stream, version);
+
+	case(version) of
+		 0: micro_qr_m1(full_stream);
+		 1: micro_qr_m2(full_stream, ecc_level);
+		 2: micro_qr_m3(full_stream, ecc_level);
+		 3: micro_qr_m4(full_stream, ecc_level);
+	end;
+
+	size := micro_qr_sizes[version];
+	SetLength(grid, size * size);
+
+	for i := 0 to size - 1 do
+		for j := 0 to size - 1 do
+			grid[(i * size) + j] := 0;
+
+	micro_setup_grid(grid, size);
+	micro_populate_grid(grid, size, full_stream);
+	bitmask := micro_apply_bitmask(grid, size);
+
+	// Add format data
+	format := 0;
+	case(version) of
+		 1: case(ecc_level) of
+				 1: format := 1;
+				 2: format := 2;
+			end;
+		 2: case(ecc_level) of
+				 1: format := 3;
+				 2: format := 4;
+			end;
+		 3: case(ecc_level) of
+				 1: format := 5;
+				 2: format := 6;
+				 3: format := 7;
+			end;
+	end;
+
+	format_full := qr_annex_c1[(format shl 2) + bitmask];
+
+	if(format_full and $4000)<>0 then inc(grid[(8 * size) + 1], $01);
+	if(format_full and $2000)<>0 then inc(grid[(8 * size) + 2], $01);
+	if(format_full and $1000)<>0 then inc(grid[(8 * size) + 3], $01);
+	if(format_full and $800)<>0 then inc(grid[(8 * size) + 4], $01);
+	if(format_full and $400)<>0 then inc(grid[(8 * size) + 5], $01);
+	if(format_full and $200)<>0 then inc(grid[(8 * size) + 6], $01);
+	if(format_full and $100)<>0 then inc(grid[(8 * size) + 7], $01);
+	if(format_full and $80)<>0 then inc(grid[(8 * size) + 8], $01);
+	if(format_full and $40)<>0 then inc(grid[(7 * size) + 8], $01);
+	if(format_full and $20)<>0 then inc(grid[(6 * size) + 8], $01);
+	if(format_full and $10)<>0 then inc(grid[(5 * size) + 8], $01);
+	if(format_full and $08)<>0 then inc(grid[(4 * size) + 8], $01);
+	if(format_full and $04)<>0 then inc(grid[(3 * size) + 8], $01);
+	if(format_full and $02)<>0 then inc(grid[(2 * size) + 8], $01);
+	if(format_full and $01)<>0 then inc(grid[(1 * size) + 8], $01);
+
+	symbol.width := size;
+	symbol.rows := size;
+
+	for i := 0 to size - 1 do
+  begin
+		for j := 0 to size - 1 do
+    begin
+			if (grid[(i * size) + j] and $01)<>0 then
+				set_module(symbol, i, j);
+		end;
+		symbol.row_height[i] := 1;
+	end;
+
+	Result:=0;
+end;
 
 end.

@@ -465,7 +465,7 @@ const MicroAutosize : array[0..55] of Integer =
   1, 14, 2, 7, 3, 25, 8, 16, 5, 17, 9, 6, 10, 11, 28, 12, 19, 13, 29, 20, 30, 21, 22, 31, 23, 32, 33, 34
 );
 
-var
+threadvar
   liste : array[0..1] of array[0..999] of Integer;
 
 { 866 }

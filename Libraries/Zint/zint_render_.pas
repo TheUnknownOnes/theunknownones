@@ -776,7 +776,14 @@ begin
     if (textdone = 0) then
     begin
       // caculate start xoffset to center text
-      render_plot_add_string(symbol, StrToArrayOfChar(ArrayOfByteToString(symbol.text)), ((symbol.width / 2.0) + xoffset) * scaler, default_text_posn, 9.0 * scaler, 0.0, last_string);
+      if symbol.input_mode = UNICODE_MODE then
+        {$IFDEF FPC}
+        render_plot_add_string(symbol, StrToArrayOfChar(TEncoding.ANSI.GetString(symbol.text)), ((symbol.width / 2.0) + xoffset) * scaler, default_text_posn, 9.0 * scaler, 0.0, last_string)
+        {$ELSE}
+        render_plot_add_string(symbol, StrToArrayOfChar(TEncoding.UTF8.GetString(symbol.text)), ((symbol.width / 2.0) + xoffset) * scaler, default_text_posn, 9.0 * scaler, 0.0, last_string)
+        {$ENDIF}
+      else
+        render_plot_add_string(symbol, StrToArrayOfChar(TEncoding.ASCII.GetString(symbol.text)), ((symbol.width / 2.0) + xoffset) * scaler, default_text_posn, 9.0 * scaler, 0.0, last_string);
     end;
   end;
 

@@ -31,6 +31,7 @@ type
     procedure FormShow(Sender: TObject);
   private
     procedure GenBarcode;
+    function GetSymbology : Integer;
   public
     { public declarations }
   end;
@@ -51,7 +52,7 @@ type
     T: integer;
   end;
 const
-  SupportedTypes: array[0..39] of
+  SupportedTypes: array[0..42] of
     BCTypeEntry = (
     (N: '2 of 5 Matrix'; T: BARCODE_C25MATRIX),
     (N: '2 of 5 Industrial'; T: BARCODE_C25IND),
@@ -92,7 +93,10 @@ const
     (N: 'Code 49'; T: BARCODE_CODE49),
     (N: 'PDF417'; T: BARCODE_PDF417),
     (N: 'PDF417 Truncated'; T: BARCODE_PDF417TRUNC),
-    (N: 'MicroPDF417'; T: BARCODE_MICROPDF417)
+    (N: 'MicroPDF417'; T: BARCODE_MICROPDF417),
+    (N: 'QR-Code'; T: BARCODE_QRCODE),
+    (N: 'MicroQR-Code'; T: BARCODE_MICROQR),
+    (N: 'Gridmatrix'; T: BARCODE_GRIDMATRIX)
     );
 
 { TformZintTest }
@@ -127,7 +131,7 @@ begin
   if SaveDialog1.Execute then
   begin
     symbol := TZintSymbol.Create;
-    symbol.symbology := SupportedTypes[comType.ItemIndex].T;
+    symbol.symbology := GetSymbology;
     symbol.show_hrt := 1;
     fs := TFileStream.Create(SaveDialog1.FileName, fmCreate);
 
@@ -157,7 +161,7 @@ begin
   GenBarcode;
 end;
 
-//{$DEFINE RenderBMP}
+{$DEFINE RenderBMP}
 
 procedure TformZintTest.GenBarcode;
 var
@@ -170,11 +174,12 @@ var
   img: TlmfImage;
   {$ENDIF}
 begin
+
   imgResult.Picture.Graphic := nil;
   lblError.Caption := '';
 
   symbol := TZintSymbol.Create;
-  symbol.symbology := SupportedTypes[comType.ItemIndex].T;
+  symbol.symbology := GetSymbology;
   symbol.input_mode := UNICODE_MODE;
   symbol.show_hrt := 1;
   try
@@ -183,6 +188,9 @@ begin
     img := TBitmap.Create;
     img.PixelFormat := pf24bit;
     img.SetSize(imgResult.Width, imgResult.Height);
+    img.Canvas.Brush.Color := clWhite;
+    img.Canvas.Brush.Style := bsSolid;
+    img.Canvas.FillRect(img.Canvas.ClipRect);
     rt := TZintBMPRenderTarget.Create(img);
     {$ELSE}
     img := TlmfImage.Create;
@@ -204,6 +212,18 @@ begin
   end;
 
   symbol.Free;
+end;
+
+function TformZintTest.GetSymbology: Integer;
+var
+  i: integer;
+begin
+  for i := Low(SupportedTypes) to High(SupportedTypes) do
+  begin
+    if comType.Text = SupportedTypes[i].N then
+      Result := SupportedTypes[i].T;
+  end;
+
 end;
 
 end.

@@ -19,9 +19,9 @@ interface
 uses
   SysUtils, zint;
 
-function StrToArrayOfByte(const AString : String; AEncoding : TEncoding = nil) : TArrayOfByte;
-function ArrayOfByteToString(const AArray : TArrayOfByte; AEncoding : TEncoding = nil) : String;
-function StrToArrayOfChar(const AString : String; AEncoding : TEncoding = nil) : TArrayOfChar;
+function StrToArrayOfByte(const AString : String) : TArrayOfByte;
+function ArrayOfByteToString(const AArray : TArrayOfByte) : String;
+function StrToArrayOfChar(const AString : String) : TArrayOfChar;
 function ArrayOfCharToString(const AArray : TArrayOfChar) : String;
 function ArrayOfCharToArrayOfByte(const AArray : TArrayOfChar) : TArrayOfByte;
 function ArrayOfByteToArrayOfChar(const AArray : TArrayOfByte) : TArrayOfChar;
@@ -35,31 +35,31 @@ implementation
 uses
   zint_common;
 
-function StrToArrayOfByte(const AString: String; AEncoding: TEncoding): TArrayOfByte;
+function StrToArrayOfByte(const AString: String): TArrayOfByte;
 begin
-  if not Assigned(AEncoding) then
-    AEncoding := TEncoding.ASCII;
-  Result := AEncoding.GetBytes(AString);
+  Result := TEncoding.ASCII.GetBytes(AString);
   SetLength(Result, Length(Result) + 1);
   Result[High(Result)] := 0;
 end;
 
-function ArrayOfByteToString(const AArray: TArrayOfByte; AEncoding: TEncoding): String;
+function ArrayOfByteToString(const AArray: TArrayOfByte): String;
 begin
-  if not Assigned(AEncoding) then
-    AEncoding := TEncoding.ASCII;
-  Result := AEncoding.GetString(AArray, 0, ustrlen(AArray));
+  Result := TEncoding.ASCII.GetString(AArray);
 end;
 
-function StrToArrayOfChar(const AString: String; AEncoding: TEncoding): TArrayOfChar;
+function StrToArrayOfChar(const AString: String): TArrayOfChar;
 var
-  b : TArrayOfByte;
   i : Integer;
+  c : Char;
 begin
-  b := StrToArrayOfByte(AString, AEncoding);
-  SetLength(Result, Length(b));
-  for i := Low(b) to High(b) do
-    Result[i] := Chr(b[i]);
+  SetLength(Result, Length(AString) + 1);
+  i := Low(Result);
+  for c in AString do
+  begin
+    Result[i] := c;
+    Inc(i);
+  end;
+  Result[High(Result)] := Chr(0);
 end;
 
 function ArrayOfCharToString(const AArray: TArrayOfChar): String;

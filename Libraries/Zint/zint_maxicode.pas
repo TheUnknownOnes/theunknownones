@@ -29,7 +29,7 @@ implementation
 uses
   zint_common, zint_reedsol, zint_helper;
 
-var
+threadvar
   maxi_codeword : array[0..143] of Integer;
 
 const MaxiGrid : array[0..989] of Integer = ( { ISO/IEC 16023 Figure 5 - MaxiCode Module Sequence } { 30 x 33 data grid }
