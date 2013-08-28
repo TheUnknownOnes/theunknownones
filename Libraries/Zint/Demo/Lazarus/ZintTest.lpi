@@ -33,7 +33,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="18">
+    <Units Count="27">
       <Unit0>
         <Filename Value="ZintTest.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -127,6 +127,51 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="zint_gb2312"/>
       </Unit17>
+      <Unit18>
+        <Filename Value="..\..\zint_common.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_common"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="..\..\zint_large.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_large"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="..\..\zint_plessey.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_plessey"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="..\..\zint_maxicode.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_maxicode"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="..\..\zint_aztec.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_aztec"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="..\..\zint_qr.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_qr"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="..\..\zint_dmatrix.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_dmatrix"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="..\..\zint_medical.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_medical"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="..\..\zint_upcean.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="zint_upcean"/>
+      </Unit26>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

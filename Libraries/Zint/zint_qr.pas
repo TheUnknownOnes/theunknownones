@@ -22,12 +22,6 @@ interface
 uses
   zint;
 
-const
-  LEVEL_L	= 1;
-  LEVEL_M	= 2;
-  LEVEL_Q	= 3;
-  LEVEL_H	= 4;
-
 
 function qr_code(symbol : zint_symbol; source : TArrayOfByte; _length : Integer): Integer;
 function microqr(symbol : zint_symbol; source : TArrayOfByte; _length : Integer): Integer;
@@ -36,6 +30,12 @@ implementation
 
 uses
   SysUtils, zint_reedsol, zint_common, zint_sjis, zint_helper;
+
+const
+  LEVEL_L	= 1;
+  LEVEL_M	= 2;
+  LEVEL_Q	= 3;
+  LEVEL_H	= 4;
 
 const
   RHODIUM = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
@@ -88,11 +88,11 @@ const
   micro_qr_sizes: array [0..3] of Integer = (
     11, 13, 15, 17);
 
-  qr_align_loopsize : array [0..39] of integer = (
-  	0, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7);
+  qr_align_loopsize : array [0..39] of integer = (
+  	0, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7);
 
-  qr_table_e1 : array [0..272] of integer = (
-    6, 18, 0, 0, 0, 0, 0,
+  qr_table_e1 : array [0..272] of integer = (
+    6, 18, 0, 0, 0, 0, 0,
     6, 22, 0, 0, 0, 0, 0,
     6, 26, 0, 0, 0, 0, 0,
     6, 30, 0, 0, 0, 0, 0,
@@ -346,14 +346,12 @@ begin
   if(version >= 27) then
 		scheme := 3;
 
-	if (debug<>0) then
-  begin
-		for i := 0 to _length-1 do
-    	write(Format('%s', [mode[i]]));
+  {$IFDEF DEBUG_ZINT}
+	for i := 0 to _length-1 do
+    write(Format('%s', [mode[i]]));
 
-		write(#13#10);
-	end;
-
+	writeln;
+  {$ENDIF}
 	percent := 0;
 
 	repeat
@@ -372,7 +370,7 @@ begin
             // Character count indicator
             bscan(binary, short_data_block_length, $20 shl (scheme*2)); // scheme = 1..3
 
-            if (debug<>0) then writeln(Format('Kanji block (length %d)', [short_data_block_length]));
+            {$IFDEF DEBUG_ZINT}writeln(Format('Kanji block (length %d)', [short_data_block_length]));{$ENDIF}
 
             // Character representation
             for i := 0 to short_data_block_length-1 do
@@ -386,10 +384,10 @@ begin
 
               bscan(binary, prod, $1000);
 
-              if(debug<>0) then write(Format('$%4X ', [prod]));
+              {$IFDEF DEBUG_ZINT}write(Format('$%4X ', [prod]));{$ENDIF}
             end;
 
-            if(debug<>0) then writeln;
+            {$IFDEF DEBUG_ZINT}writeln;{$ENDIF}
   				end;
 			'B': begin
               // Byte mode
@@ -402,7 +400,7 @@ begin
               else
                 bscan(binary, short_data_block_length, $80); // scheme = 1
 
-              if(debug<>0) then writeln(Format('Byte block (length %d)', [short_data_block_length]));
+              {$IFDEF DEBUG_ZINT}writeln(Format('Byte block (length %d)', [short_data_block_length]));{$ENDIF}
 
               // Character representation
               for i := 0 to short_data_block_length - 1 do
@@ -414,10 +412,10 @@ begin
 
                 bscan(binary, _byte, $80);
 
-                if(debug<>0) then write(Format('$%2X(%d) ', [_byte, _byte]));
+                {$IFDEF DEBUG_ZINT}write(Format('$%2X(%d) ', [_byte, _byte]));{$ENDIF}
               end;
 
-              if(debug<>0) then writeln;
+              {$IFDEF DEBUG_ZINT}writeln;{$ENDIF}
            end;
 			'A': begin
               // Alphanumeric mode
@@ -427,7 +425,7 @@ begin
               // Character count indicator
               bscan(binary, short_data_block_length, $40 shl (2 * scheme)); // scheme = 1..3
 
-              if debug<>0 then Writeln(Format('Alpha block (length %d)', [short_data_block_length]));
+              {$IFDEF DEBUG_ZINT}Writeln(Format('Alpha block (length %d)', [short_data_block_length]));{$ENDIF}
 
               // Character representation
               i := 0;
@@ -525,10 +523,10 @@ begin
                 else
                   bscan(binary, prod, $20);
 
-                if debug<>0 then write(Format('$%4X ', [prod]));
+                {$IFDEF DEBUG_ZINT}write(Format('$%4X ', [prod]));{$ENDIF}
               end;;
 
-              if debug<>0 then writeln;
+              {$IFDEF DEBUG_ZINT}writeln;{$ENDIF}
 				end;
 			'N': begin
               // Numeric mode
@@ -538,7 +536,7 @@ begin
               // Character count indicator
               bscan(binary, short_data_block_length, $80 shl (2 * scheme)); // scheme = 1..3
 
-              if debug<>0 then writeln(Format('Number block (length %d)', [short_data_block_length]));
+              {$IFDEF DEBUG_ZINT}writeln(Format('Number block (length %d)', [short_data_block_length]));{$ENDIF}
 
               // Character representation
               i := 0;
@@ -568,12 +566,12 @@ begin
 
                 bscan(binary, prod, 1 shl (3 * count)); // count = 1..3
 
-                if debug<>0 then write(Format('$%4X (%d)', [prod, prod]));
+                {$IFDEF DEBUG_ZINT}write(Format('$%4X (%d)', [prod, prod]));{$ENDIF}
 
                 inc(i, count);
               end;
 
-              if debug<>0 then writeln;
+              {$IFDEF DEBUG_ZINT}writeln;{$ENDIF}
 				end;
 		end;
 
@@ -623,14 +621,14 @@ begin
 		end;
 	end;
 
-	if debug<>0 then begin
-		writeln('Resulting codewords:');
-		for i := 0 to target_binlen-1 do
-    begin
-			write(Format('$%2X ', [datastream[i]]));
-		end;
-		writeln;
+  {$IFDEF DEBUG_ZINT}
+	writeln('Resulting codewords:');
+	for i := 0 to target_binlen-1 do
+  begin
+		write(Format('$%2X ', [datastream[i]]));
 	end;
+	writeln;
+  {$ENDIF}
 end;
 
 procedure add_ecc(var fullstream: TArrayOfInteger; datastream: TArrayOfInteger; version : Integer; data_cw : Integer; blocks : Integer);
@@ -678,22 +676,21 @@ begin
 		rs_encode(length_this_block, data_block, ecc_block);
 		rs_free();
 
-		if(debug<>0) then
-    begin
-			write(Format('Block %d: ', [i + 1]));
-			for j := 0 to length_this_block-1 do
-				write(Format('%2X ', [data_block[j]]));
+    {$IFDEF DEBUG_ZINT}
+		write(Format('Block %d: ', [i + 1]));
+		for j := 0 to length_this_block-1 do
+			write(Format('%2X ', [data_block[j]]));
 
-			if(i < qty_short_blocks) then
-				write('   ');
+		if(i < qty_short_blocks) then
+			write('   ');
 
-			write(' // ');
+		write(' // ');
 
-			for j := 0 to ecc_block_length-1 do
-				write(Format('%2X ', [ecc_block[ecc_block_length - j - 1]]));
+		for j := 0 to ecc_block_length-1 do
+			write(Format('%2X ', [ecc_block[ecc_block_length - j - 1]]));
 
-			writeln;
-		end;
+		writeln;
+    {$ENDIF}
 
 		for j := 0 to short_data_block_length-1 do
     	interleaved_data[(j * blocks) + i] := data_block[j];
@@ -713,14 +710,13 @@ begin
 	for j := 0 to ecc_cw - 1 do
 		fullstream[j + data_cw] := interleaved_ecc[j];
 
-	if(debug<>0) then
-  begin
-    writeln;
-		writeln('Data Stream: ');
-		for j := 0 to (data_cw + ecc_cw)-1 do
-    	write(Format('%2X ', [fullstream[j]]));
-		writeln;
-	end;
+	{$IFDEF DEBUG_ZINT}
+  writeln;
+	writeln('Data Stream: ');
+	for j := 0 to (data_cw + ecc_cw)-1 do
+    write(Format('%2X ', [fullstream[j]]));
+	writeln;
+  {$ENDIF}
 end;
 
 procedure place_finder(var grid : TArrayOfByte; size : Integer; x : Integer; y : Integer);
@@ -1392,12 +1388,11 @@ begin
 
 	strcpy(binary, '');
 
-	if (debug<>0) then
-  begin
-		for i := 0 to _length - 1 do
-    	write(Format('%s', [mode[i]]));
-		writeln;
-	end;
+	{$IFDEF DEBUG_ZINT}
+	for i := 0 to _length - 1 do
+    write(Format('%s', [mode[i]]));
+	writeln;
+  {$ENDIF}
 
 	repeat
 		if(strlen(binary) > 128) then
@@ -1424,7 +1419,7 @@ begin
             buffer[1] := #0;
             concat(binary, buffer);
 
-            if debug<>0 then writeln(Format('Kanji block (length %d)', [short_data_block_length]));
+            {$IFDEF DEBUG_ZINT}writeln(Format('Kanji block (length %d)', [short_data_block_length]));{$ENDIF}
 
             // Character representation
             for i := 0 to short_data_block_length - 1 do
@@ -1438,7 +1433,7 @@ begin
 
               bscan(binary, prod, $1000);
 
-              if debug<>0 then write(Format('$%4X ', [prod]));
+              {$IFDEF DEBUG_ZINT}write(Format('$%4X ', [prod]));{$ENDIF}
 
               if(strlen(binary) > 128) then
               begin
@@ -1447,7 +1442,7 @@ begin
               end;
             end;
 
-            if debug<>0 then begin writeln; end;
+            {$IFDEF DEBUG_ZINT}writeln;{$ENDIF}
 				end;
 			'B': begin
 				// Byte mode
@@ -1460,7 +1455,7 @@ begin
 				buffer[1] := #0;
 				concat(binary, buffer);
 
-				if debug<>0 then writeln(Format('Byte block (length %d)', [short_data_block_length]));
+				{$IFDEF DEBUG_ZINT}writeln(Format('Byte block (length %d)', [short_data_block_length]));{$ENDIF}
 
 				// Character representation
 				for i := 0 to short_data_block_length - 1 do
@@ -1469,7 +1464,7 @@ begin
 
 					bscan(binary, _byte, $80);
 
-					if debug<>0 then write(Format('$%4X ', [_byte]));
+					{$IFDEF DEBUG_ZINT}write(Format('$%4X ', [_byte]));{$ENDIF}
 
 					if(strlen(binary) > 128) then
           begin
@@ -1478,7 +1473,7 @@ begin
 					end;
 				end;
 
-				if debug<>0 then begin writeln; end;
+				{$IFDEF DEBUG_ZINT}writeln;{$ENDIF}
 
 				end;
 			'A': begin
@@ -1492,7 +1487,7 @@ begin
             buffer[1] := #0;
             concat(binary, buffer);
 
-            if debug<>0 then writeln(Format('Alpha block (length %d)', [short_data_block_length]));
+            {$IFDEF DEBUG_ZINT}writeln(Format('Alpha block (length %d)', [short_data_block_length]));{$ENDIF}
 
             // Character representation
             i := 0;
@@ -1514,7 +1509,7 @@ begin
 
               bscan(binary, prod, 1 shl (5 * count)); // count := 1..2
 
-              if debug<>0 then write(Format('$%4X ', [prod]));
+              {$IFDEF DEBUG_ZINT}write(Format('$%4X ', [prod]));{$ENDIF}
 
               if(strlen(binary) > 128) then
               begin
@@ -1525,7 +1520,7 @@ begin
               inc(i, 2);
             end;
 
-            if debug<>0 then writeln;
+            {$IFDEF DEBUG_ZINT}writeln;{$ENDIF}
 				end;
 			'N': begin
             // Numeric mode
@@ -1537,7 +1532,7 @@ begin
             buffer[1] := #0;
             concat(binary, buffer);
 
-            if debug<>0 then writeln(Format('Number block (length %d)', [short_data_block_length]));
+            {$IFDEF DEBUG_ZINT}writeln(Format('Number block (length %d)', [short_data_block_length]));{$ENDIF}
 
             // Character representation
             i := 0;
@@ -1567,7 +1562,7 @@ begin
 
               bscan(binary, prod, 1 shl (3 * count)); // count := 1..3
 
-              if debug<>0 then write(Format('$%4X (%d)', [prod, prod]));
+              {$IFDEF DEBUG_ZINT}write(Format('$%4X (%d)', [prod, prod]));{$ENDIF}
 
               if(strlen(binary) > 128) then
               begin
@@ -1578,7 +1573,7 @@ begin
               inc(i, 3);
             end;
 
-            if debug<>0 then writeln;
+            {$IFDEF DEBUG_ZINT}writeln;{$ENDIF}
 				end;
 		end;
 		inc(position, short_data_block_length);

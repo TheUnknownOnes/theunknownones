@@ -94,6 +94,11 @@ var
   ring : Pzint_render_ring;
   s : Pzint_render_string;
   Points : array[0..5] of TPoint;
+  st : String;
+  r  : TRect;
+  {$IFDEF FPC}
+  ts : TTextStyle;
+  {$ENDIF}
 begin
   inherited;
 
@@ -178,7 +183,18 @@ begin
       end
       else
       begin
-        FCanvas.TextRect(Rect(CalcLeft(s^.x), CalcTop(s^.y), CalcLeft(s^.x+s^.width), CalcTop(s^.y+FCanvas.Font.Height)), CalcLeft(s^.x), CalcTop(s^.y), s^.text);
+        st:=s^.text;
+        r := Rect(CalcLeft(s^.x - s^.width / 2),
+                  CalcTop(s^.y),
+                  CalcLeft(s^.x+s^.width / 2),
+                  CalcTop(s^.y+FCanvas.Font.Height));
+        {$IFDEF FPC}
+        ts.Alignment := taCenter;
+        ts.Layout := tlTop;
+        FCanvas.TextRect(r, r.Left, r.Top, st, ts);
+        {$ELSE}
+        FCanvas.TextRect(r, st, [tfCenter, tfTop]);
+        {$ENDIF}
       end;
 
       s:=s^.next;
