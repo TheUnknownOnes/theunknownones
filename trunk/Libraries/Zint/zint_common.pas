@@ -42,28 +42,28 @@ const
 // Pascal-specific things
 function strlen(const AString : TArrayOfChar) : Integer;
 procedure strcpy(var target : TArrayOfChar; const source : TArrayOfChar); overload;
-procedure strcpy(var ATarget : TArrayOfChar; const ASource : String; AEncoding : TEncoding = nil); overload;
+procedure strcpy(var ATarget : TArrayOfChar; const ASource : String); overload;
 
 { The most commonly used set }
 const NEON = '0123456789';
 
 function ustrlen(const data : TArrayOfByte) : Integer;
 procedure ustrcpy(var target : TArrayOfByte; const source : TArrayOfByte); overload;
-procedure ustrcpy(var ATarget : TArrayOfByte; const ASource : String; AEncoding : TEncoding = nil); overload;
+procedure ustrcpy(var ATarget : TArrayOfByte; const ASource : String); overload;
 procedure uconcat(var dest : TArrayOfByte; const source : TArrayOfByte); overload;
 procedure uconcat(var ADest : TArrayOfByte; const ASource : TArrayOfChar); overload;
-procedure uconcat(var ADest : TArrayOfByte; const ASource : String; AEncoding : TEncoding = nil); overload;
+procedure uconcat(var ADest : TArrayOfByte; const ASource : String); overload;
 procedure concat(var dest : TArrayOfChar; const source : TArrayOfChar); overload;
-procedure concat(var ADest: TArrayOfChar; const ASource: String; AEncoding : TEncoding = nil); overload;
+procedure concat(var ADest: TArrayOfChar; const ASource: String); overload;
 procedure concat(var ADest: TArrayOfChar; const ASource: TArrayOfByte); overload;
 function ctoi(source : Char) : Integer;
 function itoc(source : Integer) : Char;
 procedure to_upper(var source : TArrayOfByte);
 function is_sane(const test_string : TArrayOfChar; const source : TArrayOfByte; _length : Integer) : Integer; overload;
-function is_sane(const ATest_string : String; const ASource : TArrayOfByte; ALength : Integer; AEncoding : TEncoding = nil) : Integer; overload;
+function is_sane(const ATest_string : String; const ASource : TArrayOfByte; ALength : Integer) : Integer; overload;
 function posn(const set_string : TArrayOfChar; const data : Char) : Integer; overload;
-function posn(const ASet_string : String; const AData : Byte; AEncoding : TEncoding = nil) : Integer; overload;
-function posn(const ASet_string : String; const AData : Char; AEncoding : TEncoding = nil) : Integer; overload;
+function posn(const ASet_string : String; const AData : Byte) : Integer; overload;
+function posn(const ASet_string : String; const AData : Char) : Integer; overload;
 procedure lookup(const set_string : TArrayOfChar; const table : array of String; const data : Char; var dest : TArrayOfChar); overload;
 procedure lookup(const set_string : TArrayOfChar; const table : array of String; const data : Byte; var dest : TArrayOfChar); overload;
 procedure lookup(const ASet_string : String; const ATable : array of String; const AData : Byte; var ADest : TArrayOfChar); overload;
@@ -112,7 +112,7 @@ begin
   target[len] := #0;
 end;
 
-procedure strcpy(var ATarget : TArrayOfChar; const ASource : String; AEncoding : TEncoding);
+procedure strcpy(var ATarget : TArrayOfChar; const ASource : String);
 begin
   strcpy(ATarget, StrToArrayOfChar(ASource));
 end;
@@ -142,7 +142,7 @@ begin
   target[len] := 0;
 end;
 
-procedure ustrcpy(var ATarget: TArrayOfByte; const ASource : String; AEncoding : TEncoding);
+procedure ustrcpy(var ATarget: TArrayOfByte; const ASource : String);
 begin
   ustrcpy(ATarget, StrToArrayOfByte(ASource));
 end;
@@ -152,7 +152,7 @@ begin
   uconcat(ADest, ArrayOfCharToArrayOfByte(ASource));
 end;
 
-procedure uconcat(var ADest: TArrayOfByte; const ASource: String; AEncoding : TEncoding);
+procedure uconcat(var ADest: TArrayOfByte; const ASource: String);
 begin
   uconcat(ADest, StrToArrayOfByte(ASource));
 end;
@@ -178,8 +178,7 @@ begin
     dest[i + j] := source[i];
 end;
 
-procedure concat(var ADest: TArrayOfChar; const ASource: String;
-  AEncoding: TEncoding);
+procedure concat(var ADest: TArrayOfChar; const ASource: String);
 begin
   concat(ADest, StrToArrayOfChar(ASource));
 end;
@@ -247,7 +246,7 @@ begin
 end;
 
 function is_sane(const ATest_string: String; const ASource: TArrayOfByte;
-  ALength: Integer; AEncoding : TEncoding): Integer;
+  ALength: Integer): Integer;
 begin
   Result := is_sane(StrToArrayOfChar(ATest_string), ASource, ALength);
 end;
@@ -267,13 +266,12 @@ begin
   result := 0; exit;
 end;
 
-function posn(const ASet_string: String; const AData: Byte; AEncoding : TEncoding): Integer;
+function posn(const ASet_string: String; const AData: Byte): Integer;
 begin
   Result := posn(StrToArrayOfChar(ASet_string), Chr(AData));
 end;
 
-function posn(const ASet_string: String; const AData: Char; AEncoding: TEncoding
-  ): Integer;
+function posn(const ASet_string: String; const AData: Char): Integer;
 begin
   Result := posn(StrToArrayOfChar(ASet_string), AData);
 end;

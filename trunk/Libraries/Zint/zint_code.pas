@@ -27,6 +27,10 @@ function c39(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : I
 function pharmazentral(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 function ec39(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 function c93(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
+function channel_code(symbol : zint_symbol; const source : TArrayOfByte; _length : Integer) : Integer;
+
+procedure NextB(Chan : Integer; i : Integer; MaxB : Integer; MaxS : Integer; var S, B : TArrayOfInteger; var value, target_value : Integer; var pattern : TArrayOfChar);
+procedure NextS(Chan : Integer; i : Integer; MaxS : Integer; MaxB : Integer; var S, B : TArrayOfInteger; var value, target_value : Integer; var pattern : TArrayOfChar);
 
 implementation
 
@@ -77,14 +81,6 @@ const C93Table : array[0..46] of String = ('131112', '111213', '111312', '111411
 	'131121', '212112', '212211', '211122', '211221', '221121', '222111', '112122', '112221',
 	'122121', '123111', '121131', '311112', '311211', '321111', '112131', '113121', '211131',
 	'121221', '312111', '311121', '122211');
-
-{ Global Variables for Channel Code }
-{var
-  S : array[0..10] of Integer;
-  B : array[0..10] of Integer;
-  value : Integer;
-  target_value : Integer;
-  pattern : AnsiString;}
 
 
 { *********************** CODE 11 ******************** }
@@ -497,15 +493,15 @@ end;
    assume no liability for the use of this document.' }
 
 
-
-{procedure CheckCharacter();
+procedure CheckCharacter(var pattern : TArrayOfChar; const value, target_value : Integer; const S, B : TArrayOfInteger);
 var
   i : Integer;
-  part : array[0..2] of AnsiChar;
+  part : TArrayOfChar;
 begin
+  SetLength(part, 3);
   if (value = target_value) then
   begin
-     //Target reached - save the generated pattern
+    { Target reached - save the generated pattern }
     strcpy(pattern, '11110');
     for i := 0 to 10 do
     begin
@@ -517,43 +513,112 @@ begin
   end;
 end;
 
-procedure NextB(Chan : Integer; i : Integer; MaxB : Integer; MaxS : Integer);
+procedure NextB(Chan : Integer; i : Integer; MaxB : Integer; MaxS : Integer; var S, B : TArrayOfInteger; var value, target_value : Integer; var pattern : TArrayOfChar);
 var
   _b : Integer;
 begin
-  if (S[i]+B[i-1]+S[i-1]+B[i-2] > 4) then
-    _b := 1
-  else
-    _b := 2;
-
-  if (i < Chan+2) then
+  if (S[i]+B[i-1]+S[i-1]+B[i-2] > 4) then _b := 1 else _b := 2;
+  if (i < Chan + 2) then
   begin
-    for _b := _b to MaxB do
+    while _b <= MaxB do
     begin
       B[i] := _b;
-      NextS(Chan,i+1,MaxS,MaxB+1-_b);
+      NextS(Chan, i + 1, MaxS, MaxB + 1 - _b, S, B, value, target_value, pattern);
+      Inc(_b);
     end;
   end
-  else
-  if (_b <= MaxB) then
+  else if (_b <= MaxB) then
   begin
     B[i] := MaxB;
-    CheckCharacter();
+    CheckCharacter(pattern, value, target_value, S, B);
     Inc(value);
   end;
 end;
 
-procedure NextS(Chan : Integer; i : Integer; MaxS : Integer; MaxB : Integer);
+procedure NextS(Chan : Integer; i : Integer; MaxS : Integer; MaxB : Integer; var S, B : TArrayOfInteger; var value, target_value : Integer; var pattern : TArrayOfChar);
 var
   _s : Integer;
 begin
-  if (i < Chan+2) then _s := 1 else _s := MaxS;
-  for _s := _s to MaxS do
+  if (i < Chan + 2) then _s := 1 else _s := MaxS;
+  while _s <= MaxS do
   begin
     S[i] := _s;
-    NextB(Chan,i,MaxB,MaxS+1-_s);
+    NextB(Chan, i, MaxB, MaxS + 1 - _s, S, B, value, target_value, pattern);
+    Inc(_s);
   end;
-end;}
+end;
+
+{ Channel Code - According to ANSI/AIM BC12-1998 }
+function channel_code(symbol : zint_symbol; const source : TArrayOfByte; _length : Integer) : Integer;
+var
+  S, B : TArrayOfInteger;
+  value, target_value : Integer;
+  pattern : TArrayOfChar;
+  channels, i : Integer;
+  error_number, range, zeroes : Integer;
+  hrt : TArrayOfChar;
+begin
+  SetLength(S, 11);
+  SetLength(B, 11);
+  SetLength(pattern, 30);
+  error_number := 0;
+  range := 0;
+  SetLength(hrt, 9);
+
+  target_value := 0;
+
+  if (_length > 7) then
+  begin
+    strcpy(symbol.errtxt, 'Input too long');
+    result := ZERROR_TOO_LONG; exit;
+  end;
+  error_number := is_sane(NEON, source, _length);
+  if (error_number = ZERROR_INVALID_DATA) then
+  begin
+    strcpy(symbol.errtxt, 'Invalid characters in data');
+    result := error_number; exit;
+  end;
+
+  if ((symbol.option_2 < 3) or (symbol.option_2 > 8)) then channels := 0 else channels := symbol.option_2;
+  if (channels = 0) then channels := _length + 1;
+  if (channels = 2) then channels := 3;
+
+  for i := 0 to _length - 1 do
+  begin
+    target_value := target_value * 10;
+    Inc(target_value, ctoi(Chr(source[i])));
+  end;
+
+  case channels of
+    3: if (target_value > 26) then range := 1;
+    4: if (target_value > 292) then range := 1;
+    5: if (target_value > 3493) then range := 1;
+    6: if (target_value > 44072) then range := 1;
+    7: if (target_value > 576688) then range := 1;
+    8: if (target_value > 7742862) then range := 1;
+  end;
+  if (range <> 0) then
+  begin
+    strcpy(symbol.errtxt, 'Value out of range');
+    result := ZERROR_INVALID_DATA; exit;
+  end;
+
+  for i := 0 to 10 do begin B[i] := 0; S[i] := 0; end;
+
+  B[0] := 1; S[1] := 1; B[1] := 1; S[2] := 1; B[2] := 1;
+  value := 0;
+  NextS(channels, 3, channels, channels, S, B, value, target_value, pattern);
+
+  zeroes := channels - 1 - _length;
+  Fill(hrt, zeroes, '0');
+  hrt[zeroes] := #0;
+  concat(hrt, source);
+  ustrcpy(symbol.text, ArrayOfCharToArrayOfByte(hrt));
+
+  expand(symbol, pattern);
+
+  result := error_number; exit;
+end;
 
 end.
 

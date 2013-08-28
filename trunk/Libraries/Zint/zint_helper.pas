@@ -28,7 +28,8 @@ function ArrayOfByteToArrayOfChar(const AArray : TArrayOfByte) : TArrayOfChar;
 procedure ArrayCopy(var ADestination : TArrayOfChar; const ASource : TArrayOfByte; ACount : Integer = MaxInt); overload;
 procedure ArrayCopy(var ADestination : TArrayOfByte; const ASource : TArrayOfChar; ACount : Integer = MaxInt); overload;
 procedure ArrayCopy(var ADestination : TArrayOfChar; const ASource : TArrayOfChar; ACount : Integer = MaxInt); overload;
-procedure Fill(var ADestination : TArrayOfChar; ACount : Integer; AChar : Char; AStartIndex : Integer = 0);
+procedure Fill(var ADestination : TArrayOfChar; ACount : Integer; AChar : Char; AStartIndex : Integer = 0); overload;
+procedure Fill(var ADestination : TArrayOfSmallInt; ACount : Integer; AValue : Smallint; AStartIndex : Integer = 0); overload;
 
 implementation
 
@@ -44,7 +45,7 @@ end;
 
 function ArrayOfByteToString(const AArray: TArrayOfByte): String;
 begin
-  Result := TEncoding.ASCII.GetString(AArray);
+  Result := TEncoding.ASCII.GetString(AArray, Low(AArray), ustrlen(AArray));
 end;
 
 function StrToArrayOfChar(const AString: String): TArrayOfChar;
@@ -143,6 +144,15 @@ var
 begin
   for i := AStartIndex to AStartIndex + ACount do
     ADestination[i] := AChar;
+end;
+
+procedure Fill(var ADestination: TArrayOfSmallInt; ACount: Integer;
+  AValue: Smallint; AStartIndex: Integer);
+var
+  i : Integer;
+begin
+  for i := AStartIndex to AStartIndex + ACount do
+    ADestination[i] := AValue;
 end;
 
 end.

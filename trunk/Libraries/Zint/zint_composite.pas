@@ -27,7 +27,8 @@ function composite(symbol : zint_symbol; source : TArrayOfByte; _length : Intege
 implementation
 
 uses
-  zint_common, zint_pdf417, zint_rss, zint_helper, zint_gs1, zint_code128;
+  zint_common, zint_pdf417, zint_rss, zint_helper, zint_gs1, zint_code128,
+  zint_upcean;
 
 const _NUMERIC = #110;
 const _ALPHA = #97;
@@ -1900,13 +1901,13 @@ begin
     linear.option_1 := cc_mode;
 
   case symbol.symbology of
-    //BARCODE_EANX_CC:    error_number := eanx(linear, symbol.primary, pri_len);
+    BARCODE_EANX_CC:    error_number := eanx(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
     BARCODE_EAN128_CC:    error_number := ean_128(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
     //BARCODE_RSS14_CC:    error_number := rss14(linear, symbol.primary, pri_len);
     //BARCODE_RSS_LTD_CC:  error_number := rsslimited(linear, symbol.primary, pri_len);
     //BARCODE_RSS_EXP_CC:  error_number := rssexpanded(linear, symbol.primary, pri_len);
-    //BARCODE_UPCA_CC:    error_number := eanx(linear, symbol.primary, pri_len);
-    //BARCODE_UPCE_CC:    error_number := eanx(linear, symbol.primary, pri_len);
+    BARCODE_UPCA_CC:    error_number := eanx(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
+    BARCODE_UPCE_CC:    error_number := eanx(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
     //BARCODE_RSS14STACK_CC:  error_number := rss14(linear, symbol.primary, pri_len);
     //BARCODE_RSS14_OMNI_CC:  error_number := rss14(linear, symbol.primary, pri_len);
     //BARCODE_RSS_EXPSTACK_CC:  error_number := rssexpanded(linear, symbol.primary, pri_len);

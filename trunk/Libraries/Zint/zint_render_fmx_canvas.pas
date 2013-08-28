@@ -179,7 +179,10 @@ begin
       end
       else
       begin
-        FCanvas.FillText(RectF(CalcLeft(s^.x), CalcTop(s^.y), CalcLeft(s^.x+s^.width), CalcTop(s^.y+FCanvas.TextHeight(s^.text))),
+        FCanvas.FillText(RectF(CalcLeft(s^.x - s^.width / 2),
+                               CalcTop(s^.y),
+                               CalcLeft(s^.x+s^.width / 2),
+                               CalcTop(s^.y+FCanvas.TextHeight(s^.text))),
                          s^.text, false,1, [], TTextAlign.taCenter);
       end;
 

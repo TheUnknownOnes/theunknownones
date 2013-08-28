@@ -435,7 +435,7 @@ begin
   { Numeric mode is more complex }
   Inc(number_count, number_lat(gbdata, _length, position));
 
-  if (debug <> 0) then begin WriteLn(Format('C %d / B %d / M %d / U %d / L %d / N %d', [chinese_count, byte_count, mixed_count, upper_count, lower_count, number_count])); end;
+  {$IFDEF DEBUG_ZINT}WriteLn(Format('C %d / B %d / M %d / U %d / L %d / N %d', [chinese_count, byte_count, mixed_count, upper_count, lower_count, number_count]));{$ENDIF}
 
   best_count := chinese_count;
   best_mode := GM_CHINESE;
@@ -503,7 +503,7 @@ begin
       glyph := i;
   end;
 
-  if (debug <> 0) then Write(Format('SHIFT [%d] ', [glyph]));
+  {$IFDEF DEBUG_ZINT}Write(Format('SHIFT [%d] ', [glyph]));{$ENDIF}
 
   bscan(binary, glyph, $20);
 end;
@@ -618,17 +618,16 @@ begin
         end;
       end;
 
-      if (debug <> 0) then
-      begin
-        case next_mode of
-          GM_CHINESE: Write('CHIN ');
-          GM_NUMBER: Write('NUMB ');
-          GM_LOWER: Write('LOWR ');
-          GM_UPPER: Write('UPPR ');
-          GM_MIXED: Write('MIXD ');
-          GM_BYTE: Write('BYTE ');
-        end;
+      {$IFDEF DEBUG_ZINT}
+      case next_mode of
+        GM_CHINESE: Write('CHIN ');
+        GM_NUMBER: Write('NUMB ');
+        GM_LOWER: Write('LOWR ');
+        GM_UPPER: Write('UPPR ');
+        GM_MIXED: Write('MIXD ');
+        GM_BYTE: Write('BYTE ');
       end;
+      {$ENDIF}
     end;
     last_mode := current_mode;
     current_mode := next_mode;
@@ -681,7 +680,7 @@ begin
           { Byte value }
           glyph := 7777 + gbdata[sp];
 
-        if (debug <> 0) then Write(Format('[%d] ', [glyph]));
+        {$IFDEF DEBUG_ZINT}Write(Format('[%d] ', [glyph]));{$ENDIF}
 
         bscan(binary, glyph, $1000);
         Inc(sp);
@@ -748,13 +747,13 @@ begin
           Inc(glyph,  ppos);
           Inc(glyph,  1000);
 
-          if (debug <> 0) then  Write(Format('[%d] ', [glyph]));
+          {$IFDEF DEBUG_ZINT}Write(Format('[%d] ', [glyph]));{$ENDIF}
 
           bscan(binary, glyph, $200);
         end;
 
         glyph := (100 * (numbuf[0] - Ord('0'))) + (10 * (numbuf[1] - Ord('0'))) + (numbuf[2] - Ord('0'));
-        if (debug <> 0) then Write(Format('[%d] ', [glyph]));
+        {$IFDEF DEBUG_ZINT}Write(Format('[%d] ', [glyph]));{$ENDIF}
 
         bscan(binary, glyph, $200);
       end;
@@ -778,7 +777,7 @@ begin
         end;
 
         glyph := gbdata[sp];
-        if (debug <> 0) then Write(Format('[%d] ', [glyph]));
+        {$IFDEF DEBUG_ZINT}Write(Format('[%d] ', [glyph]));{$ENDIF}
         bscan(binary, glyph, $80);
         Inc(sp);
         Inc(byte_count);
@@ -796,7 +795,7 @@ begin
         begin
           { Mixed Mode character }
           glyph := posn(EUROPIUM, gbdata[sp]);
-          if (debug <> 0) then Write(Format('[%d] ', [glyph]));
+          {$IFDEF DEBUG_ZINT}Write(Format('[%d] ', [glyph]));{$ENDIF}
 
           bscan(binary, glyph, $20);
         end
@@ -820,7 +819,7 @@ begin
         begin
           { Upper character }
           glyph := posn('ABCDEFGHIJKLMNOPQRSTUVWXYZ ', gbdata[sp]);
-          if (debug <> 0) then Write(Format('[%d] ', [glyph]));
+          {$IFDEF DEBUG_ZINT}Write(Format('[%d] ', [glyph]));{$ENDIF}
 
           bscan(binary, glyph, $10);
         end
@@ -844,7 +843,7 @@ begin
         begin
           { Lower character }
           glyph := posn('abcdefghijklmnopqrstuvwxyz ', gbdata[sp]);
-          if (debug <> 0) then Write(Format('[%d] ', [glyph]));
+          {$IFDEF DEBUG_ZINT}Write(Format('[%d] ', [glyph]));{$ENDIF}
 
           bscan(binary, glyph, $10);
         end

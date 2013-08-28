@@ -32,7 +32,7 @@ implementation
 uses
   zint_common, zint_code, zint_helper;
 
-const CALCIUM	: String = '0123456789-$:/.+ABCD';
+const CALCIUM = '0123456789-$:/.+ABCD';
 
 const CodaTable : array[0..19] of String = ('11111221', '11112211', '11121121', '22111111', '11211211', '21111211',
 	'12111121', '12112111', '12211111', '21121111', '11122111', '11221111', '21112121', '21211121',
