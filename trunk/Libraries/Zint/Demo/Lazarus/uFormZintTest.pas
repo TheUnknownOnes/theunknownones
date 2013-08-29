@@ -120,7 +120,6 @@ var
   img: TlmfImage;
   {$ENDIF}
 begin
-
   imgResult.Picture.Graphic := nil;
   lblError.Caption := '';
 

@@ -17,7 +17,7 @@ unit zint_render_svg;
 interface
 
 uses
-  zint, System.Classes;
+  zint, Classes;
 
 type
   TZintSVGColor = String;
@@ -104,8 +104,9 @@ begin
   inherited;
   if Assigned(FSVGFile) then
   begin
-    fs:=FormatSettings;
     fs.DecimalSeparator:='.';
+    fs.ThousandSeparator:=#0;
+
     ResultStr:='<g><title>' + ArrayOfByteToString(ASymbol.text) + '</title><desc>Barcode generated using Zint</desc>';
 
     //clear Background

@@ -6,7 +6,7 @@ unit zint;
   Translation by TheUnknownOnes
   http://theunknownones.net
 
-  License: DWYWBDBU (do what you want, but dont blame us)
+  License: Apache License 2.0
 
   Status:
     3432bc9aff311f2aea40f0e9883abfe6564c080b complete
@@ -16,8 +16,9 @@ unit zint;
 }
 
 {$IFDEF FPC}
-{$mode objfpc}{$H+}
+  {$mode objfpc}{$H+}
 {$ENDIF}
+
 
 interface
 
@@ -25,16 +26,24 @@ uses
   Classes,
   SysUtils;
 
+{$IF declared(TEncoding)}
+  {$DEFINE UseTEncoding}
+{$IFEND}
+
 const
   ZINT_ROWS_MAX = 178;
   ZINT_COLS_MAX = 178;
 
 type
+  {$IF not declared(TBytes)}
+  TBytes = array of Byte;
+  {$IFEND}
   TArrayOfByte = TBytes;
   TArrayOfInteger = array of Integer;
   TArrayOfCardinal = array of Cardinal;
   TArrayOfWord = array of Word;
   TArrayOfChar = array of Char;
+  TArrayOfArrayOfChar = array of array of Char;
   TArrayOfSmallInt = array of SmallInt;
 
 type
@@ -226,6 +235,18 @@ type
     property Version : TmqVersion read GetVersion write SetVersion default mqvAuto;
   end;
 
+  { TZintCode1Options }
+
+  TZintCode1Options = class(TCustomZintSymbolOptions)
+  public type
+    Tc1Version = (c1vAuto, c1vA, c1vB, c1vC, c1vD, c1vE, c1vF, c1vG, c1vH, c1vS);
+  private
+    function GetVersion: Tc1Version;
+    procedure SetVersion(AValue: Tc1Version);
+  published
+    property Version : Tc1Version read GetVersion write SetVersion;
+  end;
+
   { TZintSymbol }
 
   TZintSymbol = class(TPersistent)
@@ -239,6 +260,7 @@ type
     FMaxicodeOptions : TZintMaxicodeOptions;
     FDatamatrixOptions : TZintDatamatrixOptions;
     FMicroQROptions : TZintMicroQROptions;
+    FCode1Options : TZintCode1Options;
   public
     symbology : Integer;
     height : Integer;
@@ -287,6 +309,7 @@ type
     property MaxiCodeOptions : TZintMaxicodeOptions read FMaxicodeOptions;
     property DatamatrixOptions : TZintDatamatrixOptions read FDatamatrixOptions;
     property MicroQROptions : TZintMicroQROptions read FMicroQROptions;
+    property Code1Option : TZintCode1Options read FCode1Options;
   end;
 
   zint_symbol = TZintSymbol;
@@ -532,10 +555,45 @@ uses zint_dmatrix, zint_code128, zint_gs1, zint_common, zint_2of5,
   zint_render_, zint_helper, zint_aztec, zint_qr, zint_upcean,
   zint_maxicode, zint_auspost, zint_code, zint_medical,
   zint_code16k, zint_code49, zint_pdf417, zint_composite, zint_gridmtx,
-  zint_plessey;
+  zint_plessey, zint_code1;
 
 const
   TECHNETIUM : String = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%';
+
+{ TZintCode1Options }
+
+function TZintCode1Options.GetVersion: Tc1Version;
+begin
+  case FSymbol.option_2 of
+    1: Result := c1vA;
+    2: Result := c1vB;
+    3: Result := c1vC;
+    4: Result := c1vD;
+    5: Result := c1vE;
+    6: Result := c1vF;
+    7: Result := c1vG;
+    8: Result := c1vH;
+    9: Result := c1vS;
+    else
+      Result := c1vAuto;
+  end;
+end;
+
+procedure TZintCode1Options.SetVersion(AValue: Tc1Version);
+begin
+  case AValue of
+    c1vAuto : FSymbol.option_2 := DefaultValue_Option_2;
+    c1vA : FSymbol.option_2 := 1;
+    c1vB : FSymbol.option_2 := 2;
+    c1vC : FSymbol.option_2 := 3;
+    c1vD : FSymbol.option_2 := 4;
+    c1vE : FSymbol.option_2 := 5;
+    c1vF : FSymbol.option_2 := 6;
+    c1vG : FSymbol.option_2 := 7;
+    c1vH : FSymbol.option_2 := 8;
+    c1vS : FSymbol.option_2 := 9;
+  end;
+end;
 
 { TZintMicroQROptions }
 
@@ -1185,6 +1243,7 @@ begin
   FMaxicodeOptions := TZintMaxicodeOptions.Create(Self);
   FDatamatrixOptions := TZintDatamatrixOptions.Create(Self);
   FMicroQROptions := TZintMicroQROptions.Create(Self);
+  FCode1Options := TZintCode1Options.Create(Self);
 end;
 
 destructor TZintSymbol.Destroy;
@@ -1201,6 +1260,7 @@ begin
   FMaxicodeOptions.Free;
   FDatamatrixOptions.Free;
   FMicroQROptions.Free;
+  FCode1Options.Free;
   
   inherited;
 end;
@@ -1214,20 +1274,29 @@ end;
 procedure TZintSymbol.Encode(AData: String; ARaiseExceptions: Boolean);
 var
   b : TArrayOfByte;
+
+  {$IFDEF UseTEncoding}
   e : TEncoding;
+  {$ENDIF}
 begin
   if (input_mode and UNICODE_MODE) <> 0 then
+  begin
+  {$IFDEF UseTEncoding}
     {$IFDEF FPC}
-    e := TEncoding.ANSI
+    e := TEncoding.ANSI;
     {$ELSE}
-    e := TEncoding.UTF8
+    e := TEncoding.UTF8;
     {$ENDIF}
+    b := e.GetBytes(AData);
+    SetLength(b, Length(b) + 1);
+    b[High(b)] := 0;
+  {$ELSE}            
+    b := StrToArrayOfByte(UTF8Encode(AData));
+  {$ENDIF}
+  end
   else
-    e := TEncoding.ASCII;
+    b := StrToArrayOfByte(AData);
 
-  b := e.GetBytes(AData);
-  SetLength(b, Length(b) + 1);
-  b[High(b)] := 0;
   Encode(b, ustrlen(b), ARaiseExceptions);
 end;
 
@@ -1492,7 +1561,7 @@ begin
 		//BARCODE_JAPANPOST: error_number := japan_post(symbol, preprocessed, _length);
 		BARCODE_CODE49: error_number := code_49(symbol, preprocessed, _length);
 		BARCODE_CHANNEL: error_number := channel_code(symbol, preprocessed, _length);
-		//BARCODE_CODEONE: error_number := code_one(symbol, preprocessed, _length);
+		BARCODE_CODEONE: error_number := code_one(symbol, preprocessed, _length);
 		BARCODE_DATAMATRIX: error_number := dmatrix(symbol, preprocessed, _length);
 		BARCODE_PDF417: error_number := pdf417enc(symbol, preprocessed, _length);
 		BARCODE_PDF417TRUNC: error_number := pdf417enc(symbol, preprocessed, _length);
@@ -1617,6 +1686,7 @@ begin
       else
 				symbol.text[i] := local_source[i];
 		end;
+    symbol.text[_length] := 0;
 	end;
 
 	if (error_number = 0) then

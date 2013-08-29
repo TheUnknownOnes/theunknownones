@@ -365,14 +365,14 @@ begin
   x_dimension := render^.width / total_area_width_x;
   x_dimension := x_dimension / GL_CONST;
 
-  //{ Set minimum size of symbol }
-  //{ Barcode must be at least 2mm high by 2mm across }
-  //if (render^.height < ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 2.0) * GL_CONST) then
-  //  render^.height := ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 2.0) * GL_CONST;
-  //
-  //if (render^.width < (2.0 * GL_CONST)) then
-  //  render^.width := (2.0 * GL_CONST);
-  //
+  { Set minimum size of symbol }
+  { Barcode must be at least 2mm high by 2mm across }
+  if (render^.height < ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 2.0) * GL_CONST) then
+    render^.height := ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 2.0) * GL_CONST;
+
+  if (render^.width < (2.0 * GL_CONST)) then
+    render^.width := (2.0 * GL_CONST);
+
   //if (symbol.symbology = BARCODE_CODABAR) then
   //begin
   //  { The minimum X-dimension of Codabar is 0.191mm. The minimum bar height is 5mm }
@@ -780,10 +780,14 @@ begin
         {$IFDEF FPC}
         render_plot_add_string(symbol, StrToArrayOfChar(TEncoding.ANSI.GetString(symbol.text)), ((symbol.width / 2.0) + xoffset) * scaler, default_text_posn, 9.0 * scaler, 0.0, last_string)
         {$ELSE}
+        {$IFDEF UseTEncoding}
         render_plot_add_string(symbol, StrToArrayOfChar(TEncoding.UTF8.GetString(symbol.text)), ((symbol.width / 2.0) + xoffset) * scaler, default_text_posn, 9.0 * scaler, 0.0, last_string)
+        {$ELSE}
+        render_plot_add_string(symbol, StrToArrayOfChar(UTF8Decode(ArrayOfByteToString(symbol.text))), ((symbol.width / 2.0) + xoffset) * scaler, default_text_posn, 9.0 * scaler, 0.0, last_string)
+        {$ENDIF}
         {$ENDIF}
       else
-        render_plot_add_string(symbol, StrToArrayOfChar(TEncoding.ASCII.GetString(symbol.text)), ((symbol.width / 2.0) + xoffset) * scaler, default_text_posn, 9.0 * scaler, 0.0, last_string);
+        render_plot_add_string(symbol, ArrayOfByteToArrayOfChar(symbol.text), ((symbol.width / 2.0) + xoffset) * scaler, default_text_posn, 9.0 * scaler, 0.0, last_string);
     end;
   end;
 

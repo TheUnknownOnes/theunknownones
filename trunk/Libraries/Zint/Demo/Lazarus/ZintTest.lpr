@@ -11,7 +11,7 @@ uses
   zint_auspost, zint_code, zint_code128, zint_code16k, zint_render_,
   zint_code49, zint_pdf417, zint, zint_composite, zint_gridmtx, zint_reedsol,
   zint_gb2312, zint_large, zint_plessey, zint_common, zint_upcean, zint_aztec,
-  zint_maxicode, zint_dmatrix, zint_qr, zint_medical;
+  zint_maxicode, zint_dmatrix, zint_qr, zint_medical, zint_code1;
 
 {$R *.res}
 
