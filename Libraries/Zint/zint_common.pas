@@ -75,6 +75,7 @@ procedure expand(symbol : zint_symbol; data : TArrayOfChar);
 function is_stackable(symbology : Integer) : Integer;
 function is_extendable(symbology : Integer) : Integer;
 function istwodigits(const source : TArrayOfByte; position : Integer) : Integer;
+function froundup(input : Single) : Single;
 function parunmodd(llyth : Byte) : Integer; overload;
 function parunmodd(llyth : Char) : Integer; overload;
 function latin1_process(symbol : zint_symbol; const source : TArrayOfByte; var preprocessed : TArrayOfByte; var _length : Integer) : Integer;
@@ -401,6 +402,18 @@ begin
   end;
 
   result := 0; exit;
+end;
+
+function froundup(input : Single) : Single;
+var
+  fraction, output : Single;
+begin
+  fraction := 0; output := 0;
+
+  fraction := input - Trunc(input);
+  if (fraction > 0.01) then begin output := (input - fraction) + 1.0; end else begin output := input; end;
+
+  result := output;
 end;
 
 

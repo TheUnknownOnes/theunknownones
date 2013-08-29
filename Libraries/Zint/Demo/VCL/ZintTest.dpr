@@ -9,7 +9,9 @@ uses
 begin
   ReportMemoryLeaksOnShutdown:=True;
   Application.Initialize;
+  {$IFDEF declared(TApplication.MainFormOnTaskbar)}
   Application.MainFormOnTaskbar := True;
+  {$ENDIF}
   Application.CreateForm(TForm46, Form46);
   Application.Run;
 end.

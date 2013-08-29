@@ -3,9 +3,8 @@ unit uFormZintTest;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics, zint, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Vcl.StdCtrls, Vcl.ExtCtrls, RTTI, Vcl.ComCtrls;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, zint, Controls,
+  Forms, Dialogs, StdCtrls, ExtCtrls, uRTTIHelper, ComCtrls, TypInfo;
 
 type
   TForm46 = class(TForm)
@@ -32,10 +31,10 @@ type
     FontDialog1: TFontDialog;
     ButtonFont: TButton;
     btSVG: TButton;
-    FileSaveDialog1: TFileSaveDialog;
     PageControl1: TPageControl;
     TabSheet1: TTabSheet;
     Splitter1: TSplitter;
+    SaveDialog1: TSaveDialog;
     procedure FormCreate(Sender: TObject);
     procedure edDataChange(Sender: TObject);
     procedure comTypeChange(Sender: TObject);
@@ -43,9 +42,12 @@ type
     procedure btPrintClick(Sender: TObject);
     procedure ButtonFontClick(Sender: TObject);
     procedure btSVGClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
+    FSymbol : TZintSymbol; 
     procedure GenBarcode;
     function GenSymbol: TZintSymbol;
+    procedure ProcessSymbol(ASymbol: TZintSymbol);
   public
     { Public-Deklarationen }
   end;
@@ -57,7 +59,8 @@ implementation
 
 {$R *.dfm}
 
-uses zint_render_wmf, zint_render_canvas, Printers, zint_render_svg, zint_helper;
+uses zint_render_wmf, zint_render_canvas, Printers, zint_render_svg, zint_helper,
+  uFrameOptions;
 
 procedure TForm46.btPrintClick(Sender: TObject);
 var
@@ -76,10 +79,10 @@ begin
     rt.RenderAdjustMode:=TZintRenderAdjustMode(cbRAM.ItemIndex);
     rt.Font.Assign(ButtonFont.Font);
     rt.HexagonScale:=StrToFloatDef(edMHS.Text, 1);
-    rt.Left:=Printer.Canvas.ClipRect.Width/3;
-    rt.Top:=Printer.Canvas.ClipRect.Height/3;
-    rt.WidthDesired:=Printer.Canvas.ClipRect.Width/3;
-    rt.HeightDesired:=Printer.Canvas.ClipRect.Height/3;
+    rt.Left:=(Printer.Canvas.ClipRect.Right - Printer.Canvas.ClipRect.Left) / 3;
+    rt.Top:=(Printer.Canvas.ClipRect.Bottom - Printer.Canvas.ClipRect.Top) / 3;
+    rt.WidthDesired:=(Printer.Canvas.ClipRect.Right - Printer.Canvas.ClipRect.Left) / 3;
+    rt.HeightDesired:=(Printer.Canvas.ClipRect.Right - Printer.Canvas.ClipRect.Left) / 3;
     try
       Symbol.Render(rt);
     finally
@@ -91,7 +94,6 @@ begin
     on E : Exception do
       lblError.Caption := e.Message;
   end;
-  symbol.Free;
 end;
 
 procedure TForm46.btSVGClick(Sender: TObject);
@@ -100,7 +102,7 @@ var
   symbol : TZintSymbol;
   rt  : TZintSVGRenderTarget;
 begin
-  if FileSaveDialog1.Execute then
+  if SaveDialog1.Execute then
   begin
     sl:=TStringList.Create;
     try
@@ -131,9 +133,8 @@ begin
         on E : Exception do
           lblError.Caption := e.Message;
       end;
-      symbol.Free;
 
-      sl.SaveToFile(FileSaveDialog1.FileName);
+      sl.SaveToFile(SaveDialog1.FileName);
     finally
       sl.free;
     end;
@@ -169,6 +170,20 @@ begin
 
   comPrinter.Items.Assign(Printer.Printers);
   comPrinter.ItemIndex:=0;
+
+  FSymbol:=TZintSymbol.Create;
+
+  ProcessSymbol(FSymbol);
+end;
+
+procedure TForm46.FormDestroy(Sender: TObject);
+var
+  i : Integer;
+begin
+  for i := PageControl1.PageCount-1 downto 0 do
+    PageControl1.Pages[i].Free;
+    
+  FSymbol.Free;
 end;
 
 procedure TForm46.FormShow(Sender: TObject);
@@ -178,7 +193,8 @@ end;
 
 function TForm46.GenSymbol: TZintSymbol;
 begin
-  Result := TZintSymbol.Create;
+  Result := FSymbol;
+  Result.Clear;
   Result.symbology := Integer(comType.Items.Objects[comType.ItemIndex]);
   Result.input_mode := UNICODE_MODE;
 
@@ -194,6 +210,40 @@ begin
     Result.show_hrt:= 1
   else
     Result.show_hrt:= 0;
+end;
+
+procedure TForm46.ProcessSymbol(ASymbol: TZintSymbol);
+var
+  i: Integer;
+  Properties : TStringList;
+  Property_Value: Variant;
+  ts : TTabSheet;
+  f : TFrameOptions;
+begin
+  Properties:=TStringList.Create;
+  try
+    rttihGetPropertiesList(ASymbol, Properties, false, [tkClass]);
+
+    for i := 0 to Properties.Count - 1 do
+    begin
+      Property_Value:=rttihGetPropertyValue(ASymbol, Properties[i]);
+      
+      if TObject({$IFDEF declared(NativeInt)}NativeInt{$ELSE}Integer{$ENDIF}(Property_Value)).InheritsFrom(TCustomZintSymbolOptions) then
+      begin
+        ts:=TTabSheet.Create(PageControl1);
+        ts.PageControl:=PageControl1;
+        ts.Caption:=Properties[i];
+        f := TFrameOptions.Create(ts);
+        f.Parent:=ts;
+        f.Init(ASymbol, Properties[i]);
+        ts.OnShow:=f.RefreshFrame;
+        f.OnChange:=edDataChange;
+      end;
+    end;
+  finally
+    Properties.Free;
+  end;
+
 end;
 
 procedure TForm46.GenBarcode;
@@ -227,7 +277,6 @@ begin
     on E : Exception do
       lblError.Caption := e.Message;
   end;
-  symbol.Free;
 end;
 
 end.

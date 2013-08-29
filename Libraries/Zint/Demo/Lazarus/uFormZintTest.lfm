@@ -1,11 +1,11 @@
 object formZintTest: TformZintTest
   Left = 454
-  Height = 514
+  Height = 256
   Top = 143
-  Width = 646
+  Width = 494
   Caption = 'formZintTest'
-  ClientHeight = 514
-  ClientWidth = 646
+  ClientHeight = 256
+  ClientWidth = 494
   OnCreate = FormCreate
   OnShow = FormShow
   LCLVersion = '1.1'
@@ -13,24 +13,24 @@ object formZintTest: TformZintTest
     Left = 0
     Height = 23
     Top = 0
-    Width = 646
+    Width = 494
     Align = alTop
     BevelOuter = bvNone
     ClientHeight = 23
-    ClientWidth = 646
+    ClientWidth = 494
     TabOrder = 0
     object edData: TEdit
       Left = 0
       Height = 23
       Top = 0
-      Width = 362
+      Width = 210
       Align = alClient
       OnChange = edDataChange
       TabOrder = 0
       Text = '123456'
     end
     object comType: TComboBox
-      Left = 362
+      Left = 210
       Height = 23
       Top = 0
       Width = 209
@@ -42,7 +42,7 @@ object formZintTest: TformZintTest
       TabOrder = 1
     end
     object btnSaveSVG: TButton
-      Left = 571
+      Left = 419
       Height = 23
       Top = 0
       Width = 75
@@ -54,9 +54,9 @@ object formZintTest: TformZintTest
   end
   object imgResult: TImage
     Left = 10
-    Height = 470
+    Height = 212
     Top = 33
-    Width = 626
+    Width = 474
     Align = alClient
     Center = True
     Proportional = True
@@ -65,8 +65,8 @@ object formZintTest: TformZintTest
   object lblError: TLabel
     Left = 0
     Height = 1
-    Top = 513
-    Width = 646
+    Top = 255
+    Width = 494
     Align = alBottom
     Alignment = taCenter
     Font.Color = clRed
@@ -77,7 +77,7 @@ object formZintTest: TformZintTest
     Left = 0
     Height = 10
     Top = 23
-    Width = 646
+    Width = 494
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 1
@@ -85,15 +85,15 @@ object formZintTest: TformZintTest
   object Panel3: TPanel
     Left = 0
     Height = 10
-    Top = 503
-    Width = 646
+    Top = 245
+    Width = 494
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
   end
   object Panel4: TPanel
     Left = 0
-    Height = 470
+    Height = 212
     Top = 33
     Width = 10
     Align = alLeft
@@ -101,8 +101,8 @@ object formZintTest: TformZintTest
     TabOrder = 3
   end
   object Panel5: TPanel
-    Left = 636
-    Height = 470
+    Left = 484
+    Height = 212
     Top = 33
     Width = 10
     Align = alRight

@@ -12,6 +12,7 @@ object Form46: TForm46
   Font.Style = []
   OldCreateOrder = False
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -121,7 +122,6 @@ object Form46: TForm46
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'General Settings'
-      ExplicitHeight = 89
       object Label3: TLabel
         Left = 207
         Top = 32
@@ -266,11 +266,8 @@ object Form46: TForm46
     Left = 384
     Top = 256
   end
-  object FileSaveDialog1: TFileSaveDialog
-    FavoriteLinks = <>
-    FileTypes = <>
-    Options = []
-    Left = 456
+  object SaveDialog1: TSaveDialog
+    Left = 464
     Top = 256
   end
 end

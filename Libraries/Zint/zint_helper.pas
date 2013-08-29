@@ -30,6 +30,7 @@ procedure ArrayCopy(var ADestination : TArrayOfByte; const ASource : TArrayOfCha
 procedure ArrayCopy(var ADestination : TArrayOfChar; const ASource : TArrayOfChar; ACount : Integer = MaxInt); overload;
 procedure Fill(var ADestination : TArrayOfChar; ACount : Integer; AChar : Char; AStartIndex : Integer = 0); overload;
 procedure Fill(var ADestination : TArrayOfSmallInt; ACount : Integer; AValue : Smallint; AStartIndex : Integer = 0); overload;
+procedure Fill(var ADestination : TArrayOfInteger; ACount : Integer; AValue : Integer; AStartIndex : Integer = 0); overload;
 
 implementation
 
@@ -37,15 +38,28 @@ uses
   zint_common;
 
 function StrToArrayOfByte(const AString: String): TArrayOfByte;
+var
+  c : Char;
+  i : Integer;
 begin
-  Result := TEncoding.ASCII.GetBytes(AString);
-  SetLength(Result, Length(Result) + 1);
-  Result[High(Result)] := 0;
+  SetLength(Result, Length(AString) + 1);
+  i := 0;
+  for c in AString do
+  begin
+    Result[i]:=Ord(c);
+    inc(i);
+  end;
+  Result[i] := 0;
 end;
 
 function ArrayOfByteToString(const AArray: TArrayOfByte): String;
+var
+  i : Integer;
 begin
-  Result := TEncoding.ASCII.GetString(AArray, Low(AArray), ustrlen(AArray));
+  Result := '';
+
+  for i := Low(AArray) to ustrlen(AArray) - 1 do
+    Result := Result + Chr(AArray[i]);
 end;
 
 function StrToArrayOfChar(const AString: String): TArrayOfChar;
@@ -148,6 +162,15 @@ end;
 
 procedure Fill(var ADestination: TArrayOfSmallInt; ACount: Integer;
   AValue: Smallint; AStartIndex: Integer);
+var
+  i : Integer;
+begin
+  for i := AStartIndex to AStartIndex + ACount do
+    ADestination[i] := AValue;
+end;
+
+procedure Fill(var ADestination: TArrayOfInteger; ACount: Integer;
+  AValue: Integer; AStartIndex: Integer);
 var
   i : Integer;
 begin
