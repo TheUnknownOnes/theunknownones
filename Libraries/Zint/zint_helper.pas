@@ -31,6 +31,7 @@ procedure ArrayCopy(var ADestination : TArrayOfChar; const ASource : TArrayOfCha
 procedure Fill(var ADestination : TArrayOfChar; ACount : Integer; AChar : Char; AStartIndex : Integer = 0); overload;
 procedure Fill(var ADestination : TArrayOfSmallInt; ACount : Integer; AValue : Smallint; AStartIndex : Integer = 0); overload;
 procedure Fill(var ADestination : TArrayOfInteger; ACount : Integer; AValue : Integer; AStartIndex : Integer = 0); overload;
+procedure Fill(var ADestination : TArrayOfByte; ACount : Integer; AValue : Byte; AStartIndex : Integer = 0); overload;
 
 implementation
 
@@ -171,6 +172,15 @@ end;
 
 procedure Fill(var ADestination: TArrayOfInteger; ACount: Integer;
   AValue: Integer; AStartIndex: Integer);
+var
+  i : Integer;
+begin
+  for i := AStartIndex to AStartIndex + ACount do
+    ADestination[i] := AValue;
+end;
+
+procedure Fill(var ADestination: TArrayOfByte; ACount: Integer; AValue: Byte;
+  AStartIndex: Integer);
 var
   i : Integer;
 begin

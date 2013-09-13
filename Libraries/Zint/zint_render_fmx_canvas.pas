@@ -25,8 +25,13 @@ type
     FFGColor: TColor;
     FBGColor: TColor;
     FFont: TFont;
-    function CalcLeft(AX: Single): single;
-    function CalcTop (AY: Single): single;
+    procedure ClearBackground(const AParams : TZintClearBackgroundParams); override;
+    procedure DrawRect(const AParams : TZintDrawRectParams); override;
+    procedure DrawHexagon(const AParams : TZintDrawHexagonParams); override;
+    procedure DrawRing(const AParams : TZintDrawRingParams); override;
+    procedure DrawText(const AParams: TZintDrawTextParams); override;
+    function CalcTextHeight(const AParams : TZintCalcTextHeightParams) : Single; override;
+    function CalcTextWidth(const AParams : TZintCalcTextWidthParams) : Single; override;
     procedure SetFont(const Value: TFont);
   public
     constructor Create(ACanvas: TCanvas); reintroduce; virtual;
@@ -44,14 +49,99 @@ uses
 
 { TZintCanvasRenderTarget }
 
-function TZintCanvasRenderTarget.CalcLeft(AX: Single): single;
+procedure TZintCanvasRenderTarget.ClearBackground(const AParams : TZintClearBackgroundParams);
 begin
-  Result:=(FLeft+AX*FMultiplikator);
+  FCanvas.Fill.Color:=FBGColor;
+  FCanvas.Fill.Kind:=TBrushKind.bkSolid;
+  FCanvas.Stroke.Kind:=TBrushKind.bkNone;
+
+  FCanvas.FillRect(RectF(FX,
+                         FY,
+                         FWidth,
+                         FHeight), 0, 0, [], 1);
 end;
 
-function TZintCanvasRenderTarget.CalcTop(AY: Single): single;
+procedure TZintCanvasRenderTarget.DrawRect(const AParams : TZintDrawRectParams);
 begin
-  Result:=(FTop+AY*FMultiplikator);
+  FCanvas.Stroke.Kind:=TBrushKind.bkSolid;
+  FCanvas.Stroke.Color:=ffgcolor;
+
+  FCanvas.Fill.Color:=FFGColor;
+  FCanvas.Fill.Kind:=TBrushKind.bkSolid;
+
+  FCanvas.FillRect(RectF(AParams.x,
+                        AParams.y,
+                        AParams.X + AParams.Width,
+                        AParams.y + AParams.Height), 0, 0, [], 1);
+
+  FCanvas.DrawRect(RectF(AParams.x,
+                        AParams.y,
+                        AParams.X + AParams.Width,
+                        AParams.y + AParams.Height), 0, 0, [], 1);
+end;
+
+procedure TZintCanvasRenderTarget.DrawHexagon(const AParams : TZintDrawHexagonParams);
+var
+  Points : TPolygon;
+begin
+  FCanvas.Fill.Color:=ffgcolor;
+  FCanvas.Fill.Kind:=TBrushKind.bkSolid;
+
+  SetLength(Points, 6);
+  Points[0] := PointF(AParams.x-(AParams.width/2), AParams.y - AParams.height / 4);
+  Points[1] := PointF(AParams.x-(AParams.width/2), AParams.y + AParams.height / 4);
+  Points[2] := PointF(AParams.x -(AParams.width/2) + sqrt(3) * AParams.height / 4, AParams.y + AParams.height / 2);
+  Points[3] := PointF(AParams.x -(AParams.width/2) + sqrt(3) * AParams.height / 2, AParams.y + AParams.height / 4);
+  Points[4] := PointF(AParams.x -(AParams.width/2) + sqrt(3) * AParams.height / 2, AParams.y - AParams.height / 4);
+  Points[5] := PointF(AParams.x -(AParams.width/2) + sqrt(3) * AParams.height / 4, AParams.y - AParams.height / 2);
+
+  FCanvas.FillPolygon(Points, 1);
+end;
+
+procedure TZintCanvasRenderTarget.DrawRing(const AParams : TZintDrawRingParams);
+var
+  Radius : Single;
+begin
+    FCanvas.Stroke.Kind:=TBrushKind.bkSolid;
+    FCanvas.Stroke.Color:=ffgcolor;
+
+    FCanvas.Fill.Kind:=TBrushKind.bkNone;
+
+    FCanvas.StrokeThickness:=AParams.OuterRadius-AParams.InnerRadius;
+    Radius:=AParams.InnerRadius+FCanvas.StrokeThickness/2;
+
+    FCanvas.DrawEllipse(RectF(AParams.X-radius,
+                        AParams.y-radius,
+                        AParams.x + radius,
+                        AParams.y + radius),1);
+end;
+
+procedure TZintCanvasRenderTarget.DrawText(const AParams: TZintDrawTextParams);
+var
+  s : String;
+begin
+    FCanvas.Font.Assign(FFont);
+    FCanvas.Fill.Kind:=TBrushKind.bkSolid;
+    FCanvas.Fill.Color:=FFGColor;
+
+    FCanvas.Font.Size:=AParams.Height;
+    FCanvas.FillText(RectF(AParams.x - AParams.Width / 2,
+                           AParams.y,
+                           AParams.x+AParams.width / 2,
+                           AParams.y+AParams.Height),
+                         AParams.text, false,1, [], TTextAlign.taCenter);
+end;
+
+function TZintCanvasRenderTarget.CalcTextHeight(const AParams : TZintCalcTextHeightParams) : Single;
+begin
+  FCanvas.Font.Assign(FFont);
+  Result:=FCanvas.TextHeight(AParams.Text);
+end;
+
+function TZintCanvasRenderTarget.CalcTextWidth(const AParams : TZintCalcTextWidthParams) : Single;
+begin
+  FCanvas.Font.Assign(FFont);
+  Result:=FCanvas.TextWidth(AParams.Text);
 end;
 
 procedure TZintCanvasRenderTarget.SetFont(const Value: TFont);
@@ -82,30 +172,17 @@ begin
 end;
 
 procedure TZintCanvasRenderTarget.Render(ASymbol: TZintSymbol);
-var
-  line : Pzint_render_line;
-  hexagon : Pzint_render_hexagon;
-  hexagon_width, hexagon_height: single;
-  ring : Pzint_render_ring;
-  s : Pzint_render_string;
-  Points : TPolygon;
+
 begin
   inherited;
-
+(*
   if Assigned(FCanvas) then
   begin
     FCanvas.BeginScene;
     //clear Background
     if not FTransparent then
     begin
-      FCanvas.Fill.Color:=FBGColor;
-      FCanvas.Fill.Kind:=TBrushKind.bkSolid;
-      FCanvas.Stroke.Kind:=TBrushKind.bkNone;
 
-      FCanvas.FillRect(RectF(CalcLeft(0),
-                        CalcTop(0),
-                        CalcLeft(ASymbol.rendered^.width),
-                        CalcTop(ASymbol.rendered^.height)), 0, 0, [], 1);
     end;
 
     FCanvas.Stroke.Kind:=TBrushKind.bkSolid;
@@ -189,7 +266,7 @@ begin
       s:=s^.next;
     end;
     FCanvas.EndScene;
-  end;
+  end;      *)
 end;
 
 end.

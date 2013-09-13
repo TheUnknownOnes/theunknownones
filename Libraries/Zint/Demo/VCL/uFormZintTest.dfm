@@ -19,19 +19,18 @@ object Form46: TForm46
   object imgResult: TImage
     AlignWithMargins = True
     Left = 3
-    Top = 175
+    Top = 191
     Width = 771
-    Height = 312
+    Height = 296
     Align = alClient
+    AutoSize = True
     Center = True
     ParentShowHint = False
     Proportional = True
     ShowHint = False
-    Stretch = True
     ExplicitLeft = -2
-    ExplicitTop = 44
-    ExplicitWidth = 696
-    ExplicitHeight = 300
+    ExplicitTop = 175
+    ExplicitHeight = 312
   end
   object lblError: TLabel
     AlignWithMargins = True
@@ -51,11 +50,12 @@ object Form46: TForm46
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 169
+    Top = 185
     Width = 777
     Height = 3
     Cursor = crVSplit
     Align = alTop
+    ExplicitTop = 169
     ExplicitWidth = 321
   end
   object Panel1: TPanel
@@ -66,6 +66,7 @@ object Form46: TForm46
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitTop = -6
     object edData: TEdit
       Left = 8
       Top = 8
@@ -78,7 +79,7 @@ object Form46: TForm46
     object comType: TComboBox
       Left = 310
       Top = 8
-      Width = 146
+      Width = 297
       Height = 21
       Style = csDropDownList
       Sorted = True
@@ -91,16 +92,10 @@ object Form46: TForm46
       Width = 75
       Height = 25
       Caption = 'Print'
+      DropDownMenu = pumPrint
+      Style = bsSplitButton
       TabOrder = 2
       OnClick = btPrintClick
-    end
-    object comPrinter: TComboBox
-      Left = 462
-      Top = 8
-      Width = 145
-      Height = 21
-      Style = csDropDownList
-      TabOrder = 3
     end
     object btSVG: TButton
       Left = 694
@@ -108,7 +103,7 @@ object Form46: TForm46
       Width = 75
       Height = 25
       Caption = 'Save SVG'
-      TabOrder = 4
+      TabOrder = 3
       OnClick = btSVGClick
     end
   end
@@ -116,29 +111,46 @@ object Form46: TForm46
     Left = 0
     Top = 35
     Width = 777
-    Height = 134
+    Height = 150
     ActivePage = TabSheet1
     Align = alTop
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'General Settings'
+      DesignSize = (
+        769
+        122)
       object Label3: TLabel
-        Left = 207
-        Top = 32
+        Left = 279
+        Top = 6
         Width = 97
         Height = 13
         Caption = 'Render adjust Mode'
       end
       object Label4: TLabel
-        Left = 207
-        Top = 59
+        Left = 279
+        Top = 33
         Width = 152
         Height = 13
         Caption = 'Maxicode Hexagon Scale (float)'
       end
+      object Label1: TLabel
+        Left = 279
+        Top = 60
+        Width = 53
+        Height = 13
+        Caption = 'Horiz. align'
+      end
+      object Label2: TLabel
+        Left = 279
+        Top = 87
+        Width = 49
+        Height = 13
+        Caption = 'Vert. align'
+      end
       object ButtonFont: TButton
         Left = 480
-        Top = 6
+        Top = 3
         Width = 208
         Height = 44
         Caption = 'change Text Font'
@@ -152,8 +164,8 @@ object Form46: TForm46
         OnClick = ButtonFontClick
       end
       object cbHRT: TCheckBox
-        Left = 207
-        Top = 6
+        Left = 480
+        Top = 53
         Width = 162
         Height = 17
         Caption = 'show human readable text'
@@ -163,97 +175,135 @@ object Form46: TForm46
         OnClick = edDataChange
       end
       object cbRAM: TComboBox
-        Left = 310
-        Top = 29
-        Width = 145
+        Left = 382
+        Top = 3
+        Width = 92
         Height = 21
         Style = csDropDownList
-        ItemIndex = 1
+        ItemIndex = 0
         TabOrder = 2
         Text = 'Scale'
         OnChange = edDataChange
         Items.Strings = (
-          'None'
           'Scale'
           'Inflate Image')
       end
       object edMHS: TEdit
-        Left = 365
-        Top = 56
+        Left = 437
+        Top = 30
         Width = 37
         Height = 21
         TabOrder = 3
         Text = '1'
         OnChange = edDataChange
       end
-      object GroupBox1: TGroupBox
-        Left = 8
-        Top = -1
-        Width = 185
-        Height = 92
-        Caption = 'Frames'
+      object PageControl2: TPageControl
+        Left = 3
+        Top = 3
+        Width = 270
+        Height = 117
+        ActivePage = TabSheet2
+        Anchors = [akLeft, akTop, akBottom]
         TabOrder = 4
-        object Label2: TLabel
-          Left = 15
-          Top = 68
-          Width = 56
-          Height = 13
+        object TabSheet2: TTabSheet
+          Caption = 'Margin'
+          inline fboMargin: TFrameBorderOptions
+            Left = 0
+            Top = 0
+            Width = 262
+            Height = 89
+            Align = alClient
+            TabOrder = 0
+            ExplicitWidth = 262
+            ExplicitHeight = 89
+          end
+        end
+        object TabSheet3: TTabSheet
+          Caption = 'Padding'
+          ImageIndex = 1
+          inline fboPadding: TFrameBorderOptions
+            Left = 0
+            Top = 0
+            Width = 262
+            Height = 89
+            Align = alClient
+            TabOrder = 0
+            ExplicitWidth = 262
+            ExplicitHeight = 89
+          end
+        end
+        object TabSheet4: TTabSheet
+          Caption = 'Border'
+          ImageIndex = 2
+          inline fboBorder: TFrameBorderOptions
+            Left = 0
+            Top = 0
+            Width = 262
+            Height = 89
+            Align = alClient
+            TabOrder = 0
+            ExplicitWidth = 262
+            ExplicitHeight = 89
+          end
+        end
+        object TabSheet5: TTabSheet
+          Caption = 'TextSpacing'
+          ImageIndex = 3
+          inline fboTextSpacing: TFrameBorderOptions
+            Left = 0
+            Top = 0
+            Width = 262
+            Height = 89
+            Align = alClient
+            TabOrder = 0
+            ExplicitWidth = 262
+            ExplicitHeight = 89
+          end
+        end
+        object TabSheet6: TTabSheet
           Caption = 'Whitespace'
+          ImageIndex = 4
+          inline fboWhitespace: TFrameBorderOptions
+            Left = 0
+            Top = 0
+            Width = 262
+            Height = 89
+            Align = alClient
+            TabOrder = 0
+            ExplicitWidth = 262
+            ExplicitHeight = 89
+          end
         end
-        object Label1: TLabel
-          Left = 15
-          Top = 41
-          Width = 59
-          Height = 13
-          Caption = 'Frame width'
-        end
-        object edWhitespaceWidth: TEdit
-          Left = 80
-          Top = 65
-          Width = 94
-          Height = 21
-          TabOrder = 0
-          Text = '1'
-          OnChange = edDataChange
-        end
-        object edFrameWidth: TEdit
-          Left = 80
-          Top = 38
-          Width = 94
-          Height = 21
-          TabOrder = 1
-          Text = '1'
-          OnChange = edDataChange
-        end
-        object rbBox: TRadioButton
-          Left = 15
-          Top = 18
-          Width = 42
-          Height = 17
-          Caption = 'Box'
-          TabOrder = 2
-          OnClick = edDataChange
-        end
-        object rbBind: TRadioButton
-          Left = 74
-          Top = 18
-          Width = 42
-          Height = 17
-          Caption = 'Bind'
-          TabOrder = 3
-          OnClick = edDataChange
-        end
-        object rbNone: TRadioButton
-          Left = 128
-          Top = 18
-          Width = 42
-          Height = 17
-          Caption = 'None'
-          Checked = True
-          TabOrder = 4
-          TabStop = True
-          OnClick = edDataChange
-        end
+      end
+      object comHAlign: TComboBox
+        Left = 338
+        Top = 57
+        Width = 136
+        Height = 21
+        Style = csDropDownList
+        ItemIndex = 0
+        TabOrder = 5
+        Text = 'Left'
+        OnChange = edDataChange
+        Items.Strings = (
+          'Left'
+          'Center'
+          'Right')
+      end
+      object comVAlign: TComboBox
+        Left = 338
+        Top = 84
+        Width = 136
+        Height = 21
+        Style = csDropDownList
+        ItemIndex = 0
+        TabOrder = 6
+        Text = 'Top'
+        OnChange = edDataChange
+        Items.Strings = (
+          'Top'
+          'Center'
+          'Bottom')
       end
     end
   end
@@ -268,6 +318,10 @@ object Form46: TForm46
   end
   object SaveDialog1: TSaveDialog
     Left = 464
+    Top = 256
+  end
+  object pumPrint: TPopupMenu
+    Left = 568
     Top = 256
   end
 end

@@ -23,41 +23,29 @@ object formZintTest: TformZintTest
       Left = 0
       Height = 23
       Top = 0
-      Width = 210
+      Width = 272
       Align = alClient
       OnChange = edDataChange
       TabOrder = 0
       Text = '123456'
     end
-    object comType: TComboBox
-      Left = 210
+    object edPrimary: TEdit
+      Left = 272
       Height = 23
       Top = 0
-      Width = 209
+      Width = 222
       Align = alRight
-      ItemHeight = 15
-      OnChange = comTypeChange
-      Sorted = True
-      Style = csDropDownList
+      OnChange = edDataChange
       TabOrder = 1
-    end
-    object btnSaveSVG: TButton
-      Left = 419
-      Height = 23
-      Top = 0
-      Width = 75
-      Align = alRight
-      Caption = 'SaveSVG'
-      OnClick = btnSaveSVGClick
-      TabOrder = 2
     end
   end
   object imgResult: TImage
     Left = 10
-    Height = 212
-    Top = 33
+    Height = 189
+    Top = 56
     Width = 474
     Align = alClient
+    AutoSize = True
     Center = True
     Proportional = True
     Stretch = True
@@ -76,7 +64,7 @@ object formZintTest: TformZintTest
   object Panel2: TPanel
     Left = 0
     Height = 10
-    Top = 23
+    Top = 46
     Width = 494
     Align = alTop
     BevelOuter = bvNone
@@ -93,8 +81,8 @@ object formZintTest: TformZintTest
   end
   object Panel4: TPanel
     Left = 0
-    Height = 212
-    Top = 33
+    Height = 189
+    Top = 56
     Width = 10
     Align = alLeft
     BevelOuter = bvNone
@@ -102,12 +90,24 @@ object formZintTest: TformZintTest
   end
   object Panel5: TPanel
     Left = 484
-    Height = 212
-    Top = 33
+    Height = 189
+    Top = 56
     Width = 10
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 4
+  end
+  object comType: TComboBox
+    Left = 0
+    Height = 23
+    Top = 23
+    Width = 494
+    Align = alTop
+    ItemHeight = 15
+    OnChange = comTypeChange
+    Sorted = True
+    Style = csDropDownList
+    TabOrder = 5
   end
   object SaveDialog1: TSaveDialog
     left = 89

@@ -17,12 +17,15 @@ unit zint_render_wmf;
 interface
 
 uses
-  zint, zint_render_canvas, Graphics;
+  zint, zint_render_canvas, Graphics, SysUtils;
 
 type
   TZintWMFRenderTarget = class(TZintCanvasRenderTarget)
   protected
     FWMF : TMetafile;
+    function CalcTextWidth(const AParams : TZintCalcTextWidthParams) : Single; override;
+    procedure Inflate(const ANewWidth, ANewHeight : Single); override;
+    procedure ReInitCanvas;
   public
     constructor Create(AWMF: TMetafile); reintroduce; virtual;
     procedure Render(ASymbol : TZintSymbol); override;
@@ -32,6 +35,15 @@ implementation
 
 { TZintWMFRenderTarget }
 
+function TZintWMFRenderTarget.CalcTextWidth(
+  const AParams: TZintCalcTextWidthParams): Single;
+begin
+  Result:=inherited CalcTextWidth(AParams);
+
+  if Length(AParams.Text)=1 then
+    Result:=Result * 2;
+end;
+
 constructor TZintWMFRenderTarget.Create(AWMF: TMetafile);
 begin
   inherited Create(nil);
@@ -40,18 +52,26 @@ begin
   FHeightDesired:=FWMF.Height;
 end;
 
+procedure TZintWMFRenderTarget.Inflate(const ANewWidth, ANewHeight: Single);
+begin
+  if Assigned(FCanvas) then
+    FreeAndNil(FCanvas);
+
+  FWMF.SetSize(Round(ANewWidth), Round(ANewHeight));
+
+  ReInitCanvas;
+end;
+
+procedure TZintWMFRenderTarget.ReInitCanvas;
+begin
+  FCanvas:=TMetafileCanvas.Create(FWMF, 0);
+  FCanvas.Font.Assign(FFont);
+  inherited;
+end;
+
 procedure TZintWMFRenderTarget.Render(ASymbol: TZintSymbol);
 begin
-  if FRenderAdjustMode=ramInflateImage then
-  begin
-    if ASymbol.rendered^.width+FLeft>FWMF.Width then
-      FWMF.Width:=Round(ASymbol.rendered^.width+FLeft);
-    if ASymbol.rendered^.height+FTop>FWMF.Height then
-      FWMF.Height:=Round(ASymbol.rendered^.height+FTop);
-  end;
-
-  FCanvas:=TMetafileCanvas.Create(FWMF, 0);
-
+  ReInitCanvas;
   try
     inherited;
   finally

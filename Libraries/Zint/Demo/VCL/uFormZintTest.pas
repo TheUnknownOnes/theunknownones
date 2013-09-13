@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, zint, Controls,
-  Forms, Dialogs, StdCtrls, ExtCtrls, uRTTIHelper, ComCtrls, TypInfo;
+  Forms, Dialogs, StdCtrls, ExtCtrls, uRTTIHelper, ComCtrls, TypInfo,
+  uFrameBorderOptions, Vcl.Menus;
 
 type
   TForm46 = class(TForm)
@@ -14,15 +15,6 @@ type
     comType: TComboBox;
     lblError: TLabel;
     btPrint: TButton;
-    comPrinter: TComboBox;
-    GroupBox1: TGroupBox;
-    edWhitespaceWidth: TEdit;
-    Label2: TLabel;
-    Label1: TLabel;
-    edFrameWidth: TEdit;
-    rbBox: TRadioButton;
-    rbBind: TRadioButton;
-    rbNone: TRadioButton;
     cbHRT: TCheckBox;
     cbRAM: TComboBox;
     Label3: TLabel;
@@ -35,6 +27,22 @@ type
     TabSheet1: TTabSheet;
     Splitter1: TSplitter;
     SaveDialog1: TSaveDialog;
+    PageControl2: TPageControl;
+    TabSheet2: TTabSheet;
+    TabSheet3: TTabSheet;
+    TabSheet4: TTabSheet;
+    fboMargin: TFrameBorderOptions;
+    TabSheet5: TTabSheet;
+    TabSheet6: TTabSheet;
+    fboPadding: TFrameBorderOptions;
+    fboTextSpacing: TFrameBorderOptions;
+    fboBorder: TFrameBorderOptions;
+    fboWhitespace: TFrameBorderOptions;
+    comHAlign: TComboBox;
+    Label1: TLabel;
+    comVAlign: TComboBox;
+    Label2: TLabel;
+    pumPrint: TPopupMenu;
     procedure FormCreate(Sender: TObject);
     procedure edDataChange(Sender: TObject);
     procedure comTypeChange(Sender: TObject);
@@ -48,6 +56,7 @@ type
     procedure GenBarcode;
     function GenSymbol: TZintSymbol;
     procedure ProcessSymbol(ASymbol: TZintSymbol);
+    procedure InitRenderTarget(ARenderTarget: TZintCustomRenderTarget);
   public
     { Public-Deklarationen }
   end;
@@ -59,8 +68,8 @@ implementation
 
 {$R *.dfm}
 
-uses zint_render_wmf, zint_render_canvas, Printers, zint_render_svg, zint_helper,
-  uFrameOptions;
+uses zint_render_wmf, zint_render_canvas, Printers, zint_render_svg,
+  zint_helper, uFrameOptions;
 
 procedure TForm46.btPrintClick(Sender: TObject);
 var
@@ -73,16 +82,17 @@ begin
   try
     symbol.Encode(edData.Text);
 
-    Printer.PrinterIndex:=comPrinter.ItemIndex;
+    if Sender is TMenuItem then
+      Printer.PrinterIndex:=TMenuItem(Sender).Tag;
     Printer.BeginDoc;
     rt:=TZintCanvasRenderTarget.Create(Printer.Canvas);
-    rt.RenderAdjustMode:=TZintRenderAdjustMode(cbRAM.ItemIndex);
     rt.Font.Assign(ButtonFont.Font);
-    rt.HexagonScale:=StrToFloatDef(edMHS.Text, 1);
-    rt.Left:=(Printer.Canvas.ClipRect.Right - Printer.Canvas.ClipRect.Left) / 3;
-    rt.Top:=(Printer.Canvas.ClipRect.Bottom - Printer.Canvas.ClipRect.Top) / 3;
+    rt.Font.Height:=Abs(rt.Font.Height);
+    rt.XDesired:=(Printer.Canvas.ClipRect.Right - Printer.Canvas.ClipRect.Left) / 3;
+    rt.YDesired:=(Printer.Canvas.ClipRect.Bottom - Printer.Canvas.ClipRect.Top) / 3;
     rt.WidthDesired:=(Printer.Canvas.ClipRect.Right - Printer.Canvas.ClipRect.Left) / 3;
     rt.HeightDesired:=(Printer.Canvas.ClipRect.Right - Printer.Canvas.ClipRect.Left) / 3;
+    InitRenderTarget(rt);
     try
       Symbol.Render(rt);
     finally
@@ -116,13 +126,14 @@ begin
         rt.ForegroundColor:='black';
         rt.BackgroundColor:='white';
         rt.Transparent:=false;
-        rt.RenderAdjustMode:=TZintRenderAdjustMode(cbRAM.ItemIndex);
         rt.Font:=ButtonFont.Font.Name;
         rt.HexagonScale:=StrToFloatDef(edMHS.Text, 1);
-        rt.Left:=0;
-        rt.Top:=0;
+        rt.FontHeight:=ButtonFont.Font.Height;
+        rt.XDesired:=0;
+        rt.YDesired:=0;
         rt.WidthDesired:=300;
         rt.HeightDesired:=300;
+        InitRenderTarget(rt);
         try
           Symbol.Render(rt);
         finally
@@ -145,7 +156,7 @@ procedure TForm46.ButtonFontClick(Sender: TObject);
 begin
   if FontDialog1.Execute() then
     ButtonFont.Font.Assign(FontDialog1.Font);
-  ButtonFont.Font.Size:=14;
+  //ButtonFont.Font.Size:=14;
   GenBarcode;
 end;
 
@@ -162,18 +173,33 @@ end;
 procedure TForm46.FormCreate(Sender: TObject);
 var
   i : Integer;
+  sl : TStringList;
+  mi : TMenuItem;
 begin
+  ReportMemoryLeaksOnShutdown := true;
   for i := Low(ZintSymbologies) to High(ZintSymbologies) do
     comType.Items.AddObject(ZintSymbologies[i].DisplayName, TObject(ZintSymbologies[i].Symbology));
 
   comType.ItemIndex := 0;
 
-  comPrinter.Items.Assign(Printer.Printers);
-  comPrinter.ItemIndex:=0;
+  for i := 0 to Printer.Printers.Count - 1 do
+  begin
+    mi := TMenuItem.Create(pumPrint);
+    mi.Caption := Printer.Printers[i];
+    mi.OnClick := btPrintClick;
+    mi.Tag := i;
+    pumPrint.Items.Add(mi);
+  end;
 
   FSymbol:=TZintSymbol.Create;
 
   ProcessSymbol(FSymbol);
+
+  fboMargin.OnChange:=edDataChange;
+  fboPadding.OnChange:=edDataChange;
+  fboTextSpacing.OnChange:=edDataChange;
+  fboBorder.OnChange:=edDataChange;
+  fboWhitespace.OnChange:=edDataChange;
 end;
 
 procedure TForm46.FormDestroy(Sender: TObject);
@@ -197,19 +223,6 @@ begin
   Result.Clear;
   Result.symbology := Integer(comType.Items.Objects[comType.ItemIndex]);
   Result.input_mode := UNICODE_MODE;
-
-  if rbBox.Checked then
-    Result.output_options:=Result.output_options or BARCODE_BOX
-  else
-  if rbBind.Checked then
-    Result.output_options:=Result.output_options or BARCODE_BIND;
-
-  Result.whitespace_width:=StrToIntDef(edWhitespaceWidth.Text, 0);
-  Result.border_width:=StrToIntDef(edFrameWidth.Text, 0);
-  if cbHRT.Checked then
-    Result.show_hrt:= 1
-  else
-    Result.show_hrt:= 0;
 end;
 
 procedure TForm46.ProcessSymbol(ASymbol: TZintSymbol);
@@ -243,7 +256,20 @@ begin
   finally
     Properties.Free;
   end;
+end;
 
+procedure TForm46.InitRenderTarget(ARenderTarget: TZintCustomRenderTarget);
+begin
+  ARenderTarget.HexagonScale:=StrToFloatDef(edMHS.Text, 1);
+  ARenderTarget.RenderAdjustMode:=TZintRenderAdjustMode(cbRAM.ItemIndex);
+  ARenderTarget.ShowText:=cbHRT.Checked;
+  fboMargin.UpdateRenderBox(ARenderTarget.Margin);
+  fboPadding.UpdateRenderBox(ARenderTarget.Padding);
+  fboTextSpacing.UpdateRenderBox(ARenderTarget.TextSpacing);
+  fboBorder.UpdateRenderBox(ARenderTarget.Border);
+  fboWhitespace.UpdateRenderBox(ARenderTarget.Whitespace);
+  ARenderTarget.HAlign := TZintHAlign(comHAlign.ItemIndex);
+  ARenderTarget.VAlign := TZintVAlign(comVAlign.ItemIndex);
 end;
 
 procedure TForm46.GenBarcode;
@@ -262,9 +288,9 @@ begin
     wmf:=TMetafile.Create;
     wmf.SetSize(imgResult.Width, imgResult.Height);
     rt:=TZintWMFRenderTarget.Create(wmf);
-    rt.HexagonScale:=StrToFloatDef(edMHS.Text, 1);
+
     rt.Font.Assign(ButtonFont.Font);
-    rt.RenderAdjustMode:=TZintRenderAdjustMode(cbRAM.ItemIndex);
+    InitRenderTarget(rt);
     try
       Symbol.Render(rt);
       imgResult.Picture.Graphic:=wmf;

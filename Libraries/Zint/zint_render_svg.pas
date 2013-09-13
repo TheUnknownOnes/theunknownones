@@ -17,7 +17,7 @@ unit zint_render_svg;
 interface
 
 uses
-  zint, Classes;
+  zint, Classes, SysUtils, StrUtils;
 
 type
   TZintSVGColor = String;
@@ -30,17 +30,27 @@ type
   { TZintSVGRenderTarget }
 
   TZintSVGRenderTarget = class(TZintCustomRenderTarget)
+  private
+    FFontHeight: Single;
   protected
     FSVGFile : TStringList;
+    FFormatSettings : TFormatSettings;
     FDocOption : TZintSVGDocOption;
     FIncludeDocInfo : Boolean;
     FFGColor: TZintSVGColor;
     FBGColor: TZintSVGColor;
     FFont: TZintSVGFont;
-    function CalcLeft(AX: Single): Single;
-    function CalcTop (AY: Single): Single;
-    function CalcWidth(AX: Single): Single;
-    function CalcHeight(AY: Single): Single;
+
+    
+    procedure DrawStart; override;
+    procedure DrawStop; override;
+    procedure ClearBackground(const AParams : TZintClearBackgroundParams); override;
+    procedure DrawRect(const AParams : TZintDrawRectParams); override;
+    procedure DrawHexagon(const AParams : TZintDrawHexagonParams); override;
+    procedure DrawRing(const AParams : TZintDrawRingParams); override;
+    procedure DrawText(const AParams: TZintDrawTextParams); override;
+    function CalcTextHeight(const AParams : TZintCalcTextHeightParams) : Single; override;
+    function CalcTextWidth(const AParams : TZintCalcTextWidthParams) : Single; override;
   public
     constructor Create(ASVGFile: TStringList); reintroduce; virtual;
     procedure Render(ASymbol : TZintSymbol); override;
@@ -48,34 +58,41 @@ type
     property DocOption : TZintSVGDocOption read FDocOption write FDocOption;
     property BackgroundColor : TZintSVGColor read FBGColor write FBGColor;
     property Font: TZintSVGFont read FFont write FFont;
+    property FontHeight: Single read FFontHeight write FFontHeight;
   end;
 
 implementation
 
 uses
-  Types, SysUtils, zint_helper;
+  Types, zint_helper;
 
 
 { TZintSVGRenderTarget }
 
-function TZintSVGRenderTarget.CalcHeight(AY: Single): Single;
+function TZintSVGRenderTarget.CalcTextHeight(
+  const AParams: TZintCalcTextHeightParams): Single;
 begin
-  Result:=AY*FMultiplikator;
+  Result:=FFontHeight;
 end;
 
-function TZintSVGRenderTarget.CalcLeft(AX: Single): Single;
+function TZintSVGRenderTarget.CalcTextWidth(
+  const AParams: TZintCalcTextWidthParams): Single;
 begin
-  Result:=FLeft+AX*FMultiplikator;
+  Result:=FFontHeight*Length(AParams.Text); //we guess that;
 end;
 
-function TZintSVGRenderTarget.CalcTop(AY: Single): Single;
+procedure TZintSVGRenderTarget.ClearBackground(
+  const AParams: TZintClearBackgroundParams);
 begin
-  Result:=FTop+AY*FMultiplikator;
-end;
+  FSVGFile.Append(
+          Format('<rect x="%f" y="%f" width="%f" height="%f" style="fill:%s;stroke-width:0"/>',
+                      [FX,
+                       FY,
+                       FWidth,
+                       FHeight,
+                       FBGColor],FFormatSettings)
+          );
 
-function TZintSVGRenderTarget.CalcWidth(AX: Single): Single;
-begin
-  Result:=AX*FMultiplikator;
 end;
 
 constructor TZintSVGRenderTarget.Create(ASVGFile: TStringList);
@@ -86,124 +103,84 @@ begin
   FFGColor:='black';
   FBGColor:='white';
   FFont:='sans-serif';
+  FFontHeight:=11;
+  FFormatSettings.DecimalSeparator:='.';
+  FFormatSettings.ThousandSeparator:=#0;
+end;
+
+procedure TZintSVGRenderTarget.DrawHexagon(
+  const AParams: TZintDrawHexagonParams);
+begin
+   FSVGFile.Append(
+        Format('<polygon fill="%s" points="%f,%f %f,%f %f,%f %f,%f %f,%f %f,%f" />',
+                 [FFGColor,
+                  AParams.x-(AParams.width/2), AParams.y - AParams.height/4,
+                  AParams.x-(AParams.width/2), AParams.y + AParams.height/4,
+                  AParams.x -(AParams.width/2) + sqrt(3) * AParams.height / 4, AParams.y + AParams.height / 2,
+                  AParams.x -(AParams.width/2) + sqrt(3) * AParams.height / 2, AParams.y + AParams.height / 4,
+                  AParams.x -(AParams.width/2) + sqrt(3) * AParams.height / 2, AParams.y - AParams.height / 4,
+                  AParams.x -(AParams.width/2) + sqrt(3) * AParams.height / 4, AParams.y - AParams.height / 2], FFormatSettings)
+                  );
+end;
+
+procedure TZintSVGRenderTarget.DrawRect(const AParams: TZintDrawRectParams);
+begin
+  FSVGFile.Append(
+        Format('<rect x="%f" y="%f" width="%f" height="%f" style="fill:%s;stroke-width:0"/>',
+                      [AParams.x,
+                        AParams.y,
+                        AParams.Width,
+                        AParams.Height,
+                       FFGColor],FFormatSettings)
+  );
+end;
+
+procedure TZintSVGRenderTarget.DrawRing(const AParams: TZintDrawRingParams);
+begin
+  FSVGFile.Append(Format('<circle cx="%f" cy="%f" r="%f" stroke="%s" stroke-width="%f" fill="none"/>',
+                      [AParams.x,
+                       AParams.y,
+                       AParams.InnerRadius + (AParams.OuterRadius - AParams.InnerRadius) / 2,
+                       FFGColor,
+                       AParams.OuterRadius-AParams.InnerRadius],FFormatSettings));
+
+end;
+
+procedure TZintSVGRenderTarget.DrawStart;
+begin
+  case FDocOption of
+    doSingleFile: begin
+                    FSVGFile.Text:=
+                      format('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="%f" height="%f">',[FWidth, FHeight], FFormatSettings);
+                  end;
+    doInsertIntoExisting: begin
+                            FSVGFile.Text:=ReplaceText(FSVGFile.Text, '</svg>', '');
+                          end;
+  end;
+
+  FSVGFile.Append('<g><title>' + ArrayOfByteToString(FSymbol.text) + '</title><desc>Barcode generated using Zint</desc>');
+end;
+
+procedure TZintSVGRenderTarget.DrawStop;
+begin
+  FSVGFile.Append('</g>');
+  if FDocOption<>doAppendFlat then
+    FSVGFile.Append('</svg>');
+end;
+
+procedure TZintSVGRenderTarget.DrawText(const AParams: TZintDrawTextParams);
+begin
+  FSVGFile.Append(
+   Format('<text x="%f" y="%f" fill="%s" font-family="%s" font-size="%f" style="text-anchor:middle">%s</text>',
+               [AParams.x, AParams.y+AParams.Height/2, FFGColor, FFont, AParams.Height, AParams.Text], FFormatSettings)
+               );
+
+
 end;
 
 procedure TZintSVGRenderTarget.Render(ASymbol: TZintSymbol);
-var
-  ResultStr, tmpStr : string;
-  line : Pzint_render_line;
-  hexagon : Pzint_render_hexagon;
-  hexagon_width, hexagon_height: single;
-  ring : Pzint_render_ring;
-  s : Pzint_render_string;
-  p : Integer;
-  fs : TFormatSettings;
-  DocWidth, DocHeight: Single;
-  i : integer;
 begin
   inherited;
-  if Assigned(FSVGFile) then
-  begin
-    fs.DecimalSeparator:='.';
-    fs.ThousandSeparator:=#0;
-
-    ResultStr:='<g><title>' + ArrayOfByteToString(ASymbol.text) + '</title><desc>Barcode generated using Zint</desc>';
-
-    //clear Background
-    if not FTransparent then
-    begin
-      ResultStr:=ResultStr+
-          Format('<rect x="%f" y="%f" width="%f" height="%f" style="fill:%s;stroke-width:0"/>',
-                      [CalcLeft(0),
-                       CalcTop(0),
-                       CalcWidth(ASymbol.rendered^.width),
-                       CalcHeight(ASymbol.rendered^.height),
-                       FBGColor],fs);
-    end;
-
-
-    line:=ASymbol.rendered^.lines;
-    while Assigned(line) do
-    begin
-      ResultStr:=ResultStr+
-        Format('<rect x="%f" y="%f" width="%f" height="%f" style="fill:%s;stroke-width:0"/>',
-                      [CalcLeft(line^.x),
-                        CalcTop(line^.y),
-                        CalcWidth(line^.width),
-                        CalcHeight(line^.length),
-                       FFGColor],fs);
-      line:=line^.next;
-    end;
-
-    ring:=ASymbol.rendered^.rings;
-    while Assigned(ring) do
-    begin
-       ResultStr:=ResultStr+
-        Format('<circle cx="%f" cy="%f" r="%f" stroke="%s" stroke-width="%f" fill="none"/>',
-                      [CalcLeft(ring^.x),
-                       CalcTop(ring^.y),
-                       CalcWidth(ring^.radius),
-                       FFGColor,
-                       CalcWidth(ring^.line_width)],fs);
-      ring:=ring^.next;
-    end;
-
-    hexagon:=ASymbol.rendered^.hexagons;
-    while Assigned(hexagon) do
-    begin
-      hexagon_width:=hexagon^.width*FHexagonScale;
-      hexagon_height:=hexagon^.height*FHexagonScale;
-
-      ResultStr:=ResultStr+
-        Format('<polygon fill="%s" points="%f,%f %f,%f %f,%f %f,%f %f,%f %f,%f" />',
-                 [FFGColor,
-                  calcLeft(hexagon^.x-(hexagon_width/2)), CalcTop(hexagon^.y + hexagon_height/4),
-                  calcLeft(hexagon^.x-(hexagon_width/2)), CalcTop(hexagon^.y + hexagon_height*3/4),
-                  calcLeft(hexagon^.x -(hexagon_width/2) + sqrt(3) * hexagon_height / 4), CalcTop(hexagon^.y + hexagon_height),
-                  calcLeft(hexagon^.x -(hexagon_width/2) + sqrt(3) * hexagon_height / 2), CalcTop(hexagon^.y + hexagon_height * 3/4),
-                  calcLeft(hexagon^.x -(hexagon_width/2) + sqrt(3) * hexagon_height / 2), CalcTop(hexagon^.y + hexagon_height / 4),
-                  calcLeft(hexagon^.x -(hexagon_width/2) + sqrt(3) * hexagon_height / 4), CalcTop(hexagon^.y )], fs);
-
-      hexagon:=hexagon^.next;
-    end;
-
-    s:=ASymbol.rendered^.strings;
-    while assigned(s) do
-    begin
-      ResultStr:=ResultStr+
-        Format('<text x="%f" y="%f" fill="%s" font-family="%s" font-size="%f" style="text-anchor:middle">%s</text>',
-               [CalcLeft(s^.x), CalcTop(s^.y+s^.fsize/2), FFGColor, FFont, CalcHeight(s^.fsize), s^.text], fs);
-      s:=s^.next;
-    end;
-
-    ResultStr:=ResultStr+'</g>';
-
-    case FDocOption of
-      doSingleFile: begin
-                      DocWidth:=FWidthDesired;
-                      DocHeight:=FHeightDesired;
-                      if FRenderAdjustMode=ramInflateImage then
-                      begin
-                        if ASymbol.rendered^.width+FLeft>FWidthDesired then
-                          DocWidth:=ASymbol.rendered^.width+FLeft;
-                        if ASymbol.rendered^.height+FTop>FHeightDesired then
-                          DocHeight:=ASymbol.rendered^.height+FTop;
-                      end;
-
-                      FSVGFile.Text:=
-                        format('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="%f" height="%f">',[DocWidth, DocHeight], fs)+
-                        ResultStr+
-                        '</svg>';
-                    end;
-      doInsertIntoExisting: begin
-                              tmpStr:=FSVGFile.Text;
-                              p:=Pos('</svg>', LowerCase(tmpStr));
-                              Insert(ResultStr, tmpStr, p);
-                              FSVGFile.Text:=tmpStr;
-                            end;
-      doAppendFlat: FSVGFile.Append(ResultStr);
-    end;
-  end;
 end;
 
 end.

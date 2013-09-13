@@ -365,14 +365,14 @@ begin
   x_dimension := render^.width / total_area_width_x;
   x_dimension := x_dimension / GL_CONST;
 
-  { Set minimum size of symbol }
-  { Barcode must be at least 2mm high by 2mm across }
-  if (render^.height < ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 2.0) * GL_CONST) then
-    render^.height := ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 2.0) * GL_CONST;
-
-  if (render^.width < (2.0 * GL_CONST)) then
-    render^.width := (2.0 * GL_CONST);
-
+  //{ Set minimum size of symbol }
+  //{ Barcode must be at least 2mm high by 2mm across }
+  //if (render^.height < ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 2.0) * GL_CONST) then
+  //  render^.height := ((x_dimension * ((2 * symbol.border_width) + text_offset + text_height)) + 2.0) * GL_CONST;
+  //
+  //if (render^.width < (2.0 * GL_CONST)) then
+  //  render^.width := (2.0 * GL_CONST);
+  //
   //if (symbol.symbology = BARCODE_CODABAR) then
   //begin
   //  { The minimum X-dimension of Codabar is 0.191mm. The minimum bar height is 5mm }

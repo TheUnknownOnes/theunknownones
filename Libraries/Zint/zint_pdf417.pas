@@ -1126,7 +1126,7 @@ begin
     for loop := 0 to strlen(pattern) - 1 do
       if (pattern[loop] = '1') then set_module(symbol, i, loop);
 
-    if (symbol.height = 0) then
+    //if (symbol.height = 0) then
       symbol.row_height[i] := 3;
   end;
   symbol.rows := (mc_length div symbol.option_2);

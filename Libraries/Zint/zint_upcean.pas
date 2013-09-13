@@ -642,7 +642,7 @@ begin
   end
   else
   begin
-    error_number := is_sane('0123456789Xx', source, src_len);
+    error_number := is_sane('0123456789Xx+', source, src_len);
     if (error_number = ZERROR_INVALID_DATA) then
     begin
       strcpy(symbol.errtxt, 'Invalid characters in input');

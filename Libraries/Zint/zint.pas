@@ -47,42 +47,6 @@ type
   TArrayOfSmallInt = array of SmallInt;
 
 type
-  Pzint_render_line = ^zint_render_line;
-  zint_render_line = record
-    x, y, length, width : Single;
-    next : Pzint_render_line;      { Pointer to next line }
-  end;
-
-  Pzint_render_string = ^zint_render_string;
-  zint_render_string = record
-    x, y, fsize : Single;
-    width : Single;                { Suggested string width, may be 0 if none recommended }
-    length : Integer;
-    text : String;
-    next : Pzint_render_string;    { Pointer to next character }
-  end;
-
-  Pzint_render_ring = ^zint_render_ring;
-  zint_render_ring  = record
-    x, y, radius, line_width : Single;
-    next : Pzint_render_ring;      { Pointer to next ring }
-  end;
-
-  Pzint_render_hexagon = ^zint_render_hexagon;
-  zint_render_hexagon = record
-    x, y, width, height : Single;
-    next : Pzint_render_hexagon;   { Pointer to next hexagon }
-  end;
-
-  Pzint_render = ^zint_render;
-  zint_render = record
-    width, height : Single;
-    lines : Pzint_render_line;          { Pointer to first line }
-    strings : Pzint_render_string;      { Pointer to first string }
-    rings : Pzint_render_ring;          { Pointer to first ring }
-    hexagons : Pzint_render_hexagon;    { Pointer to first hexagon }
-  end;
-
   TZintCustomRenderTarget = class;
   TZintSymbol = class;
 
@@ -262,15 +226,15 @@ type
     FMicroQROptions : TZintMicroQROptions;
     FCode1Options : TZintCode1Options;
   public
+    //please use the following vars *ONLY* if you *REALLY* know, what you're doing
+    //otherwise use the properties of the RenderTarget or the TZintSymbol.???Options - properties
     symbology : Integer;
-    height : Integer;
     whitespace_width : Integer;
     border_width : Integer;
     output_options : Integer;
     option_1 : Integer;
     option_2 : Integer;
     option_3 : Integer;
-    show_hrt : Integer;
     input_mode : Integer;
     text : TArrayOfByte;
     rows : Integer;
@@ -279,17 +243,18 @@ type
     errtxt : TArrayOfChar;
     encoded_data : array[0..ZINT_ROWS_MAX - 1] of array[0..ZINT_COLS_MAX - 1] of Byte;
     row_height : array[0..ZINT_ROWS_MAX - 1] of Integer; { Largest symbol is 177x177 QR Code }
-    rendered : Pzint_render;
 
     constructor Create(); virtual;
     destructor Destroy; override;
 
     procedure Clear; virtual;
-    procedure ClearRendered; virtual;
 
     procedure Encode(AData : TArrayOfByte; ALength : Integer; ARaiseExceptions : Boolean = true); overload; virtual;
     procedure Encode(AData : String; ARaiseExceptions : Boolean = true); overload; virtual;
     procedure Render(ATarget : TZintCustomRenderTarget); virtual;
+
+    procedure InsertModuleRow(AIndex : Integer; ACount : Integer = 1; ASet : Boolean = false);
+    procedure InsertModuleCol(AIndex : Integer; ACount : Integer = 1; ASet : Boolean = false);
 
     //These are the functions from library.c
     class function gs1_compliant(_symbology : Integer) : Integer;
@@ -314,29 +279,183 @@ type
 
   zint_symbol = TZintSymbol;
 
-  TZintRenderAdjustMode = (ramNone, ramScaleBarcode, ramInflateImage);
+  TZintRenderAdjustMode = (ramScale, ramInflate);
+
+  { TZintRenderValue }
+
+  TZintRenderValue = class
+  protected
+    FTargetUnits : Single; //depends on the target; may be pixels, ...
+    FModules : Single; //will be used as multiplicator with the module[height|width]
+  public
+    constructor Create(); overload; virtual;
+
+    procedure IncTargetUnits(AValue : Single); virtual;
+    procedure IncModules(AValue : Single); virtual;
+    procedure DecTargetUnits(AValue : Single); virtual;
+    procedure DecModules(AValue : Single); virtual;
+  published
+    property TargetUnits : Single read FTargetUnits write FTargetUnits;
+    property Modules : Single read FModules write FModules;
+  end;
+
+  { TZintRenderBox }
+
+  TZintRenderBox = class
+  protected
+    FTop, FBottom, FLeft, FRight : TZintRenderValue;
+
+    function GetSum(AIndex : Integer) : Single;
+  public
+    constructor Create(); virtual;
+    destructor Destroy; override;
+    procedure SetModules(AValue : Single); virtual;
+    procedure SetTargetUnits(AValue : Single); virtual;
+    procedure AddModulesToTargetUnits(AModuleWidth, AModuleHeight : Single;
+                                      ATop : Boolean = true;
+                                      ABottom : Boolean = true;
+                                      ALeft : Boolean = true;
+                                      ARight : Boolean = true); virtual;
+    procedure RemoveModulesFromTargetUnits(AModuleWidth, AModuleHeight : Single;
+                                           ATop : Boolean = true;
+                                           ABottom : Boolean = true;
+                                           ALeft : Boolean = true;
+                                           ARight : Boolean = true); virtual;
+
+    property TopAndBottomTargetUnits : Single index 0 read GetSum;
+    property LeftAndRightTargetUnits : Single index 1 read GetSum;
+    property TopAndBottomModules : Single index 2 read GetSum;
+    property LeftAndRightModules : Single index 3 read GetSum;
+  published
+    property Top : TZintRenderValue read FTop;
+    property Bottom : TZintRenderValue read FBottom;
+    property Left : TZintRenderValue read FLeft;
+    property Right : TZintRenderValue read FRight;
+  end;
+
+  TZintRenderRect = record
+    X, Y, Width, Height : Single;
+  end;
+
+  TZintHAlign = (haLeft, haCenter, haRight);
+  TZintVAlign = (vaTop, vaCenter, vaBottom);
+
+  TZintClearBackgroundParams = TZintRenderRect;
+
+  TZintDrawRectParams = TZintRenderRect;
+
+  TZintDrawHexagonParams = TZintRenderRect;
+
+  TZintDrawRingParams = record
+    X, Y, OuterRadius, InnerRadius : Single;
+  end;
+
+  TZintDrawTextParams = record
+    X, Y, Width, Height : Single;
+    Text : String;
+  end;
+
+  TZintCalcTextHeightParams = record
+    Text : String;
+  end;
+
+  TZintCalcTextWidthParams = TZintCalcTextHeightParams;
+
+  TZintEANUPCFlag = (euEAN8, euEAN13, euUPCA, euUPCE, euAddon2, euAddon5);
+  TZintEANUPCFlags = set of TZintEANUPCFlag;
+
+  { TZintCustomRenderTarget }
 
   TZintCustomRenderTarget = class(TObject)
   protected
+    FSymbol : TZintSymbol;
+
+    FRowHeights : Integer; //sum of all rowheights measured in modules
+    FModuleWidth, FModuleHeight : Single;
+    FLargeBarCount : Integer; //count of rows, which height should be maximied
+    FLargeBarHeight : Single; //barheight of the rows, which height should be maximied
+    FTextSpacing : TZintRenderBox;
+    FHasText, FHasAddonText : Boolean;
+    FText, FAddonText : String;
+    FWhitespace : TZintRenderBox;
+    FMargin, FPadding, FBorder: TZintRenderBox;
+    FMarginBox, FBorderBox, FPaddingBox, FWhitespaceBox, FBarcodeBox, FTextSpacingBox, FTextBox : TZintRenderRect;
     FHexagonScale: Single;
     FTransparent: Boolean;
     FRenderAdjustMode : TZintRenderAdjustMode;
-    FHeightDesired : Single;
-    FWidthDesired  : Single;
-    FTop           : Single;
-    FLeft          : Single;
-    FMultiplikator : Single;
+    FHeightDesired, FWidthDesired, FWidth, FHeight : Single;
+    FYDesired, FXDesired, FY, FX : Single;
+    FTextHeight    : Single;
+    FMinModuleWidth : Single;
+    FHAlign : TZintHAlign;
+    FVAlign : TZintVAlign;
+    FStartTextBar : TZintRenderRect;
+    FTextDone : Boolean;
+    FEANUPCFlags : TZintEANUPCFlags;
+    FShowText : Boolean;
+    FLeadingTextWidth, FTrailingTextWidth : Single;
+
+    //these functions calculates the zero-based values to absolute values based on the ...Desired-Values and FWidth & FHeight
+    function CalcX(AValue : Single) : Single;
+    function CalcY(AValue : Single) : Single;
+
+    procedure AddSymbolOptions; virtual; //adds options from the symbol to this render target (border, whitespace, ...)
+    procedure RemoveSymbolOptions; virtual; //removes options from this render target previously added by AddSymbolOptions
+    procedure AddBoxModulesToTargetUnits; virtual;
+    procedure RemoveBoxModulesFromTargetUnits; virtual;
+    procedure FetchRowInfos; virtual; //search for large bars and sum up the heights of the rows
+    procedure CalcSize; virtual;
+    procedure CalcText; virtual;
+    procedure CalcTextEANUPC; virtual;
+    procedure CheckEANUPC; virtual;
+    procedure CalcLargeBarHeight; virtual;
+    procedure CalcBoxes; virtual;
+    procedure DrawBorder; virtual;
+    procedure DrawMaxiRings; virtual;
+    procedure DrawMaxiModules; virtual;
+    procedure DrawModules; virtual;
+    procedure DrawTexts; virtual;
+    procedure RenderStart; virtual;
+    procedure RenderStop; virtual;
+    procedure DrawStart; virtual;
+    procedure DrawStop; virtual;
+    procedure HandleSpecialBarsEANUPC(ABarIndex : Integer; var ABar : TZintDrawRectParams); virtual;
+    procedure Inflate(const ANewWidth, ANewHeight : Single); virtual; abstract;
+    procedure ClearBackground(const AParams : TZintClearBackgroundParams); virtual; abstract;
+    procedure DrawRect(const AParams : TZintDrawRectParams); virtual; abstract;
+    procedure DrawHexagon(const AParams : TZintDrawHexagonParams); virtual; abstract;
+    procedure DrawRing(const AParams : TZintDrawRingParams); virtual; abstract;
+    procedure DrawText(const AParams : TZintDrawTextParams); virtual; abstract;
+    function CalcTextHeight(const AParams : TZintCalcTextHeightParams) : Single; virtual; abstract;
+    function CalcTextWidth(const AParams : TZintCalcTextWidthParams) : Single; virtual; abstract;
   public
     constructor Create(); virtual;
     destructor Destroy; override;
     procedure Render(ASymbol : TZintSymbol); virtual;
-    property Top: Single read FTop write FTop;
-    property Left: Single read FLeft write FLeft;
+
+    property XDesired: Single read FXDesired write FXDesired;
+    property YDesired: Single read FYDesired write FYDesired;
     property HeightDesired: Single read FHeightDesired write FHeightDesired;
     property WidthDesired: Single read FWidthDesired write FWidthDesired;
+
+    property Y : Single read FY;
+    property X : Single read FX;
+    property Height : Single read FHeight;
+    property Width : Single read FWidth;
+
+  published
     property RenderAdjustMode : TZintRenderAdjustMode read FRenderAdjustMode write FRenderAdjustMode;
     property Transparent : Boolean read FTransparent write FTransparent;
     property HexagonScale : Single read FHexagonScale write FHexagonScale;
+    property Margin : TZintRenderBox read FMargin write FMargin;
+    property Padding : TZintRenderBox read FPadding write FPadding;
+    property Border : TZintRenderBox read FBorder write FBorder;
+    property TextSpacing : TZintRenderBox read FTextSpacing write FTextSpacing;
+    property Whitespace : TZintRenderBox read FWhitespace write FWhitespace;
+    property HAlign : TZintHAlign read FHAlign write FHAlign;
+    property VAlign : TZintVAlign read FVAlign write FVAlign;
+    property MinModuleWidth : Single read FMinModuleWidth write FMinModuleWidth; //will only be applied if RenderAdjustMode = ramInflate
+    property ShowText : Boolean read FShowText write FShowText;
   end;
 
 const
@@ -439,98 +558,95 @@ type
 
 const
   ZintSymbologies : array[0..83] of TZintBarcodeSymbologyEntry =
-     ((DisplayName : 'CODE11'; Symbology : BARCODE_CODE11),
-      (DisplayName : 'C25MATRIX'; Symbology : BARCODE_C25MATRIX),
-      (DisplayName : 'C25INTER'; Symbology : BARCODE_C25INTER),
-      (DisplayName : 'C25IATA'; Symbology : BARCODE_C25IATA),
-      (DisplayName : 'C25LOGIC'; Symbology : BARCODE_C25LOGIC),
-      (DisplayName : 'C25IND'; Symbology : BARCODE_C25IND),
-      (DisplayName : 'CODE39'; Symbology : BARCODE_CODE39),
-      (DisplayName : 'EXCODE39'; Symbology : BARCODE_EXCODE39),
-      (DisplayName : 'EANX'; Symbology : BARCODE_EANX),
-      (DisplayName : 'EAN128'; Symbology : BARCODE_EAN128),
-      (DisplayName : 'CODABAR'; Symbology : BARCODE_CODABAR),
-      (DisplayName : 'CODE128'; Symbology : BARCODE_CODE128),
-      (DisplayName : 'DPLEIT'; Symbology : BARCODE_DPLEIT),
-      (DisplayName : 'DPIDENT'; Symbology : BARCODE_DPIDENT),
-      (DisplayName : 'CODE16K'; Symbology : BARCODE_CODE16K),
-      (DisplayName : 'CODE49'; Symbology : BARCODE_CODE49),
-      (DisplayName : 'CODE93'; Symbology : BARCODE_CODE93),
-      (DisplayName : 'FLAT'; Symbology : BARCODE_FLAT),
-      (DisplayName : 'RSS14'; Symbology : BARCODE_RSS14),
-      (DisplayName : 'RSS_LTD'; Symbology : BARCODE_RSS_LTD),
-      (DisplayName : 'RSS_EXP'; Symbology : BARCODE_RSS_EXP),
-      (DisplayName : 'TELEPEN'; Symbology : BARCODE_TELEPEN),
-      (DisplayName : 'UPCA'; Symbology : BARCODE_UPCA),
-      (DisplayName : 'UPCE'; Symbology : BARCODE_UPCE),
-      (DisplayName : 'POSTNET'; Symbology : BARCODE_POSTNET),
-      (DisplayName : 'MSI_PLESSEY'; Symbology : BARCODE_MSI_PLESSEY),
+     ((DisplayName : 'Code 11'; Symbology : BARCODE_CODE11),
+      (DisplayName : 'Standard Code 2 of 5'; Symbology : BARCODE_C25MATRIX),
+      (DisplayName : 'Interleaved 2 of 5'; Symbology : BARCODE_C25INTER),
+      (DisplayName : 'Code 2 of 5 IATA'; Symbology : BARCODE_C25IATA),
+      (DisplayName : 'Code 2 of 5 Data Logic'; Symbology : BARCODE_C25LOGIC),
+      (DisplayName : 'Code 2 of 5 Industrial'; Symbology : BARCODE_C25IND),
+      (DisplayName : 'Code 3 of 9 (Code 39)'; Symbology : BARCODE_CODE39),
+      (DisplayName : 'Extended Code 3 of 9 (Code 39+)'; Symbology : BARCODE_EXCODE39),
+      (DisplayName : 'EAN'; Symbology : BARCODE_EANX),
+      (DisplayName : 'GS1-128 (UCC.EAN-128)'; Symbology : BARCODE_EAN128),
+      (DisplayName : 'Codabar'; Symbology : BARCODE_CODABAR),
+      (DisplayName : 'Code 128 (automatic subset switching)'; Symbology : BARCODE_CODE128),
+      (DisplayName : 'Deutsche Post Leitcode'; Symbology : BARCODE_DPLEIT),
+      (DisplayName : 'Deutsche Post Identcode'; Symbology : BARCODE_DPIDENT),
+      (DisplayName : 'Code 16K'; Symbology : BARCODE_CODE16K),
+      (DisplayName : 'Code 49'; Symbology : BARCODE_CODE49),
+      (DisplayName : 'Code 93'; Symbology : BARCODE_CODE93),
+      (DisplayName : 'Flattermarken'; Symbology : BARCODE_FLAT),
+      (DisplayName : 'GS1 DataBar-14'; Symbology : BARCODE_RSS14),
+      (DisplayName : 'GS1 DataBar Limited'; Symbology : BARCODE_RSS_LTD),
+      (DisplayName : 'GS1 DataBar Extended'; Symbology : BARCODE_RSS_EXP),
+      (DisplayName : 'Telepen Alpha'; Symbology : BARCODE_TELEPEN),
+      (DisplayName : 'UPC A'; Symbology : BARCODE_UPCA),
+      (DisplayName : 'UPC E'; Symbology : BARCODE_UPCE),
+      (DisplayName : 'PostNet'; Symbology : BARCODE_POSTNET),
+      (DisplayName : 'MSI Plessey'; Symbology : BARCODE_MSI_PLESSEY),
       (DisplayName : 'FIM'; Symbology : BARCODE_FIM),
       (DisplayName : 'LOGMARS'; Symbology : BARCODE_LOGMARS),
-      (DisplayName : 'PHARMA'; Symbology : BARCODE_PHARMA),
+      (DisplayName : 'Pharmacode One-Track'; Symbology : BARCODE_PHARMA),
       (DisplayName : 'PZN'; Symbology : BARCODE_PZN),
-      (DisplayName : 'PHARMA_TWO'; Symbology : BARCODE_PHARMA_TWO),
+      (DisplayName : 'Pharmacode Two-Track'; Symbology : BARCODE_PHARMA_TWO),
       (DisplayName : 'PDF417'; Symbology : BARCODE_PDF417),
-      (DisplayName : 'PDF417TRUNC'; Symbology : BARCODE_PDF417TRUNC),
-      (DisplayName : 'MAXICODE'; Symbology : BARCODE_MAXICODE),
-      (DisplayName : 'QRCODE'; Symbology : BARCODE_QRCODE),
-      (DisplayName : 'CODE128B'; Symbology : BARCODE_CODE128B),
-      (DisplayName : 'AUSPOST'; Symbology : BARCODE_AUSPOST),
-      (DisplayName : 'AUSREPLY'; Symbology : BARCODE_AUSREPLY),
-      (DisplayName : 'AUSROUTE'; Symbology : BARCODE_AUSROUTE),
-      (DisplayName : 'AUSREDIRECT'; Symbology : BARCODE_AUSREDIRECT),
-      (DisplayName : 'ISBNX'; Symbology : BARCODE_ISBNX),
-      (DisplayName : 'RM4SCC'; Symbology : BARCODE_RM4SCC),
-      (DisplayName : 'DATAMATRIX'; Symbology : BARCODE_DATAMATRIX),
-      (DisplayName : 'EAN14'; Symbology : BARCODE_EAN14),
+      (DisplayName : 'PDF417 Truncated'; Symbology : BARCODE_PDF417TRUNC),
+      (DisplayName : 'Maxicode'; Symbology : BARCODE_MAXICODE),
+      (DisplayName : 'QR Code'; Symbology : BARCODE_QRCODE),
+      (DisplayName : 'Code 128 (Subset B)'; Symbology : BARCODE_CODE128B),
+      (DisplayName : 'Australia Post Standard Customer'; Symbology : BARCODE_AUSPOST),
+      (DisplayName : 'Australia Post Reply Paid'; Symbology : BARCODE_AUSREPLY),
+      (DisplayName : 'Australia Post Routing'; Symbology : BARCODE_AUSROUTE),
+      (DisplayName : 'Australia Post Redirection'; Symbology : BARCODE_AUSREDIRECT),
+      (DisplayName : 'ISBN (EAN-13 with verification stage)'; Symbology : BARCODE_ISBNX),
+      (DisplayName : 'Royal Mail 4 State (RM4SCC)'; Symbology : BARCODE_RM4SCC),
+      (DisplayName : 'Data Matrix'; Symbology : BARCODE_DATAMATRIX),
+      (DisplayName : 'EAN-14'; Symbology : BARCODE_EAN14),
       (DisplayName : 'CODABLOCKF'; Symbology : BARCODE_CODABLOCKF),
-      (DisplayName : 'NVE18'; Symbology : BARCODE_NVE18),
-      (DisplayName : 'JAPANPOST'; Symbology : BARCODE_JAPANPOST),
-      (DisplayName : 'KOREAPOST'; Symbology : BARCODE_KOREAPOST),
-      (DisplayName : 'RSS14STACK'; Symbology : BARCODE_RSS14STACK),
-      (DisplayName : 'RSS14STACK_OMNI'; Symbology : BARCODE_RSS14STACK_OMNI),
-      (DisplayName : 'RSS_EXPSTACK'; Symbology : BARCODE_RSS_EXPSTACK),
+      (DisplayName : 'NVE-18'; Symbology : BARCODE_NVE18),
+      (DisplayName : 'Japanese Postal Code'; Symbology : BARCODE_JAPANPOST),
+      (DisplayName : 'Korea Post'; Symbology : BARCODE_KOREAPOST),
+      (DisplayName : 'GS1 DataBar-14 Stacked'; Symbology : BARCODE_RSS14STACK),
+      (DisplayName : 'GS1 DataBar-14 Stacked Omnidirectional'; Symbology : BARCODE_RSS14STACK_OMNI),
+      (DisplayName : 'GS1 DataBar Expanded Stacked'; Symbology : BARCODE_RSS_EXPSTACK),
       (DisplayName : 'PLANET'; Symbology : BARCODE_PLANET),
-      (DisplayName : 'MICROPDF417'; Symbology : BARCODE_MICROPDF417),
-      (DisplayName : 'ONECODE'; Symbology : BARCODE_ONECODE),
-      (DisplayName : 'PLESSEY'; Symbology : BARCODE_PLESSEY),
-      (DisplayName : 'TELEPEN_NUM'; Symbology : BARCODE_TELEPEN_NUM),
-      (DisplayName : 'ITF14'; Symbology : BARCODE_ITF14),
-      (DisplayName : 'KIX'; Symbology : BARCODE_KIX),
-      (DisplayName : 'AZTEC'; Symbology : BARCODE_AZTEC),
-      (DisplayName : 'DAFT'; Symbology : BARCODE_DAFT),
-      (DisplayName : 'MICROQR'; Symbology : BARCODE_MICROQR),
-      (DisplayName : 'HIBC_128'; Symbology : BARCODE_HIBC_128),
-      (DisplayName : 'HIBC_39'; Symbology : BARCODE_HIBC_39),
-      (DisplayName : 'HIBC_DM'; Symbology : BARCODE_HIBC_DM),
-      (DisplayName : 'HIBC_QR'; Symbology : BARCODE_HIBC_QR),
-      (DisplayName : 'HIBC_PDF'; Symbology : BARCODE_HIBC_PDF),
-      (DisplayName : 'HIBC_MICPDF'; Symbology : BARCODE_HIBC_MICPDF),
+      (DisplayName : 'MicroPDF417'; Symbology : BARCODE_MICROPDF417),
+      (DisplayName : 'USPS OneCode'; Symbology : BARCODE_ONECODE),
+      (DisplayName : 'Plessey Code'; Symbology : BARCODE_PLESSEY),
+      (DisplayName : 'Telepen Numeric'; Symbology : BARCODE_TELEPEN_NUM),
+      (DisplayName : 'ITF-14'; Symbology : BARCODE_ITF14),
+      (DisplayName : 'Dutch Post KIX Code'; Symbology : BARCODE_KIX),
+      (DisplayName : 'Aztec Code'; Symbology : BARCODE_AZTEC),
+      (DisplayName : 'DAFT Code'; Symbology : BARCODE_DAFT),
+      (DisplayName : 'Micro QR Code'; Symbology : BARCODE_MICROQR),
+      (DisplayName : 'HIBC Code 128'; Symbology : BARCODE_HIBC_128),
+      (DisplayName : 'HIBC Code 39'; Symbology : BARCODE_HIBC_39),
+      (DisplayName : 'HIBC Data Matrix'; Symbology : BARCODE_HIBC_DM),
+      (DisplayName : 'HIBC QR Code'; Symbology : BARCODE_HIBC_QR),
+      (DisplayName : 'HIBC PDF417'; Symbology : BARCODE_HIBC_PDF),
+      (DisplayName : 'HIBC MicroPDF417'; Symbology : BARCODE_HIBC_MICPDF),
       (DisplayName : 'HIBC_BLOCKF'; Symbology : BARCODE_HIBC_BLOCKF),
-      (DisplayName : 'HIBC_AZTEC'; Symbology : BARCODE_HIBC_AZTEC),
-      (DisplayName : 'AZRUNE'; Symbology : BARCODE_AZRUNE),
-      (DisplayName : 'CODE32'; Symbology : BARCODE_CODE32),
-      (DisplayName : 'EANX_CC'; Symbology : BARCODE_EANX_CC),
-      (DisplayName : 'EAN128_CC'; Symbology : BARCODE_EAN128_CC),
-      (DisplayName : 'RSS14_CC'; Symbology : BARCODE_RSS14_CC),
-      (DisplayName : 'RSS_LTD_CC'; Symbology : BARCODE_RSS_LTD_CC),
-      (DisplayName : 'RSS_EXP_CC'; Symbology : BARCODE_RSS_EXP_CC),
-      (DisplayName : 'UPCA_CC'; Symbology : BARCODE_UPCA_CC),
-      (DisplayName : 'UPCE_CC'; Symbology : BARCODE_UPCE_CC),
-      (DisplayName : 'RSS14STACK_CC'; Symbology : BARCODE_RSS14STACK_CC),
-      (DisplayName : 'RSS14_OMNI_CC'; Symbology : BARCODE_RSS14_OMNI_CC),
-      (DisplayName : 'RSS_EXPSTACK_CC'; Symbology : BARCODE_RSS_EXPSTACK_CC),
-      (DisplayName : 'CHANNEL'; Symbology : BARCODE_CHANNEL),
-      (DisplayName : 'CODEONE'; Symbology : BARCODE_CODEONE),
-      (DisplayName : 'GRIDMATRIX'; Symbology : BARCODE_GRIDMATRIX));
+      (DisplayName : 'HIBC Aztec Code'; Symbology : BARCODE_HIBC_AZTEC),
+      (DisplayName : 'Aztec Runes'; Symbology : BARCODE_AZRUNE),
+      (DisplayName : 'Code 32'; Symbology : BARCODE_CODE32),
+      (DisplayName : 'Composite Symbol with EAN linear component'; Symbology : BARCODE_EANX_CC),
+      (DisplayName : 'Composite Symbol with GS1-128 linear component'; Symbology : BARCODE_EAN128_CC),
+      (DisplayName : 'Composite Symbol with GS1 DataBar-14 linear component'; Symbology : BARCODE_RSS14_CC),
+      (DisplayName : 'Composite Symbol with GS1 DataBar Limited component'; Symbology : BARCODE_RSS_LTD_CC),
+      (DisplayName : 'Composite Symbol with GS1 DataBar Extended component'; Symbology : BARCODE_RSS_EXP_CC),
+      (DisplayName : 'Composite Symbol with UPC A linear component'; Symbology : BARCODE_UPCA_CC),
+      (DisplayName : 'Composite Symbol with UPC E linear component'; Symbology : BARCODE_UPCE_CC),
+      (DisplayName : 'Composite Symbol with GS1 DataBar-14 Stacked component'; Symbology : BARCODE_RSS14STACK_CC),
+      (DisplayName : 'Composite Symbol with GS1 DataBar-14 Stacked Omnidirectional component'; Symbology : BARCODE_RSS14_OMNI_CC),
+      (DisplayName : 'Composite Symbol with GS1 DataBar Expanded Stacked component'; Symbology : BARCODE_RSS_EXPSTACK_CC),
+      (DisplayName : 'Channel Code'; Symbology : BARCODE_CHANNEL),
+      (DisplayName : 'Code One'; Symbology : BARCODE_CODEONE),
+      (DisplayName : 'Grid Matrix'; Symbology : BARCODE_GRIDMATRIX));
 
 
-  BARCODE_NO_ASCII = 1;
   BARCODE_BIND = 2;
   BARCODE_BOX = 4;
-  BARCODE_STDOUT = 8;
   READER_INIT = 16;
-  SMALL_TEXT = 32;
 
   DATA_MODE = 0;
   UNICODE_MODE = 1;
@@ -546,19 +662,118 @@ const
   ZERROR_INVALID_CHECK = 7;
   ZERROR_INVALID_OPTION = 8;
   ZERROR_ENCODING_PROBLEM = 9;
-  ZERROR_FILE_ACCESS = 10;
-  ZERROR_MEMORY = 11;
 
 implementation
 
 uses zint_dmatrix, zint_code128, zint_gs1, zint_common, zint_2of5,
-  zint_render_, zint_helper, zint_aztec, zint_qr, zint_upcean,
+  zint_helper, zint_aztec, zint_qr, zint_upcean,
   zint_maxicode, zint_auspost, zint_code, zint_medical,
   zint_code16k, zint_code49, zint_pdf417, zint_composite, zint_gridmtx,
-  zint_plessey, zint_code1;
+  zint_plessey, zint_code1, zint_telepen, zint_postal, zint_imail, zint_rss;
 
 const
   TECHNETIUM : String = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%';
+
+const
+  EDesiredWithTooSmall = 'The desired width is too small.';
+  EDesiredHeightTooSmall = 'The desired height is too small.';
+
+{ TZintRenderValue }
+
+constructor TZintRenderValue.Create;
+begin
+  inherited;
+  Modules := 0;
+  TargetUnits := 0;
+end;
+
+procedure TZintRenderValue.IncTargetUnits(AValue: Single);
+begin
+  FTargetUnits := FTargetUnits + AValue;
+end;
+
+procedure TZintRenderValue.IncModules(AValue: Single);
+begin
+  FModules := FModules + AValue;
+end;
+
+procedure TZintRenderValue.DecTargetUnits(AValue: Single);
+begin
+  FTargetUnits := FTargetUnits - AValue;
+end;
+
+procedure TZintRenderValue.DecModules(AValue: Single);
+begin
+  FModules := FModules - AValue;
+end;
+
+{ TZintRenderBox }
+
+function TZintRenderBox.GetSum(AIndex: Integer): Single;
+begin
+  case AIndex of
+    0: Result := FTop.TargetUnits + FBottom.TargetUnits;
+    1: Result := FLeft.TargetUnits + FRight.TargetUnits;
+    2: Result := FTop.Modules + FBottom.Modules;
+    3: Result := FLeft.Modules + FRight.Modules;
+    else
+      Result := 0;
+  end;
+end;
+
+constructor TZintRenderBox.Create();
+begin
+  FTop := TZintRenderValue.Create();
+  FBottom := TZintRenderValue.Create();
+  FLeft := TZintRenderValue.Create();
+  FRight := TZintRenderValue.Create();
+end;
+
+destructor TZintRenderBox.Destroy;
+begin
+  FTop.Free;
+  FBottom.Free;
+  FLeft.Free;
+  FRight.Free;
+
+  inherited;
+end;
+
+procedure TZintRenderBox.SetModules(AValue: Single);
+begin
+  Top.Modules := AValue;
+  Bottom.Modules := AValue;
+  Left.Modules := AValue;
+  Right.Modules := AValue;
+end;
+
+procedure TZintRenderBox.SetTargetUnits(AValue: Single);
+begin
+  Top.TargetUnits := AValue;
+  Bottom.TargetUnits := AValue;
+  Left.TargetUnits := AValue;
+  Right.TargetUnits := AValue;
+end;
+
+procedure TZintRenderBox.AddModulesToTargetUnits(AModuleWidth,
+  AModuleHeight: Single; ATop, ABottom, ALeft, ARight : Boolean);
+begin
+  //the modules stays untouched, because we need them later to rollback this action
+  if ATop then Top.IncTargetUnits(Top.Modules * AModuleHeight);
+  if ABottom then Bottom.IncTargetUnits(Bottom.Modules * AModuleHeight);
+  if ALeft then Left.IncTargetUnits(Left.Modules * AModuleWidth);
+  if ARight then Right.IncTargetUnits(Right.Modules * AModuleWidth);
+end;
+
+procedure TZintRenderBox.RemoveModulesFromTargetUnits(AModuleWidth,
+  AModuleHeight: Single; ATop, ABottom, ALeft, ARight : Boolean);
+begin
+  //rollback what we've done in TransferFromModulesToTargetUnits
+  if ATop then Top.DecTargetUnits(Top.Modules * AModuleHeight);
+  if ABottom then Bottom.DecTargetUnits(Bottom.Modules * AModuleHeight);
+  if ALeft then Left.DecTargetUnits(Left.Modules * AModuleWidth);
+  if ARight then Right.DecTargetUnits(Right.Modules * AModuleWidth);
+end;
 
 { TZintCode1Options }
 
@@ -1159,56 +1374,13 @@ begin
 		for j := 0 to width - 1 do
 			unset_module(Self, i, j);
 
+  for i := Low(row_height) to High(row_height) do
+    row_height[i] := 0;
+
 	rows := 0;
 	width := 0;
 	ustrcpy(text, '');
 	strcpy(errtxt, '');
-end;
-
-procedure TZintSymbol.ClearRendered;
-var
-  current_line, next_line : Pzint_render_line;
-  current_string, next_string : Pzint_render_string;
-  current_ring, next_ring : Pzint_render_ring;
-  current_hexagon, next_hexagon : Pzint_render_hexagon;
-begin
-  if Assigned(rendered) then
-  begin
-    next_line := rendered^.lines;
-    while Assigned(next_line) do
-    begin
-      current_line := next_line;
-      next_line := current_line^.next;
-      Dispose(current_line);
-    end;
-
-    next_string := rendered^.strings;
-    while Assigned(next_string) do
-    begin
-      current_string := next_string;
-      next_string := current_string^.next;
-      current_string^.text := '';
-      Dispose(current_string);
-    end;
-
-    next_ring := rendered^.rings;
-    while Assigned(next_ring) do
-    begin
-      current_ring := next_ring;
-      next_ring := current_ring^.next;
-      Dispose(current_ring);
-    end;
-
-    next_hexagon := rendered^.hexagons;
-    while Assigned(next_hexagon) do
-    begin
-      current_hexagon := next_hexagon;
-      next_hexagon := current_hexagon^.next;
-      Dispose(current_hexagon);
-    end;
-
-    Dispose(rendered);
-  end;
 end;
 
 constructor TZintSymbol.Create;
@@ -1220,7 +1392,6 @@ begin
   SetLength(errtxt, 100);
 
   symbology := BARCODE_CODE128;
-	height := 0;
 	whitespace_width := 0;
 	border_width := 0;
   output_options := 0;
@@ -1229,10 +1400,8 @@ begin
 	option_1 := -1;
 	option_2 := 0;
 	option_3 := 928; // PDF_MAX
-	show_hrt := 1; // Show human readable text
 	input_mode := DATA_MODE;
 	strcpy(primary, '');
-  rendered := nil;
 
   FMSIPlesseyOptions := TZintMSIPlessyOptions.Create(Self);
   FExtCode39Options := TZintExtCode39Options.Create(Self);
@@ -1249,7 +1418,6 @@ end;
 destructor TZintSymbol.Destroy;
 begin
   Clear;
-  ClearRendered;
 
   FMSIPlesseyOptions.Free;
   FExtCode39Options.Free;
@@ -1267,8 +1435,11 @@ end;
 
 procedure TZintSymbol.Encode(AData: TArrayOfByte; ALength : Integer; ARaiseExceptions : Boolean);
 begin
-  if (ZBarcode_Encode(Self, AData, ALength) >= ZERROR_TOO_LONG) and ARaiseExceptions then
-    raise Exception.Create(PChar(@self.errtxt[0]));
+  if (ZBarcode_Encode(Self, AData, ALength) >= ZERROR_TOO_LONG) then
+  begin
+    if ARaiseExceptions then
+      raise Exception.Create(PChar(@self.errtxt[0]));
+  end;
 end;
 
 procedure TZintSymbol.Encode(AData: String; ARaiseExceptions: Boolean);
@@ -1511,30 +1682,30 @@ begin
 		BARCODE_NVE18: error_number := nve_18(symbol, preprocessed, _length);
 		BARCODE_CODE11: error_number := code_11(symbol, preprocessed, _length);
 		BARCODE_MSI_PLESSEY: error_number := msi_handle(symbol, preprocessed, _length);
-		//BARCODE_TELEPEN: error_number := telepen(symbol, preprocessed, _length);
-		//BARCODE_TELEPEN_NUM: error_number := telepen_num(symbol, preprocessed, _length);
+		BARCODE_TELEPEN: error_number := telepen(symbol, preprocessed, _length);
+		BARCODE_TELEPEN_NUM: error_number := telepen_num(symbol, preprocessed, _length);
 		BARCODE_PHARMA: error_number := pharma_one(symbol, preprocessed, _length);
 		BARCODE_PLESSEY: error_number := plessey(symbol, preprocessed, _length);
 		BARCODE_ITF14: error_number := itf14(symbol, preprocessed, _length);
-		//BARCODE_FLAT: error_number := flattermarken(symbol, preprocessed, _length);
-		//BARCODE_FIM: error_number := fim(symbol, preprocessed, _length);
-		//BARCODE_POSTNET: error_number := post_plot(symbol, preprocessed, _length);
-		//BARCODE_PLANET: error_number := planet_plot(symbol, preprocessed, _length);
-		//BARCODE_RM4SCC: error_number := royal_plot(symbol, preprocessed, _length);
+		BARCODE_FLAT: error_number := flattermarken(symbol, preprocessed, _length);
+		BARCODE_FIM: error_number := fim(symbol, preprocessed, _length);
+		BARCODE_POSTNET: error_number := post_plot(symbol, preprocessed, _length);
+		BARCODE_PLANET: error_number := planet_plot(symbol, preprocessed, _length);
+		BARCODE_RM4SCC: error_number := royal_plot(symbol, preprocessed, _length);
 		BARCODE_AUSPOST: error_number := australia_post(symbol, preprocessed, _length);
 		BARCODE_AUSREPLY: error_number := australia_post(symbol, preprocessed, _length);
 		BARCODE_AUSROUTE: error_number := australia_post(symbol, preprocessed, _length);
 		BARCODE_AUSREDIRECT: error_number := australia_post(symbol, preprocessed, _length);
 		BARCODE_CODE16K: error_number := code16k(symbol, preprocessed, _length);
 		BARCODE_PHARMA_TWO: error_number := pharma_two(symbol, preprocessed, _length);
-		//BARCODE_ONECODE: error_number := imail(symbol, preprocessed, _length);
+		BARCODE_ONECODE: error_number := imail(symbol, preprocessed, _length);
 		BARCODE_ISBNX: error_number := eanx(symbol, preprocessed, _length);
-		//BARCODE_RSS14: error_number := rss14(symbol, preprocessed, _length);
-		//BARCODE_RSS14STACK: error_number := rss14(symbol, preprocessed, _length);
-		//BARCODE_RSS14STACK_OMNI: error_number := rss14(symbol, preprocessed, _length);
-		//BARCODE_RSS_LTD: error_number := rsslimited(symbol, preprocessed, _length);
-		//BARCODE_RSS_EXP: error_number := rssexpanded(symbol, preprocessed, _length);
-		//BARCODE_RSS_EXPSTACK: error_number := rssexpanded(symbol, preprocessed, _length);
+		BARCODE_RSS14: error_number := rss14(symbol, preprocessed, _length);
+		BARCODE_RSS14STACK: error_number := rss14(symbol, preprocessed, _length);
+		BARCODE_RSS14STACK_OMNI: error_number := rss14(symbol, preprocessed, _length);
+		BARCODE_RSS_LTD: error_number := rsslimited(symbol, preprocessed, _length);
+		BARCODE_RSS_EXP: error_number := rssexpanded(symbol, preprocessed, _length);
+		BARCODE_RSS_EXPSTACK: error_number := rssexpanded(symbol, preprocessed, _length);
 		BARCODE_EANX_CC: error_number := composite(symbol, preprocessed, _length);
 		BARCODE_EAN128_CC: error_number := composite(symbol, preprocessed, _length);
 		BARCODE_RSS14_CC: error_number := composite(symbol, preprocessed, _length);
@@ -1545,20 +1716,20 @@ begin
 		BARCODE_RSS14STACK_CC: error_number := composite(symbol, preprocessed, _length);
 		BARCODE_RSS14_OMNI_CC: error_number := composite(symbol, preprocessed, _length);
 		BARCODE_RSS_EXPSTACK_CC: error_number := composite(symbol, preprocessed, _length);
-		//BARCODE_KIX: error_number := kix_code(symbol, preprocessed, _length);
+		BARCODE_KIX: error_number := kix_code(symbol, preprocessed, _length);
 		BARCODE_CODE32: error_number := code32(symbol, preprocessed, _length);
-		//BARCODE_DAFT: error_number := daft_code(symbol, preprocessed, _length);
+		BARCODE_DAFT: error_number := daft_code(symbol, preprocessed, _length);
 		BARCODE_EAN14: error_number := ean_14(symbol, preprocessed, _length);
 		BARCODE_AZRUNE: error_number := aztec_runes(symbol, preprocessed, _length);
-		//BARCODE_KOREAPOST: error_number := korea_post(symbol, preprocessed, _length);
-		//BARCODE_HIBC_128: error_number := hibc(symbol, preprocessed, _length);
-		//BARCODE_HIBC_39: error_number := hibc(symbol, preprocessed, _length);
+		BARCODE_KOREAPOST: error_number := korea_post(symbol, preprocessed, _length);
+		BARCODE_HIBC_128: error_number := hibc(symbol, preprocessed, _length);
+		BARCODE_HIBC_39: error_number := hibc(symbol, preprocessed, _length);
 		BARCODE_HIBC_DM: error_number := hibc(symbol, preprocessed, _length);
 		BARCODE_HIBC_QR: error_number := hibc(symbol, preprocessed, _length);
-		//BARCODE_HIBC_PDF: error_number := hibc(symbol, preprocessed, _length);
-		//BARCODE_HIBC_MICPDF: error_number := hibc(symbol, preprocessed, _length);
+		BARCODE_HIBC_PDF: error_number := hibc(symbol, preprocessed, _length);
+		BARCODE_HIBC_MICPDF: error_number := hibc(symbol, preprocessed, _length);
 		BARCODE_HIBC_AZTEC: error_number := hibc(symbol, preprocessed, _length);
-		//BARCODE_JAPANPOST: error_number := japan_post(symbol, preprocessed, _length);
+		BARCODE_JAPANPOST: error_number := japan_post(symbol, preprocessed, _length);
 		BARCODE_CODE49: error_number := code_49(symbol, preprocessed, _length);
 		BARCODE_CHANNEL: error_number := channel_code(symbol, preprocessed, _length);
 		BARCODE_CODEONE: error_number := code_one(symbol, preprocessed, _length);
@@ -1575,9 +1746,65 @@ end;
 
 procedure TZintSymbol.Render(ATarget : TZintCustomRenderTarget);
 begin
-  ClearRendered;
-  render_plot(Self, ATarget.FWidthDesired, ATarget.FHeightDesired);
   ATarget.Render(Self);
+end;
+
+procedure TZintSymbol.InsertModuleRow(AIndex: Integer; ACount : Integer; ASet: Boolean);
+var
+  i, j : Integer;
+begin
+  for i := rows - 1 downto AIndex do
+  begin
+    for j := 0 to width - 1 do
+    begin
+      if module_is_set(Self, i, j) <> 0 then
+        set_module(Self, i + ACount, j)
+      else
+        unset_module(Self, i + ACount, j);
+    end;
+  end;
+
+  for i := AIndex to AIndex + ACount - 1 do
+  begin
+    for j := 0 to width - 1 do
+    begin
+      if ASet then
+        set_module(Self, i, j)
+      else
+        unset_module(Self, i, j);
+    end;
+  end;
+
+  Inc(rows, ACount);
+end;
+
+procedure TZintSymbol.InsertModuleCol(AIndex: Integer; ACount: Integer; ASet: Boolean);
+var
+  i, j : Integer;
+begin
+  for i := 0 to rows - 1 do
+  begin
+    for j := width - 1 downto AIndex do
+    begin
+      if module_is_set(Self, i, j) <> 0 then
+        set_module(Self, i, j + ACount)
+      else
+        unset_module(Self, i, j + ACount);
+    end;
+  end;
+
+  for i := 0 to rows - 1 do
+  begin
+    for j := AIndex to AIndex + ACount - 1 do
+    begin
+      if ASet then
+        set_module(Self, i, j)
+      else
+        unset_module(Self, i, j);
+    end;
+  end;
+
+  Inc(width, ACount);
 end;
 
 class function TZintSymbol.ZBarcode_Encode(symbol : TZintSymbol; source : TArrayOfByte; _length : Integer) : Integer;
@@ -1693,34 +1920,776 @@ begin
 		error_number := error_buffer;
 
 	error_tag(symbol.errtxt, error_number);
-	{printf('%s\n',symbol.text);}
 	result := error_number; exit;
 end;
 
 { TZintCustomRenderTarget }
 
+function TZintCustomRenderTarget.CalcX(AValue: Single): Single;
+begin
+  case FHAlign of
+    haLeft : Result := FXDesired + AValue;
+    haCenter : Result := (FWidthDesired - FWidth) / 2 + AValue;
+    haRight : Result := FWidthDesired - FWidth + AValue;
+  end;
+end;
+
+function TZintCustomRenderTarget.CalcY(AValue: Single): Single;
+begin
+  case FVAlign of
+    vaTop : Result := FYDesired + AValue;
+    vaCenter : Result := (FHeightDesired - FHeight) / 2 + AValue;
+    vaBottom : Result := FHeightDesired - FHeight + AValue;
+  end;
+end;
+
+procedure TZintCustomRenderTarget.AddSymbolOptions;
+begin
+  FWhitespace.Left.IncModules(FSymbol.whitespace_width);
+  FWhitespace.Right.IncModules(FSymbol.whitespace_width);
+
+  if FSymbol.output_options and (BARCODE_BIND or BARCODE_BOX) <> 0 then
+  begin
+    FBorder.Top.IncModules(FSymbol.border_width);
+    FBorder.Bottom.IncModules(FSymbol.border_width);
+  end;
+
+  if FSymbol.output_options and BARCODE_BOX <> 0 then
+  begin
+    FBorder.Left.IncModules(FSymbol.border_width);
+    FBorder.Right.IncModules(FSymbol.border_width);
+  end;
+end;
+
+procedure TZintCustomRenderTarget.RemoveSymbolOptions;
+begin
+  FWhitespace.Left.DecModules(FSymbol.whitespace_width);
+  FWhitespace.Right.DecModules(FSymbol.whitespace_width);
+
+  if FSymbol.output_options and (BARCODE_BIND or BARCODE_BOX) <> 0 then
+  begin
+    FBorder.Top.DecModules(FSymbol.border_width);
+    FBorder.Bottom.DecModules(FSymbol.border_width);
+  end;
+
+  if FSymbol.output_options and BARCODE_BOX <> 0 then
+  begin
+    FBorder.Left.DecModules(FSymbol.border_width);
+    FBorder.Right.DecModules(FSymbol.border_width);
+  end;
+end;
+
+procedure TZintCustomRenderTarget.AddBoxModulesToTargetUnits;
+begin
+  FMargin.AddModulesToTargetUnits(FModuleWidth, FModuleHeight);
+  FBorder.AddModulesToTargetUnits(FModuleWidth, FModuleHeight);
+  FPadding.AddModulesToTargetUnits(FModuleWidth, FModuleHeight);
+  FWhitespace.AddModulesToTargetUnits(FModuleWidth, FModuleHeight);
+  //i'm sorry, but left and right textspace can only be set in targetunits
+  FTextSpacing.AddModulesToTargetUnits(FModuleWidth, FModuleHeight, true, true, false, false);
+end;
+
+procedure TZintCustomRenderTarget.RemoveBoxModulesFromTargetUnits;
+begin
+  FMargin.RemoveModulesFromTargetUnits(FModuleWidth, FModuleHeight);
+  FBorder.RemoveModulesFromTargetUnits(FModuleWidth, FModuleHeight);
+  FPadding.RemoveModulesFromTargetUnits(FModuleWidth, FModuleHeight);
+  FWhitespace.RemoveModulesFromTargetUnits(FModuleWidth, FModuleHeight);
+  FTextSpacing.RemoveModulesFromTargetUnits(FModuleWidth, FModuleHeight, true, true, false, false);
+end;
+
+procedure TZintCustomRenderTarget.FetchRowInfos;
+var
+  idx : Integer;
+begin
+  FRowHeights := 0;
+  FLargeBarCount := 0;
+
+  for idx := 0 to FSymbol.rows - 1 do
+  begin
+    FRowHeights := FRowHeights + FSymbol.row_height[idx];
+    if FSymbol.row_height[idx] = 0 then
+      Inc(FLargeBarCount)
+  end;
+end;
+
+procedure TZintCustomRenderTarget.CalcSize;
+var
+  BarcodeSpace,
+  Modules,
+  ExtraModules: Single;
+  FModuleHWRatio : Single;
+
+  function CalcModulesWidth : Single;
+  begin
+    Result := FSymbol.width +
+              FWhitespace.LeftAndRightModules +
+              FPadding.LeftAndRightModules +
+              FBorder.LeftAndRightModules +
+              FMargin.LeftAndRightModules;
+  end;
+
+begin
+  if FSymbol.symbology = BARCODE_MAXICODE then
+    FModuleHWRatio := 2 / sqrt(3)
+  else
+    FModuleHWRatio := 1;
+
+  FWidth := FWidthDesired;
+  Modules := CalcModulesWidth;
+
+  BarcodeSpace := (FWidthDesired -
+                   FWhitespace.LeftAndRightTargetUnits -
+                   FPadding.LeftAndRightTargetUnits -
+                   FBorder.LeftAndRightTargetUnits -
+                   FMargin.LeftAndRightTargetUnits);
+
+  if BarcodeSpace <= 0 then //if the desired width is too small ...
+  begin
+    if FRenderAdjustMode <> ramInflate then //... and we can't inflate the image ...
+      raise Exception.Create(EDesiredWithTooSmall) //... then we can go home ;)
+    else
+    begin
+      FWidth := FMargin.LeftAndRightTargetUnits +
+                FBorder.LeftAndRightTargetUnits +
+                FPadding.LeftAndRightTargetUnits +
+                FWhitespace.LeftAndRightTargetUnits;
+      if FMinModuleWidth > 0 then //if there is a MinModuleWidth, we care about it, in order to waive a Inflate()
+        BarcodeSpace := Modules * FMinModuleWidth
+      else
+        BarcodeSpace := Modules;
+      FWidth := FWidth + BarcodeSpace;
+      Inflate(FWidth, FHeightDesired);
+      FWidthDesired := FWidth;
+    end;
+  end;
+
+  FModuleWidth := BarcodeSpace / Modules;
+
+  //if there is a minimum ModuleWidth defined, we have to care about it
+  if (FMinModuleWidth > 0) and
+     (FModuleWidth < FMinModuleWidth) and
+     (FRenderAdjustMode = ramInflate) then
+  begin
+    FWidth := FWidth * (FMinModuleWidth / FModuleWidth);
+    Inflate(FWidth, FHeightDesired);
+    FWidthDesired := FWidth;
+    FModuleWidth := FMinModuleWidth;
+  end;
+
+  //lets go on with the height
+  FModuleHeight := FModuleWidth * FModuleHWRatio;
+
+  //we need 2 vars, because Maxicode has a special height calculation
+  Modules := FRowHeights + FLargeBarCount;
+  ExtraModules := FWhitespace.TopAndBottomModules +
+                  FPadding.TopAndBottomModules +
+                  FBorder.TopAndBottomModules +
+                  FMargin.TopAndBottomModules;
+  if FHasText and FShowText then
+    ExtraModules := ExtraModules +
+                    FTextSpacing.TopAndBottomModules;
+
+  BarcodeSpace := FHeightDesired -
+                  FWhitespace.TopAndBottomTargetUnits -
+                  FPadding.TopAndBottomTargetUnits -
+                  FBorder.TopAndBottomTargetUnits -
+                  FMargin.TopAndBottomTargetUnits;
+  if FHasText and FShowText then
+    BarcodeSpace := BarcodeSpace -
+                    FTextSpacing.TopAndBottomTargetUnits -
+                    FTextHeight;
+
+  //calc the minium height
+  if FSymbol.symbology = BARCODE_MAXICODE then
+  begin
+    FHeight := Modules * FModuleHeight * 0.75 +
+               FModuleHeight * 0.25 +
+               ExtraModules * FModuleHeight +
+               FWhitespace.TopAndBottomTargetUnits +
+               FPadding.TopAndBottomTargetUnits +
+               FBorder.TopAndBottomTargetUnits +
+               FMargin.TopAndBottomTargetUnits;
+  end
+  else
+  begin
+    FHeight := (Modules + ExtraModules) * FModuleHeight +
+               FWhitespace.TopAndBottomTargetUnits +
+               FPadding.TopAndBottomTargetUnits +
+               FBorder.TopAndBottomTargetUnits +
+               FMargin.TopAndBottomTargetUnits;
+    if FHasText and FShowText then
+      FHeight := FHeight +
+                 FTextHeight +
+                 FTextSpacing.TopAndBottomTargetUnits;
+  end;
+
+  if BarcodeSpace <= 0 then //if the desired height is too small ...
+  begin
+    if FRenderAdjustMode <> ramInflate then //... and we can't inflate the image ...
+      raise Exception.Create(EDesiredHeightTooSmall) //... then we can go home ;)
+    else
+    begin
+      Inflate(FWidth, FHeight);
+      FHeightDesired := FHeight;
+      BarcodeSpace := Modules * FModuleHeight;
+    end;
+  end;
+
+  if FHeight > FHeightDesired then
+  begin
+    case FRenderAdjustMode of
+      ramInflate:
+      begin
+        Inflate(FWidth, FHeight);
+        FHeightDesired := FHeight;
+      end;
+      ramScale:
+      begin
+        //starting from the height, we have to recalc the width
+        if FSymbol.symbology = BARCODE_MAXICODE then
+          FModuleHeight := BarcodeSpace / (Modules * 0.75 + 0.25 + ExtraModules)
+        else
+          FModuleHeight := BarcodeSpace / (Modules + ExtraModules);
+        FModuleWidth := FModuleHeight / FModuleHWRatio;
+        Modules := CalcModulesWidth;
+        FWidth := Modules * FModuleWidth +
+                  FWhitespace.LeftAndRightTargetUnits +
+                  FPadding.LeftAndRightTargetUnits +
+                  FBorder.LeftAndRightTargetUnits +
+                  FMargin.LeftAndRightTargetUnits;
+        FHeight := FHeightDesired;
+      end;
+    end;
+  end
+  else
+  if (FSymbol.symbology <> BARCODE_MAXICODE) and (FLargeBarCount > 0) then
+    FHeight := FHeightDesired;
+end;
+
+procedure TZintCustomRenderTarget.CalcText;
+var
+  idx : Integer;
+  CTHP : TZintCalcTextHeightParams;
+  CTWP : TZintCalcTextHeightParams;
+begin
+  FHasText := ustrlen(FSymbol.text) > 0;
+  if FHasText then
+    FText := ArrayOfByteToString(FSymbol.text)
+  else
+    FText := '';
+
+  idx := Pos('+', FText);
+  FHasAddonText := (is_extendable(FSymbol.symbology) <> 0) and (idx > 0);
+  if FHasAddonText then
+  begin
+    FAddonText := Copy(FText, idx + 1, Length(FText) - idx);
+    FText := Copy(FText, 1, idx - 1);
+  end
+  else
+    FAddonText := '';
+
+  if FShowText and FHasText then
+  begin
+    CTHP.Text := FText;
+    FTextHeight := CalcTextHeight(CTHP);
+  end
+  else
+  begin
+    FTextHeight := 0;
+  end;
+end;
+
+procedure TZintCustomRenderTarget.CalcTextEANUPC;
+var
+  CTWP : TZintCalcTextWidthParams;
+begin
+  if (euEAN13 in FEANUPCFlags) or
+     (euUPCA in FEANUPCFlags) or
+     (euUPCE in FEANUPCFlags) then
+  begin
+    CTWP.Text := Copy(FText, 1, 1);
+    FLeadingTextWidth := CalcTextWidth(CTWP);
+    if FWhitespace.Left.TargetUnits < FLeadingTextWidth + FTextSpacing.Right.TargetUnits then
+      FWhitespace.Left.TargetUnits := FLeadingTextWidth + FTextSpacing.Right.TargetUnits;
+  end
+  else
+    FLeadingTextWidth := 0;
+
+  if (euUPCA in FEANUPCFlags) or
+     (euUPCE in FEANUPCFlags) then
+  begin
+    CTWP.Text := Copy(FText, Length(FText), 1);
+    FTrailingTextWidth := CalcTextWidth(CTWP);
+    //if there is no addon, we have to increase the whitespace (maybe)
+    if (not ((euAddon2 in FEANUPCFlags) or (euAddon5 in FEANUPCFlags))) and
+       (FWhitespace.Right.TargetUnits < FTrailingTextWidth + FTextSpacing.Left.TargetUnits) then
+      FWhitespace.Right.TargetUnits := FTrailingTextWidth + FTextSpacing.Left.TargetUnits;
+  end
+  else
+    FTrailingTextWidth := 0;
+end;
+
+procedure TZintCustomRenderTarget.CheckEANUPC;
+begin
+  FEANUPCFlags := [];
+
+  if ((FSymbol.symbology in [BARCODE_EANX, BARCODE_UPCA, BARCODE_UPCE]) and (FSymbol.rows = 1)) or
+     (FSymbol.symbology in [BARCODE_EANX_CC, BARCODE_ISBNX, BARCODE_UPCA_CC, BARCODE_UPCE_CC]) then
+  begin
+    if FHasText then
+    begin
+      case FSymbol.symbology of
+        BARCODE_EANX, BARCODE_EANX_CC, BARCODE_ISBNX:
+        begin
+          if Length(FText) = 8 then Include(FEANUPCFlags, euEAN8);
+          if Length(FText) = 13 then Include(FEANUPCFlags, euEAN13);
+        end;
+        BARCODE_UPCA, BARCODE_UPCA_CC: Include(FEANUPCFlags, euUPCA);
+        BARCODE_UPCE, BARCODE_UPCE_CC: Include(FEANUPCFlags, euUPCE);
+      end;
+    end;
+    if FHasAddonText then
+    begin
+      if Length(FAddonText) = 2 then Include(FEANUPCFlags, euAddon2);
+      if Length(FAddonText) = 5 then Include(FEANUPCFlags, euAddon5);
+    end;
+  end;
+end;
+
+procedure TZintCustomRenderTarget.CalcLargeBarHeight;
+begin
+  if FLargeBarCount > 0 then
+    FLargeBarHeight := (FBarcodeBox.Height - FRowHeights * FModuleHeight) / FLargeBarCount;
+end;
+
+procedure TZintCustomRenderTarget.CalcBoxes;
+begin
+  FX := CalcX(0);
+  FY := CalcY(0);
+
+  FMarginBox.X := FX;
+  FMarginBox.Y := FY;
+  FMarginBox.Width := FWidth;
+  FMarginBox.Height := FHeight;
+
+  FBorderBox.X := FMarginBox.X + FMargin.Left.TargetUnits;
+  FBorderBox.Y := FMarginBox.Y + FMargin.Top.TargetUnits;
+  FBorderBox.Width := FMarginBox.Width - FMargin.Left.TargetUnits - FMargin.Right.TargetUnits;
+  FBorderBox.Height := FMarginBox.Height - FMargin.Top.TargetUnits - FMargin.Bottom.TargetUnits;
+
+  FPaddingBox.X := FBorderBox.X + FBorder.Left.TargetUnits;
+  FPaddingBox.Y := FBorderBox.Y + FBorder.Top.TargetUnits;
+  FPaddingBox.Width := FBorderBox.Width - FBorder.Left.TargetUnits - FBorder.Right.TargetUnits;
+  FPaddingBox.Height := FBorderBox.Height - FBorder.Top.TargetUnits - FBorder.Bottom.TargetUnits;
+
+  FWhitespaceBox.X := FPaddingBox.X + FPadding.Left.TargetUnits;
+  FWhitespaceBox.Y := FPaddingBox.Y + FPadding.Top.TargetUnits;
+  FWhitespaceBox.Width := FPaddingBox.Width - FPadding.Left.TargetUnits - FPadding.Right.TargetUnits;
+  FWhitespaceBox.Height := FPaddingBox.Height - FPadding.Top.TargetUnits - FPadding.Bottom.TargetUnits -
+                           FTextHeight - FTextSpacing.Bottom.TargetUnits - FTextSpacing.Top.TargetUnits;
+
+  FTextspacingBox.X := FWhitespaceBox.X;
+  FTextspacingBox.Y := FWhitespaceBox.Y + FWhitespaceBox.Height;
+  FTextspacingBox.Width := FWhitespaceBox.Width;
+  FTextspacingBox.Height := FTextSpacing.Top.TargetUnits + FTextHeight + FTextSpacing.Bottom.TargetUnits;
+
+  FTextBox.X := FTextspacingBox.X + FTextSpacing.Left.TargetUnits;
+  FTextBox.Y := FTextspacingBox.Y + FTextSpacing.Top.TargetUnits;
+  FTextBox.Width := FTextspacingBox.Width - FTextSpacing.Left.TargetUnits - FTextSpacing.Right.TargetUnits;
+  FTextBox.Height := FTextSpacingBox.Height - FTextSpacing.Top.TargetUnits - FTextSpacing.Bottom.TargetUnits;
+
+  FBarcodeBox.X := FWhitespaceBox.X + FWhitespace.Left.TargetUnits;
+  FBarcodeBox.Y := FWhitespaceBox.Y + FWhitespace.Top.TargetUnits;
+  FBarcodeBox.Width := FWhitespaceBox.Width - FWhitespace.Left.TargetUnits - FWhitespace.Right.TargetUnits;
+  FBarcodeBox.Height := FWhitespaceBox.Height - FWhitespace.Top.TargetUnits - FWhitespace.Bottom.TargetUnits;
+end;
+
+procedure TZintCustomRenderTarget.DrawBorder;
+var
+  DRP : TZintDrawRectParams;
+begin
+  if FBorder.Top.TargetUnits > 0 then
+  begin
+    DRP.X := FBorderBox.X;
+    DRP.Y := FBorderBox.Y;
+    DRP.Width := FBorderBox.Width;
+    DRP.Height := FBorder.Top.TargetUnits;
+    DrawRect(DRP);
+  end;
+
+  if FBorder.Bottom.TargetUnits > 0 then
+  begin
+    DRP.X := FBorderBox.X;
+    DRP.Y := FBorderBox.Y + FBorderBox.Height - FBorder.Bottom.TargetUnits;
+    DRP.Width := FBorderBox.Width;
+    DRP.Height := FBorder.Bottom.TargetUnits;
+    DrawRect(DRP);
+  end;
+
+  if FBorder.Left.TargetUnits > 0 then
+  begin
+    DRP.X := FBorderBox.X;
+    DRP.Y := FBorderBox.Y;
+    DRP.Width := FBorder.Left.TargetUnits;
+    DRP.Height := FBorderBox.Height;
+    DrawRect(DRP);
+  end;
+
+  if FBorder.Right.TargetUnits > 0 then
+  begin
+    DRP.X := FBorderBox.X + FBorderBox.Width - FBorder.Right.TargetUnits;
+    DRP.Y := FBorderBox.Y;
+    DRP.Width := FBorder.Right.TargetUnits;
+    DRP.Height := FBorderBox.Height;
+    DrawRect(DRP);
+  end;
+end;
+
+procedure TZintCustomRenderTarget.DrawMaxiRings;
+var
+  DRP : TZintDrawRingParams;
+  LineWidth : Single;
+  OuterRadius : Single;
+begin
+  LineWidth := FBarcodeBox.Height / 40;
+  OuterRadius := (11 * FModuleHeight * 0.75 - FModuleHeight * 0.25) / 2;
+
+  DRP.X := FBarcodeBox.X + FBarcodeBox.Width / 2 - FModuleWidth / 2;
+  DRP.Y := FBarcodeBox.Y + FBarcodeBox.Height / 2;
+
+  DRP.OuterRadius := OuterRadius - 0 * LineWidth;
+  DRP.InnerRadius := OuterRadius - 1 * LineWidth;
+  DrawRing(DRP);
+
+  DRP.OuterRadius := OuterRadius - 2 * LineWidth;
+  DRP.InnerRadius := OuterRadius - 3 * LineWidth;
+  DrawRing(DRP);
+
+  DRP.OuterRadius := OuterRadius - 4 * LineWidth;
+  DRP.InnerRadius := OuterRadius - 5 * LineWidth;
+  DrawRing(DRP);
+end;
+
+procedure TZintCustomRenderTarget.DrawMaxiModules;
+var
+  row, col : Integer;
+  LX, LY : Single;
+  DHP : TZintDrawHexagonParams;
+begin
+  DHP.Width := FModuleWidth;
+  DHP.Height := FModuleHeight;
+
+  LY := FBarcodeBox.Y + FModuleHeight * 0.5;
+  for row := 0 to FSymbol.rows - 1 do
+  begin
+    LX := FBarcodeBox.X + FModuleWidth * 0.5;
+    for col := 0 to FSymbol.width - 1 do
+    begin
+      if module_is_set(FSymbol, row, col) <> 0 then
+      begin
+        DHP.Y := LY;
+
+        if (row and 1) <> 0 then
+          DHP.X := LX + FModuleWidth * 0.5
+        else
+          DHP.X := LX;
+
+        DrawHexagon(DHP);
+      end;
+      LX := LX + FModuleWidth;
+    end;
+    LY := LY + FModuleHeight * 0.75;
+  end;
+end;
+
+procedure TZintCustomRenderTarget.DrawModules;
+var
+  row, col : Integer;
+  block_width : Integer;
+  isspace : Boolean;
+  LX,LY : Single;
+  DRP : TZintDrawRectParams;
+  BarHeight : Single;
+  BarIndex : Integer;
+begin
+  LY := FBarcodeBox.Y;
+
+  for row := 0 to FSymbol.rows - 1 do
+  begin
+    BarIndex := 0;
+    LX := FBarcodeBox.X;
+    col := 0;
+    isspace := module_is_set(FSymbol, row, col) = 0;
+
+    if FSymbol.row_height[row] = 0 then
+      BarHeight := FLargeBarHeight
+    else
+      BarHeight := FSymbol.row_height[row] * FModuleWidth;
+
+    if (row > 0) and ((FSymbol.output_options and (BARCODE_BIND or BARCODE_BIND)) <> 0) and
+       (is_stackable(FSymbol.symbology) <> 0) then
+    begin
+      DRP.X := LX;
+      DRP.Y := LY - (FSymbol.border_width * FModuleWidth) / 2;
+      DRP.Width := FBarcodeBox.Width;
+      DRP.Height := FSymbol.border_width * FModuleWidth;
+      DrawRect(DRP);
+    end;
+
+    repeat
+      block_width := 0;
+
+      repeat
+        Inc(block_width);
+      until not (module_is_set(FSymbol, row, col + block_width) = module_is_set(FSymbol, row, col));
+
+      if not isspace then
+      begin
+        DRP.X := LX;
+        DRP.Y := LY;
+        DRP.Width := block_width * FModuleWidth;
+        DRP.Height := BarHeight;
+
+        if FShowText and FHasText and (row = FSymbol.rows - 1) and (FEANUPCFlags <> []) then
+          HandleSpecialBarsEANUPC(BarIndex, DRP);
+
+        DrawRect(DRP);
+        Inc(BarIndex)
+      end;
+
+      Inc(col, block_width);
+      LX := LX + block_width * FModuleWidth;
+      isspace := isspace xor true;
+    until col >= FSymbol.width;
+
+    LY := LY + BarHeight;
+  end;
+end;
+
+procedure TZintCustomRenderTarget.DrawTexts;
+var
+  DTP : TZintDrawTextParams;
+begin
+  if FShowText and FHasText and (not FTextDone) then
+  begin
+    DTP.X := FTextBox.X;
+    DTP.Y := FTextBox.Y;
+    DTP.Width := FTextBox.Width;
+    DTP.Height := FTextBox.Height;
+    DTP.Text := FText;
+
+    DrawText(DTP);
+  end;
+end;
+
+procedure TZintCustomRenderTarget.RenderStart;
+begin
+end;
+
+procedure TZintCustomRenderTarget.RenderStop;
+begin
+end;
+
+procedure TZintCustomRenderTarget.DrawStart;
+begin
+end;
+
+procedure TZintCustomRenderTarget.DrawStop;
+begin
+end;
+
+procedure TZintCustomRenderTarget.HandleSpecialBarsEANUPC(ABarIndex : Integer; var ABar : TZintDrawRectParams);
+var
+  DTP : TZintDrawTextParams;
+begin
+  FTextDone := true;
+
+  //guardbars are longer then the others
+  if ((euEAN8 in FEANUPCFlags) and (ABarIndex in [0,1,10,11,20,21])) or
+     ((euEAN8 in FEANUPCFlags) and (ABarIndex > 21)) or
+     ((euEAN13 in FEANUPCFlags) and (ABarIndex in [0,1,14,15,28,29])) or
+     ((euEAN13 in FEANUPCFlags) and (ABarIndex > 29)) or
+     ((euUPCA in FEANUPCFlags) and (ABarIndex in [0,1,2,3,14,15,26,27,28,29])) or
+     ((euUPCA in FEANUPCFlags) and (ABarIndex > 29)) or
+     ((euUPCE in FEANUPCFlags) and (ABarIndex in [0,1,14,15,16])) or
+     ((euUPCE in FEANUPCFlags) and (ABarIndex > 16))then
+    ABar.Height := ABar.Height + FWhitespace.Bottom.TargetUnits + FTextSpacing.Top.TargetUnits + FTextHeight / 2;
+
+  //addon-bars need space above for the text
+  if ((euEAN8 in FEANUPCFlags) and (ABarIndex > 21)) or
+     ((euEAN13 in FEANUPCFlags) and (ABarIndex > 29)) or
+     ((euUPCA in FEANUPCFlags) and (ABarIndex > 29)) or
+     ((euUPCE in FEANUPCFlags) and (ABarIndex > 16)) then
+  begin
+    ABar.Y := ABar.Y + FTextHeight + FTextSpacing.Top.TargetUnits + FTextSpacing.Bottom.TargetUnits;
+    ABar.Height := ABar.Height - FTextHeight - FTextSpacing.Top.TargetUnits - FTextSpacing.Bottom.TargetUnits;
+  end;
+
+  //add leading digit
+  if (ABarIndex = 0) and
+     ((euEAN13 in FEANUPCFlags) or
+      (euUPCA in FEANUPCFlags) or
+      (euUPCE in FEANUPCFlags)) then
+  begin
+    DTP.X := ABar.X - FTextSpacing.Right.TargetUnits - FLeadingTextWidth;
+    DTP.Y := FTextBox.Y;
+    DTP.Width := FLeadingTextWidth;
+    DTP.Height := FTextBox.Height;
+    DTP.Text := Copy(FText, 1, 1);
+    DrawText(DTP);
+  end;
+
+  //add trailing digit
+  if ((euUPCA in FEANUPCFlags) and (ABarIndex = 29)) or
+     ((euUPCE in FEANUPCFlags) and (ABarIndex = 16)) then
+  begin
+    DTP.X := ABar.X + ABar.Width + FTextSpacing.Left.TargetUnits;
+    DTP.Y := FTextBox.Y;
+    DTP.Width := FTrailingTextWidth;
+    DTP.Height := FTextBox.Height;
+    DTP.Text := Copy(FText, Length(FText), 1);
+    DrawText(DTP);
+  end;
+
+  //draw the main text under the barcode
+  if ((euEAN8 in FEANUPCFlags) and (ABarIndex in [10, 20])) or
+     ((euEAN13 in FEANUPCFlags) and (ABarIndex in [14, 28])) or
+     ((euUPCA in FEANUPCFlags) and (ABarIndex in [14, 26])) or
+     ((euUPCE in FEANUPCFlags) and (ABarIndex = 14)) then
+  begin
+    DTP.X := FStartTextBar.X + FStartTextBar.Width + FTextSpacing.Left.TargetUnits;
+    DTP.Y := FTextBox.Y;
+    DTP.Height := FTextBox.Height;
+    DTP.Width := ABar.X - FStartTextBar.X + FStartTextBar.Width - FTextSpacing.Left.TargetUnits - FTextSpacing.Right.TargetUnits;
+    if euEAN8 in FEANUPCFlags then
+    begin
+      case ABarIndex of
+        10: DTP.Text := Copy(FText, 1, 4);
+        20: DTP.Text := Copy(FText, 5, 4);
+      end;
+    end
+    else
+    if (euEAN13 in FEANUPCFlags) then
+    begin
+      case ABarIndex of
+        14: DTP.Text := Copy(FText, 2, 6);
+        28: DTP.Text := Copy(FText, 8, 6);
+      end;
+    end
+    else
+    if (euUPCA in FEANUPCFlags) then
+    begin
+      case ABarIndex of
+        14: DTP.Text := Copy(FText, 2, 5);
+        26: DTP.Text := Copy(FText, 7, 5);
+      end;
+    end
+    else
+    if (euUPCE in FEANUPCFlags) then
+    begin
+      DTP.Text := Copy(FText, 2, 6);
+    end;
+    DrawText(DTP);
+  end;
+
+  if ((euEAN8 in FEANUPCFlags) and (ABarIndex = 28) and (euAddon2 in FEANUPCFlags)) or
+     ((euEAN8 in FEANUPCFlags) and (ABarIndex = 36)) or
+     ((euEAN13 in FEANUPCFlags) and (ABarIndex = 36) and (euAddon2 in FEANUPCFlags)) or
+     ((euEAN13 in FEANUPCFlags) and (ABarIndex = 44)) or
+     ((euUPCA in FEANUPCFlags) and (ABarIndex = 36) and (euAddon2 in FEANUPCFlags)) or
+     ((euUPCA in FEANUPCFlags) and (ABarIndex = 44)) or
+     ((euUPCE in FEANUPCFlags) and (ABarIndex = 23) and (euAddon2 in FEANUPCFlags)) or
+     ((euUPCE in FEANUPCFlags) and (ABarIndex = 32)) then
+  begin
+    DTP.X := FStartTextBar.X;
+    DTP.Y := FBarcodeBox.Y + FTextSpacing.Top.TargetUnits;
+    DTP.Height := FTextHeight;
+    DTP.Width := ABar.X + ABar.Width - FStartTextBar.X;
+    DTP.Text := FAddonText;
+    DrawText(DTP);
+  end;
+
+  if ((euEAN8 in FEANUPCFlags) and (ABarIndex in [1, 11, 22])) or
+     ((euEAN13 in FEANUPCFlags) and (ABarIndex in [1, 15, 30])) or
+     ((euUPCA in FEANUPCFlags) and (ABarIndex in [3, 15, 30])) or
+     ((euUPCE in FEANUPCFlags) and (ABarIndex in [1, 17])) then
+    FStartTextBar := ABar;
+end;
+
 constructor TZintCustomRenderTarget.Create();
 begin
   FTransparent:=False;
-  FHexagonScale:=0.9;
+  FHexagonScale := 0.9;
+  FMargin := TZintRenderBox.Create();
+  FBorder := TZintRenderBox.Create();
+  FPadding := TZintRenderBox.Create();
+  FWhitespace := TZintRenderBox.Create();
+  FTextSpacing := TZintRenderBox.Create();
+  FShowText := true;
+  FHAlign := haLeft;
+  FVAlign := vaTop;
+  FMinModuleWidth := 0;
+  FRenderAdjustMode := ramScale;
 end;
 
 destructor TZintCustomRenderTarget.Destroy;
 begin
+  FreeAndNil(FMargin);
+  FreeAndNil(FBorder);
+  FreeAndNil(FPadding);
+  FreeAndNil(FWhitespace);
+  FreeAndNil(FTextSpacing);
   inherited;
 end;
 
 procedure TZintCustomRenderTarget.Render(ASymbol: TZintSymbol);
+var
+  CBP : TZintClearBackgroundParams;
 begin
-  if FRenderAdjustMode=ramScaleBarcode then
-  begin
-    FMultiplikator:=FHeightDesired/ASymbol.rendered^.height;
+  FSymbol := ASymbol;
+  FTextDone := false;
 
-    if FMultiplikator*ASymbol.rendered^.width>FWidthDesired then
-      FMultiplikator:=FWidthDesired/ASymbol.rendered^.width;
+  RenderStart;
+  AddSymbolOptions;
+  FetchRowInfos;
+  CalcText;
+  CheckEANUPC;
+  CalcTextEANUPC;
+  CalcSize;
+  AddBoxModulesToTargetUnits;
+  CalcBoxes;
+  CalcLargeBarHeight;
+
+  DrawStart;
+
+  if not FTransparent then
+  begin
+    CBP.X := FXDesired;
+    CBP.Y := FYDesired;
+    CBP.Width := FWidthDesired;
+    CBP.Height := FHeightDesired;
+    ClearBackground(CBP);
+  end;
+
+  DrawBorder;
+
+  if FSymbol.symbology = BARCODE_MAXICODE then
+  begin
+    DrawMaxiRings;
+    DrawMaxiModules;
   end
   else
-    FMultiplikator := 1;
+  begin
+    DrawModules;
+    if FHasText then
+      DrawTexts;
+  end;
+
+  DrawStop;
+  RemoveBoxModulesFromTargetUnits;
+  RemoveSymbolOptions;
+  RenderStop;
 end;
 
 end.

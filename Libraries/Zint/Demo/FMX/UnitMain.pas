@@ -51,11 +51,12 @@ begin
     Printer.ActivePrinter.SelectDPI(1200, 1200);
     Printer.BeginDoc;
     rt:=TZintCanvasRenderTarget.Create(Printer.Canvas);
-    rt.RenderAdjustMode:=ramScaleBarcode;
-    rt.Left:=Printer.Canvas.Width/3;
-    rt.Top:=Printer.Canvas.Height/3;
+    rt.RenderAdjustMode:=ramScale;
+    rt.XDesired:=Printer.Canvas.Width/3;
+    rt.YDesired:=Printer.Canvas.Height/3;
     rt.WidthDesired:=Printer.Canvas.Width/3;
     rt.HeightDesired:=Printer.Canvas.Height/3;
+    rt.ShowText:=True;
     try
       Symbol.Render(rt);
     finally
@@ -97,7 +98,6 @@ begin
   Result := TZintSymbol.Create;
   Result.symbology := Integer(comType.Items.Objects[comType.ItemIndex]);
   Result.input_mode := UNICODE_MODE;
-  Result.show_hrt := 1;
   Result.output_options:=Result.output_options or BARCODE_BOX;
   Result.border_width:=1;
   Result.whitespace_width:=10;
@@ -114,8 +114,9 @@ begin
 
    bmp:=TBitmap.Create(round(imgResult.Width), round(imgResult.Height));
    rt:=TZintBMPRenderTarget.Create(bmp);
-   rt.RenderAdjustMode:=ramScaleBarcode;
+   rt.RenderAdjustMode:=ramScale;
    rt.Font.Family:='Courier New';
+   rt.ShowText:=True;
    Symbol.Render(rt);
    rt.Free;
    imgResult.Bitmap:=bmp;

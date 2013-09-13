@@ -13,9 +13,9 @@ type
   { TformZintTest }
 
   TformZintTest = class(TForm)
-    btnSaveSVG: TButton;
     comType: TComboBox;
     edData: TEdit;
+    edPrimary: TEdit;
     imgResult: TImage;
     lblError: TLabel;
     Panel1: TPanel;
@@ -24,7 +24,6 @@ type
     Panel4: TPanel;
     Panel5: TPanel;
     SaveDialog1: TSaveDialog;
-    procedure btnSaveSVGClick(Sender: TObject);
     procedure comTypeChange(Sender: TObject);
     procedure edDataChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -42,8 +41,7 @@ implementation
 
 {$R *.lfm}
 
-uses zint, zint_lmf, zint_render_lmf, zint_render_bmp, TADrawerSVG,
-  zint_render_tadrawer, zint_helper, TADrawUtils;
+uses zint, zint_lmf, zint_render_lmf, zint_render_bmp, zint_helper;
 
 { TformZintTest }
 
@@ -65,41 +63,6 @@ end;
 procedure TformZintTest.comTypeChange(Sender: TObject);
 begin
   GenBarcode;
-end;
-
-procedure TformZintTest.btnSaveSVGClick(Sender: TObject);
-var
-  symbol: TZintSymbol;
-  rt: TZintTADrawerRenderTarget;
-  svgd: TSVGDrawer;
-  fs: TFileStream;
-begin
-  if SaveDialog1.Execute then
-  begin
-    symbol := TZintSymbol.Create;
-    symbol.symbology := Integer(comType.Items.Objects[comType.ItemIndex]);
-    symbol.show_hrt := 1;
-    fs := TFileStream.Create(SaveDialog1.FileName, fmCreate);
-
-    try
-      symbol.Encode(edData.Text, True);
-
-      svgd := TSVGDrawer.Create(fs, True);
-      rt := TZintTADrawerRenderTarget.Create(svgd, svgd, 10000, 10000); //the higher the values ... the more accurate the drawing (e.g. maxicode)
-      rt.Transparent:=True;
-
-      rt.RenderAdjustMode := ramScaleBarcode;
-      try
-        symbol.Render(rt);
-      finally
-        rt.Free;
-      end;
-
-    finally
-      fs.Free;
-      symbol.Free;
-    end;
-  end;
 end;
 
 procedure TformZintTest.edDataChange(Sender: TObject);
@@ -126,16 +89,13 @@ begin
   symbol := TZintSymbol.Create;
   symbol.symbology := Integer(comType.Items.Objects[comType.ItemIndex]);
   symbol.input_mode := UNICODE_MODE;
-  symbol.show_hrt := 1;
+  symbol.primary := StrToArrayOfChar(edPrimary.Text);
   try
     symbol.Encode(edData.Text, True);
     {$IFDEF RenderBMP}
     img := TBitmap.Create;
-    img.PixelFormat := pf24bit;
+    img.PixelFormat := pf8bit;
     img.SetSize(imgResult.Width, imgResult.Height);
-    img.Canvas.Brush.Color := clWhite;
-    img.Canvas.Brush.Style := bsSolid;
-    img.Canvas.FillRect(img.Canvas.ClipRect);
     rt := TZintBMPRenderTarget.Create(img);
     {$ELSE}
     img := TlmfImage.Create;
@@ -143,7 +103,14 @@ begin
     img.Height := imgResult.Height;
     rt := TZintLMFRenderTarget.Create(img);
     {$ENDIF}
-    rt.RenderAdjustMode := ramScaleBarcode;
+    rt.Font.Height := 23;
+    rt.Font.Name := 'Arial';
+    rt.TextSpacing.left.TargetUnits := 10;
+    rt.TextSpacing.Right.TargetUnits := 10;
+    //rt.Whitespace.SetModules(1);
+    //rt.Border.SetModules(1);
+    rt.HAlign := haCenter;
+    rt.VAlign := vaCenter;
     try
       symbol.Render(rt);
       imgResult.Picture.Graphic := img;
