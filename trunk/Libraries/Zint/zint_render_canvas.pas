@@ -29,13 +29,18 @@ type
     FFGColor: TColor;
     FBGColor: TColor;
     FFont: TFont;
-    function CalcLeft(AX: Single): Integer;
-    function CalcTop (AY: Single): Integer;
     procedure SetFont(const Value: TFont);
+    procedure ClearBackground(const AParams : TZintClearBackgroundParams); override;
+    procedure DrawRect(const AParams : TZintDrawRectParams); override;
+    procedure DrawHexagon(const AParams : TZintDrawHexagonParams); override;
+    procedure DrawRing(const AParams : TZintDrawRingParams); override;
+    procedure DrawText(const AParams: TZintDrawTextParams); override;
+    function CalcTextHeight(const AParams : TZintCalcTextHeightParams) : Single; override;
+    function CalcTextWidth(const AParams : TZintCalcTextWidthParams) : Single; override;
+    procedure RenderStart; override;
   public
     constructor Create(ACanvas: TCanvas); reintroduce; virtual;
     destructor Destroy; override;
-    procedure Render(ASymbol : TZintSymbol); override;
     property ForegroundColor : TColor read FFGColor write FFGColor;
     property BackgroundColor : TColor read FBGColor write FBGColor;
     property Font: TFont read FFont write SetFont;
@@ -48,19 +53,118 @@ uses
 
 { TZintCanvasRenderTarget }
 
-function TZintCanvasRenderTarget.CalcLeft(AX: Single): Integer;
-begin
-  Result:=Round(FLeft+AX*FMultiplikator);
-end;
-
-function TZintCanvasRenderTarget.CalcTop(AY: Single): Integer;
-begin
-  Result:=Round(FTop+AY*FMultiplikator);
-end;
-
 procedure TZintCanvasRenderTarget.SetFont(const Value: TFont);
 begin
   FFont.Assign(Value);
+end;
+
+procedure TZintCanvasRenderTarget.ClearBackground(
+  const AParams: TZintClearBackgroundParams);
+begin
+  FCanvas.Brush.Color:=FBGColor;
+  FCanvas.Brush.Style:=bsSolid;
+  FCanvas.Pen.Style:=psSolid;
+  FCanvas.Pen.Color:=FBGColor;
+
+  FCanvas.Rectangle(Round(AParams.X),
+                    Round(AParams.Y),
+                    Round(AParams.X) + Round(AParams.Width),
+                    Round(AParams.Y) + Round(AParams.Height));
+end;
+
+procedure TZintCanvasRenderTarget.DrawRect(const AParams: TZintDrawRectParams);
+begin
+  FCanvas.Pen.Style:=psSolid;
+  FCanvas.Pen.Color:=FFGColor;
+  FCanvas.Brush.Color:=FFGColor;
+  FCanvas.Brush.Style:=bsSolid;
+  FCanvas.Rectangle(Round(AParams.X),
+                    Round(AParams.Y),
+                    Round(AParams.X + AParams.Width),
+                    Round(AParams.Y + AParams.Height));
+
+end;
+
+procedure TZintCanvasRenderTarget.DrawHexagon(const AParams: TZintDrawHexagonParams);
+var
+  hexagon_width, hexagon_height : Single;
+  Points : array[0..5] of TPoint;
+begin
+  FCanvas.Pen.Style:=psClear;
+  FCanvas.Brush.Style:=bsSolid;
+  FCanvas.Brush.Color:=ffgcolor;
+
+  hexagon_width:=AParams.Width*FHexagonScale;
+  hexagon_height:=AParams.Height*FHexagonScale;
+
+  Points[0] := Point(Round(AParams.X-(hexagon_width/2)), Round(AParams.Y - hexagon_height/4));
+  Points[1] := Point(Round(AParams.X-(hexagon_width/2)), Round(AParams.Y + hexagon_height/4));
+  Points[2] := Point(Round(AParams.X -(hexagon_width/2) + sqrt(3) * hexagon_height / 4), Round(AParams.Y + hexagon_height / 2));
+  Points[3] := Point(Round(AParams.X -(hexagon_width/2) + sqrt(3) * hexagon_height / 2), Round(AParams.Y + hexagon_height / 4));
+  Points[4] := Point(Round(AParams.X -(hexagon_width/2) + sqrt(3) * hexagon_height / 2), Round(AParams.Y - hexagon_height / 4));
+  Points[5] := Point(Round(AParams.X -(hexagon_width/2) + sqrt(3) * hexagon_height / 4), Round(AParams.Y - hexagon_height / 2));
+
+  {$IFDEF FPC}
+  FCanvas.Polygon(@Points[0], Length(Points), true);
+  {$ELSE}
+  FCanvas.Polygon(Points);
+  {$ENDIF}
+end;
+
+procedure TZintCanvasRenderTarget.DrawRing(const AParams: TZintDrawRingParams);
+var
+  LineWidth, HalfLineWidth : Integer;
+begin
+  LineWidth := Round(AParams.OuterRadius - AParams.InnerRadius);
+  HalfLineWidth := Round((AParams.OuterRadius - AParams.InnerRadius) / 2);
+  FCanvas.Brush.Style := bsClear;
+  FCanvas.Pen.Width := LineWidth;
+  FCanvas.Pen.Color := FFGColor;
+  FCanvas.Pen.Style := psSolid;
+
+  FCanvas.Ellipse(Round(AParams.x - AParams.OuterRadius + HalfLineWidth),
+                  Round(AParams.y - AParams.OuterRadius + HalfLineWidth),
+                  Round(AParams.x + AParams.OuterRadius - HalfLineWidth),
+                  Round(AParams.y + AParams.OuterRadius - HalfLineWidth));
+end;
+
+procedure TZintCanvasRenderTarget.DrawText(const AParams: TZintDrawTextParams);
+var
+  r : TRect;
+  txt : String;
+  {$IFDEF FPC}
+    ts : TTextStyle;
+  {$ENDIF}
+begin
+  r.Left := Round(AParams.X);
+  r.Top := Round(AParams.Y);
+  r.Right := Round(AParams.X + AParams.Width);
+  r.Bottom := Round(AParams.Y + AParams.Height);
+  FCanvas.Brush.Style := bsClear;
+  txt:=AParams.Text;
+  {$IFDEF FPC}
+    ts.Alignment := taCenter;
+    ts.Layout := tlCenter;
+    ts.SystemFont := False;
+    FCanvas.TextRect(r, r.Left, r.Top, txt, ts);
+  {$ELSE}
+    FCanvas.TextRect(r, txt, [tfCenter, tfVerticalCenter]);
+  {$ENDIF}
+end;
+
+function TZintCanvasRenderTarget.CalcTextHeight(const AParams : TZintCalcTextHeightParams): Single;
+begin
+  Result := FCanvas.TextHeight(AParams.Text);
+end;
+
+function TZintCanvasRenderTarget.CalcTextWidth(const AParams : TZintCalcTextWidthParams): Single;
+begin
+  Result := FCanvas.TextWidth(AParams.Text);
+end;
+
+procedure TZintCanvasRenderTarget.RenderStart;
+begin
+  FCanvas.Font.Assign(Font);
 end;
 
 constructor TZintCanvasRenderTarget.Create(ACanvas: TCanvas);
@@ -74,8 +178,8 @@ begin
 
   if Assigned(ACanvas) then
   begin
-    FWidthDesired:=ACanvas.ClipRect.Right-ACanvas.ClipRect.Left;
-    FHeightDesired:=ACanvas.ClipRect.Right-ACanvas.ClipRect.Left;
+    FWidth:=ACanvas.ClipRect.Right-ACanvas.ClipRect.Left;
+    FHeight:=ACanvas.ClipRect.Right-ACanvas.ClipRect.Left;
   end;
   FCanvas := ACanvas;
 end;
@@ -86,121 +190,5 @@ begin
   inherited Destroy;
 end;
 
-procedure TZintCanvasRenderTarget.Render(ASymbol: TZintSymbol);
-var
-  line : Pzint_render_line;
-  hexagon : Pzint_render_hexagon;
-  hexagon_width, hexagon_height: single;
-  ring : Pzint_render_ring;
-  s : Pzint_render_string;
-  Points : array[0..5] of TPoint;
-  st : String;
-  r  : TRect;
-  {$IFDEF FPC}
-  ts : TTextStyle;
-  {$ENDIF}
-begin
-  inherited;
-
-  if Assigned(FCanvas) then
-  begin
-    //clear Background
-    if not FTransparent then
-    begin
-      FCanvas.Brush.Color:=FBGColor;
-      FCanvas.Brush.Style:=bsSolid;
-      FCanvas.Pen.Style:=psSolid;
-      FCanvas.Pen.Color:=FBGColor;
-
-      FCanvas.Rectangle(CalcLeft(0),
-                        CalcTop(0),
-                        CalcLeft(ASymbol.rendered^.width),
-                        CalcTop(ASymbol.rendered^.height));
-    end;
-
-    FCanvas.Pen.Style:=psSolid;
-    FCanvas.Pen.Color:=FFGColor;
-    FCanvas.Brush.Color:=FFGColor;
-    FCanvas.Brush.Style:=bsSolid;
-    line:=ASymbol.rendered^.lines;
-    while Assigned(line) do
-    begin
-      FCanvas.Rectangle(CalcLeft(line^.x),
-                        CalcTop(line^.y),
-                        CalcLeft(line^.x + line^.width),
-                        CalcTop(line^.y + line^.length));
-      line:=line^.next;
-    end;
-
-    FCanvas.Brush.Style:=bsClear;
-    ring:=ASymbol.rendered^.rings;
-    while Assigned(ring) do
-    begin
-      FCanvas.Pen.Width:=round(ring^.line_width*FMultiplikator);
-
-      FCanvas.Ellipse(CalcLeft(ring^.x-ring^.radius),
-                        CalcTop(ring^.y-ring^.radius),
-                        CalcLeft(ring^.x + ring^.radius),
-                        CalcTop(ring^.y + ring^.radius));
-      ring:=ring^.next;
-    end;
-
-    FCanvas.Pen.Style:=psClear;
-    FCanvas.Brush.Style:=bsSolid;
-    FCanvas.Brush.Color:=ffgcolor;
-    hexagon:=ASymbol.rendered^.hexagons;
-    while Assigned(hexagon) do
-    begin
-      hexagon_width:=hexagon^.width*FHexagonScale;
-      hexagon_height:=hexagon^.height*FHexagonScale;
-
-      Points[0] := Point(calcLeft(hexagon^.x-(hexagon_width/2)), CalcTop(hexagon^.y + hexagon_height/4));
-      Points[1] := Point(calcLeft(hexagon^.x-(hexagon_width/2)), CalcTop(hexagon^.y + hexagon_height*3/4));
-      Points[2] := Point(calcLeft(hexagon^.x -(hexagon_width/2) + sqrt(3) * hexagon_height / 4), CalcTop(hexagon^.y + hexagon_height));
-      Points[3] := Point(calcLeft(hexagon^.x -(hexagon_width/2) + sqrt(3) * hexagon_height / 2), CalcTop(hexagon^.y + hexagon_height * 3/4));
-      Points[4] := Point(calcLeft(hexagon^.x -(hexagon_width/2) + sqrt(3) * hexagon_height / 2), CalcTop(hexagon^.y + hexagon_height / 4));
-      Points[5] := Point(calcLeft(hexagon^.x -(hexagon_width/2) + sqrt(3) * hexagon_height / 4), CalcTop(hexagon^.y ));
-
-      {$IFDEF FPC}
-      FCanvas.Polygon(@Points[0], Length(Points), true);
-      {$ELSE}
-      FCanvas.Polygon(Points);
-      {$ENDIF}
-
-      hexagon:=hexagon^.next;
-    end;
-
-    FCanvas.Font.Assign(FFont);
-    FCanvas.Brush.Style:=bsClear;
-
-    s:=ASymbol.rendered^.strings;
-    while assigned(s) do
-    begin
-      FCanvas.Font.Height:=Round(FMultiplikator*S^.fsize);
-      if s^.width=0 then
-      begin
-        FCanvas.TextOut(CalcLeft(s^.x)-FCanvas.TextWidth(s^.text) div 2, CalcTop(s^.y), s^.text);
-      end
-      else
-      begin
-        st:=s^.text;
-        r := Rect(CalcLeft(s^.x - s^.width / 2),
-                  CalcTop(s^.y),
-                  CalcLeft(s^.x+s^.width / 2),
-                  CalcTop(s^.y+FCanvas.Font.Height));
-        {$IFDEF FPC}
-        ts.Alignment := taCenter;
-        ts.Layout := tlTop;
-        FCanvas.TextRect(r, r.Left, r.Top, st, ts);
-        {$ELSE}
-        FCanvas.TextRect(r, st, [tfCenter, tfTop]);
-        {$ENDIF}
-      end;
-
-      s:=s^.next;
-    end;
-
-  end;
-end;
 
 end.

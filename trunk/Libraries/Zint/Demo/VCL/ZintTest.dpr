@@ -2,7 +2,8 @@ program ZintTest;
 
 uses
   Forms,
-  uFormZintTest in 'uFormZintTest.pas' {Form46};
+  uFormZintTest in 'uFormZintTest.pas' {Form46},
+  uFrameBorderOptions in 'uFrameBorderOptions.pas' {FrameBorderOptions: TFrame};
 
 {$R *.res}
 

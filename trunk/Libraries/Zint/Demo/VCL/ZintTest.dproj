@@ -32,7 +32,7 @@
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DCC_DependencyCheckOutputName>ZintTest.exe</DCC_DependencyCheckOutputName>
 			<VerInfo_Locale>1031</VerInfo_Locale>
-			<Manifest_File>None</Manifest_File>
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 			<DCC_F>false</DCC_F>
 			<DCC_K>false</DCC_K>
 			<DCC_UnitSearchPath>..\..;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
@@ -45,7 +45,6 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_Win64)'!=''">
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-			<DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
 			<VerInfo_Locale>1033</VerInfo_Locale>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
@@ -66,6 +65,11 @@
 			</DelphiCompile>
 			<DCCReference Include="uFormZintTest.pas">
 				<Form>Form46</Form>
+			</DCCReference>
+			<DCCReference Include="uFrameBorderOptions.pas">
+				<Form>FrameBorderOptions</Form>
+				<FormType>dfm</FormType>
+				<DesignClass>TFrame</DesignClass>
 			</DCCReference>
 			<BuildConfiguration Include="Debug">
 				<Key>Cfg_2</Key>

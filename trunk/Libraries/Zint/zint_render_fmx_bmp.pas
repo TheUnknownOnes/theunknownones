@@ -19,6 +19,8 @@ type
   TZintBMPRenderTarget = class(TZintCanvasRenderTarget)
   protected
     FBMP : TBitmap;
+
+    procedure Inflate(const ANewWidth, ANewHeight : Single); override;
   public
     constructor Create(ABMP: TBitmap); reintroduce; virtual;
     procedure Render(ASymbol : TZintSymbol); override;
@@ -27,6 +29,13 @@ type
 implementation
 
 { TZintBMPRenderTarget }
+
+
+procedure TZintBMPRenderTarget.Inflate(const ANewWidth, ANewHeight : Single);
+begin
+  FBMP.Height:=Round(ANewHeight);
+  FBMP.Width:=Round(ANewWidth);
+end;
 
 constructor TZintBMPRenderTarget.Create(ABMP: TBitmap);
 begin
@@ -38,14 +47,6 @@ end;
 
 procedure TZintBMPRenderTarget.Render(ASymbol: TZintSymbol);
 begin
-  if FRenderAdjustMode=ramInflateImage then
-  begin
-    if ASymbol.rendered^.width+FLeft>FBMP.Width then
-      FBMP.Width:=Round(ASymbol.rendered^.width+FLeft);
-    if ASymbol.rendered^.height+FTop>FBMP.Height then
-      FBMP.Height:=Round(ASymbol.rendered^.height+FTop);
-  end;
-
   FCanvas:=FBMP.Canvas;
 
   inherited;

@@ -94,7 +94,7 @@ function strlen(const AString: TArrayOfChar): Integer;
 var
   i : Integer;
 begin
-  Result := High(AString);
+  Result := High(AString) + 1;
   for i := Low(AString) to High(AString) do
     if AString[i] = #0 then
     begin
