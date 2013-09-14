@@ -65,11 +65,11 @@ type
     constructor Create(ASymbol : TZintSymbol); virtual;
   end;
 
+  TmpCheckDigitType = (cdtNone, cdtMod10, cdtMod1010, cdtMod11, cdtMod1110);
+
   { TZintMSIPlessyOptions }
 
   TZintMSIPlessyOptions = class(TCustomZintSymbolOptions)
-  public type
-    TmpCheckDigitType = (cdtNone, cdtMod10, cdtMod1010, cdtMod11, cdtMod1110);
   private
     function GetCheckDigitType: TmpCheckDigitType;
     procedure SetCheckDigitType(AValue: TmpCheckDigitType);
@@ -84,11 +84,11 @@ type
     property AddCheckDigit : Boolean index 2 read GetBooleanOption write SetBooleanOption default false;
   end;
 
+  TCompositeType = (ctAuto, ctCC_A, ctCC_B, ctCC_C);
+
   { TZintCompositeOptions }
 
   TZintCompositeOptions = class(TCustomZintSymbolOptions)
-  public type
-    TCompositeType = (ctAuto, ctCC_A, ctCC_B, ctCC_C);
   protected
     function GetCompositeType: TCompositeType;
     procedure SetCompositeType(AValue: TCompositeType);
@@ -96,12 +96,12 @@ type
     property CompositeType : TCompositeType read GetCompositeType write SetCompositeType default ctAuto;
   end;
 
+  TgmSize = (gmsAuto, gms18, gms30, gms42, gms54, gms66, gms78, gms90, gms102, gms114, gms126, gms138, gms150, gms162);
+  TgmErrorCorrectCapacity = (gmeccAuto, gmecc10Percent, gmecc20Percent, gmecc30Percent, gmecc40Percent, gmecc50Percent);
+
   { TZintGridMatrixOptions }
 
   TZintGridMatrixOptions = class(TCustomZintSymbolOptions)
-  public type
-    TgmSize = (gmsAuto, gms18, gms30, gms42, gms54, gms66, gms78, gms90, gms102, gms114, gms126, gms138, gms150, gms162);
-    TgmErrorCorrectCapacity = (gmeccAuto, gmecc10Percent, gmecc20Percent, gmecc30Percent, gmecc40Percent, gmecc50Percent);
   protected
     function GetErrorCorrectionCapacity: TgmErrorCorrectCapacity;
     function GetSize: TgmSize;
@@ -112,12 +112,12 @@ type
     property ErrorCorrectionCapacity : TgmErrorCorrectCapacity read GetErrorCorrectionCapacity write SetErrorCorrectionCapacity default gmeccAuto;
   end;
 
+  TpdfCheckDigitCount = -1..8;
+  TpdfColumns = 0..30;
+
   { TZintPDF417Options }
 
   TZintPDF417Options = class(TCustomZintSymbolOptions)
-  public type
-    TpdfCheckDigitCount = -1..8;
-    TpdfColumns = 0..30;
   protected
     function GetCheckDigitCount: TpdfCheckDigitCount;
     function GetColumns: TpdfColumns;
@@ -128,12 +128,12 @@ type
     property Columns : TpdfColumns read GetColumns write SetColumns default 0;
   end;
 
+  TatErrorCorrectCapacity = (ateccAuto, atecc10Percent, atecc23Percent, atecc36Percent, atecc50Percent);
+  TatSize = (atsAuto, ats15Compact, ats19Compact, ats23Compact, ats27Compact, ats19, ats23, ats27, ats31, ats37, ats41, ats45, ats49, ats53, ats57, ats61, ats67, ats71, ats75, ats79, ats83, ats87, ats91, ats95, ats101, ats105, ats109, ats113, ats117, ats121, ats125, ats131, ats135, ats139, ats143, ats147, ats151);
+
   { TZintAztecOptions }
 
   TZintAztecOptions = class(TCustomZintSymbolOptions)
-  public type
-    TatErrorCorrectCapacity = (ateccAuto, atecc10Percent, atecc23Percent, atecc36Percent, atecc50Percent);
-    TatSize = (atsAuto, ats15Compact, ats19Compact, ats23Compact, ats27Compact, ats19, ats23, ats27, ats31, ats37, ats41, ats45, ats49, ats53, ats57, ats61, ats67, ats71, ats75, ats79, ats83, ats87, ats91, ats95, ats101, ats105, ats109, ats113, ats117, ats121, ats125, ats131, ats135, ats139, ats143, ats147, ats151);
   protected
     function GetErrorCorrectCapacity: TatErrorCorrectCapacity;
     function GetSize: TatSize;
@@ -144,11 +144,11 @@ type
     property Size : TatSize read GetSize write SetSize;
   end;
 
+  TmcMode = (mcmAuto, mcmMode2, mcmMode3, mcmMode4, mcmMode5, mcmMode6);
+
   { TZintMaxicodeOptions }
 
   TZintMaxicodeOptions = class(TCustomZintSymbolOptions)
-  public type
-    TmcMode = (mcmAuto, mcmMode2, mcmMode3, mcmMode4, mcmMode5, mcmMode6);
   protected
     function GetMode: TmcMode;
     procedure SetMode(AValue: TmcMode);
@@ -156,11 +156,11 @@ type
     property Mode : TmcMode read GetMode write SetMode;
   end;
 
+  TdmSize = (dmsAuto, dms10x10, dms12x12, dms14x14, dms16x16, dms18x18, dms20x20, dms22x22, dms24x24, dms26x26, dms32x32, dms36x36, dms40x40, dms44x44, dms48x48, dms52x52, dms64x64, dms72x72, dms80x80, dms88x88, dms96x96, dms104x104, dms120x120, dms132x132, dms144x144, dms8x18, dms8x32, dms12x26, dms12x36, dms16x36, dms16x48);
+
   { TZintDatamatrixOptions }
 
   TZintDatamatrixOptions = class(TCustomZintSymbolOptions)
-  public type
-    TdmSize = (dmsAuto, dms10x10, dms12x12, dms14x14, dms16x16, dms18x18, dms20x20, dms22x22, dms24x24, dms26x26, dms32x32, dms36x36, dms40x40, dms44x44, dms48x48, dms52x52, dms64x64, dms72x72, dms80x80, dms88x88, dms96x96, dms104x104, dms120x120, dms132x132, dms144x144, dms8x18, dms8x32, dms12x26, dms12x36, dms16x36, dms16x48);
   protected
     function GetForceSquare: Boolean;
     function GetSize: TdmSize;
@@ -171,12 +171,12 @@ type
     property ForceSquare : Boolean read GetForceSquare write SetForceSquare default false;
   end;
 
+  TqrECCLevel = (qreAuto, qreLevelL, qreLevelM, qreLevelQ, qreLevelH);
+  TqrSize = (qrsAuto, qrs21, qrs25, qrs29, qrs33, qrs37, qrs41, qrs45, qrs49, qrs53, qrs57, qrs61, qrs65, qrs69, qrs73, qrs77, qrs81, qrs85, qrs89, qrs93, qrs97, qrs101, qrs105, qrs109, qrs113, qrs117, qrs121, qrs125, qrs129, qrs133, qrs137, qrs141, qrs145, qrs149, qrs153, qrs157, qrs161, qrs165, qrs169, qrs173, qrs177);
+
   { TZintQRCodeOptions }
 
   TZintQRCodeOptions = class(TCustomZintSymbolOptions)
-  public type
-    TqrECCLevel = (qreAuto, qreLevelL, qreLevelM, qreLevelQ, qreLevelH);
-    TqrSize = (qrsAuto, qrs21, qrs25, qrs29, qrs33, qrs37, qrs41, qrs45, qrs49, qrs53, qrs57, qrs61, qrs65, qrs69, qrs73, qrs77, qrs81, qrs85, qrs89, qrs93, qrs97, qrs101, qrs105, qrs109, qrs113, qrs117, qrs121, qrs125, qrs129, qrs133, qrs137, qrs141, qrs145, qrs149, qrs153, qrs157, qrs161, qrs165, qrs169, qrs173, qrs177);
   private
     function GetECCLevel: TqrECCLevel;
     function GetSize: TqrSize;
@@ -187,11 +187,11 @@ type
     property Size : TqrSize read GetSize write SetSize default qrsAuto;
   end;
 
+  TmqVersion = (mqvAuto, mqv1, mqv2, mqv3, mqv4);
+
   { TZintMicroQROptions }
 
   TZintMicroQROptions = class(TCustomZintSymbolOptions)
-  public type
-    TmqVersion = (mqvAuto, mqv1, mqv2, mqv3, mqv4);
   private
     function GetVersion: TmqVersion;
     procedure SetVersion(AValue: TmqVersion);
@@ -199,11 +199,11 @@ type
     property Version : TmqVersion read GetVersion write SetVersion default mqvAuto;
   end;
 
+  Tc1Version = (c1vAuto, c1vA, c1vB, c1vC, c1vD, c1vE, c1vF, c1vG, c1vH, c1vS);
+
   { TZintCode1Options }
 
   TZintCode1Options = class(TCustomZintSymbolOptions)
-  public type
-    Tc1Version = (c1vAuto, c1vA, c1vB, c1vC, c1vD, c1vE, c1vF, c1vG, c1vH, c1vS);
   private
     function GetVersion: Tc1Version;
     procedure SetVersion(AValue: Tc1Version);
