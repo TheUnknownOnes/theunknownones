@@ -936,6 +936,7 @@ var
   local_source : TArrayOfChar;
   t, done, v : Integer;
   data_part, ecc_part : TArrayOfCardinal;
+  RSGlobals : TRSGlobals;
 begin
   SetLength(binary_string, 20000);
   SetLength(adjusted_string, 20000);
@@ -1307,12 +1308,12 @@ begin
         if (adjusted_string[(i * codeword_size) + 4] = '1') then Inc(data_part[i], 2);
         if (adjusted_string[(i * codeword_size) + 5] = '1') then Inc(data_part[i], 1);
       end;
-      rs_init_gf($43);
-      rs_init_code(ecc_blocks, 1);
-      rs_encode_long(data_blocks, data_part, ecc_part);
+      rs_init_gf($43, RSGlobals);
+      rs_init_code(ecc_blocks, 1, RSGlobals);
+      rs_encode_long(data_blocks, data_part, ecc_part, RSGlobals);
       for i := ecc_blocks - 1 downto 0 do
         bscan(adjusted_string, ecc_part[i], $20);
-      rs_free();
+      rs_free(RSGlobals);
     end;
     8:
     begin
@@ -1327,12 +1328,12 @@ begin
         if (adjusted_string[(i * codeword_size) + 6] = '1') then Inc(data_part[i], 2);
         if (adjusted_string[(i * codeword_size) + 7] = '1') then Inc(data_part[i], 1);
       end;
-      rs_init_gf($12d);
-      rs_init_code(ecc_blocks, 1);
-      rs_encode_long(data_blocks, data_part, ecc_part);
+      rs_init_gf($12d, RSGlobals);
+      rs_init_code(ecc_blocks, 1, RSGlobals);
+      rs_encode_long(data_blocks, data_part, ecc_part, RSGlobals);
       for i := (ecc_blocks - 1) downto 0 do
         bscan(adjusted_string, ecc_part[i], $80);
-      rs_free();
+      rs_free(RSGlobals);
     end;
     10:
     begin
@@ -1349,12 +1350,12 @@ begin
         if (adjusted_string[(i * codeword_size) + 8] = '1') then Inc(data_part[i], 2);
         if (adjusted_string[(i * codeword_size) + 9] = '1') then Inc(data_part[i], 1);
       end;
-      rs_init_gf($409);
-      rs_init_code(ecc_blocks, 1);
-      rs_encode_long(data_blocks, data_part, ecc_part);
+      rs_init_gf($409, RSGlobals);
+      rs_init_code(ecc_blocks, 1, RSGlobals);
+      rs_encode_long(data_blocks, data_part, ecc_part, RSGlobals);
       for i := ecc_blocks - 1 downto 0 do
         bscan(adjusted_string, ecc_part[i], $200);
-      rs_free();
+      rs_free(RSGlobals);
     end;
     12:
     begin
@@ -1373,12 +1374,12 @@ begin
         if (adjusted_string[(i * codeword_size) + 10] = '1') then Inc(data_part[i], 2);
         if (adjusted_string[(i * codeword_size) + 11] = '1') then Inc(data_part[i], 1);
       end;
-      rs_init_gf($1069);
-      rs_init_code(ecc_blocks, 1);
-      rs_encode_long(data_blocks, data_part, ecc_part);
+      rs_init_gf($1069, RSGlobals);
+      rs_init_code(ecc_blocks, 1, RSGlobals);
+      rs_encode_long(data_blocks, data_part, ecc_part, RSGlobals);
       for i := ecc_blocks - 1 downto 0 do
         bscan(adjusted_string, ecc_part[i], $800);
-      rs_free();
+      rs_free(RSGlobals);
     end;
   end;
 
@@ -1463,11 +1464,11 @@ begin
   { Add reed-solomon error correction with Galois field GF(16) and prime
      modulus x^4 + x + 1 (section 7.2.3) }
 
-  rs_init_gf($13);
+  rs_init_gf($13, RSGlobals);
   if (compact <> 0) then
   begin
-    rs_init_code(5, 1);
-    rs_encode(2, desc_data, desc_ecc);
+    rs_init_code(5, 1, RSGlobals);
+    rs_encode(2, desc_data, desc_ecc, RSGlobals);
     for i := 0 to 4 do
     begin
       j := i shl 2 + 8;
@@ -1482,8 +1483,8 @@ begin
   end
   else
   begin
-    rs_init_code(6, 1);
-    rs_encode(4, desc_data, desc_ecc);
+    rs_init_code(6, 1, RSGlobals);
+    rs_encode(4, desc_data, desc_ecc, RSGlobals);
     for i := 0 to 5 do
     begin
       j := (i shl 2) + 16;
@@ -1496,7 +1497,7 @@ begin
       end;
     end;
   end;
-  rs_free();
+  rs_free(RSGlobals);
 
   { Merge descriptor with the rest of the symbol }
   for i := 0 to 39 do
@@ -1566,6 +1567,7 @@ var
   binary_string : TArrayOfChar;
   data_codewords, ecc_codewords : TArrayOfByte;
   i, j, v, x, y : Integer;
+  RSGlobals : TRSGlobals;
 begin
   SetLength(binary_string, 28);
   input_value := 0;
@@ -1627,10 +1629,10 @@ begin
     end;
   end;
 
-  rs_init_gf($13);
-  rs_init_code(5, 1);
-  rs_encode(2, data_codewords, ecc_codewords);
-  rs_free();
+  rs_init_gf($13, RSGlobals);
+  rs_init_code(5, 1, RSGlobals);
+  rs_encode(2, data_codewords, ecc_codewords, RSGlobals);
+  rs_free(RSGlobals);
 
   strcpy(binary_string, '');
 

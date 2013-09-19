@@ -465,8 +465,8 @@ const MicroAutosize : array[0..55] of Integer =
   1, 14, 2, 7, 3, 25, 8, 16, 5, 17, 9, 6, 10, 11, 28, 12, 19, 13, 29, 20, 30, 21, 22, 31, 23, 32, 33, 34
 );
 
-threadvar
-  liste : array[0..1] of array[0..999] of Integer;
+type
+  TGLoballiste = array[0..1] of array[0..999] of Integer;
 
 { 866 }
 
@@ -482,7 +482,7 @@ begin
 end;
 
 { 844 }
-procedure regroupe(var indexliste : Integer);
+procedure regroupe(var indexliste : Integer; var liste : TGLoballiste);
 var
   i, j : Integer;
 begin
@@ -516,7 +516,7 @@ end;
 
 
 { 478 }
-procedure pdfsmooth(var indexliste : Integer);
+procedure pdfsmooth(var indexliste : Integer; var liste : TGLoballiste);
 var
   i, crnt, last, next, _length : Integer;
 begin
@@ -554,7 +554,7 @@ begin
       end;
     end;
   end;
-  regroupe(indexliste);
+  regroupe(indexliste, liste);
   { 520 }
   for i := 0 to indexliste - 1 do
   begin
@@ -578,7 +578,7 @@ begin
     end;
   end;
   { 540 }
-  regroupe(indexliste);
+  regroupe(indexliste, liste);
 end;
 
 { 547 }
@@ -907,6 +907,7 @@ var
   chainemc : TArrayOfInteger;
   dummy : array[0..34] of Integer;
   codebarre, pattern : TArrayOfChar;
+  liste : TGLoballiste;
 begin
   SetLength(chainemc, 2700);
   SetLength(codebarre, 140);
@@ -935,7 +936,7 @@ begin
   until not (indexchaine < _length);
 
   { 474 }
-  pdfsmooth(indexliste);
+  pdfsmooth(indexliste, liste);
 
   { 541 - now compress the data }
   indexchaine := 0;
@@ -1204,6 +1205,7 @@ var
   codebarre, pattern : TArrayOfChar;
   variant, LeftRAPStart, CentreRAPStart, RightRAPStart, StartCluster : Integer;
   LeftRAP, CentreRAP, RightRAP, Cluster, writer, flip, loop : Integer;
+  liste : TGLoballiste;
 begin
   SetLength(chainemc, 2700);
   SetLength(codebarre, 100);
@@ -1233,7 +1235,7 @@ begin
   until not (indexchaine < _length);
 
   { 474 }
-  pdfsmooth(indexliste);
+  pdfsmooth(indexliste, liste);
 
   { 541 - now compress the data }
   indexchaine := 0;

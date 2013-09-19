@@ -35,8 +35,8 @@ uses
 const
   DPDSET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*';
 
-threadvar
-  list : array[0..1] of array[0..169] of Integer;
+type
+  TGlobalList = array[0..1] of array[0..169] of Integer;
 
 const
   {Code 128 tables checked against ISO/IEC 15417:2007 }
@@ -59,7 +59,7 @@ const
  {
  * bring together same type blocks
  }
-procedure grwp(var indexliste : Integer);
+procedure grwp(var indexliste : Integer; var list : TGlobalList);
 var
   i, j : Integer;
 begin
@@ -91,7 +91,7 @@ end;
  {
  * Implements rules from ISO 15417 Annex E
  }
-procedure dxsmooth(var indexliste : Integer);
+procedure dxsmooth(var indexliste : Integer; var list : TGlobalList);
 var
 	i, current, _length, last, next : Integer;
 begin
@@ -198,7 +198,7 @@ begin
       end;
 		end; { Rule 2 is implimented elsewhere, Rule 6 is implied }
 	end;
-	grwp(indexliste);
+	grwp(indexliste, list);
 end;
 
  {
@@ -263,6 +263,7 @@ var
   mode : Integer;
   glyph_count : Single;
   dest : TArrayOfChar;
+  list : TGlobalList;
 begin
   SetLength(_set, 170);
   Fill(_set, Length(_set), ' ');
@@ -362,7 +363,7 @@ begin
 		Inc(indexliste);
 	until not (indexchaine < sourcelen);
 
-	dxsmooth(indexliste);
+	dxsmooth(indexliste, list);
 
 	{ Resolve odd length LATCHC blocks }
 	if ((list[1][0] = LATCHC) and ((list[0][0] and 1) <> 0)) then
@@ -710,6 +711,7 @@ var
   separator_row, linkage_flag, c_count : Integer;
   reduced : TArrayOfChar;
   i, j : Integer;
+  list : TGlobalList;
 begin
   SetLength(dest, 1000);
   SetLength(values, 170);
@@ -782,7 +784,7 @@ begin
 		Inc(indexliste);
 	until not (indexchaine < zint_common.strlen(reduced));
 
-	dxsmooth(indexliste);
+	dxsmooth(indexliste, list);
 
 	{ Put set data into _set[] }
 	read := 0;

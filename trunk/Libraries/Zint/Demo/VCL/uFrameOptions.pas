@@ -35,7 +35,7 @@ var
   i: Integer;
 begin
   FSymbol:=ASymbol;
-  FOptionPropertyObj:=TCustomZintSymbolOptions({$IFDEF declared(NativeInt)}NativeInt{$ELSE}Integer{$ENDIF}(rttihGetPropertyValue(FSymbol, AOptionProperty)));
+  FOptionPropertyObj:=TCustomZintSymbolOptions({$IF declared(NativeInt)}NativeInt{$ELSE}Integer{$IFEND}(rttihGetPropertyValue(FSymbol, AOptionProperty)));
 
   Properties:=TStringList.Create;
   try

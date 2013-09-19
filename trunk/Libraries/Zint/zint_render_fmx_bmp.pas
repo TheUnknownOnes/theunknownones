@@ -17,13 +17,15 @@ uses
 
 type
   TZintBMPRenderTarget = class(TZintCanvasRenderTarget)
+  private
+    FBitmap: TBitmap;
+    procedure SetBitmap(const Value: TBitmap);
   protected
     FBMP : TBitmap;
 
     procedure Inflate(const ANewWidth, ANewHeight : Single); override;
   public
-    constructor Create(ABMP: TBitmap); reintroduce; virtual;
-    procedure Render(ASymbol : TZintSymbol); override;
+    property Bitmap: TBitmap read FBitmap write SetBitmap;
   end;
 
 implementation
@@ -37,19 +39,15 @@ begin
   FBMP.Width:=Round(ANewWidth);
 end;
 
-constructor TZintBMPRenderTarget.Create(ABMP: TBitmap);
+procedure TZintBMPRenderTarget.SetBitmap(const Value: TBitmap);
 begin
-  inherited Create(nil);
-  FBMP:=ABMP;
-  FWidthDesired:=ABMP.Width;
-  FHeightDesired:=ABMP.Height;
-end;
-
-procedure TZintBMPRenderTarget.Render(ASymbol: TZintSymbol);
-begin
-  FCanvas:=FBMP.Canvas;
-
-  inherited;
+  FBitmap := Value;
+  if Assigned(Value) then
+  begin
+    FWidthDesired:=Value.Width;
+    FHeightDesired:=Value.Height;
+    Canvas:=Value.Canvas;
+  end;
 end;
 
 end.

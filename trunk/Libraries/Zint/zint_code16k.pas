@@ -28,8 +28,8 @@ implementation
 
 uses zint_common, zint_helper;
 
-threadvar
-  list : array[0..1] of array[0..169] of Integer;
+type
+  TGlobalList = array[0..1] of array[0..169] of Integer;
 
 { EN 12323 Table 1 - "Code 16K" character encodations }
 const C16KTable : array[0..106] of String = ('212222', '222122', '222221', '121223', '121322', '131222', '122213',
@@ -54,7 +54,7 @@ const C16KStartValues : array[0..15] of Integer = (0, 1, 2, 3, 4, 5, 6, 7, 0, 1,
 const C16KStopValues : array[0..15] of Integer = (0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7, 0, 1, 2, 3);
 
 { bring together same type blocks }
-procedure grwp16(var indexliste : Integer);
+procedure grwp16(var indexliste : Integer; var list : TGlobalList);
 var
   i, j : Integer;
 begin
@@ -83,7 +83,7 @@ begin
 end;
 
 { Implements rules from ISO 15417 Annex E }
-procedure dxsmooth16(var indexliste : Integer);
+procedure dxsmooth16(var indexliste : Integer; var list : TGlobalList);
 var
   current, last, next, _length : Integer;
   i : Integer;
@@ -162,7 +162,7 @@ begin
         begin list[1][i] := LATCHB; current := LATCHB; end;
     end; { Rule 2 is implimented elsewhere, Rule 6 is implied }
   end;
-  grwp16(indexliste);
+  grwp16(indexliste, list);
 end;
 
 procedure c16k_set_a(source : Byte; var values : TArrayOfInteger; var bar_chars : Integer);
@@ -207,6 +207,7 @@ var
   errornum, first_sum, second_sum : Integer;
   input_length : Integer;
   gs1, c_count : Integer;
+  list : TGlobalList;
 begin
   SetLength(width_pattern, 100);
   SetLength(_set, 160);
@@ -294,7 +295,7 @@ begin
     Inc(indexliste);
   until not (indexchaine <= input_length);
 
-  dxsmooth16(indexliste);
+  dxsmooth16(indexliste, list);
 
   { Put set data into _set[] }
   read := 0;
@@ -332,9 +333,10 @@ begin
     until not (_set[i] = 'b');
   end;
 
-  { Watch out for odd-_length Mode C blocks }
+  { Watch out for odd-length Mode C blocks }
   c_count := 0;
-  for i := 0 to read - 1 do
+  i := 0;
+  while i < read do
   begin
     if (_set[i] = 'C') then
     begin
@@ -363,6 +365,7 @@ begin
       end;
       c_count := 0;
     end;
+    Inc(i);
   end;
   if (c_count and 1) <> 0 then
   begin

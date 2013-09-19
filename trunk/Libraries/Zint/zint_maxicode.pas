@@ -29,8 +29,8 @@ implementation
 uses
   zint_common, zint_reedsol, zint_helper;
 
-threadvar
-  maxi_codeword : array[0..143] of Integer;
+type
+  TGlobalmaxi_codeword = array[0..143] of Integer;
 
 const MaxiGrid : array[0..989] of Integer = ( { ISO/IEC 16023 Figure 5 - MaxiCode Module Sequence } { 30 x 33 data grid }
 	122, 121, 128, 127, 134, 133, 140, 139, 146, 145, 152, 151, 158, 157, 164, 163, 170, 169, 176, 175, 182, 181, 188, 187, 194, 193, 200, 199, 0, 0,
@@ -102,11 +102,12 @@ const maxiSymbolChar : array[0..255] of Integer = ( { from Appendix A - ASCII ch
 );
 
 { Handles error correction of primary message }
-procedure maxi_do_primary_check;
+procedure maxi_do_primary_check(var maxi_codeword : TGlobalmaxi_codeword);
 var
   data : TArrayOfByte;
   results : TArrayOfByte;
   j : Integer;
+  RSGlobals : TRSGlobals;
 const
   datalen = 10;
   ecclen = 10;
@@ -114,34 +115,35 @@ begin
   SetLength(data, 15);
   SetLength(results, 15);
 
-  rs_init_gf($43);
-  rs_init_code(ecclen, 1);
+  rs_init_gf($43, RSGlobals);
+  rs_init_code(ecclen, 1, RSGlobals);
 
   for j := 0 to datalen - 1 do
     data[j] := maxi_codeword[j];
 
-  rs_encode(datalen, data, results);
+  rs_encode(datalen, data, results, RSGlobals);
 
   for j := 0 to ecclen - 1 do
     maxi_codeword[ datalen + j] := results[ecclen - 1 - j];
 
-  rs_free();
+  rs_free(RSGlobals);
 end;
 
 { Handles error correction of odd characters in secondary }
-procedure maxi_do_secondary_chk_odd(ecclen : Integer);
+procedure maxi_do_secondary_chk_odd(ecclen : Integer; var maxi_codeword : TGlobalmaxi_codeword);
 var
   data : TArrayOfByte;
   results : TArrayOfByte;
   j : Integer;
   datalen : Integer;
+  RSGlobals : TRSGlobals;
 begin
   SetLength(data, 100);
   SetLength(results, 30);
   datalen := 68;
 
-  rs_init_gf($43);
-  rs_init_code(ecclen, 1);
+  rs_init_gf($43, RSGlobals);
+  rs_init_code(ecclen, 1, RSGlobals);
 
   if (ecclen = 20) then
     datalen := 84;
@@ -150,21 +152,22 @@ begin
     if (j and 1) <> 0 then  // odd
       data[(j-1) div 2] := maxi_codeword[j + 20];
 
-  rs_encode(datalen div 2, data, results);
+  rs_encode(datalen div 2, data, results, RSGlobals);
 
   for j := 0 to ecclen - 1 do
     maxi_codeword[ datalen + (2 *j) + 1 + 20 ] := results[ecclen - 1 - j];
 
-  rs_free();
+  rs_free(RSGlobals);
 end;
 
 { Handles error correction of even characters in secondary }
-procedure maxi_do_secondary_chk_even(ecclen : Integer);
+procedure maxi_do_secondary_chk_even(ecclen : Integer; var maxi_codeword : TGlobalmaxi_codeword);
 var
   data : TArrayOfByte;
   results : TArrayOfByte;
   j : Integer;
   datalen : Integer;
+  RSGlobals : TRSGlobals;
 begin
   SetLength(data, 100);
   SetLength(results, 30);
@@ -173,18 +176,18 @@ begin
   if (ecclen = 20) then
     datalen := 84;
 
-  rs_init_gf($43);
-  rs_init_code(ecclen, 1);
+  rs_init_gf($43, RSGlobals);
+  rs_init_code(ecclen, 1, RSGlobals);
 
   for j := 0 to datalen do
     if ((j and 1) = 0) then // even
       data[j div 2] := maxi_codeword[j + 20];
 
-  rs_encode(datalen div 2, data, results);
+  rs_encode(datalen div 2, data, results, RSGlobals);
 
   for j := 0 to ecclen - 1 do
     maxi_codeword[ datalen + (2 *j) + 20] := results[ecclen - 1 - j];
-  rs_free();
+  rs_free(RSGlobals);
 end;
 
 { Moves everything up so that a shift or latch can be inserted }
@@ -200,7 +203,7 @@ begin
 end;
 
 { Format text according to Appendix A }
-function maxi_text_process(mode : Integer; source : TArrayOfChar; _length : Integer) : Integer;
+function maxi_text_process(mode : Integer; source : TArrayOfChar; _length : Integer; var maxi_codeword : TGlobalmaxi_codeword) : Integer;
 var
   _set, character : TArrayOfInteger;
   i : Integer;
@@ -636,7 +639,7 @@ begin
 end;
 
 { Format structured primary for Mode 2 }
-procedure maxi_do_primary_2(postcode : TArrayOfChar; country : Integer; service : Integer);
+procedure maxi_do_primary_2(postcode : TArrayOfChar; country : Integer; service : Integer; var maxi_codeword : TGlobalmaxi_codeword);
 var
   postcode_length, postcode_num : Integer;
   i : Integer;
@@ -661,7 +664,7 @@ begin
 end;
 
 { Format structured primary for Mode 3 }
-procedure maxi_do_primary_3(postcode : TArrayOfByte; country : Cardinal; service : Integer);
+procedure maxi_do_primary_3(postcode : TArrayOfByte; country : Cardinal; service : Integer; var maxi_codeword : TGlobalmaxi_codeword);
 var
   i, h : Integer;
 begin
@@ -700,6 +703,7 @@ var
   internal_error, eclen, error_number : Integer;
   postcode, countrystr, servicestr : TArrayOfChar;
   local_source : TArrayOfChar;
+  maxi_codeword : TGlobalmaxi_codeword;
 begin
   SetLength(local_source, _length + 1);
   SetLength(postcode, 12);
@@ -807,13 +811,13 @@ begin
     countrycode := StrToInt(ArrayOfCharToString(countrystr));
     service := StrToInt(ArrayOfCharToString(servicestr));
 
-    if (mode = 2) then maxi_do_primary_2( postcode, countrycode, service);
-    if (mode = 3) then maxi_do_primary_3( ArrayOfCharToArrayOfByte(postcode), countrycode, service);
+    if (mode = 2) then maxi_do_primary_2( postcode, countrycode, service, maxi_codeword);
+    if (mode = 3) then maxi_do_primary_3( ArrayOfCharToArrayOfByte(postcode), countrycode, service, maxi_codeword);
   end
   else
     maxi_codeword[0] := mode;
 
-  i := maxi_text_process(mode,  local_source, _length);
+  i := maxi_text_process(mode,  local_source, _length, maxi_codeword);
   if (i = ZERROR_TOO_LONG ) then
   begin
     strcpy(symbol.errtxt, 'Input data too long');
@@ -821,15 +825,15 @@ begin
   end;
 
   { All the data is sorted - now do error correction }
-  maxi_do_primary_check();  { always EEC }
+  maxi_do_primary_check(maxi_codeword);  { always EEC }
 
   if ( mode = 5 ) then
     eclen := 56   // 68 data codewords , 56 error corrections
   else
     eclen := 40;  // 84 data codewords,  40 error corrections
 
-  maxi_do_secondary_chk_even(eclen div 2);  // do error correction of even
-  maxi_do_secondary_chk_odd(eclen div 2);   // do error correction of odd
+  maxi_do_secondary_chk_even(eclen div 2, maxi_codeword);  // do error correction of even
+  maxi_do_secondary_chk_odd(eclen div 2, maxi_codeword);   // do error correction of odd
 
   { Copy data into symbol grid }
   for i := 0 to 32 do

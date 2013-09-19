@@ -17,19 +17,22 @@ unit zint_render_canvas;
 interface
 
 uses
-  zint, Graphics;
+  Classes, zint, Graphics;
 
 type
 
-  { TZintCanvasRenderTarget }
+  { TZintRenderTargetCanvas }
 
-  TZintCanvasRenderTarget = class(TZintCustomRenderTarget)
+  TZintRenderTargetCanvas = class(TZintCustomRenderTarget)
   protected
     FCanvas : TCanvas;
     FFGColor: TColor;
     FBGColor: TColor;
     FFont: TFont;
-    procedure SetFont(const Value: TFont);
+
+    procedure OnFontChange(Sender : TObject);
+    procedure SetCanvas(const Value: TCanvas); virtual;
+    procedure SetFont(const Value: TFont); virtual;
     procedure ClearBackground(const AParams : TZintClearBackgroundParams); override;
     procedure DrawRect(const AParams : TZintDrawRectParams); override;
     procedure DrawHexagon(const AParams : TZintDrawHexagonParams); override;
@@ -37,28 +40,56 @@ type
     procedure DrawText(const AParams: TZintDrawTextParams); override;
     function CalcTextHeight(const AParams : TZintCalcTextHeightParams) : Single; override;
     function CalcTextWidth(const AParams : TZintCalcTextWidthParams) : Single; override;
+    procedure Inflate(const ANewWidth, ANewHeight : Single); override;
     procedure RenderStart; override;
+    procedure SetColor(const Index: Integer; const Value: TColor); virtual;
   public
-    constructor Create(ACanvas: TCanvas); reintroduce; virtual;
+    constructor Create(AOwner : TPersistent); override;
     destructor Destroy; override;
-    property ForegroundColor : TColor read FFGColor write FFGColor;
-    property BackgroundColor : TColor read FBGColor write FBGColor;
+
+    property Canvas : TCanvas read FCanvas write SetCanvas;
+  published
+    property ForegroundColor : TColor index 0 read FFGColor write SetColor default clBlack;
+    property BackgroundColor : TColor index 1 read FBGColor write SetColor default clWhite;
     property Font: TFont read FFont write SetFont;
   end;
 
 implementation
 
 uses
-  Classes, Types;
+  Types;
 
-{ TZintCanvasRenderTarget }
+{ TZintRenderTargetCanvas }
 
-procedure TZintCanvasRenderTarget.SetFont(const Value: TFont);
+procedure TZintRenderTargetCanvas.SetCanvas(const Value: TCanvas);
 begin
-  FFont.Assign(Value);
+  if Assigned(Value) then
+  begin
+    FXDesired := Value.ClipRect.Left;
+    FYDesired := Value.ClipRect.Top;
+    FWidthDesired:=Value.ClipRect.Right-Value.ClipRect.Left;
+    FHeightDesired:=Value.ClipRect.Right-Value.ClipRect.Left;
+  end;
+  FCanvas := Value;
 end;
 
-procedure TZintCanvasRenderTarget.ClearBackground(
+procedure TZintRenderTargetCanvas.SetColor(const Index: Integer;
+  const Value: TColor);
+begin
+  case Index of
+    0 : FFGColor := Value;
+    1 : FBGColor := Value;
+  end;
+  Changed;
+end;
+
+procedure TZintRenderTargetCanvas.SetFont(const Value: TFont);
+begin
+  FFont.Assign(Value);
+  Changed;
+end;
+
+procedure TZintRenderTargetCanvas.ClearBackground(
   const AParams: TZintClearBackgroundParams);
 begin
   FCanvas.Brush.Color:=FBGColor;
@@ -72,20 +103,18 @@ begin
                     Round(AParams.Y) + Round(AParams.Height));
 end;
 
-procedure TZintCanvasRenderTarget.DrawRect(const AParams: TZintDrawRectParams);
+procedure TZintRenderTargetCanvas.DrawRect(const AParams: TZintDrawRectParams);
 begin
-  FCanvas.Pen.Style:=psSolid;
-  FCanvas.Pen.Color:=FFGColor;
   FCanvas.Brush.Color:=FFGColor;
   FCanvas.Brush.Style:=bsSolid;
-  FCanvas.Rectangle(Round(AParams.X),
-                    Round(AParams.Y),
-                    Round(AParams.X + AParams.Width),
-                    Round(AParams.Y + AParams.Height));
+  FCanvas.FillRect(Rect(Round(AParams.X),
+                        Round(AParams.Y),
+                        Round(AParams.X + AParams.Width),
+                        Round(AParams.Y + AParams.Height)));
 
 end;
 
-procedure TZintCanvasRenderTarget.DrawHexagon(const AParams: TZintDrawHexagonParams);
+procedure TZintRenderTargetCanvas.DrawHexagon(const AParams: TZintDrawHexagonParams);
 var
   hexagon_width, hexagon_height : Single;
   Points : array[0..5] of TPoint;
@@ -111,7 +140,7 @@ begin
   {$ENDIF}
 end;
 
-procedure TZintCanvasRenderTarget.DrawRing(const AParams: TZintDrawRingParams);
+procedure TZintRenderTargetCanvas.DrawRing(const AParams: TZintDrawRingParams);
 var
   LineWidth, HalfLineWidth : Integer;
 begin
@@ -128,7 +157,7 @@ begin
                   Round(AParams.y + AParams.OuterRadius - HalfLineWidth));
 end;
 
-procedure TZintCanvasRenderTarget.DrawText(const AParams: TZintDrawTextParams);
+procedure TZintRenderTargetCanvas.DrawText(const AParams: TZintDrawTextParams);
 var
   r : TRect;
   txt : String;
@@ -152,42 +181,46 @@ begin
   {$ENDIF}
 end;
 
-function TZintCanvasRenderTarget.CalcTextHeight(const AParams : TZintCalcTextHeightParams): Single;
+procedure TZintRenderTargetCanvas.Inflate(const ANewWidth, ANewHeight: Single);
+begin
+  //a canvas can't inflate, but we have to prevent the abstract-error
+end;
+
+procedure TZintRenderTargetCanvas.OnFontChange(Sender: TObject);
+begin
+  Changed;
+end;
+
+function TZintRenderTargetCanvas.CalcTextHeight(const AParams : TZintCalcTextHeightParams): Single;
 begin
   Result := FCanvas.TextHeight(AParams.Text);
 end;
 
-function TZintCanvasRenderTarget.CalcTextWidth(const AParams : TZintCalcTextWidthParams): Single;
+function TZintRenderTargetCanvas.CalcTextWidth(const AParams : TZintCalcTextWidthParams): Single;
 begin
   Result := FCanvas.TextWidth(AParams.Text);
 end;
 
-procedure TZintCanvasRenderTarget.RenderStart;
+procedure TZintRenderTargetCanvas.RenderStart;
 begin
   FCanvas.Font.Assign(Font);
 end;
 
-constructor TZintCanvasRenderTarget.Create(ACanvas: TCanvas);
+constructor TZintRenderTargetCanvas.Create(AOwner : TPersistent);
 begin
-  inherited Create();
-
   FFont:=TFont.Create;
   FFont.Color:=clBlack;
+  FFont.OnChange := {$IFDEF FPC}@{$ENDIF}OnFontChange;
   FFGColor:=clBlack;
   FBGColor:=clWhite;
 
-  if Assigned(ACanvas) then
-  begin
-    FWidth:=ACanvas.ClipRect.Right-ACanvas.ClipRect.Left;
-    FHeight:=ACanvas.ClipRect.Right-ACanvas.ClipRect.Left;
-  end;
-  FCanvas := ACanvas;
+  inherited;
 end;
 
-destructor TZintCanvasRenderTarget.Destroy;
+destructor TZintRenderTargetCanvas.Destroy;
 begin
   FFont.Free;
-  inherited Destroy;
+  inherited;
 end;
 
 

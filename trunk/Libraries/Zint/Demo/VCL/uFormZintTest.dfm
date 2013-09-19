@@ -66,7 +66,6 @@ object Form46: TForm46
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitTop = -6
     object edData: TEdit
       Left = 8
       Top = 8

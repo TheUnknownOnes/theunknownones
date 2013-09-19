@@ -70,8 +70,8 @@ const aRAPTable : array[0..67] of Integer = (
 	6, 0, 3, 3, 3, 0, 3, 3, 0, 3, 6, 6, 0, 0, 0, 0, 3
 );
 
-threadvar
-  pwr928 : array[0..68] of array[0..6] of Word;
+type
+  TGlobalpwr928 = array[0..68] of array[0..6] of Word;
 
 function _min(first : Integer; second : Integer) : Integer;
 begin
@@ -91,7 +91,7 @@ begin
 end;
 
 { initialize pwr928 encoding table }
-procedure init928();
+procedure init928(var pwr928 : TGlobalpwr928);
 var
   i, j, v : Integer;
   cw : array[0..6] of Integer;
@@ -117,7 +117,7 @@ begin
 end;
 
 { converts bit string to base 928 values, codeWords[0] is highest order }
-function encode928(bitString : TArrayOfWord; var codeWords : TArrayOfWord; bitLng : Integer) : Integer;
+function encode928(bitString : TArrayOfWord; var codeWords : TArrayOfWord; bitLng : Integer; var pwr928 : TGlobalpwr928) : Integer;
 var
   i, j, b, bitCnt, cwNdx, cwCnt, cwLng : Integer;
 begin
@@ -162,6 +162,7 @@ var
   codeWords, bitStr : TArrayOfWord;
   codebarre, pattern : TArrayOfChar;
   local_source : TArrayOfChar; { A copy of source but with padding zeroes to make 208 bits }
+  pwr928 : TGlobalpwr928;
 begin
   SetLength(codebarre, 100);
   SetLength(pattern, 580);
@@ -200,9 +201,9 @@ begin
     if (local_source[strpos + 15] = '1') then Inc(bitStr[segment], $01);
   end;
 
-  init928();
+  init928(pwr928);
   { encode codeWords from bitStr }
-  cwCnt := encode928(bitStr, codeWords, bitlen);
+  cwCnt := encode928(bitStr, codeWords, bitlen, pwr928);
 
   case cc_width of
     2:
@@ -1877,7 +1878,7 @@ begin
     result := ZERROR_TOO_LONG; exit;
   end;
 
-  linear := TZintSymbol.Create(); { Symbol contains the 2D component and Linear contains the rest }
+  linear := TZintSymbol.Create(nil); { Symbol contains the 2D component and Linear contains the rest }
 
   error_number := gs1_verify(symbol, source, _length, reduced);
   if (error_number <> 0) then begin result := error_number; exit; end;

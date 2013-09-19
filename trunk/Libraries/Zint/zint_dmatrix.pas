@@ -224,12 +224,13 @@ var
   blocks, b : Integer;
   n, p : Integer;
   buf, ecc : TArrayOfByte;
+  RSGlobals : TRSGlobals;
 begin
   SetLength(buf, 256);
   SetLength(ecc, 256);
   blocks := (bytes + 2) div datablock;
-  rs_init_gf($12d);
-  rs_init_code(rsblock, 1);
+  rs_init_gf($12d, RSGlobals);
+  rs_init_code(rsblock, 1, RSGlobals);
   for b := 0 to blocks - 1 do
   begin
     p := 0;
@@ -240,7 +241,7 @@ begin
       Inc(p);
       Inc(n, blocks);
     end;
-    rs_encode(p, buf, ecc);
+    rs_encode(p, buf, ecc, RSGlobals);
     p := rsblock - 1;  // comes back reversed
     n := b;
     while n < rsblock * blocks do
@@ -268,7 +269,7 @@ begin
       Inc(n, blocks);
     end;
   end;
-  rs_free();
+  rs_free(RSGlobals);
 end;
 
 function isx12(source : Byte) : Integer;

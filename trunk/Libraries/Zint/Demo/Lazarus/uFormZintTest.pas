@@ -49,8 +49,8 @@ procedure TformZintTest.FormCreate(Sender: TObject);
 var
   i: integer;
 begin
-  for i := Low(ZintSymbologies) to High(ZintSymbologies) do
-    comType.Items.AddObject(ZintSymbologies[i].DisplayName, TObject(ZintSymbologies[i].Symbology));
+  for i := Low(ZintSymbologyInfos) to High(ZintSymbologyInfos) do
+    comType.Items.AddObject(ZintSymbologyInfos[i].DisplayName, TObject(ZintSymbologyInfos[i].Symbology));
 
   comType.ItemIndex := 0;
 end;
@@ -76,18 +76,18 @@ procedure TformZintTest.GenBarcode;
 var
   symbol: TZintSymbol;
   {$IFDEF RenderBMP}
-  rt: TZintBMPRenderTarget;
+  rt: TZintRenderTargetBMP;
   img: TBitmap;
   {$ELSE}
-  rt: TZintLMFRenderTarget;
+  rt: TZintRenderTargetLMF;
   img: TlmfImage;
   {$ENDIF}
 begin
   imgResult.Picture.Graphic := nil;
   lblError.Caption := '';
 
-  symbol := TZintSymbol.Create;
-  symbol.symbology := Integer(comType.Items.Objects[comType.ItemIndex]);
+  symbol := TZintSymbol.Create(nil);
+  symbol.SymbolType := TZintSymbology(comType.Items.Objects[comType.ItemIndex]);
   symbol.input_mode := UNICODE_MODE;
   symbol.primary := StrToArrayOfChar(edPrimary.Text);
   try
@@ -96,19 +96,22 @@ begin
     img := TBitmap.Create;
     img.PixelFormat := pf8bit;
     img.SetSize(imgResult.Width, imgResult.Height);
-    rt := TZintBMPRenderTarget.Create(img);
+    rt := TZintRenderTargetBMP.Create(nil);
+    rt.Bitmap := img;
     {$ELSE}
     img := TlmfImage.Create;
     img.Width := imgResult.Width;
     img.Height := imgResult.Height;
-    rt := TZintLMFRenderTarget.Create(img);
+    rt := TZintRenderTargetLMF.Create(nil);
+    rt.Metafile := img;
     {$ENDIF}
     rt.Font.Height := 23;
     rt.Font.Name := 'Arial';
     rt.TextSpacing.left.TargetUnits := 10;
     rt.TextSpacing.Right.TargetUnits := 10;
-    //rt.Whitespace.SetModules(1);
-    //rt.Border.SetModules(1);
+    rt.Whitespace.Modules := 1;
+    rt.Border.Modules := 0;
+    rt.MaxModuleWidth := 3;
     rt.HAlign := haCenter;
     rt.VAlign := vaCenter;
     try

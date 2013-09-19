@@ -643,6 +643,7 @@ var
   ecc_block : TArrayOfByte;
   interleaved_data :  TArrayOfInteger;
   interleaved_ecc : TArrayOfInteger;
+  RSGlobals : TRSGlobals;
 begin
 	// Split data into blocks, add error correction and then interleave the blocks and error correction data
 	ecc_cw := qr_total_codewords[version - 1] - data_cw;
@@ -671,10 +672,10 @@ begin
 		for j := 0 to length_this_block-1 do
       data_block[j] := datastream[posn + j];
 
-		rs_init_gf($11d);
-		rs_init_code(ecc_block_length, 0);
-		rs_encode(length_this_block, data_block, ecc_block);
-		rs_free();
+		rs_init_gf($11d, RSGlobals);
+		rs_init_code(ecc_block_length, 0, RSGlobals);
+		rs_encode(length_this_block, data_block, ecc_block, RSGlobals);
+		rs_free(RSGlobals);
 
     {$IFDEF DEBUG_ZINT}
 		write(Format('Block %d: ', [i + 1]));
@@ -1709,6 +1710,7 @@ var
 	bits_total, bits_left, remainder : Integer;
 	data_codewords, ecc_codewords : Integer;
 	data_blocks, ecc_blocks : TArrayOfByte;
+  RSGlobals : TRSGlobals;
 begin
 	SetLength(data_blocks, 4);
   SetLength(ecc_blocks, 3);
@@ -1784,10 +1786,10 @@ begin
 	if(binary_data[19] = '1') then inc( data_blocks[2], $01);
 
 	// Calculate Reed-Solomon error codewords
-	rs_init_gf($11d);
-	rs_init_code(ecc_codewords, 0);
-	rs_encode(data_codewords,data_blocks,ecc_blocks);
-	rs_free();
+	rs_init_gf($11d, RSGlobals);
+	rs_init_code(ecc_codewords, 0, RSGlobals);
+	rs_encode(data_codewords,data_blocks,ecc_blocks, RSGlobals);
+	rs_free(RSGlobals);
 
 	// Add Reed-Solomon codewords to binary data
 	for i := 0 to ecc_codewords - 1 do
@@ -1800,6 +1802,7 @@ var
 	bits_total, bits_left, remainder : Integer;
 	data_codewords, ecc_codewords : Integer;
 	data_blocks, ecc_blocks : TArrayOfByte;
+  RSGlobals : TRSGlobals;
 begin
 	SetLength(data_blocks, 6);
   SetLength(ecc_blocks, 7);
@@ -1856,10 +1859,10 @@ begin
 	end;
 
 	// Calculate Reed-Solomon error codewords
-	rs_init_gf($11d);
-	rs_init_code(ecc_codewords, 0);
-	rs_encode(data_codewords,data_blocks,ecc_blocks);
-	rs_free();
+	rs_init_gf($11d, RSGlobals);
+	rs_init_code(ecc_codewords, 0, RSGlobals);
+	rs_encode(data_codewords,data_blocks,ecc_blocks, RSGlobals);
+	rs_free(RSGlobals);
 
 	// Add Reed-Solomon codewords to binary data
   for i := 0 to ecc_codewords - 1 do
@@ -1872,6 +1875,7 @@ var
 	bits_total, bits_left, remainder : Integer;
 	data_codewords, ecc_codewords : Integer;
 	data_blocks, ecc_blocks : TArrayOfByte;
+  RSGlobals : TRSGlobals;
 begin
 	SetLength(data_blocks, 12);
   SetLength(ecc_blocks, 9);
@@ -1962,10 +1966,10 @@ begin
 	end;
 
 	// Calculate Reed-Solomon error codewords
-	rs_init_gf($11d);
-	rs_init_code(ecc_codewords, 0);
-	rs_encode(data_codewords,data_blocks,ecc_blocks);
-	rs_free();
+	rs_init_gf($11d, RSGlobals);
+	rs_init_code(ecc_codewords, 0, RSGlobals);
+	rs_encode(data_codewords,data_blocks,ecc_blocks, RSGlobals);
+	rs_free(RSGlobals);
 
 	// Add Reed-Solomon codewords to binary data
 	for i := 0 to ecc_codewords - 1 do
@@ -1980,6 +1984,7 @@ var
 	bits_total, bits_left, remainder : Integer;
 	data_codewords, ecc_codewords : Integer;
 	data_blocks, ecc_blocks : TArrayOfByte;
+  RSGlobals : TRSGlobals;
 begin
   SetLength(data_blocks,17);
   SetLength(ecc_blocks,15);
@@ -2040,10 +2045,10 @@ begin
 	end;
 
 	// Calculate Reed-Solomon error codewords
-	rs_init_gf($11d);
-	rs_init_code(ecc_codewords, 0);
-	rs_encode(data_codewords,data_blocks,ecc_blocks);
-	rs_free();
+	rs_init_gf($11d, RSGlobals);
+	rs_init_code(ecc_codewords, 0, RSGlobals);
+	rs_encode(data_codewords,data_blocks,ecc_blocks, RSGlobals);
+	rs_free(RSGlobals);
 
 	// Add Reed-Solomon codewords to binary data
 	for i := 0 to ecc_codewords - 1 do

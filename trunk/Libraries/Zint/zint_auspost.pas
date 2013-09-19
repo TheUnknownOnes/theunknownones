@@ -58,6 +58,7 @@ var
   reader, triple_writer : Integer;
   triple, inv_triple : TArrayOfByte;
   result : TArrayOfByte;
+  RSGlobals : TRSGlobals;
 begin
   triple_writer := 0;
   SetLength(triple, 31);
@@ -77,14 +78,14 @@ begin
   for reader := 0 to triple_writer - 1 do
     inv_triple[reader] := triple[(triple_writer - 1) - reader];
 
-  rs_init_gf($43);
-  rs_init_code(4, 1);
-  rs_encode(triple_writer, inv_triple, result);
+  rs_init_gf($43, RSGlobals);
+  rs_init_code(4, 1, RSGlobals);
+  rs_encode(triple_writer, inv_triple, result, RSGlobals);
 
   for reader := 4 downto 1 do
     concat(data_pattern, AusBarTable[result[reader - 1]]);
 
-  rs_free();
+  rs_free(RSGlobals);
 end;
 
 { Handles Australia Posts's 4 State Codes }
