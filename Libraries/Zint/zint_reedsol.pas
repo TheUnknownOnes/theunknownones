@@ -22,11 +22,21 @@ interface
 uses
   zint, zint_common;
 
-procedure rs_init_gf(poly : Integer);
-procedure rs_init_code(nsym : Integer; index : Integer);
-procedure rs_encode(len : Integer; const data : TArrayOfByte; var res : TArrayOfByte);
-procedure rs_encode_long(len : Integer; data : TArrayOfCardinal; var res : TArrayOfCardinal);
-procedure rs_free;
+type
+  TRSGlobals = record
+    gfpoly : Integer;
+    symsize : Integer;    // in bits
+    logmod : Integer;    // 2**Globals.symsize - 1
+    rlen : Integer;
+
+    logt, alog, rspoly : TArrayOfInteger;
+  end;
+
+procedure rs_init_gf(poly : Integer; var Globals : TRSGlobals);
+procedure rs_init_code(nsym : Integer; index : Integer; var Globals : TRSGlobals);
+procedure rs_encode(len : Integer; const data : TArrayOfByte; var res : TArrayOfByte; var Globals : TRSGlobals);
+procedure rs_encode_long(len : Integer; data : TArrayOfCardinal; var res : TArrayOfCardinal; var Globals : TRSGlobals);
+procedure rs_free(var Globals : TRSGlobals);
 
 implementation
 
@@ -49,13 +59,6 @@ implementation
 // malloc/free can be avoided by using static arrays of a suitable
 // size.
 
-var
-  gfpoly : Integer;
-  symsize : Integer;    // in bits
-  logmod : Integer;    // 2**symsize - 1
-  rlen : Integer;
-
-  logt, alog, rspoly : TArrayOfInteger;
 
 // rs_init_gf(poly) initialises the parameters for the Galois Field.
 // The symbol size is determined from the highest bit set in poly
@@ -67,7 +70,7 @@ var
 // polynomial.  e.g. for ECC200 (8-bit symbols) the polynomial is
 // a**8 + a**5 + a**3 + a**2 + 1, which translates to 0x12d.
 
-procedure rs_init_gf(poly : Integer);
+procedure rs_init_gf(poly : Integer; var Globals : TRSGlobals);
 var
   m, b, p, v : Integer;
 begin
@@ -82,20 +85,20 @@ begin
 
   b := b shr 1;
   Dec(m);
-  gfpoly := poly;
-  symsize := m;
+  Globals.gfpoly := poly;
+  Globals.symsize := m;
 
-  // Calculate the log/alog tables
-  logmod := (1 shl m) - 1;
-  SetLength(logt, logmod + 1);
-  SetLength(alog, logmod);
+  // Calculate the log/Globals.alog tables
+  Globals.logmod := (1 shl m) - 1;
+  SetLength(Globals.logt, Globals.logmod + 1);
+  SetLength(Globals.alog, Globals.logmod);
 
   p := 1;
   v := 0;
-  while (v < logmod) do
+  while (v < Globals.logmod) do
   begin
-    alog[v] := p;
-    logt[p] := v;
+    Globals.alog[v] := p;
+    Globals.logt[p] := v;
     p := p shl 1;
     if (p and b) <> 0 then
       p := p xor poly;
@@ -110,81 +113,81 @@ end;
 // (x + 2**i)*(x + 2**(i+1))*...   [nsym terms]
 // For ECC200, index is 1.
 
-procedure rs_init_code(nsym : Integer; index : Integer);
+procedure rs_init_code(nsym : Integer; index : Integer; var Globals : TRSGlobals);
 var
   i, k : Integer;
 begin
-  SetLength(rspoly, nsym + 1);
+  SetLength(Globals.rspoly, nsym + 1);
 
-  rlen := nsym;
+  Globals.rlen := nsym;
 
-  rspoly[0] := 1;
+  Globals.rspoly[0] := 1;
   for i := 1 to nsym do
   begin
-    rspoly[i] := 1;
+    Globals.rspoly[i] := 1;
     for k := i - 1 downto 1 do
     begin
-      if (rspoly[k] <> 0) then
-        rspoly[k] := alog[(logt[rspoly[k]] + index) mod logmod];
-      rspoly[k] := rspoly[k] xor rspoly[k - 1];
+      if (Globals.rspoly[k] <> 0) then
+        Globals.rspoly[k] := Globals.alog[(Globals.logt[Globals.rspoly[k]] + index) mod Globals.logmod];
+      Globals.rspoly[k] := Globals.rspoly[k] xor Globals.rspoly[k - 1];
     end;
-    rspoly[0] := alog[(logt[rspoly[0]] + index) mod logmod];
+    Globals.rspoly[0] := Globals.alog[(Globals.logt[Globals.rspoly[0]] + index) mod Globals.logmod];
     Inc(index);
   end;
 end;
 
-procedure rs_encode(len : Integer; const data : TArrayOfByte; var res : TArrayOfByte);
+procedure rs_encode(len : Integer; const data : TArrayOfByte; var res : TArrayOfByte; var Globals : TRSGlobals);
 var
   i, k, m : Integer;
 begin
-  for i := 0 to rlen - 1 do
+  for i := 0 to Globals.rlen - 1 do
     res[i] := 0;
   for i := 0 to len - 1 do
   begin
-    m := res[rlen - 1] xor data[i];
-    for k := rlen - 1 downto 1 do
+    m := res[Globals.rlen - 1] xor data[i];
+    for k := Globals.rlen - 1 downto 1 do
     begin
-      if (m <> 0) and (rspoly[k] <> 0) then
-        res[k] := res[k - 1] xor alog[(logt[m] + logt[rspoly[k]]) mod logmod]
+      if (m <> 0) and (Globals.rspoly[k] <> 0) then
+        res[k] := res[k - 1] xor Globals.alog[(Globals.logt[m] + Globals.logt[Globals.rspoly[k]]) mod Globals.logmod]
       else
         res[k] := res[k - 1];
     end;
-    if (m <> 0) and (rspoly[0] <> 0) then
-      res[0] := alog[(logt[m] + logt[rspoly[0]]) mod logmod]
+    if (m <> 0) and (Globals.rspoly[0] <> 0) then
+      res[0] := Globals.alog[(Globals.logt[m] + Globals.logt[Globals.rspoly[0]]) mod Globals.logmod]
     else
       res[0] := 0;
   end;
 end;
 
-procedure rs_encode_long(len : Integer; data : TArrayOfCardinal; var res : TArrayOfCardinal);
+procedure rs_encode_long(len : Integer; data : TArrayOfCardinal; var res : TArrayOfCardinal; var Globals : TRSGlobals);
 { The same as above but for larger bitlengths - Aztec code compatible }
 var
   i, k, m : Integer;
 begin
-  for i := 0 to rlen - 1 do
+  for i := 0 to Globals.rlen - 1 do
     res[i] := 0;
   for i := 0 to len - 1 do
   begin
-    m := res[rlen - 1] xor data[i];
-    for k := rlen - 1 downto 1 do
+    m := res[Globals.rlen - 1] xor data[i];
+    for k := Globals.rlen - 1 downto 1 do
     begin
-      if (m <> 0) and (rspoly[k] <> 0) then
-        res[k] := res[k - 1] xor alog[(logt[m] + logt[rspoly[k]]) mod logmod]
+      if (m <> 0) and (Globals.rspoly[k] <> 0) then
+        res[k] := res[k - 1] xor Globals.alog[(Globals.logt[m] + Globals.logt[Globals.rspoly[k]]) mod Globals.logmod]
       else
         res[k] := res[k - 1];
     end;
-    if (m <> 0) and (rspoly[0] <> 0) then
-      res[0] := alog[(logt[m] + logt[rspoly[0]]) mod logmod]
+    if (m <> 0) and (Globals.rspoly[0] <> 0) then
+      res[0] := Globals.alog[(Globals.logt[m] + Globals.logt[Globals.rspoly[0]]) mod Globals.logmod]
     else
       res[0] := 0;
   end;
 end;
 
-procedure rs_free;
+procedure rs_free(var Globals : TRSGlobals);
 begin { Free memory }
-  SetLength(logt, 0);
-  SetLength(alog, 0);
-  SetLength(rspoly, 0);
+  SetLength(Globals.logt, 0);
+  SetLength(Globals.alog, 0);
+  SetLength(Globals.rspoly, 0);
 end;
 
 end.

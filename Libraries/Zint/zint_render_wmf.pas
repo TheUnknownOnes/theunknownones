@@ -20,22 +20,24 @@ uses
   zint, zint_render_canvas, Graphics, SysUtils;
 
 type
-  TZintWMFRenderTarget = class(TZintCanvasRenderTarget)
+  TZintRenderTargetWMF = class(TZintRenderTargetCanvas)
   protected
-    FWMF : TMetafile;
+    FMetafile : TMetafile;
+    procedure SetWMF(const Value: TMetafile); virtual;
     function CalcTextWidth(const AParams : TZintCalcTextWidthParams) : Single; override;
     procedure Inflate(const ANewWidth, ANewHeight : Single); override;
-    procedure ReInitCanvas;
+    procedure CreateCanvas;
   public
-    constructor Create(AWMF: TMetafile); reintroduce; virtual;
     procedure Render(ASymbol : TZintSymbol); override;
+
+    property Metafile : TMetafile read FMetafile write SetWMF;
   end;
 
 implementation
 
-{ TZintWMFRenderTarget }
+{ TZintRenderTargetWMF }
 
-function TZintWMFRenderTarget.CalcTextWidth(
+function TZintRenderTargetWMF.CalcTextWidth(
   const AParams: TZintCalcTextWidthParams): Single;
 begin
   Result:=inherited CalcTextWidth(AParams);
@@ -44,39 +46,40 @@ begin
     Result:=Result * 2;
 end;
 
-constructor TZintWMFRenderTarget.Create(AWMF: TMetafile);
-begin
-  inherited Create(nil);
-  FWMF:=AWMF;
-  FWidthDesired:=FWMF.Width;
-  FHeightDesired:=FWMF.Height;
-end;
-
-procedure TZintWMFRenderTarget.Inflate(const ANewWidth, ANewHeight: Single);
+procedure TZintRenderTargetWMF.Inflate(const ANewWidth, ANewHeight: Single);
 begin
   if Assigned(FCanvas) then
     FreeAndNil(FCanvas);
 
-  FWMF.SetSize(Round(ANewWidth), Round(ANewHeight));
+  FMetafile.SetSize(Round(ANewWidth), Round(ANewHeight));
 
-  ReInitCanvas;
+  CreateCanvas;
 end;
 
-procedure TZintWMFRenderTarget.ReInitCanvas;
+procedure TZintRenderTargetWMF.CreateCanvas;
 begin
-  FCanvas:=TMetafileCanvas.Create(FWMF, 0);
+  FCanvas:=TMetafileCanvas.Create(FMetafile, 0);
   FCanvas.Font.Assign(FFont);
-  inherited;
 end;
 
-procedure TZintWMFRenderTarget.Render(ASymbol: TZintSymbol);
+procedure TZintRenderTargetWMF.Render(ASymbol: TZintSymbol);
 begin
-  ReInitCanvas;
+  CreateCanvas;
   try
     inherited;
   finally
     FCanvas.Free;
   end;
+end;
+
+procedure TZintRenderTargetWMF.SetWMF(const Value: TMetafile);
+begin
+  if Assigned(Value) then
+  begin
+    WidthDesired := Value.Width;
+    HeightDesired := Value.Height;
+  end;
+  FMetafile := Value;
 end;
 
 end.

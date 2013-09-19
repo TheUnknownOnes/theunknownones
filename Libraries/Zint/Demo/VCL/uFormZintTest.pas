@@ -74,7 +74,7 @@ uses zint_render_wmf, zint_render_canvas, Printers, zint_render_svg,
 procedure TForm46.btPrintClick(Sender: TObject);
 var
   symbol : TZintSymbol;
-  rt  : TZintCanvasRenderTarget;
+  rt  : TZintRenderTargetCanvas;
 begin
   lblError.Caption := '';
 
@@ -85,7 +85,8 @@ begin
     if Sender is TMenuItem then
       Printer.PrinterIndex:=TMenuItem(Sender).Tag;
     Printer.BeginDoc;
-    rt:=TZintCanvasRenderTarget.Create(Printer.Canvas);
+    rt:=TZintRenderTargetCanvas.Create(nil);
+    rt.Canvas:=Printer.Canvas;
     rt.Font.Assign(ButtonFont.Font);
     rt.Font.Height:=Abs(rt.Font.Height);
     rt.XDesired:=(Printer.Canvas.ClipRect.Right - Printer.Canvas.ClipRect.Left) / 3;
@@ -110,7 +111,7 @@ procedure TForm46.btSVGClick(Sender: TObject);
 var
   sl : TStringList;
   symbol : TZintSymbol;
-  rt  : TZintSVGRenderTarget;
+  rt  : TZintRenderTargetSVG;
 begin
   if SaveDialog1.Execute then
   begin
@@ -122,7 +123,7 @@ begin
       try
         symbol.Encode(edData.Text);
 
-        rt:=TZintSVGRenderTarget.Create(sl);
+        rt:=TZintRenderTargetSVG.Create(sl);
         rt.ForegroundColor:='black';
         rt.BackgroundColor:='white';
         rt.Transparent:=false;
@@ -173,12 +174,12 @@ end;
 procedure TForm46.FormCreate(Sender: TObject);
 var
   i : Integer;
-  sl : TStringList;
   mi : TMenuItem;
 begin
-  ReportMemoryLeaksOnShutdown := true;
-  for i := Low(ZintSymbologies) to High(ZintSymbologies) do
-    comType.Items.AddObject(ZintSymbologies[i].DisplayName, TObject(ZintSymbologies[i].Symbology));
+  //ReportMemoryLeaksOnShutdown := true;
+
+  for i := Low(ZintSymbologyInfos) to High(ZintSymbologyInfos) do
+    comType.Items.AddObject(ZintSymbologyInfos[i].DisplayName, TObject(ZintSymbologyInfos[i].Symbology));
 
   comType.ItemIndex := 0;
 
@@ -191,7 +192,7 @@ begin
     pumPrint.Items.Add(mi);
   end;
 
-  FSymbol:=TZintSymbol.Create;
+  FSymbol:=TZintSymbol.Create(nil);
 
   ProcessSymbol(FSymbol);
 
@@ -206,8 +207,8 @@ procedure TForm46.FormDestroy(Sender: TObject);
 var
   i : Integer;
 begin
-  for i := PageControl1.PageCount-1 downto 0 do
-    PageControl1.Pages[i].Free;
+ // for i := PageControl1.PageCount-1 downto 0 do
+ //   PageControl1.Pages[i].Free;
     
   FSymbol.Free;
 end;
@@ -221,7 +222,7 @@ function TForm46.GenSymbol: TZintSymbol;
 begin
   Result := FSymbol;
   Result.Clear;
-  Result.symbology := Integer(comType.Items.Objects[comType.ItemIndex]);
+  Result.SymbolType := TZintSymbology(comType.Items.Objects[comType.ItemIndex]);
   Result.input_mode := UNICODE_MODE;
 end;
 
@@ -241,7 +242,7 @@ begin
     begin
       Property_Value:=rttihGetPropertyValue(ASymbol, Properties[i]);
       
-      if TObject({$IFDEF declared(NativeInt)}NativeInt{$ELSE}Integer{$ENDIF}(Property_Value)).InheritsFrom(TCustomZintSymbolOptions) then
+      if TObject({$IF declared(NativeInt)}NativeInt{$ELSE}Integer{$IFEND}(Property_Value)).InheritsFrom(TCustomZintSymbolOptions) then
       begin
         ts:=TTabSheet.Create(PageControl1);
         ts.PageControl:=PageControl1;
@@ -276,7 +277,7 @@ procedure TForm46.GenBarcode;
 var
   symbol : TZintSymbol;
   wmf : TMetafile;
-  rt  : TZintWMFRenderTarget;
+  rt  : TZintRenderTargetWMF;
 begin
   imgResult.Picture.Graphic := nil;
   lblError.Caption := '';
@@ -287,7 +288,8 @@ begin
 
     wmf:=TMetafile.Create;
     wmf.SetSize(imgResult.Width, imgResult.Height);
-    rt:=TZintWMFRenderTarget.Create(wmf);
+    rt:=TZintRenderTargetWMF.Create(nil);
+    rt.Metafile:=wmf;
 
     rt.Font.Assign(ButtonFont.Font);
     InitRenderTarget(rt);

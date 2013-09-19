@@ -27,9 +27,9 @@ type
                        doInsertIntoExisting, //Barcode will be inserted into existing SVG document before the closing </svg> tag
                        doAppendFlat  //Barcode information will be written in SVG Format without and opening/closing tags
                        );
-  { TZintSVGRenderTarget }
+  { TZintRenderTargetSVG }
 
-  TZintSVGRenderTarget = class(TZintCustomRenderTarget)
+  TZintRenderTargetSVG = class(TZintCustomRenderTarget)
   private
     FFontHeight: Single;
   protected
@@ -67,21 +67,21 @@ uses
   Types, zint_helper;
 
 
-{ TZintSVGRenderTarget }
+{ TZintRenderTargetSVG }
 
-function TZintSVGRenderTarget.CalcTextHeight(
+function TZintRenderTargetSVG.CalcTextHeight(
   const AParams: TZintCalcTextHeightParams): Single;
 begin
   Result:=FFontHeight;
 end;
 
-function TZintSVGRenderTarget.CalcTextWidth(
+function TZintRenderTargetSVG.CalcTextWidth(
   const AParams: TZintCalcTextWidthParams): Single;
 begin
   Result:=FFontHeight*Length(AParams.Text); //we guess that;
 end;
 
-procedure TZintSVGRenderTarget.ClearBackground(
+procedure TZintRenderTargetSVG.ClearBackground(
   const AParams: TZintClearBackgroundParams);
 begin
   FSVGFile.Append(
@@ -95,9 +95,9 @@ begin
 
 end;
 
-constructor TZintSVGRenderTarget.Create(ASVGFile: TStringList);
+constructor TZintRenderTargetSVG.Create(ASVGFile: TStringList);
 begin
-  inherited Create;
+  inherited Create(nil);
   FSVGFile:=ASVGFile;
   FDocOption:=doSingleFile;
   FFGColor:='black';
@@ -108,7 +108,7 @@ begin
   FFormatSettings.ThousandSeparator:=#0;
 end;
 
-procedure TZintSVGRenderTarget.DrawHexagon(
+procedure TZintRenderTargetSVG.DrawHexagon(
   const AParams: TZintDrawHexagonParams);
 begin
    FSVGFile.Append(
@@ -123,7 +123,7 @@ begin
                   );
 end;
 
-procedure TZintSVGRenderTarget.DrawRect(const AParams: TZintDrawRectParams);
+procedure TZintRenderTargetSVG.DrawRect(const AParams: TZintDrawRectParams);
 begin
   FSVGFile.Append(
         Format('<rect x="%f" y="%f" width="%f" height="%f" style="fill:%s;stroke-width:0"/>',
@@ -135,7 +135,7 @@ begin
   );
 end;
 
-procedure TZintSVGRenderTarget.DrawRing(const AParams: TZintDrawRingParams);
+procedure TZintRenderTargetSVG.DrawRing(const AParams: TZintDrawRingParams);
 begin
   FSVGFile.Append(Format('<circle cx="%f" cy="%f" r="%f" stroke="%s" stroke-width="%f" fill="none"/>',
                       [AParams.x,
@@ -146,7 +146,7 @@ begin
 
 end;
 
-procedure TZintSVGRenderTarget.DrawStart;
+procedure TZintRenderTargetSVG.DrawStart;
 begin
   case FDocOption of
     doSingleFile: begin
@@ -161,14 +161,14 @@ begin
   FSVGFile.Append('<g><title>' + ArrayOfByteToString(FSymbol.text) + '</title><desc>Barcode generated using Zint</desc>');
 end;
 
-procedure TZintSVGRenderTarget.DrawStop;
+procedure TZintRenderTargetSVG.DrawStop;
 begin
   FSVGFile.Append('</g>');
   if FDocOption<>doAppendFlat then
     FSVGFile.Append('</svg>');
 end;
 
-procedure TZintSVGRenderTarget.DrawText(const AParams: TZintDrawTextParams);
+procedure TZintRenderTargetSVG.DrawText(const AParams: TZintDrawTextParams);
 begin
   FSVGFile.Append(
    Format('<text x="%f" y="%f" fill="%s" font-family="%s" font-size="%f" style="text-anchor:middle">%s</text>',
@@ -178,7 +178,7 @@ begin
 
 end;
 
-procedure TZintSVGRenderTarget.Render(ASymbol: TZintSymbol);
+procedure TZintRenderTargetSVG.Render(ASymbol: TZintSymbol);
 begin
   inherited;
 end;

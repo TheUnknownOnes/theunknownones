@@ -909,6 +909,7 @@ var
   block_size, data_size, ecc_size : Integer;
   data, block : TArrayOfInteger;
   data_block, ecc_block : TArrayOfByte;
+  RSGlobals : TRSGlobals;
 begin
   SetLength(data, 1320); SetLength(block, 130);
   SetLength(data_block, 115); SetLength(ecc_block, 70);
@@ -966,10 +967,10 @@ begin
     end;
 
     { Calculate ECC data for this block }
-    rs_init_gf($89);
-    rs_init_code(ecc_size, 1);
-    rs_encode(data_size, data_block, ecc_block);
-    rs_free();
+    rs_init_gf($89, RSGlobals);
+    rs_init_code(ecc_size, 1, RSGlobals);
+    rs_encode(data_size, data_block, ecc_block, RSGlobals);
+    rs_free(RSGlobals);
 
     { Correct error correction data but in reverse order }
     for j := 0 to data_size - 1 do

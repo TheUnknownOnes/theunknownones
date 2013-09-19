@@ -21,40 +21,42 @@ uses
 
 type
 
-  { TZintBMPRenderTarget }
+  { TZintRenderTargetBMP }
 
-  TZintBMPRenderTarget = class(TZintCanvasRenderTarget)
+  TZintRenderTargetBMP = class(TZintRenderTargetCanvas)
   protected
-    FBMP : TBitmap;
+    FBitmap : TBitmap;
+    procedure SetBitmap(const Value: TBitmap); virtual;
     procedure Inflate(const ANewWidth, ANewHeight : Single); override;
   public
-    constructor Create(ABMP: TBitmap); reintroduce; virtual;
     procedure Render(ASymbol : TZintSymbol); override;
+
+    property Bitmap : TBitmap read FBitmap write SetBitmap;
   end;
 
 implementation
 
-{ TZintBMPRenderTarget }
+{ TZintRenderTargetBMP }
 
-procedure TZintBMPRenderTarget.Inflate(const ANewWidth, ANewHeight: Single);
+procedure TZintRenderTargetBMP.Inflate(const ANewWidth, ANewHeight: Single);
 begin
-  FBMP.SetSize(Round(ANewWidth), Round(ANewHeight));
+  FBitmap.SetSize(Round(ANewWidth), Round(ANewHeight));
 end;
 
-constructor TZintBMPRenderTarget.Create(ABMP: TBitmap);
+procedure TZintRenderTargetBMP.Render(ASymbol: TZintSymbol);
 begin
-  inherited Create(nil);
-  FBMP := ABMP;
-  FXDesired := 0;
-  FYDesired := 0;
-  FWidthDesired := FBMP.Width;
-  FHeightDesired := FBMP.Height;
-end;
-
-procedure TZintBMPRenderTarget.Render(ASymbol: TZintSymbol);
-begin
-  FCanvas := FBMP.Canvas;
+  FCanvas := FBitmap.Canvas;
   inherited;
+end;
+
+procedure TZintRenderTargetBMP.SetBitmap(const Value: TBitmap);
+begin
+  if Assigned(Value) then
+  begin
+    FWidthDesired := Value.Width;
+    FHeightDesired := Value.Height
+  end;
+  FBitmap := Value;
 end;
 
 end.

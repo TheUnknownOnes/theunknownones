@@ -13,13 +13,15 @@ unit zint_render_fmx_canvas;
 interface
 
 uses
-  zint, FMX.Types, system.UITypes;
+  zint, FMX.Types, system.UITypes, Classes;
 
 type
 
   { TZintCanvasRenderTarget }
 
   TZintCanvasRenderTarget = class(TZintCustomRenderTarget)
+  private
+    procedure SetCanvas(const Value: TCanvas);
   protected
     FCanvas : TCanvas;
     FFGColor: TColor;
@@ -34,9 +36,10 @@ type
     function CalcTextWidth(const AParams : TZintCalcTextWidthParams) : Single; override;
     procedure SetFont(const Value: TFont);
   public
-    constructor Create(ACanvas: TCanvas); reintroduce; virtual;
+    constructor Create(AOwner : TPersistent); override;
+    property Canvas : TCanvas read FCanvas write SetCanvas;
     destructor Destroy; override;
-    procedure Render(ASymbol : TZintSymbol); override;
+  published
     property ForegroundColor : TColor read FFGColor write FFGColor;
     property BackgroundColor : TColor read FBGColor write FBGColor;
     property Font: TFont read FFont write SetFont;
@@ -45,7 +48,7 @@ type
 implementation
 
 uses
-  Classes, Types;
+  Types;
 
 { TZintCanvasRenderTarget }
 
@@ -125,9 +128,9 @@ begin
     FCanvas.Fill.Color:=FFGColor;
 
     FCanvas.Font.Size:=AParams.Height;
-    FCanvas.FillText(RectF(AParams.x - AParams.Width / 2,
+    FCanvas.FillText(RectF(AParams.x,
                            AParams.y,
-                           AParams.x+AParams.width / 2,
+                           AParams.x+AParams.width,
                            AParams.y+AParams.Height),
                          AParams.text, false,1, [], TTextAlign.taCenter);
 end;
@@ -144,129 +147,34 @@ begin
   Result:=FCanvas.TextWidth(AParams.Text);
 end;
 
+procedure TZintCanvasRenderTarget.SetCanvas(const Value: TCanvas);
+begin
+  if Assigned(Value) then
+  begin
+    FWidthDesired:=Value.Width;
+    FHeightDesired:=Value.Height;
+  end;
+  FCanvas := Value;
+end;
+
 procedure TZintCanvasRenderTarget.SetFont(const Value: TFont);
 begin
   FFont.Assign(Value);
 end;
 
-constructor TZintCanvasRenderTarget.Create(ACanvas: TCanvas);
+constructor TZintCanvasRenderTarget.Create(AOwner : TPersistent);
 begin
-  inherited Create();
+  inherited;
 
   FFont:=TFont.Create;
   FFGColor:=FMX.Types.claBlack;
   FBGColor:=FMX.Types.claWhite;
-
-  if Assigned(ACanvas) then
-  begin
-    FWidthDesired:=ACanvas.Width;
-    FHeightDesired:=ACanvas.Height;
-  end;
-  FCanvas := ACanvas;
 end;
 
 destructor TZintCanvasRenderTarget.Destroy;
 begin
   FFont.Free;
   inherited Destroy;
-end;
-
-procedure TZintCanvasRenderTarget.Render(ASymbol: TZintSymbol);
-
-begin
-  inherited;
-(*
-  if Assigned(FCanvas) then
-  begin
-    FCanvas.BeginScene;
-    //clear Background
-    if not FTransparent then
-    begin
-
-    end;
-
-    FCanvas.Stroke.Kind:=TBrushKind.bkSolid;
-    FCanvas.Stroke.Color:=ffgcolor;
-
-    FCanvas.Fill.Color:=FFGColor;
-    FCanvas.Fill.Kind:=TBrushKind.bkSolid;
-    line:=ASymbol.rendered^.lines;
-    while Assigned(line) do
-    begin
-      FCanvas.FillRect(RectF(CalcLeft(line^.x),
-                        CalcTop(line^.y),
-                        CalcLeft(line^.x + line^.width),
-                        CalcTop(line^.y + line^.length)), 0, 0, [], 1);
-
-      FCanvas.DrawRect(RectF(CalcLeft(line^.x),
-                        CalcTop(line^.y),
-                        CalcLeft(line^.x + line^.width),
-                        CalcTop(line^.y + line^.length)), 0, 0, [], 1);
-      line:=line^.next;
-    end;
-
-    FCanvas.Fill.Kind:=TBrushKind.bkNone;
-    ring:=ASymbol.rendered^.rings;
-    while Assigned(ring) do
-    begin
-      FCanvas.StrokeThickness:=ring^.line_width*FMultiplikator;
-
-      FCanvas.DrawEllipse(RectF(CalcLeft(ring^.x-ring^.radius),
-                        CalcTop(ring^.y-ring^.radius),
-                        CalcLeft(ring^.x + ring^.radius),
-                        CalcTop(ring^.y + ring^.radius)),1);
-      ring:=ring^.next;
-    end;
-
-    FCanvas.Fill.Color:=ffgcolor;
-    FCanvas.Fill.Kind:=TBrushKind.bkSolid;
-    hexagon:=ASymbol.rendered^.hexagons;
-    while Assigned(hexagon) do
-    begin
-      hexagon_width:=hexagon^.width*FHexagonScale;
-      hexagon_height:=hexagon^.height*FHexagonScale;
-
-      SetLength(Points, 6);
-      Points[0] := PointF(calcLeft(hexagon^.x-(hexagon_width/2)), CalcTop(hexagon^.y + hexagon_height/4));
-      Points[1] := PointF(calcLeft(hexagon^.x-(hexagon_width/2)), CalcTop(hexagon^.y + hexagon_height*3/4));
-      Points[2] := PointF(calcLeft(hexagon^.x -(hexagon_width/2) + sqrt(3) * hexagon_height / 4), CalcTop(hexagon^.y + hexagon_height));
-      Points[3] := PointF(calcLeft(hexagon^.x -(hexagon_width/2) + sqrt(3) * hexagon_height / 2), CalcTop(hexagon^.y + hexagon_height * 3/4));
-      Points[4] := PointF(calcLeft(hexagon^.x -(hexagon_width/2) + sqrt(3) * hexagon_height / 2), CalcTop(hexagon^.y + hexagon_height / 4));
-      Points[5] := PointF(calcLeft(hexagon^.x -(hexagon_width/2) + sqrt(3) * hexagon_height / 4), CalcTop(hexagon^.y ));
-
-      FCanvas.FillPolygon(Points, 1);
-
-      hexagon:=hexagon^.next;
-    end;
-
-    FCanvas.Font.Assign(FFont);
-    FCanvas.Fill.Kind:=TBrushKind.bkSolid;
-    FCanvas.Fill.Color:=FFGColor;
-    s:=ASymbol.rendered^.strings;
-    while assigned(s) do
-    begin
-      FCanvas.Font.Size:=FMultiplikator*S^.fsize;
-      if s^.width=0 then
-      begin
-        FCanvas.FillText(RectF(CalcLeft(s^.x) - FCanvas.TextWidth(s^.text) / 2,
-                               CalcTop(s^.y),
-                               CalcLeft(s^.x)+FCanvas.TextWidth(s^.text)/2,
-                               CalcTop(s^.y)+FCanvas.TextHeight(s^.text)),
-                         s^.text, false,1, [], TTextAlign.taCenter);
-      end
-      else
-      begin
-        FCanvas.FillText(RectF(CalcLeft(s^.x - s^.width / 2),
-                               CalcTop(s^.y),
-                               CalcLeft(s^.x+s^.width / 2),
-                               CalcTop(s^.y+FCanvas.TextHeight(s^.text))),
-                         s^.text, false,1, [], TTextAlign.taCenter);
-      end;
-
-      s:=s^.next;
-    end;
-    FCanvas.EndScene;
-  end;      *)
 end;
 
 end.

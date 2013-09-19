@@ -19,17 +19,20 @@ uses
 
 type
 
-  { TZintLMFRenderTarget }
+  { TZintRenderTargetLMF }
 
-  TZintLMFRenderTarget = class(TZintCanvasRenderTarget)
+  TZintRenderTargetLMF = class(TZintRenderTargetCanvas)
+  private
+    procedure SetMetafile(AValue: TlmfImage);
   protected
-    FLMF : TlmfImage;
+    FMetafile : TlmfImage;
     procedure Inflate(const ANewWidth, ANewHeight : Single); override;
-    procedure ReInitCanvas;
+    procedure CreateCanvas;
     procedure DrawText(const AParams: TZintDrawTextParams); override;
   public
-    constructor Create(ALMF: TlmfImage); reintroduce; virtual;
     procedure Render(ASymbol : TZintSymbol); override;
+
+    property Metafile : TlmfImage read FMetafile write SetMetafile;
   end;
 
 implementation
@@ -37,26 +40,36 @@ implementation
 uses
   Types, Classes;
 
-{ TZintLMFRenderTarget }
+{ TZintRenderTargetLMF }
 
-procedure TZintLMFRenderTarget.Inflate(const ANewWidth, ANewHeight: Single);
+procedure TZintRenderTargetLMF.SetMetafile(AValue: TlmfImage);
+begin
+  if Assigned(AValue) then
+  begin
+    WidthDesired := AValue.Width;
+    HeightDesired := AValue.Height;
+  end;
+  FMetafile := AValue;
+end;
+
+procedure TZintRenderTargetLMF.Inflate(const ANewWidth, ANewHeight: Single);
 begin
   if Assigned(FCanvas) then
     FCanvas.Free;
 
-  FLMF.Width := Round(ANewWidth);
-  FLMF.Height := Round(ANewHeight);
+  FMetafile.Width := Round(ANewWidth);
+  FMetafile.Height := Round(ANewHeight);
 
-  ReInitCanvas;
+  CreateCanvas;
 end;
 
-procedure TZintLMFRenderTarget.ReInitCanvas;
+procedure TZintRenderTargetLMF.CreateCanvas;
 begin
-  FCanvas := TlmfCanvas.Create(FLMF);
+  FCanvas := TlmfCanvas.Create(FMetafile);
   FCanvas.Font.Assign(FFont);
 end;
 
-procedure TZintLMFRenderTarget.DrawText(const AParams: TZintDrawTextParams);
+procedure TZintRenderTargetLMF.DrawText(const AParams: TZintDrawTextParams);
 var
   r : TRect;
   ts : TTextStyle;
@@ -74,17 +87,9 @@ begin
   FCanvas.TextRect(r, r.Left + Round((AParams.Width - w) / 2), r.Top, AParams.Text, ts);
 end;
 
-constructor TZintLMFRenderTarget.Create(ALMF: TlmfImage);
+procedure TZintRenderTargetLMF.Render(ASymbol: TZintSymbol);
 begin
-  inherited Create(nil);
-  FLMF := ALMF;
-  FWidthDesired := FLMF.Width;
-  FHeightDesired := FLMF.Height;
-end;
-
-procedure TZintLMFRenderTarget.Render(ASymbol: TZintSymbol);
-begin
-  ReInitCanvas;
+  CreateCanvas;
   try
     inherited;
   finally

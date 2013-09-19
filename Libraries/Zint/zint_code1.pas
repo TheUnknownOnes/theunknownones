@@ -576,10 +576,13 @@ begin
           else
           begin
             latch := 1;
-            for j := sp + 8 to _length - 1 do
+            j := sp + 8;
+            while j < _length do
             begin
               if (source[j] <= Ord('0')) or (source[j] >= Ord('9')) then
                 latch := 0;
+
+              Inc(j);
             end;
           end;
 
@@ -684,9 +687,11 @@ begin
           else
           begin
             latch := 1;
-            for j := sp + 8 to _length - 1 do
+            j := sp + 8;
+            while j < _length do
             begin
               if ((source[j] <= Ord('0')) or (source[j] >= Ord('9'))) then latch := 0;
+              Inc(j);
             end;
           end;
 
@@ -789,10 +794,12 @@ begin
           else
           begin
             latch := 1;
-            for j := sp + 8 to _length - 1 do
+            j := sp + 8;
+            while j < _length do
             begin
               if (source[j] <= Ord('0')) or (source[j] >= Ord('9')) then
                 latch := 0;
+              Inc(j);
             end;
           end;
 
@@ -1206,6 +1213,7 @@ var
   data_length : Integer;
   data_cw, ecc_cw : Integer;
   sub_data, sub_ecc : TArrayOfCardinal;
+  RSGlobals : TRSGlobals;
 begin
   size := 1;
   SetLength(datagrid, 136);
@@ -1259,10 +1267,10 @@ begin
       Inc(data[codewords - i - 1], 16 * elreg[(i * 5) + 4]);
     end;
 
-    rs_init_gf($25);
-    rs_init_code(codewords, 1);
-    rs_encode_long(codewords, data, ecc);
-    rs_free();
+    rs_init_gf($25, RSGlobals);
+    rs_init_code(codewords, 1, RSGlobals);
+    rs_encode_long(codewords, data, ecc, RSGlobals);
+    rs_free(RSGlobals);
 
     for i := 0 to codewords - 1 do
     begin
@@ -1339,10 +1347,10 @@ begin
       data[i] := 129; { Pad }
 
     { Calculate error correction data }
-    rs_init_gf($12d);
-    rs_init_code(ecc_cw, 1);
-    rs_encode_long(data_cw, data, ecc);
-    rs_free();
+    rs_init_gf($12d, RSGlobals);
+    rs_init_code(ecc_cw, 1, RSGlobals);
+    rs_encode_long(data_cw, data, ecc, RSGlobals);
+    rs_free(RSGlobals);
 
     { 'Stream' combines data and error correction data }
     for i := 0 to data_cw - 1 do
@@ -1425,8 +1433,8 @@ begin
 
     data_blocks := c1_blocks[size - 1];
 
-    rs_init_gf($12d);
-    rs_init_code(c1_ecc_blocks[size - 1], 0);
+    rs_init_gf($12d, RSGlobals);
+    rs_init_code(c1_ecc_blocks[size - 1], 0, RSGlobals);
 
     for i := 0 to data_blocks - 1 do
     begin
@@ -1434,11 +1442,11 @@ begin
       begin
         sub_data[j] := data[j * data_blocks + i];
       end;
-      rs_encode_long(c1_data_blocks[size - 1], sub_data, sub_ecc);
+      rs_encode_long(c1_data_blocks[size - 1], sub_data, sub_ecc, RSGlobals);
       for j := 0 to c1_ecc_blocks[size - 1] - 1 do
         ecc[c1_ecc_length[size - 1] - (j * data_blocks + i) - 1] := sub_ecc[j];
     end;
-    rs_free();
+    rs_free(RSGlobals);
 
     { 'Stream' combines data and error correction data }
     for i := 0 to data_length - 1 do

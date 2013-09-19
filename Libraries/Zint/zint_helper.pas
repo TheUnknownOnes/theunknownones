@@ -157,7 +157,7 @@ procedure Fill(var ADestination: TArrayOfChar; ACount: Integer; AChar: Char;
 var
   i : Integer;
 begin
-  for i := AStartIndex to AStartIndex + ACount do
+  for i := AStartIndex to AStartIndex + ACount - 1 do
     ADestination[i] := AChar;
 end;
 
@@ -166,7 +166,7 @@ procedure Fill(var ADestination: TArrayOfSmallInt; ACount: Integer;
 var
   i : Integer;
 begin
-  for i := AStartIndex to AStartIndex + ACount do
+  for i := AStartIndex to AStartIndex + ACount - 1 do
     ADestination[i] := AValue;
 end;
 
@@ -175,7 +175,7 @@ procedure Fill(var ADestination: TArrayOfInteger; ACount: Integer;
 var
   i : Integer;
 begin
-  for i := AStartIndex to AStartIndex + ACount do
+  for i := AStartIndex to AStartIndex + ACount - 1 do
     ADestination[i] := AValue;
 end;
 
@@ -184,7 +184,7 @@ procedure Fill(var ADestination: TArrayOfByte; ACount: Integer; AValue: Byte;
 var
   i : Integer;
 begin
-  for i := AStartIndex to AStartIndex + ACount do
+  for i := AStartIndex to AStartIndex + ACount - 1 do
     ADestination[i] := AValue;
 end;
 
