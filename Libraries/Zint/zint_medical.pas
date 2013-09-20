@@ -232,20 +232,9 @@ begin
     strcpy(symbol.errtxt, 'Invalid characters in data');
     result := error_number; exit;
   end;
-  { Codabar must begin and end with the characters A, B, C or D }
-  {chaosben: It seems to me, that the real definition is: ABCD can only be used as first and last char.
-             Thats why, we replace the original code}
-
-  for i := 1 to _length - 2 do
-  begin
-    if Chr(source[i]) in ['A', 'B', 'C', 'D'] then
-    begin
-      strcpy(symbol.errtxt, 'The chars "A", "B", "C" and "D" can only be used as first and/or last character.');
-      result := ZERROR_INVALID_DATA; exit;
-    end;
-  end;
-
-  {if ((source[0] <> Ord('A')) and (source[0] <> Ord('B')) and (source[0] <> Ord('C')) and (source[0] <> Ord('D'))) then
+  
+  { Codabar must begin and end with the characters A, B, C or D }  
+  if ((source[0] <> Ord('A')) and (source[0] <> Ord('B')) and (source[0] <> Ord('C')) and (source[0] <> Ord('D'))) then
   begin
     strcpy(symbol.errtxt, 'Invalid characters in data');
     result := ZERROR_INVALID_DATA; exit;
@@ -256,10 +245,7 @@ begin
   begin
     strcpy(symbol.errtxt, 'Invalid characters in data');
     result := ZERROR_INVALID_DATA; exit;
-  end;}
-
-
-
+  end;
 
   for i := 0 to _length - 1 do
     lookup(CALCIUM, CodaTable, source[i], dest);
