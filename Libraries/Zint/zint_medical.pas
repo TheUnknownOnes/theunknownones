@@ -236,14 +236,14 @@ begin
   { Codabar must begin and end with the characters A, B, C or D }  
   if ((source[0] <> Ord('A')) and (source[0] <> Ord('B')) and (source[0] <> Ord('C')) and (source[0] <> Ord('D'))) then
   begin
-    strcpy(symbol.errtxt, 'Invalid characters in data');
+    strcpy(symbol.errtxt, 'The data has to start with "A", "B", "C" or "D"');
     result := ZERROR_INVALID_DATA; exit;
   end;
 
   if ((source[_length - 1] <> Ord('A')) and (source[_length - 1] <> Ord('B')) and
         (source[_length - 1] <> Ord('C')) and (source[_length - 1] <> Ord('D'))) then
   begin
-    strcpy(symbol.errtxt, 'Invalid characters in data');
+    strcpy(symbol.errtxt, 'The data has to end with "A", "B", "C" or "D"');
     result := ZERROR_INVALID_DATA; exit;
   end;
 
