@@ -28,6 +28,7 @@ function ArrayOfByteToArrayOfChar(const AArray : TArrayOfByte) : TArrayOfChar;
 procedure ArrayCopy(var ADestination : TArrayOfChar; const ASource : TArrayOfByte; ACount : Integer = MaxInt); overload;
 procedure ArrayCopy(var ADestination : TArrayOfByte; const ASource : TArrayOfChar; ACount : Integer = MaxInt); overload;
 procedure ArrayCopy(var ADestination : TArrayOfChar; const ASource : TArrayOfChar; ACount : Integer = MaxInt); overload;
+procedure ArrayCopy(var ADestination : TArrayOfByte; const ASource : TArrayOfByte; ACount : Integer = MaxInt); overload;
 procedure Fill(var ADestination : TArrayOfChar; ACount : Integer; AChar : Char; AStartIndex : Integer = 0); overload;
 procedure Fill(var ADestination : TArrayOfSmallInt; ACount : Integer; AValue : Smallint; AStartIndex : Integer = 0); overload;
 procedure Fill(var ADestination : TArrayOfInteger; ACount : Integer; AValue : Integer; AStartIndex : Integer = 0); overload;
@@ -137,6 +138,22 @@ end;
 
 procedure ArrayCopy(var ADestination: TArrayOfChar;
   const ASource: TArrayOfChar; ACount: Integer);
+var
+  i, j, cnt : Integer;
+begin
+  i := Low(ADestination);
+  j := Low(ASource);
+  cnt := 0;
+  while (i <= High(ADestination)) and (j <= High(ASource)) and (cnt <= ACount) do
+  begin
+    ADestination[i] := ASource[j];
+    Inc(i);
+    Inc(j);
+    Inc(cnt);
+  end;
+end;
+
+procedure ArrayCopy(var ADestination : TArrayOfByte; const ASource : TArrayOfByte; ACount : Integer = MaxInt);
 var
   i, j, cnt : Integer;
 begin
