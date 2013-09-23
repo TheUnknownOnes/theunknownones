@@ -211,44 +211,71 @@ begin
 end;
 
 { The Codabar system consisting of simple substitution }
+//chaosben: some changes where made based on the article at http://en.wikipedia.org/wiki/Codabar}
 function codabar(symbol : zint_symbol; source : TArrayOfByte; _length : Integer) : Integer;
 var
-  i, error_number : Integer;
+  i, j, error_number : Integer;
   dest : TArrayOfChar;
+  local_source : TArrayOfByte;
+const
+  CODABAR_DELIMITERS : array[0..7] of Char = ('A', 'B', 'C', 'D', 'T', 'N', '*', 'E');
 begin
   SetLength(dest, 512);
   error_number := 0;
   strcpy(dest, '');
+
+  SetLength(local_source, Length(source));
+  ArrayCopy(local_source, source);
 
   if (_length > 60) then
   begin { No stack smashing please }
     strcpy(symbol.errtxt, 'Input too long');
     result := ZERROR_TOO_LONG; exit;
   end;
-  to_upper(source);
-  error_number := is_sane(CALCIUM, source, _length);
+  to_upper(local_source);
+
+  //replace alternate delimiters
+  for i := 0 to _length - 1 do
+  begin
+    for j := 4 to 7 do
+      if local_source[i] = Ord(CODABAR_DELIMITERS[j]) then
+        local_source[i] := Ord(CODABAR_DELIMITERS[j - 4]);
+  end;
+
+  error_number := is_sane(CALCIUM, local_source, _length);
   if (error_number = ZERROR_INVALID_DATA) then
   begin
     strcpy(symbol.errtxt, 'Invalid characters in data');
     result := error_number; exit;
   end;
-  
-  { Codabar must begin and end with the characters A, B, C or D }  
-  if ((source[0] <> Ord('A')) and (source[0] <> Ord('B')) and (source[0] <> Ord('C')) and (source[0] <> Ord('D'))) then
+
+  for i := 1 to _length - 2 do
   begin
-    strcpy(symbol.errtxt, 'The data has to start with "A", "B", "C" or "D"');
+    for j := Low(CODABAR_DELIMITERS) to High(CODABAR_DELIMITERS) do
+    begin
+      if local_source[i] = Ord(CODABAR_DELIMITERS[j]) then
+      begin
+        strcpy(symbol.errtxt, 'The character "' + Chr(source[i]) + '" can only be used as first and/or last character.');
+        result := ZERROR_INVALID_DATA; exit;
+      end;
+    end;
+  end;
+
+  {if ((source[0] <> Ord('A')) and (source[0] <> Ord('B')) and (source[0] <> Ord('C')) and (source[0] <> Ord('D'))) then
+  begin
+    strcpy(symbol.errtxt, 'Invalid characters in data');
     result := ZERROR_INVALID_DATA; exit;
   end;
 
   if ((source[_length - 1] <> Ord('A')) and (source[_length - 1] <> Ord('B')) and
         (source[_length - 1] <> Ord('C')) and (source[_length - 1] <> Ord('D'))) then
   begin
-    strcpy(symbol.errtxt, 'The data has to end with "A", "B", "C" or "D"');
+    strcpy(symbol.errtxt, 'Invalid characters in data');
     result := ZERROR_INVALID_DATA; exit;
-  end;
+  end;}
 
   for i := 0 to _length - 1 do
-    lookup(CALCIUM, CodaTable, source[i], dest);
+    lookup(CALCIUM, CodaTable, local_source[i], dest);
 
   expand(symbol, dest);
   ustrcpy(symbol.text, source);
