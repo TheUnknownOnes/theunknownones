@@ -89,10 +89,15 @@ begin
 
   comType.ItemIndex := 0;
 
- { for i := 0 to Printer.Count-1 do
-    comPrinter.Items.AddObject(Printer.Printers[i].Title, Printer.Printers[i]);
-  if comPrinter.Items.Count>0 then
-    comPrinter.ItemIndex:=0;     }
+  try
+    for i := 0 to Printer.Count-1 do
+      comPrinter.Items.AddObject(Printer.Printers[i].Title, Printer.Printers[i]);
+    if comPrinter.Items.Count>0 then
+      comPrinter.ItemIndex:=0;
+  except
+    on E: Exception do
+      ShowMessage('Error at getting Printer list: '+E.Message);
+  end;
 end;
 
 function  TFormMain.GenSymbol: TZintSymbol;
