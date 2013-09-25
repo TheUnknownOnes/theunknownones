@@ -24,8 +24,8 @@ type
     procedure SetCanvas(const Value: TCanvas);
   protected
     FCanvas : TCanvas;
-    FFGColor: TColor;
-    FBGColor: TColor;
+    FFGColor: TAlphaColor;
+    FBGColor: TAlphaColor;
     FFont: TFont;
     procedure ClearBackground(const AParams : TZintClearBackgroundParams); override;
     procedure DrawRect(const AParams : TZintDrawRectParams); override;
@@ -35,13 +35,15 @@ type
     function CalcTextHeight(const AParams : TZintCalcTextHeightParams) : Single; override;
     function CalcTextWidth(const AParams : TZintCalcTextWidthParams) : Single; override;
     procedure SetFont(const Value: TFont);
+    procedure DrawStart; override;
+    procedure DrawStop; override;
   public
     constructor Create(AOwner : TPersistent); override;
     property Canvas : TCanvas read FCanvas write SetCanvas;
     destructor Destroy; override;
   published
-    property ForegroundColor : TColor read FFGColor write FFGColor;
-    property BackgroundColor : TColor read FBGColor write FBGColor;
+    property ForegroundColor : TAlphaColor read FFGColor write FFGColor;
+    property BackgroundColor : TAlphaColor read FBGColor write FBGColor;
     property Font: TFont read FFont write SetFont;
   end;
 
@@ -117,6 +119,18 @@ begin
                         AParams.y-radius,
                         AParams.x + radius,
                         AParams.y + radius),1);
+end;
+
+procedure TZintCanvasRenderTarget.DrawStart;
+begin
+  inherited;
+  FCanvas.BeginScene;
+end;
+
+procedure TZintCanvasRenderTarget.DrawStop;
+begin
+  inherited;
+  FCanvas.EndScene;
 end;
 
 procedure TZintCanvasRenderTarget.DrawText(const AParams: TZintDrawTextParams);

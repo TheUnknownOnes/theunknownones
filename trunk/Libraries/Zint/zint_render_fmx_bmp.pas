@@ -23,6 +23,7 @@ type
   protected
     FBMP : TBitmap;
 
+    procedure DrawStop; override;
     procedure Inflate(const ANewWidth, ANewHeight : Single); override;
   public
     property Bitmap: TBitmap read FBitmap write SetBitmap;
@@ -32,6 +33,12 @@ implementation
 
 { TZintBMPRenderTarget }
 
+
+procedure TZintBMPRenderTarget.DrawStop;
+begin
+  inherited;
+  Bitmap.BitmapChanged;
+end;
 
 procedure TZintBMPRenderTarget.Inflate(const ANewWidth, ANewHeight : Single);
 begin
