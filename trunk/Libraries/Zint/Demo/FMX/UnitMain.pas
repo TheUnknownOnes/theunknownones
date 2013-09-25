@@ -91,7 +91,8 @@ begin
 
   for i := 0 to Printer.Count-1 do
     comPrinter.Items.AddObject(Printer.Printers[i].Title, Printer.Printers[i]);
-  comPrinter.ItemIndex:=0;
+  if comPrinter.Items.Count>0 then
+    comPrinter.ItemIndex:=0;
 end;
 
 function  TFormMain.GenSymbol: TZintSymbol;
