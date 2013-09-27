@@ -147,6 +147,20 @@ object Form46: TForm46
         Height = 13
         Caption = 'Vert. align'
       end
+      object Label5: TLabel
+        Left = 483
+        Top = 79
+        Width = 21
+        Height = 13
+        Caption = 'Bars'
+      end
+      object Label6: TLabel
+        Left = 483
+        Top = 100
+        Width = 59
+        Height = 13
+        Caption = 'Background '
+      end
       object ButtonFont: TButton
         Left = 480
         Top = 3
@@ -303,6 +317,24 @@ object Form46: TForm46
           'Top'
           'Center'
           'Bottom')
+      end
+      object ColorBox1: TColorBox
+        Left = 543
+        Top = 76
+        Width = 145
+        Height = 22
+        TabOrder = 7
+        OnChange = edDataChange
+      end
+      object ColorBox2: TColorBox
+        Left = 543
+        Top = 97
+        Width = 145
+        Height = 22
+        NoneColorColor = clWhite
+        Selected = clWhite
+        TabOrder = 8
+        OnChange = edDataChange
       end
     end
   end
