@@ -43,6 +43,10 @@ type
     comVAlign: TComboBox;
     Label2: TLabel;
     pumPrint: TPopupMenu;
+    ColorBox1: TColorBox;
+    ColorBox2: TColorBox;
+    Label5: TLabel;
+    Label6: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure edDataChange(Sender: TObject);
     procedure comTypeChange(Sender: TObject);
@@ -290,6 +294,8 @@ begin
     wmf.SetSize(imgResult.Width, imgResult.Height);
     rt:=TZintRenderTargetWMF.Create(nil);
     rt.Metafile:=wmf;
+    rt.ForegroundColor:=ColorBox1.Selected;
+    rt.BackgroundColor:=ColorBox2.Selected;
 
     rt.Font.Assign(ButtonFont.Font);
     InitRenderTarget(rt);
