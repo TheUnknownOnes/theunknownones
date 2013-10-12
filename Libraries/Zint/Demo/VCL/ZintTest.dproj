@@ -3,7 +3,7 @@
 			<ProjectGuid>{237F9625-C027-40CE-948F-E3A1B4D81937}</ProjectGuid>
 			<MainSource>ZintTest.dpr</MainSource>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<TargetedPlatforms>3</TargetedPlatforms>
 			<AppType>Application</AppType>
 			<FrameworkType>VCL</FrameworkType>

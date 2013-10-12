@@ -284,6 +284,7 @@ type
   end;
 
   TmqVersion = (mqvAuto, mqv1, mqv2, mqv3, mqv4);
+  TmqECCLevel = (mqeAuto, mqeL, mqeM, mqeQ, mqeH);
 
   { TZintMicroQROptions }
 
@@ -291,7 +292,10 @@ type
   private
     function GetVersion: TmqVersion;
     procedure SetVersion(AValue: TmqVersion);
+    function GetECCLevel: TmqECCLevel;
+    procedure SetECCLevel(const AValue: TmqECCLevel);
   published
+    property ECCLevel : TmqECCLevel read GetECCLevel write SetECCLevel default mqeAuto;
     property Version : TmqVersion read GetVersion write SetVersion default mqvAuto;
   end;
 
@@ -1192,6 +1196,18 @@ end;
 
 { TZintMicroQROptions }
 
+function TZintMicroQROptions.GetECCLevel: TmqECCLevel;
+begin
+  case FSymbol.option_1 of
+    1: Result := mqeL;
+    2: Result := mqeM;
+    3: Result := mqeQ;
+    4: Result := mqeH;
+    else
+      Result :=mqeAuto;
+  end;
+end;
+
 function TZintMicroQROptions.GetVersion: TmqVersion;
 begin
   case FSymbol.option_2 of
@@ -1202,6 +1218,18 @@ begin
     else
       Result :=mqvAuto;
   end;
+end;
+
+procedure TZintMicroQROptions.SetECCLevel(const AValue: TmqECCLevel);
+begin
+  case AValue of
+    mqeAuto : FSymbol.option_1 := DEFAULTVALUE_OPTION_1;
+    mqeL : FSymbol.option_1 := 1;
+    mqeM : FSymbol.option_1 := 2;
+    mqeQ : FSymbol.option_1 := 3;
+    mqeH : FSymbol.option_1 := 4;
+  end;
+  Changed;
 end;
 
 procedure TZintMicroQROptions.SetVersion(AValue: TmqVersion);
@@ -1990,7 +2018,7 @@ begin
 
 	strcpy(to_process, '+');
 	counter := 41;
-	for i := 1 to _length do
+	for i := 0 to _length - 1 do
 		Inc(counter, posn(TECHNETIUM, source[i])) ;
 
 	counter := counter mod 43;
@@ -2312,7 +2340,7 @@ begin
 
 	if (symbol.input_mode = GS1_MODE) then
   begin
-		for i := 1 to _length do
+		for i := 0 to _length - 1 do
     begin
 			if (source[i] = 0) then
       begin
