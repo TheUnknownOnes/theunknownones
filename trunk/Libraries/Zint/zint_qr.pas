@@ -1053,7 +1053,7 @@ begin
 	dark_mods := 0;
 	for x := 0 to size - 1 do
   begin
-		for y := 0 to size do
+		for y := 0 to size - 1 do
     begin
 			if (local[(y * size) + x] = '1') then
 				inc(dark_mods);
@@ -2402,7 +2402,7 @@ begin
 
 	// Eliminate possible versions depending on error correction level specified
 	ecc_level := LEVEL_L;
-	if((symbol.option_1 >= 1) and (symbol.option_2 <= 4)) then
+	if((symbol.option_1 >= 1) and (symbol.option_1 <= 4)) then
   	ecc_level := symbol.option_1;
 
 	if(ecc_level = LEVEL_H) then
@@ -2448,7 +2448,7 @@ begin
 	if((symbol.option_2 >= 1) and (symbol.option_2 <= 4)) then
   begin
 		if(symbol.option_2 >= autoversion) then
-			version := symbol.option_2;
+			version := symbol.option_2 - 1; //decrement, because we work internal with 0..3
 	end;
 
 	// If there is enough unused space then increase the error correction level

@@ -1642,7 +1642,7 @@ begin
     v := 8;
     while v <> 0 do
     begin
-      if (ecc_codewords[4 - i] and v) <> 0 then binary_string[j] := '1' else binary_string[j + 1] := '0';
+      if (ecc_codewords[4 - i] and v) <> 0 then binary_string[j] := '1' else binary_string[j] := '0';
       Inc(j);
       v := v shr 1;
     end;
