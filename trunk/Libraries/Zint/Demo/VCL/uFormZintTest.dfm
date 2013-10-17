@@ -19,9 +19,9 @@ object Form46: TForm46
   object imgResult: TImage
     AlignWithMargins = True
     Left = 3
-    Top = 191
+    Top = 231
     Width = 771
-    Height = 296
+    Height = 256
     Align = alClient
     AutoSize = True
     Center = True
@@ -50,7 +50,7 @@ object Form46: TForm46
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 185
+    Top = 225
     Width = 777
     Height = 3
     Cursor = crVSplit
@@ -110,15 +110,16 @@ object Form46: TForm46
     Left = 0
     Top = 35
     Width = 777
-    Height = 150
+    Height = 190
     ActivePage = TabSheet1
     Align = alTop
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'General Settings'
+      ExplicitHeight = 154
       DesignSize = (
         769
-        122)
+        162)
       object Label3: TLabel
         Left = 279
         Top = 6
@@ -160,6 +161,20 @@ object Form46: TForm46
         Width = 59
         Height = 13
         Caption = 'Background '
+      end
+      object Label7: TLabel
+        Left = 279
+        Top = 114
+        Width = 87
+        Height = 13
+        Caption = 'Min. Modulewidth:'
+      end
+      object Label8: TLabel
+        Left = 279
+        Top = 141
+        Width = 91
+        Height = 13
+        Caption = 'Max. Modulewidth:'
       end
       object ButtonFont: TButton
         Left = 480
@@ -214,17 +229,19 @@ object Form46: TForm46
         Left = 3
         Top = 3
         Width = 270
-        Height = 117
+        Height = 157
         ActivePage = TabSheet2
         Anchors = [akLeft, akTop, akBottom]
         TabOrder = 4
+        ExplicitHeight = 117
         object TabSheet2: TTabSheet
           Caption = 'Margin'
+          ExplicitHeight = 89
           inline fboMargin: TFrameBorderOptions
             Left = 0
             Top = 0
             Width = 262
-            Height = 89
+            Height = 129
             Align = alClient
             TabOrder = 0
             ExplicitWidth = 262
@@ -234,11 +251,12 @@ object Form46: TForm46
         object TabSheet3: TTabSheet
           Caption = 'Padding'
           ImageIndex = 1
+          ExplicitHeight = 89
           inline fboPadding: TFrameBorderOptions
             Left = 0
             Top = 0
             Width = 262
-            Height = 89
+            Height = 129
             Align = alClient
             TabOrder = 0
             ExplicitWidth = 262
@@ -248,11 +266,12 @@ object Form46: TForm46
         object TabSheet4: TTabSheet
           Caption = 'Border'
           ImageIndex = 2
+          ExplicitHeight = 89
           inline fboBorder: TFrameBorderOptions
             Left = 0
             Top = 0
             Width = 262
-            Height = 89
+            Height = 129
             Align = alClient
             TabOrder = 0
             ExplicitWidth = 262
@@ -262,11 +281,12 @@ object Form46: TForm46
         object TabSheet5: TTabSheet
           Caption = 'TextSpacing'
           ImageIndex = 3
+          ExplicitHeight = 89
           inline fboTextSpacing: TFrameBorderOptions
             Left = 0
             Top = 0
             Width = 262
-            Height = 89
+            Height = 129
             Align = alClient
             TabOrder = 0
             ExplicitWidth = 262
@@ -276,11 +296,12 @@ object Form46: TForm46
         object TabSheet6: TTabSheet
           Caption = 'Whitespace'
           ImageIndex = 4
+          ExplicitHeight = 89
           inline fboWhitespace: TFrameBorderOptions
             Left = 0
             Top = 0
             Width = 262
-            Height = 89
+            Height = 129
             Align = alClient
             TabOrder = 0
             ExplicitWidth = 262
@@ -334,6 +355,24 @@ object Form46: TForm46
         NoneColorColor = clWhite
         Selected = clWhite
         TabOrder = 8
+        OnChange = edDataChange
+      end
+      object edMiMW: TEdit
+        Left = 382
+        Top = 111
+        Width = 95
+        Height = 21
+        TabOrder = 9
+        Text = '0'
+        OnChange = edDataChange
+      end
+      object edMaMW: TEdit
+        Left = 382
+        Top = 138
+        Width = 95
+        Height = 21
+        TabOrder = 10
+        Text = '0'
         OnChange = edDataChange
       end
     end

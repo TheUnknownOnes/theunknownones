@@ -47,6 +47,10 @@ type
     ColorBox2: TColorBox;
     Label5: TLabel;
     Label6: TLabel;
+    Label7: TLabel;
+    edMiMW: TEdit;
+    Label8: TLabel;
+    edMaMW: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure edDataChange(Sender: TObject);
     procedure comTypeChange(Sender: TObject);
@@ -275,6 +279,8 @@ begin
   fboWhitespace.UpdateRenderBox(ARenderTarget.Whitespace);
   ARenderTarget.HAlign := TZintHAlign(comHAlign.ItemIndex);
   ARenderTarget.VAlign := TZintVAlign(comVAlign.ItemIndex);
+  ARenderTarget.MinModuleWidth := StrToFloatDef(edMiMW.Text, 0);
+  ARenderTarget.MaxModuleWidth := StrToFloatDef(edMaMW.Text, 0);
 end;
 
 procedure TForm46.GenBarcode;

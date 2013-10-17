@@ -94,13 +94,10 @@ procedure TZintRenderTargetCanvas.ClearBackground(
 begin
   FCanvas.Brush.Color:=FBGColor;
   FCanvas.Brush.Style:=bsSolid;
-  FCanvas.Pen.Style:=psSolid;
-  FCanvas.Pen.Color:=FBGColor;
-
-  FCanvas.Rectangle(Round(AParams.X),
-                    Round(AParams.Y),
-                    Round(AParams.X) + Round(AParams.Width),
-                    Round(AParams.Y) + Round(AParams.Height));
+  FCanvas.FillRect(Rect(Round(AParams.X),
+                        Round(AParams.Y),
+                        Round(AParams.X + AParams.Width),
+                        Round(AParams.Y + AParams.Height)));
 end;
 
 procedure TZintRenderTargetCanvas.DrawRect(const AParams: TZintDrawRectParams);
