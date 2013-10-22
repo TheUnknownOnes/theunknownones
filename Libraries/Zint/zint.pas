@@ -2282,12 +2282,17 @@ var
 begin
   error_number := 0;
 
+  if _length = 0 then
+    _length := ustrlen(source);
+
 	if (_length = 0) then
   begin
 		strcpy(symbol.errtxt, 'No input data');
 		error_tag(symbol.errtxt, ZERROR_INVALID_DATA);
 		Result := ZERROR_INVALID_DATA; exit;
 	end;
+
+  SetLength(local_source, _length + 1);
 
 	{ First check the symbology field }
 	if (symbol.symbology < 1) then begin strcpy(symbol.errtxt, 'Symbology out of range, using Code 128'); symbol.symbology := BARCODE_CODE128; error_number := ZWARN_INVALID_OPTION; end;
