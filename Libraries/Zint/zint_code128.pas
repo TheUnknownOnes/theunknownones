@@ -1087,10 +1087,10 @@ begin
 	total_sum := 0;
 	for i := sourcelen - 1 downto 0 do
   begin
-		Inc(total_sum, StrToInt(Chr(source[i])));
+		Inc(total_sum, ctoi(Chr(source[i])));
 
-		if((i and 1) <> 0) then
-			Inc(total_sum, 2 * StrToInt(Chr(source[i])));
+		if(((sourcelen - 1 - i) and 1) = 0) then
+			Inc(total_sum, 2 * ctoi(Chr(source[i])));
 	end;
 	nve_check := 10 - total_sum mod 10;
 
@@ -1128,17 +1128,17 @@ begin
 
 	zeroes := 13 - _length;
 	ustrcpy(ean128_equiv, '[01]');
-  FillChar(ean128_equiv[4], zeroes, Ord('0'));
+  FillChar(ean128_equiv[4], zeroes, '0');
   ean128_equiv[4 + zeroes] := 0;
   uconcat(ean128_equiv, source);
 
 	count := 0;
-	for i := _length -1 downto 0 do
+	for i := _length - 1 downto 0 do
   begin
-		Inc(count, StrToInt(Chr(source[i])));
+		Inc(count, ctoi(Chr(source[i])));
 
-		if ((i and 1) <> 0) then
-			Inc(count, 2 * StrToInt(Chr(source[i])));
+		if (((_length - 1 - i) and 1) = 0) then
+			Inc(count, 2 * ctoi(Chr(source[i])));
 	end;
 	check_digit := 10 - (count mod 10);
   if (check_digit = 10) then check_digit := 0;

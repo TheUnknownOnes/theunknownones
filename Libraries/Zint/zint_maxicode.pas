@@ -670,7 +670,7 @@ var
 begin
   h := ustrlen(postcode);
   to_upper(postcode);
-  for i := 1 to h do
+  for i := 0 to h - 1 do
   begin
     if ((Chr(postcode[i]) >= 'A') and (Chr(postcode[i]) <= 'Z')) then
       { (Capital) letters shifted to Code Set A values }
@@ -684,13 +684,13 @@ begin
     interpreted as capital letters in Code Set A (e.g. LF becomes 'J') }
   end;
 
-  maxi_codeword[0] := ((Ord(postcode[6]) and $03) shl 4) or 3;
-  maxi_codeword[1] := ((Ord(postcode[5]) and $03) shl 4) or ((Ord(postcode[6]) and $3c) shr 2);
-  maxi_codeword[2] := ((Ord(postcode[4]) and $03) shl 4) or ((Ord(postcode[5]) and $3c) shr 2);
-  maxi_codeword[3] := ((Ord(postcode[3]) and $03) shl 4) or ((Ord(postcode[4]) and $3c) shr 2);
-  maxi_codeword[4] := ((Ord(postcode[2]) and $03) shl 4) or ((Ord(postcode[3]) and $3c) shr 2);
-  maxi_codeword[5] := ((Ord(postcode[1]) and $03) shl 4) or ((Ord(postcode[2]) and $3c) shr 2);
-  maxi_codeword[6] := ((Ord(postcode[1]) and $3c) shr 2) or ((country and $3) shl 4);
+  maxi_codeword[0] := ((Ord(postcode[5]) and $03) shl 4) or 3;
+  maxi_codeword[1] := ((Ord(postcode[4]) and $03) shl 4) or ((Ord(postcode[5]) and $3c) shr 2);
+  maxi_codeword[2] := ((Ord(postcode[3]) and $03) shl 4) or ((Ord(postcode[4]) and $3c) shr 2);
+  maxi_codeword[3] := ((Ord(postcode[2]) and $03) shl 4) or ((Ord(postcode[3]) and $3c) shr 2);
+  maxi_codeword[4] := ((Ord(postcode[1]) and $03) shl 4) or ((Ord(postcode[2]) and $3c) shr 2);
+  maxi_codeword[5] := ((Ord(postcode[0]) and $03) shl 4) or ((Ord(postcode[1]) and $3c) shr 2);
+  maxi_codeword[6] := ((Ord(postcode[0]) and $3c) shr 2) or ((country and $3) shl 4);
   maxi_codeword[7] := (country and $fc) shr 2;
   maxi_codeword[8] := ((country and $300) shr 8) or ((service and $f) shl 2);
   maxi_codeword[9] := ((service and $3f0) shr 4);
@@ -778,7 +778,7 @@ begin
       result := ZERROR_INVALID_DATA; exit;
     end;
 
-    for i := 10 to 14  do
+    for i := 9 to 14  do
     begin { check that country code and service are numeric }
       if ((symbol.primary[i] < '0') or (symbol.primary[i] > '9')) then
       begin
@@ -787,11 +787,11 @@ begin
       end;
     end;
 
-    postcode := symbol.primary;
+    ArrayCopy(postcode, symbol.primary);
 
     if (mode = 2) then
     begin
-      for i := 1 to 10 do
+      for i := 0 to 9 do
         if (postcode[i] = ' ') then
           postcode[i] := #0;
     end

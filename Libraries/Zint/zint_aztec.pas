@@ -342,7 +342,7 @@ begin
 
   for i := 0 to src_len - 1 do
   begin
-    if (gs1 <> 0) and (i = 1) then
+    if (gs1 <> 0) and (i = 0) then
     begin
       { Add FNC1 to beginning of GS1 messages }
       charmap[map_length] := 0;
@@ -956,7 +956,7 @@ begin
     result := ZERROR_INVALID_OPTION; exit;
   end;
 
-  //chaosben: imho, the following is a bug, because its done the second time (1st one in zint__library -> reduced_charset)
+  //chaosben: imho, the following is a bug, because its done the second time (1st one in zint_library -> reduced_charset)
   {case symbol.input_mode of
     DATA_MODE:
     GS1_MODE:
