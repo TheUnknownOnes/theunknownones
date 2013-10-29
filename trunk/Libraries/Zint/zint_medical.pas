@@ -291,6 +291,8 @@ var
   codeword : array[0..5] of Integer;
   tabella : TArrayOfChar;
 begin
+  SetLength(tabella, 34);
+
   { Validate the input }
   if (_length > 8) then
   begin
@@ -344,7 +346,6 @@ begin
   end;
 
   { Look up values in 'Tabella di conversione' }
-  SetLength(tabella, 32);
   strcpy(tabella, '0123456789BCDFGHJKLMNPQRSTUVWXYZ');
   for i := 5 downto 0 do
     risultante[5 - i] := tabella[codeword[i]];

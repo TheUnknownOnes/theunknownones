@@ -87,7 +87,7 @@ begin
   lblError.Caption := '';
 
   symbol := TZintSymbol.Create(nil);
-  symbol.SymbolType := TZintSymbology(comType.Items.Objects[comType.ItemIndex]);
+  symbol.SymbolType := zsEAN14; // TZintSymbology(comType.Items.Objects[comType.ItemIndex]);
   symbol.input_mode := UNICODE_MODE;
   symbol.primary := StrToArrayOfChar(edPrimary.Text);
   try
@@ -111,7 +111,7 @@ begin
     rt.TextSpacing.Right.TargetUnits := 10;
     rt.Whitespace.Modules := 1;
     rt.Border.Modules := 0;
-    rt.MaxModuleWidth := 3;
+    //rt.MaxModuleWidth := 3;
     rt.HAlign := haCenter;
     rt.VAlign := vaCenter;
     try
