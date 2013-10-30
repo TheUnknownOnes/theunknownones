@@ -51,6 +51,7 @@ type
     edMiMW: TEdit;
     Label8: TLabel;
     edMaMW: TEdit;
+    edPrimary: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure edDataChange(Sender: TObject);
     procedure comTypeChange(Sender: TObject);
@@ -294,6 +295,7 @@ begin
 
   symbol:=GenSymbol;
   try
+    symbol.primary := StrToArrayOfChar(edPrimary.Text);
     symbol.Encode(edData.Text, true);
 
     wmf:=TMetafile.Create;
