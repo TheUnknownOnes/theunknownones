@@ -1879,202 +1879,203 @@ begin
   end;
 
   linear := TZintSymbol.Create(nil); { Symbol contains the 2D component and Linear contains the rest }
+  try
+    error_number := gs1_verify(symbol, source, _length, reduced);
+    if (error_number <> 0) then begin result := error_number; exit; end;
 
-  error_number := gs1_verify(symbol, source, _length, reduced);
-  if (error_number <> 0) then begin result := error_number; exit; end;
+    cc_mode := symbol.option_1;
 
-  cc_mode := symbol.option_1;
-
-  if ((cc_mode = 3) and (symbol.symbology <> BARCODE_EAN128_CC)) then
-  begin
-    { CC-C can only be used with a GS1-128 linear part }
-    strcpy(symbol.errtxt, 'Invalid mode (CC-C only valid with GS1-128 linear component)');
-    result := ZERROR_INVALID_OPTION; exit;
-  end;
-
-  linear.symbology := symbol.symbology;
-
-  if (linear.symbology <> BARCODE_EAN128_CC) then
-    { Set the 'component linkage' flag in the linear component }
-    linear.option_1 := 2
-  else
-    { GS1-128 needs to know which type of 2D component is used }
-    linear.option_1 := cc_mode;
-
-  case symbol.symbology of
-    BARCODE_EANX_CC:    error_number := eanx(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
-    BARCODE_EAN128_CC:    error_number := ean_128(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
-    BARCODE_RSS14_CC:    error_number := rss14(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
-    BARCODE_RSS_LTD_CC:  error_number := rsslimited(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
-    BARCODE_RSS_EXP_CC:  error_number := rssexpanded(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
-    BARCODE_UPCA_CC:    error_number := eanx(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
-    BARCODE_UPCE_CC:    error_number := eanx(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
-    BARCODE_RSS14STACK_CC:  error_number := rss14(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
-    BARCODE_RSS14_OMNI_CC:  error_number := rss14(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
-    BARCODE_RSS_EXPSTACK_CC:  error_number := rssexpanded(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
-  end;
-
-  if (error_number <> 0) then
-  begin
-    strcpy(symbol.errtxt, linear.errtxt);
-    concat(symbol.errtxt, ' in linear component');
-    result := error_number; exit;
-  end;
-
-  case symbol.symbology of
-    { Determine width of 2D component according to ISO/IEC 24723 Table 1 }
-    BARCODE_EANX_CC:
+    if ((cc_mode = 3) and (symbol.symbology <> BARCODE_EAN128_CC)) then
     begin
-      case pri_len of
-        7, { EAN-8 }
-        10, { EAN-8 + 2 }
-        13: { EAN-8 + 5 }
-          cc_width := 3;
-        12, { EAN-13 }
-        15, { EAN-13 + 2 }
-        18: { EAN-13 + 5 }
-          cc_width := 4;
+      { CC-C can only be used with a GS1-128 linear part }
+      strcpy(symbol.errtxt, 'Invalid mode (CC-C only valid with GS1-128 linear component)');
+      result := ZERROR_INVALID_OPTION; exit;
+    end;
+
+    linear.symbology := symbol.symbology;
+
+    if (linear.symbology <> BARCODE_EAN128_CC) then
+      { Set the 'component linkage' flag in the linear component }
+      linear.option_1 := 2
+    else
+      { GS1-128 needs to know which type of 2D component is used }
+      linear.option_1 := cc_mode;
+
+    case symbol.symbology of
+      BARCODE_EANX_CC:    error_number := eanx(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
+      BARCODE_EAN128_CC:    error_number := ean_128(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
+      BARCODE_RSS14_CC:    error_number := rss14(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
+      BARCODE_RSS_LTD_CC:  error_number := rsslimited(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
+      BARCODE_RSS_EXP_CC:  error_number := rssexpanded(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
+      BARCODE_UPCA_CC:    error_number := eanx(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
+      BARCODE_UPCE_CC:    error_number := eanx(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
+      BARCODE_RSS14STACK_CC:  error_number := rss14(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
+      BARCODE_RSS14_OMNI_CC:  error_number := rss14(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
+      BARCODE_RSS_EXPSTACK_CC:  error_number := rssexpanded(linear, ArrayOfCharToArrayOfByte(symbol.primary), pri_len);
+    end;
+
+    if (error_number <> 0) then
+    begin
+      strcpy(symbol.errtxt, linear.errtxt);
+      concat(symbol.errtxt, ' in linear component');
+      result := error_number; exit;
+    end;
+
+    case symbol.symbology of
+      { Determine width of 2D component according to ISO/IEC 24723 Table 1 }
+      BARCODE_EANX_CC:
+      begin
+        case pri_len of
+          7, { EAN-8 }
+          10, { EAN-8 + 2 }
+          13: { EAN-8 + 5 }
+            cc_width := 3;
+          12, { EAN-13 }
+          15, { EAN-13 + 2 }
+          18: { EAN-13 + 5 }
+            cc_width := 4;
+        end;
+      end;
+      BARCODE_EAN128_CC:    cc_width := 4;
+      BARCODE_RSS14_CC:    cc_width := 4;
+      BARCODE_RSS_LTD_CC:  cc_width := 3;
+      BARCODE_RSS_EXP_CC:  cc_width := 4;
+      BARCODE_UPCA_CC:    cc_width := 4;
+      BARCODE_UPCE_CC:    cc_width := 2;
+      BARCODE_RSS14STACK_CC:  cc_width := 2;
+      BARCODE_RSS14_OMNI_CC:  cc_width := 2;
+      BARCODE_RSS_EXPSTACK_CC:  cc_width := 4;
+    end;
+
+    Fill(binary_string, bs, #0);
+
+    if (cc_mode < 1) or (cc_mode > 3) then cc_mode := 1;
+
+    if (cc_mode = 1) then
+    begin
+      i := cc_binary_string(symbol, reduced, binary_string, cc_mode, cc_width, ecc_level, linear.width);
+      if (i = ZERROR_TOO_LONG) then
+        cc_mode := 2;
+    end;
+
+    if (cc_mode = 2) then
+    begin { If the data didn't fit into CC-A it is recalculated for CC-B }
+      i := cc_binary_string(symbol, reduced, binary_string, cc_mode, cc_width, ecc_level, linear.width);
+      if (i = ZERROR_TOO_LONG) then
+      begin
+        if (symbol.symbology <> BARCODE_EAN128_CC) then
+        begin
+          result := ZERROR_TOO_LONG; exit;
+        end
+        else
+          cc_mode := 3;
       end;
     end;
-    BARCODE_EAN128_CC:    cc_width := 4;
-    BARCODE_RSS14_CC:    cc_width := 4;
-    BARCODE_RSS_LTD_CC:  cc_width := 3;
-    BARCODE_RSS_EXP_CC:  cc_width := 4;
-    BARCODE_UPCA_CC:    cc_width := 4;
-    BARCODE_UPCE_CC:    cc_width := 2;
-    BARCODE_RSS14STACK_CC:  cc_width := 2;
-    BARCODE_RSS14_OMNI_CC:  cc_width := 2;
-    BARCODE_RSS_EXPSTACK_CC:  cc_width := 4;
-  end;
 
-  Fill(binary_string, bs, #0);
-
-  if (cc_mode < 1) or (cc_mode > 3) then cc_mode := 1;
-
-  if (cc_mode = 1) then
-  begin
-    i := cc_binary_string(symbol, reduced, binary_string, cc_mode, cc_width, ecc_level, linear.width);
-    if (i = ZERROR_TOO_LONG) then
-      cc_mode := 2;
-  end;
-
-  if (cc_mode = 2) then
-  begin { If the data didn't fit into CC-A it is recalculated for CC-B }
-    i := cc_binary_string(symbol, reduced, binary_string, cc_mode, cc_width, ecc_level, linear.width);
-    if (i = ZERROR_TOO_LONG) then
-    begin
-      if (symbol.symbology <> BARCODE_EAN128_CC) then
+    if (cc_mode = 3) then
+    begin { If the data didn't fit in CC-B (and linear part is GS1-128) it is recalculated for CC-C }
+      i := cc_binary_string(symbol, reduced, binary_string, cc_mode, cc_width, ecc_level, linear.width);
+      if (i = ZERROR_TOO_LONG) then
       begin
         result := ZERROR_TOO_LONG; exit;
-      end
-      else
-        cc_mode := 3;
-    end;
-  end;
-
-  if (cc_mode = 3) then
-  begin { If the data didn't fit in CC-B (and linear part is GS1-128) it is recalculated for CC-C }
-    i := cc_binary_string(symbol, reduced, binary_string, cc_mode, cc_width, ecc_level, linear.width);
-    if (i = ZERROR_TOO_LONG) then
-    begin
-      result := ZERROR_TOO_LONG; exit;
-    end;
-  end;
-
-  case cc_mode of { Note that ecc_level is only relevant to CC-C }
-    1: error_number := cc_a(symbol, binary_string, cc_width);
-    2: error_number := cc_b(symbol, binary_string, cc_width);
-    3: error_number := cc_c(symbol, binary_string, cc_width, ecc_level);
-  end;
-
-  if (error_number <> 0) then
-  begin
-    result := ZERROR_ENCODING_PROBLEM; exit;
-  end;
-
-  { Merge the linear component with the 2D component }
-
-  top_shift := 0;
-  bottom_shift := 0;
-
-  case symbol.symbology of
-    { Determine horizontal alignment (according to section 12.3) }
-    BARCODE_EANX_CC:
-    begin
-      case pri_len of
-        7, { EAN-8 }
-        10, { EAN-8 + 2 }
-        13: { EAN-8 + 5 }
-          bottom_shift := 13;
-        12, { EAN-13 }
-        15, { EAN-13 + 2 }
-        18: { EAN-13 + 5 }
-          bottom_shift := 2;
       end;
     end;
-    BARCODE_EAN128_CC:
-      if (cc_mode = 3) then
-        bottom_shift := 7;
-    BARCODE_RSS14_CC: bottom_shift := 4;
-    BARCODE_RSS_LTD_CC: bottom_shift := 9;
-    BARCODE_RSS_EXP_CC:
-    begin
-      k := 1;
-      while((not (module_is_set(linear, 1, k - 1) <> 0)) and (module_is_set(linear, 1, k) <> 0)) do
-      { while((linear.encoded_data[1][k - 1] <> '1') and (linear.encoded_data[1][k] <> '0')) begin }
-        Inc(k);
-      top_shift := k;
-    end;
-    BARCODE_UPCA_CC: bottom_shift := 2;
-    BARCODE_UPCE_CC: bottom_shift := 2;
-    BARCODE_RSS14STACK_CC: top_shift := 1;
-    BARCODE_RSS14_OMNI_CC: top_shift := 1;
-    BARCODE_RSS_EXPSTACK_CC:
-    begin
-      k := 1;
-      while((not (module_is_set(linear, 1, k - 1) <> 0)) and (module_is_set(linear, 1, k) <> 0)) do
-      { while((linear.encoded_data[1][k - 1] <> '1') and (linear.encoded_data[1][k] <> '0')) begin }
-        Inc(k);
-      top_shift := k;
-    end;
-  end;
 
-  if (top_shift <> 0) then
-  begin
-    { Move the 2d component of the symbol horizontally }
-    for i := 0 to symbol.rows do
+    case cc_mode of { Note that ecc_level is only relevant to CC-C }
+      1: error_number := cc_a(symbol, binary_string, cc_width);
+      2: error_number := cc_b(symbol, binary_string, cc_width);
+      3: error_number := cc_c(symbol, binary_string, cc_width, ecc_level);
+    end;
+
+    if (error_number <> 0) then
     begin
-      for j := (symbol.width + top_shift) downto top_shift do
+      result := ZERROR_ENCODING_PROBLEM; exit;
+    end;
+
+    { Merge the linear component with the 2D component }
+
+    top_shift := 0;
+    bottom_shift := 0;
+
+    case symbol.symbology of
+      { Determine horizontal alignment (according to section 12.3) }
+      BARCODE_EANX_CC:
       begin
-        if (module_is_set(symbol, i, j - top_shift) <> 0) then set_module(symbol, i, j) else unset_module(symbol, i, j);
+        case pri_len of
+          7, { EAN-8 }
+          10, { EAN-8 + 2 }
+          13: { EAN-8 + 5 }
+            bottom_shift := 13;
+          12, { EAN-13 }
+          15, { EAN-13 + 2 }
+          18: { EAN-13 + 5 }
+            bottom_shift := 2;
+        end;
       end;
-      for j := 0 to top_shift - 1 do
-        unset_module(symbol, i, j);
+      BARCODE_EAN128_CC:
+        if (cc_mode = 3) then
+          bottom_shift := 7;
+      BARCODE_RSS14_CC: bottom_shift := 4;
+      BARCODE_RSS_LTD_CC: bottom_shift := 9;
+      BARCODE_RSS_EXP_CC:
+      begin
+        k := 1;
+        while((not (module_is_set(linear, 1, k - 1) <> 0)) and (module_is_set(linear, 1, k) <> 0)) do
+        { while((linear.encoded_data[1][k - 1] <> '1') and (linear.encoded_data[1][k] <> '0')) begin }
+          Inc(k);
+        top_shift := k;
+      end;
+      BARCODE_UPCA_CC: bottom_shift := 2;
+      BARCODE_UPCE_CC: bottom_shift := 2;
+      BARCODE_RSS14STACK_CC: top_shift := 1;
+      BARCODE_RSS14_OMNI_CC: top_shift := 1;
+      BARCODE_RSS_EXPSTACK_CC:
+      begin
+        k := 1;
+        while((not (module_is_set(linear, 1, k - 1) <> 0)) and (module_is_set(linear, 1, k) <> 0)) do
+        { while((linear.encoded_data[1][k - 1] <> '1') and (linear.encoded_data[1][k] <> '0')) begin }
+          Inc(k);
+        top_shift := k;
+      end;
     end;
-  end;
 
-  { Merge linear and 2D components into one structure }
-  for i := 0 to linear.rows do
-  begin
-    symbol.row_height[symbol.rows + i] := linear.row_height[i];
-    for j := 0 to linear.width do
+    if (top_shift <> 0) then
     begin
-      if (module_is_set(linear, i, j) <> 0) then
-        set_module(symbol, i + symbol.rows, j + bottom_shift)
-      else
-        unset_module(symbol, i + symbol.rows, j + bottom_shift);
+      { Move the 2d component of the symbol horizontally }
+      for i := 0 to symbol.rows do
+      begin
+        for j := (symbol.width + top_shift) downto top_shift do
+        begin
+          if (module_is_set(symbol, i, j - top_shift) <> 0) then set_module(symbol, i, j) else unset_module(symbol, i, j);
+        end;
+        for j := 0 to top_shift - 1 do
+          unset_module(symbol, i, j);
+      end;
     end;
+
+    { Merge linear and 2D components into one structure }
+    for i := 0 to linear.rows do
+    begin
+      symbol.row_height[symbol.rows + i] := linear.row_height[i];
+      for j := 0 to linear.width do
+      begin
+        if (module_is_set(linear, i, j) <> 0) then
+          set_module(symbol, i + symbol.rows, j + bottom_shift)
+        else
+          unset_module(symbol, i + symbol.rows, j + bottom_shift);
+      end;
+    end;
+    if ((linear.width + bottom_shift) > symbol.width) then
+      symbol.width := linear.width + bottom_shift;
+
+    if ((symbol.width + top_shift) > symbol.width) then
+      Inc(symbol.width, top_shift);
+
+    Inc(symbol.rows, linear.rows);
+    ustrcpy(symbol.text, linear.text);
+  finally
+    linear.Free;
   end;
-  if ((linear.width + bottom_shift) > symbol.width) then
-    symbol.width := linear.width + bottom_shift;
-
-  if ((symbol.width + top_shift) > symbol.width) then
-    Inc(symbol.width, top_shift);
-
-  Inc(symbol.rows, linear.rows);
-  ustrcpy(symbol.text, linear.text);
-
-  linear.Free;
 
   result := error_number; exit;
 end;

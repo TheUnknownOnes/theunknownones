@@ -67,9 +67,9 @@ object Form46: TForm46
     BevelOuter = bvNone
     TabOrder = 0
     object edData: TEdit
-      Left = 8
+      Left = 130
       Top = 8
-      Width = 296
+      Width = 174
       Height = 21
       TabOrder = 0
       Text = '123456'
@@ -105,6 +105,14 @@ object Form46: TForm46
       TabOrder = 3
       OnClick = btSVGClick
     end
+    object edPrimary: TEdit
+      Left = 4
+      Top = 8
+      Width = 120
+      Height = 21
+      TabOrder = 4
+      OnChange = edDataChange
+    end
   end
   object PageControl1: TPageControl
     Left = 0
@@ -116,7 +124,6 @@ object Form46: TForm46
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'General Settings'
-      ExplicitHeight = 154
       DesignSize = (
         769
         162)
@@ -233,10 +240,8 @@ object Form46: TForm46
         ActivePage = TabSheet2
         Anchors = [akLeft, akTop, akBottom]
         TabOrder = 4
-        ExplicitHeight = 117
         object TabSheet2: TTabSheet
           Caption = 'Margin'
-          ExplicitHeight = 89
           inline fboMargin: TFrameBorderOptions
             Left = 0
             Top = 0
@@ -245,13 +250,12 @@ object Form46: TForm46
             Align = alClient
             TabOrder = 0
             ExplicitWidth = 262
-            ExplicitHeight = 89
+            ExplicitHeight = 129
           end
         end
         object TabSheet3: TTabSheet
           Caption = 'Padding'
           ImageIndex = 1
-          ExplicitHeight = 89
           inline fboPadding: TFrameBorderOptions
             Left = 0
             Top = 0
@@ -260,13 +264,12 @@ object Form46: TForm46
             Align = alClient
             TabOrder = 0
             ExplicitWidth = 262
-            ExplicitHeight = 89
+            ExplicitHeight = 129
           end
         end
         object TabSheet4: TTabSheet
           Caption = 'Border'
           ImageIndex = 2
-          ExplicitHeight = 89
           inline fboBorder: TFrameBorderOptions
             Left = 0
             Top = 0
@@ -275,13 +278,12 @@ object Form46: TForm46
             Align = alClient
             TabOrder = 0
             ExplicitWidth = 262
-            ExplicitHeight = 89
+            ExplicitHeight = 129
           end
         end
         object TabSheet5: TTabSheet
           Caption = 'TextSpacing'
           ImageIndex = 3
-          ExplicitHeight = 89
           inline fboTextSpacing: TFrameBorderOptions
             Left = 0
             Top = 0
@@ -290,13 +292,12 @@ object Form46: TForm46
             Align = alClient
             TabOrder = 0
             ExplicitWidth = 262
-            ExplicitHeight = 89
+            ExplicitHeight = 129
           end
         end
         object TabSheet6: TTabSheet
           Caption = 'Whitespace'
           ImageIndex = 4
-          ExplicitHeight = 89
           inline fboWhitespace: TFrameBorderOptions
             Left = 0
             Top = 0
@@ -305,7 +306,7 @@ object Form46: TForm46
             Align = alClient
             TabOrder = 0
             ExplicitWidth = 262
-            ExplicitHeight = 89
+            ExplicitHeight = 129
           end
         end
       end
