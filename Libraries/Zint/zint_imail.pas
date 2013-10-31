@@ -386,7 +386,7 @@ begin
 
   if (strlen(tracker) <> 20) then
   begin
-    strcpy(symbol.errtxt, 'Invalid _length tracking code');
+    strcpy(symbol.errtxt, 'Invalid length tracking code');
     result := ZERROR_INVALID_DATA; exit;
   end;
   if (strlen(zip) > 11) then

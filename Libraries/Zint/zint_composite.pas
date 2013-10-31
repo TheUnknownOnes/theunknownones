@@ -1934,6 +1934,11 @@ begin
           15, { EAN-13 + 2 }
           18: { EAN-13 + 5 }
             cc_width := 4;
+          else //added for the case that the primary date is invalid
+          begin
+            concat(symbol.errtxt, 'Invalid primary data');
+            result := ZERROR_INVALID_DATA; exit;
+          end;
         end;
       end;
       BARCODE_EAN128_CC:    cc_width := 4;
