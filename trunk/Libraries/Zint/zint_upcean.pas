@@ -705,7 +705,7 @@ begin
         7: ean8(symbol, first_part, dest);
         12: ean13(symbol, first_part, dest);
       else
-        strcpy(symbol.errtxt, 'Invalid _length input');
+        strcpy(symbol.errtxt, 'Invalid length input');
         Result:=ZERROR_TOO_LONG;
         Exit;
       end;
@@ -739,7 +739,7 @@ begin
               ean13(symbol, first_part, dest);
           end;
         else
-            strcpy(symbol.errtxt, 'Invalid _length EAN input');
+            strcpy(symbol.errtxt, 'Invalid length EAN input');
             Result:=ZERROR_TOO_LONG;
             Exit;
       end;
@@ -827,7 +827,7 @@ begin
       uconcat(symbol.text, second_part);
       end;
     else
-      strcpy(symbol.errtxt, 'Invalid _length input');
+      strcpy(symbol.errtxt, 'Invalid length input');
       Result:=ZERROR_TOO_LONG;
       Exit
   end;
