@@ -787,7 +787,8 @@ begin
       end;
     end;
 
-    ArrayCopy(postcode, symbol.primary);
+    ArrayCopy(postcode, symbol.primary, 9);
+    postcode[9] := #0;
 
     if (mode = 2) then
     begin
