@@ -123,11 +123,11 @@ function ustrlen(const data : TArrayOfByte) : Integer;
 var
   i : Integer;
 begin
-  Result := High(data);
+  Result := High(data) - Low(data) + 1;
   for i := Low(data) to High(data) do
     if data[i] = 0 then
     begin
-      Result := i;
+      Result := i - Low(data);
       break;
     end;
 end;

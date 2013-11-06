@@ -209,7 +209,7 @@ begin { UPC E is a zero-compressed version of UPC A }
   { start character }
   concat (dest, '111');
 
-  for i := 0 to ustrlen(source) do
+  for i := 0 to ustrlen(source) - 1 do
     case Chr(parity[i]) of
       'A': lookup(NEON, EANsetA, source[i], dest);
       'B': lookup(NEON, EANsetB, source[i], dest);
@@ -617,7 +617,7 @@ begin
   SetLength(first_part, 20);
   SetLength(second_part, 20);
   SetLength(dest, 1000);
-  SetLength(local_source, 20);
+  SetLength(local_source, 41);
 
   with_addon := FALSE;
   latch := FALSE;
@@ -658,8 +658,8 @@ begin
 
   ean_leading_zeroes(symbol, source, local_source);
 
-  for reader := 0 to ustrlen(local_source) do
-    if (source[reader] = Ord('+')) then with_addon := TRUE;
+  for reader := 0 to ustrlen(local_source) - 1 do
+    if (local_source[reader] = Ord('+')) then with_addon := TRUE;
 
   reader := 0;
   if (with_addon) then
