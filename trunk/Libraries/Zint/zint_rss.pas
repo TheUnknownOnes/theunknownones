@@ -1418,8 +1418,8 @@ var
   group_val : Integer;
 begin
   last_mode := ISOIEC;
-  SetLength(general_field, strlen(source));
-  SetLength(general_field_type, strlen(source));
+  SetLength(general_field, strlen(source) + 1);
+  SetLength(general_field_type, strlen(source) + 1);
   SetLength(padstring, 40);
 
   read_posn := 0;
@@ -1573,7 +1573,7 @@ begin
     2: begin concat(binary_string, '00XX'); read_posn := 0; end;
     3: begin concat(binary_string, '0100'); read_posn := strlen(source); end;
     4: begin concat(binary_string, '0101'); read_posn := strlen(source); end;
-    5: begin concat(binary_string, '0110XX'); read_posn := 20; end;
+    5: begin concat(binary_string, '01100XX'); read_posn := 20; end;
     6: begin concat(binary_string, '01101XX'); read_posn := 23; end;
     7: begin concat(binary_string, '0111000'); read_posn := strlen(source); end;
     8: begin concat(binary_string, '0111001'); read_posn := strlen(source); end;
@@ -2340,8 +2340,8 @@ begin
   SetLength(check_widths, 8);
   SetLength(elements, 235);
   SetLength(sub_elements, 235);
-  SetLength(reduced, src_len);
-  SetLength(binary_string, 7 * src_len);
+  SetLength(reduced, src_len + 1);
+  SetLength(binary_string, 7 * (src_len + 1));
 
   separator_row := 0;
   reader := 0;
