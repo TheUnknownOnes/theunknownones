@@ -752,7 +752,7 @@ end;
 procedure byteprocess(var chainemc : TArrayOfInteger; var mc_length : Integer; chaine : TArrayOfByte; start : Integer; _length : Integer; block : Integer);
 var
   len : Integer;
-  chunkLen : Cardinal;
+  chunkLen : UInt64;
   mantisa : UInt64;
   total : UInt64;
 begin
@@ -791,33 +791,33 @@ begin
         Inc(len, chunkLen);
         total := 0;
 
-        while (chunkLen <> 0) do
+        while (chunkLen > 0) do
         begin
+          Dec(chunkLen);
           mantisa := chaine[start];
           Inc(start);
-          total := total or mantisa shl (chunkLen * 8);
-          Dec(chunkLen);
+          total := total or (mantisa shl UInt64(chunkLen * 8));
         end;
 
         chunkLen := 5;
 
-        while (chunkLen <> 0) do
+        while (chunkLen > 0) do
         begin
-          chainemc[mc_length + chunkLen] := (total mod 900);
-          total := total div 900;
           Dec(chunkLen);
+          chainemc[mc_length + chunkLen] := Integer(total mod 900);
+          total := total div 900;
         end;
         Inc(mc_length, 5);
       end
       else  {  If it remain a group of less than 6 bytes   }
       begin
         Inc(len, chunkLen);
-        while (chunkLen <> 0) do
+        while (chunkLen > 0) do
         begin
+          Dec(chunkLen);
           chainemc[mc_length] := chaine[start];
           Inc(mc_length);
           Inc(start);
-          Dec(chunkLen)
         end;
       end;
     end;
