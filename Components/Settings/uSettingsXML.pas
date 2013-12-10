@@ -14,13 +14,14 @@ unit uSettingsXML;
 interface
 
 uses
-  Classes,
   SysUtils,
   Variants,
   WideStrings,
   uSettingsBase,     
   MSXML,
-  uXMLTools;
+  uXMLTools,
+  ActiveX,
+  Classes;
 
 type
   TCustomSettingsXML = class(TCustomSettings)
@@ -38,11 +39,16 @@ type
     function DoSaveXMLContent(const AXMLNode : IXMLDOMNode) : Boolean; virtual; abstract;
   end;
 
-  TSettingsXMLFile = class(TCustomSettingsXML)
+  TSettingsXMLPersistent = class(TCustomSettingsXML)
+  protected
+    function DoCreateXMLRoot(out AXMLNode : IXMLDOMNode): Boolean; override;
+
+  end;
+
+  TSettingsXMLFile = class(TSettingsXMLPersistent)
   private
     FFilename: String;
   protected
-    function DoCreateXMLRoot(out AXMLNode : IXMLDOMNode): Boolean; override;
     function DoLoadXMLContent(out AXMLNode : IXMLDOMNode) : Boolean; override;
     function DoSaveXMLContent(const AXMLNode : IXMLDOMNode) : Boolean; override;
 
@@ -51,6 +57,20 @@ type
     property ParentMode;
 
     property FileName : String read FFilename write FFilename;
+  end;
+
+  TSettingsXMLStream = class(TSettingsXMLPersistent)
+  private
+    FStream: TStream;
+  protected
+    function DoLoadXMLContent(out AXMLNode : IXMLDOMNode) : Boolean; override;
+    function DoSaveXMLContent(const AXMLNode : IXMLDOMNode) : Boolean; override;
+
+  published
+    property ParentSettings;
+    property ParentMode;
+
+    property Stream : TStream read FStream write FStream;
   end;
 
 implementation
@@ -230,18 +250,6 @@ end;
 
 { TSettingsXMLFile }
 
-function TSettingsXMLFile.DoCreateXMLRoot(out AXMLNode : IXMLDOMNode): Boolean;
-var
-  XMLDoc : IXMLDOMDocument;
-begin
-  XMLDoc:=CreateMSXMLV1Document;
-  XMLDoc.loadXML('<?xml version="1.0" encoding="UTF-8"?><Settings />');
-  AXMLNode:=XMLDoc.documentElement;
-
-  Result:=Assigned(AXMLNode);
-end;
-
-
 function TSettingsXMLFile.DoLoadXMLContent(out AXMLNode: IXMLDOMNode): Boolean;
 var
   doc : IXMLDOMDocument;
@@ -256,6 +264,51 @@ function TSettingsXMLFile.DoSaveXMLContent(const AXMLNode: IXMLDOMNode): Boolean
 begin
   AXMLNode.ownerDocument.save(FFilename);
   Result:=True;
+end;
+
+{ TSettingsXMLStream }
+
+function TSettingsXMLStream.DoLoadXMLContent(
+  out AXMLNode: IXMLDOMNode): Boolean;
+var
+  doc : IXMLDOMDocument;
+  StreamAdapter: IStream;
+begin
+  if Assigned(FStream) then
+  begin
+    DoCreateXMLRoot(AXMLNode);
+    doc:=AXMLNode.ownerDocument;
+    StreamAdapter:=TStreamAdapter.Create(FStream);
+    Result:=doc.load(StreamAdapter);
+    AXMLNode:=doc.documentElement;
+  end;
+end;
+
+function TSettingsXMLStream.DoSaveXMLContent(
+  const AXMLNode: IXMLDOMNode): Boolean;
+var
+  StreamAdapter: IStream;
+begin
+  if Assigned(FStream) then
+  begin
+    StreamAdapter:=TStreamAdapter.Create(FStream);
+    AXMLNode.ownerDocument.save(StreamAdapter);
+    Result:=True;
+  end;
+end;
+
+{ TSettingsXMLPersistent }
+
+function TSettingsXMLPersistent.DoCreateXMLRoot(
+  out AXMLNode: IXMLDOMNode): Boolean;
+var
+  XMLDoc : IXMLDOMDocument;
+begin
+  XMLDoc:=CreateMSXMLV1Document;
+  XMLDoc.loadXML('<?xml version="1.0" encoding="UTF-8"?><Settings />');
+  AXMLNode:=XMLDoc.documentElement;
+
+  Result:=Assigned(AXMLNode);
 end;
 
 end.
