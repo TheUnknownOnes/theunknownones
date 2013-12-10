@@ -1,0 +1,48 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{9D22D0BB-A871-4752-B8E1-2E65B90BC0B1}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="OptionParser.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="dclOptionParser.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="OptionParser">
+			<MSBuild Projects="OptionParser.dproj"/>
+		</Target>
+		<Target Name="OptionParser:Clean">
+			<MSBuild Targets="Clean" Projects="OptionParser.dproj"/>
+		</Target>
+		<Target Name="OptionParser:Make">
+			<MSBuild Targets="Make" Projects="OptionParser.dproj"/>
+		</Target>
+		<Target Name="dclOptionParser">
+			<MSBuild Projects="dclOptionParser.dproj"/>
+		</Target>
+		<Target Name="dclOptionParser:Clean">
+			<MSBuild Targets="Clean" Projects="dclOptionParser.dproj"/>
+		</Target>
+		<Target Name="dclOptionParser:Make">
+			<MSBuild Targets="Make" Projects="dclOptionParser.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="OptionParser;dclOptionParser"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="OptionParser:Clean;dclOptionParser:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="OptionParser:Make;dclOptionParser:Make"/>
+		</Target>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
+	</Project>

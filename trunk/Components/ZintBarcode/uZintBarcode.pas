@@ -153,6 +153,8 @@ type
     function GetSHRT: Boolean;
     procedure SetSHRT(const Value: Boolean);
     procedure SetStacked(const Value: Boolean);
+    procedure SetInputMode(const Value: TZInputMode);
+    function GetInputMode: TZInputMode;
   public
     constructor Create();
     destructor Destroy(); override;
@@ -182,6 +184,7 @@ type
     property Primary : String read GetPrimary write SetPrimary;
     property ShowHumanReadableText : Boolean read GetSHRT write SetSHRT;
     property Stacked : Boolean read FStacked write SetStacked;
+    property InputMode : TZInputMode read GetInputMode write SetInputMode;
   end;
 
   TCustomZintBarcodeComponent = class(TGraphicControl)
@@ -429,6 +432,17 @@ begin
   Result := FSymbol.height;
 end;
 
+function TZintBarcode.GetInputMode: TZInputMode;
+begin
+  case FSymbol.input_mode of
+    Integer(DATA_MODE) : Result := DATA_MODE;
+    Integer(UNICODE_MODE) : Result := UNICODE_MODE;
+    Integer(GS1_MODE) : Result := GS1_MODE;
+    Integer(KANJI_MODE) : Result := KANJI_MODE;
+    Integer(SJIS_MODE) : Result := SJIS_MODE;
+  end;
+end;
+
 function TZintBarcode.GetOption(const Index: Integer): Integer;
 begin
   case Index of
@@ -595,6 +609,12 @@ end;
 procedure TZintBarcode.SetHeight(const Value: Integer);
 begin
   FSymbol.height := Value;
+  Changed;
+end;
+
+procedure TZintBarcode.SetInputMode(const Value: TZInputMode);
+begin
+  FSymbol.input_mode := Integer(Value);
   Changed;
 end;
 
