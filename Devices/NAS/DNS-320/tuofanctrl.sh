@@ -11,15 +11,15 @@ PATH=/ffp/bin:/ffp/sbin:$PATH
 # if you want to see some really beautifull :) log lines, set logfile to a valid name
 # daemon-restart required: no
 # default: (empty)
-#logfile=
-logfile="/ffp/var/log/tuofanctrl.log"
+logfile=
+#logfile="/ffp/var/log/tuofanctrl.log"
 
 # checkinterval specifies the timespan between two checks of the temperature
 # internally its used as parameter for the sleep command
 # because of that you can specify "s", "m", "h" or "d" as suffix for seconds, minutes, hours or days
 # daemon-restart required: yes
 # default: 5m
-checkinterval=2m
+checkinterval=5m
 
 # Temperatures (all specified in Celsius)
 # shutdown_over specifies over which temperature the system should shutdown
@@ -35,7 +35,7 @@ low_speed_under=40
 # stop_under specifies under which temperature the fan should be switched off
 # daemon-restart required: no
 # default: 30
-stop_under=40
+stop_under=30
 
 # with check_low_speed set to 1, this script will check wether the fan is rotating after setting it to low
 # if it is not rotating, the speed will be set to high
