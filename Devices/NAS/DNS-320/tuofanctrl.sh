@@ -10,8 +10,8 @@ PATH=/ffp/bin:/ffp/sbin:$PATH
 
 # if you want to see some really beautifull :) log lines, set logfile to a valid name
 # default: (empty)
-logfile=
-#logfile="/ffp/var/log/tuofanctrl.log"
+#logfile=
+logfile="/ffp/var/log/tuofanctrl.log"
 
 # checkinterval specifies the timespan between two checks of the temperature
 # internally its used as parameter for the sleep command
@@ -32,12 +32,9 @@ low_speed_under=40
 # default: 30
 stop_under=30
 
-# with check_low_speed set to 1, this script will check wether the fan is rotating after setting it to low
-# if it is not rotating, the speed will be set to high
-# this is usefull, if you use a 12V-fan which only rotates if the voltage is high enough respectivly the speed is set to high
-# if you need either high-speed of stopped fan, you should set stop_under and low_speed_under to the same value
-# default: 1
-check_low_speed=1
+# set fan_doesnt_support_low_speed to 1 if the fan is a 12V model, which doesnt rotate on low speed
+# default: 0
+fan_doesnt_support_low_speed=0
 
 # set only_rotate_if_hdd_active to 1 if you have hdparm installed and 
 # you want the fan only to be active if at least one harddisk is active
@@ -58,7 +55,6 @@ daemon_cmd="rc_daemon"
 checknow_cmd="rc_checknow"
 
 pidfile=/ffp/var/run/tuofanctrl.pid
-
 
 log() 
 {
@@ -144,7 +140,12 @@ rc_checknow()
   # if the temperature is under "low_speed_under" the fan-speed is set to low
   if [ $temp -lt $low_speed_under ]
   then    
-    new_fanspeed="-L"  
+    if [ $fan_doesnt_support_low_speed -gt 0 ]
+    then
+      new_fanspeed="-F"
+    else
+      new_fanspeed="-L"
+    fi  
   fi
   
   # if the temperature is under "stop_under" the fan-speed is set to stop
@@ -154,19 +155,6 @@ rc_checknow()
   fi
   
   log "$(FT_testing $new_fanspeed)"
-  
-  # maybe we should check wether the fan is rotating
-  if [ $check_low_speed -eq 1 -a "$new_fanspeed" = "-L" ] 
-  then   
-    sleep 5s
-    state=$(FT_testing -G | tail -1)
-    
-    if [ "$state" = "stop" ] 
-    then
-      log "Fan is not rotating with low speed. It will be set to full speed."
-      log "$(FT_testing -F)"
-    fi
-  fi
 }
 
 run_rc_command "$1"
