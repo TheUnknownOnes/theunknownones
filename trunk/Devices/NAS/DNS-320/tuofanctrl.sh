@@ -9,35 +9,42 @@ PATH=/ffp/bin:/ffp/sbin:$PATH
 # config
 
 # if you want to see some really beautifull :) log lines, set logfile to a valid name
+# daemon-restart required: no
 # default: (empty)
-#logfile=
-logfile="/ffp/var/log/tuofanctrl.log"
+logfile=
+#logfile="/ffp/var/log/tuofanctrl.log"
 
 # checkinterval specifies the timespan between two checks of the temperature
 # internally its used as parameter for the sleep command
 # because of that you can specify "s", "m", "h" or "d" as suffix for seconds, minutes, hours or days
+# daemon-restart required: yes
 # default: 5m
 checkinterval=5m
 
 # Temperatures (all specified in Celsius)
 # shutdown_over specifies over which temperature the system should shutdown
+# daemon-restart required: no
 # default: 60
 shutdown_over=60
 
 # low_speed_under specifies under which temperature the fan-speed should be set to low
+# daemon-restart required: no
 # default: 40
 low_speed_under=40
 
 # stop_under specifies under which temperature the fan should be switched off
+# daemon-restart required: no
 # default: 30
 stop_under=30
 
 # set fan_doesnt_support_low_speed to 1 if the fan is a 12V model, which doesnt rotate on low speed
+# daemon-restart required: no
 # default: 0
 fan_doesnt_support_low_speed=0
 
 # set only_rotate_if_hdd_active to 1 if you have hdparm installed and 
 # you want the fan only to be active if at least one harddisk is active
+# daemon-restart required: no
 # default: 0
 only_rotate_if_hdd_active=0
 
