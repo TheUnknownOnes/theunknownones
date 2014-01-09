@@ -129,8 +129,8 @@ rc_checknow()
     disks_active=($(hdparm -C /dev/sda | grep -i -c "active") + $(hdparm -C /dev/sdb | grep -i -c "active"))
     if [ $disks_active -eq 0 ] 
     then
-      log "No disks active. Fan will be switched off"
-      FT_testing -S >/dev/null 2>&1
+      log "No disks active."
+      log "$(FT_testing -S)"
       exit
     fi  
   fi
