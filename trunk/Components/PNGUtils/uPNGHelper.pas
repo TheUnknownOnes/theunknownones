@@ -72,7 +72,12 @@ type
                                   Instance : THandle;
                                   Identifier : String;
                                   Backcolor : Graphics.TColor;
-                                  ImageList : TCustomImageList);
+                                  ImageList : TCustomImageList); overload;
+
+  procedure ReplacePNGInImageList(Index : Integer;
+                                  PNG : TPNGObject;
+                                  Backcolor : Graphics.TColor;
+                                  ImageList : TCustomImageList); overload;
 
   procedure ReplacePNGInImageListTransparent(Index: integer;
                                              APNG: TPngObject;
@@ -286,8 +291,10 @@ var
   DC            : HDC;
   IconInfo      : _ICONINFO;
   Pixel         : ^Integer;
-  ScanLine      : PRGBTriple;
   AlphaScanline : pByteArray;
+  PixelColor,
+  TranspColor   : TColor;
+  PixelRGB      : LongInt;
 begin
   if not Assigned(APNG) then
   begin
@@ -343,33 +350,44 @@ begin
   //man nehme ein Bitmap, welches wir später als Maske "verkaufen"
   hMonoBitmap:=CreateBitmap(Width,Height,1,1,nil);
 
+  TranspColor := APNG.TransparentColor;
+
   //Und los gehts beim ersten Pixel
   Pixel := Bits;
   for y := 0 to Height-1 do
   begin
-    //aus dem PNG die Farbwerte einer Zeile holen
-    ScanLine := APNG.Scanline[y];
     // ... und dazu die Alpha-Werte
     AlphaScanline := APNG.AlphaScanline[y];
     for x := 0 to Width - 1 do
     begin
-      //ein Pixel-Wert setzt sich aus ...
+      PixelColor := APNG.Pixels[x, y];
+      PixelRGB := ColorToRGB(PixelColor);
+
+      //ein Pixel-Wert setzt sich aus dem Alpha-Wert, ...
       if Assigned(AlphaScanline) then
-        Pixel^ := AlphaScanLine[x]  // ... dem Alpha-Wert (falls es einen gibt), ...
+        Pixel^ := AlphaScanLine[x]
       else
-        Pixel^:=255;
+      if TranspColor <> 0 then
+      begin
+        if PixelColor = TranspColor then
+          Pixel^ := 0
+        else
+          Pixel^ := 255;
+      end
+      else
+        Pixel^  := 255;
+
       Pixel^ := Pixel^ shl 8;
-      Inc(Pixel^, Scanline^.rgbtRed);  // ... einem Rot-Anteil, ...
+      Inc(Pixel^, (PixelRGB and $000000FF)); // ... einem Rot-Anteil, ...
+
       Pixel^ := Pixel^ shl 8;
-      Inc(Pixel^, Scanline^.rgbtGreen); // ... einem Grün-Anteil, ...
+      Inc(Pixel^, (PixelRGB and $0000FF00) shr 8); // ... einem Grün-Anteil, ...
+
       Pixel^ := Pixel^ shl 8;
-      Inc(Pixel^, Scanline^.rgbtBlue); // ... und einem Blau-Anteil zusammen
+      Inc(Pixel^, (PixelRGB and $00FF0000) shr 16); // ... und einem Blau-Anteil zusammen
 
       //weiter gehts mit dem nächsten Pixel innerhalb unseres RAM-Bitmaps
       Inc(Pixel);
-
-      //und auch ein neues Pixel von unserem PNG währe nicht schlecht
-      Inc(ScanLine);
     end;
   end;
 
@@ -453,6 +471,19 @@ var
 begin
   BMP:=Graphics.TBitmap.Create;
   GetAsBitmap(Instance,Identifier,Backcolor,BMP);
+  ImageList.ReplaceMasked(Index,BMP,BMP.Canvas.Pixels[BMP.Width-1,0]);
+  BMP.Free;
+end;
+
+procedure ReplacePNGInImageList(Index : Integer;
+                                PNG : TPNGObject;
+                                Backcolor : Graphics.TColor;
+                                ImageList : TCustomImageList);
+var
+  BMP:Graphics.TBitmap;
+begin
+  BMP:=Graphics.TBitmap.Create;
+  PNGtoBitmap(PNG, BMP, Backcolor);
   ImageList.ReplaceMasked(Index,BMP,BMP.Canvas.Pixels[BMP.Width-1,0]);
   BMP.Free;
 end;
