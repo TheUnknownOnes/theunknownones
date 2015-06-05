@@ -1,0 +1,1 @@
+It holds one or more [TTaskbarListThumbButton](TTaskbarListThumbButton.md) elements.
