@@ -1,0 +1,132 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{5091C851-0E4A-4B7A-9B9D-5E04D6617AEC}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="XE5\EffectPNGToolbar.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE5\EffectPNGImageList.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE5\EffectPNGImage.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE5\EffectPNGEdit.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE5\EffectPNG.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE5\dclEffectPNGToolbar.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE5\dclEffectPNGImageList.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE5\dclEffectPNGImage.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE5\dclEffectPNGEdit.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="EffectPNGToolbar">
+        <MSBuild Projects="XE5\EffectPNGToolbar.dproj"/>
+    </Target>
+    <Target Name="EffectPNGToolbar:Clean">
+        <MSBuild Projects="XE5\EffectPNGToolbar.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EffectPNGToolbar:Make">
+        <MSBuild Projects="XE5\EffectPNGToolbar.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="EffectPNGImageList">
+        <MSBuild Projects="XE5\EffectPNGImageList.dproj"/>
+    </Target>
+    <Target Name="EffectPNGImageList:Clean">
+        <MSBuild Projects="XE5\EffectPNGImageList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EffectPNGImageList:Make">
+        <MSBuild Projects="XE5\EffectPNGImageList.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="EffectPNGImage">
+        <MSBuild Projects="XE5\EffectPNGImage.dproj"/>
+    </Target>
+    <Target Name="EffectPNGImage:Clean">
+        <MSBuild Projects="XE5\EffectPNGImage.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EffectPNGImage:Make">
+        <MSBuild Projects="XE5\EffectPNGImage.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="EffectPNGEdit">
+        <MSBuild Projects="XE5\EffectPNGEdit.dproj"/>
+    </Target>
+    <Target Name="EffectPNGEdit:Clean">
+        <MSBuild Projects="XE5\EffectPNGEdit.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EffectPNGEdit:Make">
+        <MSBuild Projects="XE5\EffectPNGEdit.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="EffectPNG">
+        <MSBuild Projects="XE5\EffectPNG.dproj"/>
+    </Target>
+    <Target Name="EffectPNG:Clean">
+        <MSBuild Projects="XE5\EffectPNG.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EffectPNG:Make">
+        <MSBuild Projects="XE5\EffectPNG.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclEffectPNGToolbar">
+        <MSBuild Projects="XE5\dclEffectPNGToolbar.dproj"/>
+    </Target>
+    <Target Name="dclEffectPNGToolbar:Clean">
+        <MSBuild Projects="XE5\dclEffectPNGToolbar.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclEffectPNGToolbar:Make">
+        <MSBuild Projects="XE5\dclEffectPNGToolbar.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclEffectPNGImageList">
+        <MSBuild Projects="XE5\dclEffectPNGImageList.dproj"/>
+    </Target>
+    <Target Name="dclEffectPNGImageList:Clean">
+        <MSBuild Projects="XE5\dclEffectPNGImageList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclEffectPNGImageList:Make">
+        <MSBuild Projects="XE5\dclEffectPNGImageList.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclEffectPNGImage">
+        <MSBuild Projects="XE5\dclEffectPNGImage.dproj"/>
+    </Target>
+    <Target Name="dclEffectPNGImage:Clean">
+        <MSBuild Projects="XE5\dclEffectPNGImage.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclEffectPNGImage:Make">
+        <MSBuild Projects="XE5\dclEffectPNGImage.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclEffectPNGEdit">
+        <MSBuild Projects="XE5\dclEffectPNGEdit.dproj"/>
+    </Target>
+    <Target Name="dclEffectPNGEdit:Clean">
+        <MSBuild Projects="XE5\dclEffectPNGEdit.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclEffectPNGEdit:Make">
+        <MSBuild Projects="XE5\dclEffectPNGEdit.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="EffectPNGToolbar;EffectPNGImageList;EffectPNGImage;EffectPNGEdit;EffectPNG;dclEffectPNGToolbar;dclEffectPNGImageList;dclEffectPNGImage;dclEffectPNGEdit"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="EffectPNGToolbar:Clean;EffectPNGImageList:Clean;EffectPNGImage:Clean;EffectPNGEdit:Clean;EffectPNG:Clean;dclEffectPNGToolbar:Clean;dclEffectPNGImageList:Clean;dclEffectPNGImage:Clean;dclEffectPNGEdit:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="EffectPNGToolbar:Make;EffectPNGImageList:Make;EffectPNGImage:Make;EffectPNGEdit:Make;EffectPNG:Make;dclEffectPNGToolbar:Make;dclEffectPNGImageList:Make;dclEffectPNGImage:Make;dclEffectPNGEdit:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

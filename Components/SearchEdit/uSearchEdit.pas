@@ -32,13 +32,20 @@ implementation
 procedure SetAutoCompleteControl(const AControl  : TWinControl;
     const AList     : TStrings);
 var
+  FComObj : IUnknown;
   FAutoComplete : IAutoComplete2;
   FStrings : TEnumString;
 begin
-  FAutoComplete := CreateComObject(CLSID_AutoComplete) as IAutoComplete2;
-  FStrings := TEnumString.Create(AList);
-  OleCheck(FAutoComplete.SetOptions(ACO_AUTOSUGGEST or ACO_AUTOAPPEND or ACO_UPDOWNKEYDROPSLIST));
-  OleCheck(FAutoComplete.Init(AControl.Handle, FStrings, nil, nil));
+  FComObj:=CreateComObject(CLSID_AutoComplete);
+
+  if (FComObj<>nil) and
+     (FComObj.QueryInterface(IAutoComplete2, FAutoComplete) = S_OK) then
+  begin
+  //FAutoComplete :=   IAutoComplete2;
+    FStrings := TEnumString.Create(AList);
+    OleCheck(FAutoComplete.SetOptions(ACO_AUTOSUGGEST or ACO_AUTOAPPEND or ACO_UPDOWNKEYDROPSLIST));
+    OleCheck(FAutoComplete.Init(AControl.Handle, FStrings, nil, nil));
+  end;
 end;
 
 { TCustomSearchEdit }
@@ -65,7 +72,9 @@ end;
 
 procedure TCustomSearchEdit.InitAutoComplete;
 begin
+  {$IFNDEF SPPDesk}
   SetAutoCompleteControl(Self, Items);
+  {$ENDIF}
 end;
 
 procedure TCustomSearchEdit.SetItems(const Value: TStrings);

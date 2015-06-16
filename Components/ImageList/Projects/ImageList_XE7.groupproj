@@ -1,0 +1,96 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{58E25258-9697-4695-A235-D6D99054EF35}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="XE7\BaseImageList.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE7\PNGImageList.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE7\ImageListProvider.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE7\dclImageListProvider.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE7\dclPNGImageList.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="XE7\dclPNGImageListDesigner.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="BaseImageList">
+        <MSBuild Projects="XE7\BaseImageList.dproj"/>
+    </Target>
+    <Target Name="BaseImageList:Clean">
+        <MSBuild Projects="XE7\BaseImageList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BaseImageList:Make">
+        <MSBuild Projects="XE7\BaseImageList.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PNGImageList">
+        <MSBuild Projects="XE7\PNGImageList.dproj"/>
+    </Target>
+    <Target Name="PNGImageList:Clean">
+        <MSBuild Projects="XE7\PNGImageList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PNGImageList:Make">
+        <MSBuild Projects="XE7\PNGImageList.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ImageListProvider">
+        <MSBuild Projects="XE7\ImageListProvider.dproj"/>
+    </Target>
+    <Target Name="ImageListProvider:Clean">
+        <MSBuild Projects="XE7\ImageListProvider.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ImageListProvider:Make">
+        <MSBuild Projects="XE7\ImageListProvider.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclImageListProvider">
+        <MSBuild Projects="XE7\dclImageListProvider.dproj"/>
+    </Target>
+    <Target Name="dclImageListProvider:Clean">
+        <MSBuild Projects="XE7\dclImageListProvider.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclImageListProvider:Make">
+        <MSBuild Projects="XE7\dclImageListProvider.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclPNGImageList">
+        <MSBuild Projects="XE7\dclPNGImageList.dproj"/>
+    </Target>
+    <Target Name="dclPNGImageList:Clean">
+        <MSBuild Projects="XE7\dclPNGImageList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclPNGImageList:Make">
+        <MSBuild Projects="XE7\dclPNGImageList.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclPNGImageListDesigner">
+        <MSBuild Projects="XE7\dclPNGImageListDesigner.dproj"/>
+    </Target>
+    <Target Name="dclPNGImageListDesigner:Clean">
+        <MSBuild Projects="XE7\dclPNGImageListDesigner.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclPNGImageListDesigner:Make">
+        <MSBuild Projects="XE7\dclPNGImageListDesigner.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="BaseImageList;PNGImageList;ImageListProvider;dclImageListProvider;dclPNGImageList;dclPNGImageListDesigner"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="BaseImageList:Clean;PNGImageList:Clean;ImageListProvider:Clean;dclImageListProvider:Clean;dclPNGImageList:Clean;dclPNGImageListDesigner:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="BaseImageList:Make;PNGImageList:Make;ImageListProvider:Make;dclImageListProvider:Make;dclPNGImageList:Make;dclPNGImageListDesigner:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

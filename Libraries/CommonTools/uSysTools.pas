@@ -154,7 +154,7 @@ begin
   Result:=0; //by default, we found no file
 
   //If we have to parse subdirs, we have to find them
-  if (AAttributes and faDirectory)=faDirectory then
+  if ASubDirs then
     AAttributes:=AAttributes or faDirectory;
 
   //Init the temproray List for the result

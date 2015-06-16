@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.776,\\vmware-host\Shared Folders\Dokumente\Embarcadero\Studio\Projekte\ProjectGroup1.groupproj=C:\Source\SPP\Externals\TUO\Components\EffectPNG\Projects\EffectPNG_XE7.groupproj</Transaction>
+  </Transactions>
+	<Default.Personality>
+		<Projects ActiveProject="C:\Source\SPP\Externals\TUO\Components\EffectPNG\Projects\XE7\EffectPNGEdit.dproj"/>
+	</Default.Personality>
+</BorlandProject>
