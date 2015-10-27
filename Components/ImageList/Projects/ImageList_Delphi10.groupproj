@@ -1,0 +1,96 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{323E6AD9-E791-435C-A2D0-8DD7B5CB41B6}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Delphi10\BaseImageList.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10\ImageListProvider.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10\PNGImageList.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10\dclPNGImageList.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10\dclImageListProvider.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10\dclPNGImageListDesigner.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="BaseImageList">
+        <MSBuild Projects="Delphi10\BaseImageList.dproj"/>
+    </Target>
+    <Target Name="BaseImageList:Clean">
+        <MSBuild Projects="Delphi10\BaseImageList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BaseImageList:Make">
+        <MSBuild Projects="Delphi10\BaseImageList.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ImageListProvider">
+        <MSBuild Projects="Delphi10\ImageListProvider.dproj"/>
+    </Target>
+    <Target Name="ImageListProvider:Clean">
+        <MSBuild Projects="Delphi10\ImageListProvider.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ImageListProvider:Make">
+        <MSBuild Projects="Delphi10\ImageListProvider.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PNGImageList">
+        <MSBuild Projects="Delphi10\PNGImageList.dproj"/>
+    </Target>
+    <Target Name="PNGImageList:Clean">
+        <MSBuild Projects="Delphi10\PNGImageList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PNGImageList:Make">
+        <MSBuild Projects="Delphi10\PNGImageList.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclPNGImageList">
+        <MSBuild Projects="Delphi10\dclPNGImageList.dproj"/>
+    </Target>
+    <Target Name="dclPNGImageList:Clean">
+        <MSBuild Projects="Delphi10\dclPNGImageList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclPNGImageList:Make">
+        <MSBuild Projects="Delphi10\dclPNGImageList.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclImageListProvider">
+        <MSBuild Projects="Delphi10\dclImageListProvider.dproj"/>
+    </Target>
+    <Target Name="dclImageListProvider:Clean">
+        <MSBuild Projects="Delphi10\dclImageListProvider.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclImageListProvider:Make">
+        <MSBuild Projects="Delphi10\dclImageListProvider.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclPNGImageListDesigner">
+        <MSBuild Projects="Delphi10\dclPNGImageListDesigner.dproj"/>
+    </Target>
+    <Target Name="dclPNGImageListDesigner:Clean">
+        <MSBuild Projects="Delphi10\dclPNGImageListDesigner.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclPNGImageListDesigner:Make">
+        <MSBuild Projects="Delphi10\dclPNGImageListDesigner.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="BaseImageList;ImageListProvider;PNGImageList;dclPNGImageList;dclImageListProvider;dclPNGImageListDesigner"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="BaseImageList:Clean;ImageListProvider:Clean;PNGImageList:Clean;dclPNGImageList:Clean;dclImageListProvider:Clean;dclPNGImageListDesigner:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="BaseImageList:Make;ImageListProvider:Make;PNGImageList:Make;dclPNGImageList:Make;dclImageListProvider:Make;dclPNGImageListDesigner:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{920EAB55-7C0E-4B72-8822-9EAB17A8A216}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Delphi10\SearchEdit.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10\dclSearchEdit.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="SearchEdit">
+        <MSBuild Projects="Delphi10\SearchEdit.dproj"/>
+    </Target>
+    <Target Name="SearchEdit:Clean">
+        <MSBuild Projects="Delphi10\SearchEdit.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SearchEdit:Make">
+        <MSBuild Projects="Delphi10\SearchEdit.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclSearchEdit">
+        <MSBuild Projects="Delphi10\dclSearchEdit.dproj"/>
+    </Target>
+    <Target Name="dclSearchEdit:Clean">
+        <MSBuild Projects="Delphi10\dclSearchEdit.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclSearchEdit:Make">
+        <MSBuild Projects="Delphi10\dclSearchEdit.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="SearchEdit;dclSearchEdit"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="SearchEdit:Clean;dclSearchEdit:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="SearchEdit:Make;dclSearchEdit:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

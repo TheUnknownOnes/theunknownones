@@ -7,7 +7,7 @@ unit uEffectPNGEdit;
 
 interface
 
-{$I ..\..\Common\jedi\jedi.inc}
+{$I ..\..\Common\jedi.inc}
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,

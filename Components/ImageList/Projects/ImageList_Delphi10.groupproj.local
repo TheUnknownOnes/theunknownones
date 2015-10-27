@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.567,C:\Source\Delphi\Libs\theunknownones\Components\ImageList\Projects\ImageList_Delphi10.groupproj=\\vmware-host\Shared Folders\Dokumente\Embarcadero\Studio\Projekte\ProjectGroup1.groupproj</Transaction>
+  </Transactions>
+	<Default.Personality>
+		<Projects ActiveProject="C:\Source\Delphi\Libs\theunknownones\Components\ImageList\Projects\Delphi10\PNGImageList.dproj"/>
+	</Default.Personality>
+</BorlandProject>

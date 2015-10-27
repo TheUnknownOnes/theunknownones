@@ -21,15 +21,15 @@ uses
 type
   TImageListProvider = class(TCustomImageList)
   private
-    FImageList: TBaseImagelist;
+    FImageList: TTUOBaseImagelist;
     FChangeLnk : TImageListChangeLink;
     FBackColor: TColor;
     FSupportCommCtrls: Boolean;
     FStates: TilDrawStates;
 
-    procedure SetImagelist(const Value: TBaseImagelist);
+    procedure SetImagelist(const Value: TTUOBaseImagelist);
 
-    procedure OnChange(AImagelist : TBaseImagelist; AIndex : Integer);
+    procedure OnChange(AImagelist : TTUOBaseImagelist; AIndex : Integer);
 
     procedure SyncToImageList;
     procedure SetBackColor(const Value: TColor);
@@ -46,7 +46,7 @@ type
 
     procedure GetImageSize(AIndex : Integer; out AWidth, AHeight : Integer);
   published
-    property Source : TBaseImagelist read FImageList write SetImagelist;
+    property Source : TTUOBaseImagelist read FImageList write SetImagelist;
 
     property SupportCommCtrls : Boolean read FSupportCommCtrls write SetSupportCommCtrls default false;
     property CommCtrlsBackColor : TColor read FBackColor write SetBackColor default clWhite;
@@ -164,7 +164,7 @@ begin
   end;
 end;
 
-procedure TImageListProvider.OnChange(AImagelist: TBaseImagelist;
+procedure TImageListProvider.OnChange(AImagelist: TTUOBaseImagelist;
   AIndex: Integer);
 begin
   SyncToImageList;
@@ -176,7 +176,7 @@ begin
   SyncToImageList;
 end;
 
-procedure TImageListProvider.SetImagelist(const Value: TBaseImagelist);
+procedure TImageListProvider.SetImagelist(const Value: TTUOBaseImagelist);
 begin
   FImageList := Value;
   

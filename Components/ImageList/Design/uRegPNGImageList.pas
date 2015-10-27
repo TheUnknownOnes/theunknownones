@@ -6,8 +6,6 @@ uses
   Classes,
   uPNGImageList;
 
-
-  
 procedure Register;
 
 implementation

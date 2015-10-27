@@ -27,7 +27,7 @@ type
   {TCustomPNGImageList
    - the mother of all PNGImage lists
    - use this ton implement your own list}
-  TCustomPNGImageList = class(TBaseImagelist)
+  TCustomPNGImageList = class(TTUOBaseImagelist)
   protected
     FImages : TPNGObjectList;
 

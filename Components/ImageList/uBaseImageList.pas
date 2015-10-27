@@ -13,15 +13,15 @@ uses
   Windows;
 
 type
-  TBaseImagelist = class;
+  TTUOBaseImagelist = class;
 
-  TImagelistChangeProc = procedure(AImagelist : TBaseImagelist; AIndex : Integer) of object;
+  TImagelistChangeProc = procedure(AImagelist : TTUOBaseImagelist; AIndex : Integer) of object;
   
   TImageListChangeLink = class
   {- Use a object of this class, to get informed about changes of the imagelist
    - just create a object and register it with "RegisterChangeLink"}
   private
-    FImageList: TBaseImageList;
+    FImageList: TTUOBaseImagelist;
 
     FOnChange: TImagelistChangeProc;
 
@@ -30,7 +30,7 @@ type
     destructor Destroy(); override;
 
     property OnChange : TImagelistChangeProc read FOnChange write FOnChange;
-    property ImageList : TBaseImagelist read FImageList;
+    property ImageList : TTUOBaseImagelist read FImageList;
   end;
 
 
@@ -41,7 +41,7 @@ type
                   ildSelected);
   TilDrawStates = set of TilDrawState;
 
-  TBaseImagelist = class(TComponent)
+  TTUOBaseImagelist = class(TComponent)
   {- the mother of all image lists}
   protected
     FChangeLinks : TList;
@@ -79,14 +79,14 @@ uses
 
 { TBaseImageList }
 
-constructor TBaseImagelist.Create(AOwner: TComponent);
+constructor TTUOBaseImagelist.Create(AOwner: TComponent);
 begin
   FChangeLinks:=TList.Create;
 
   inherited;
 end;
 
-destructor TBaseImagelist.Destroy;
+destructor TTUOBaseImagelist.Destroy;
 begin
   while FChangeLinks.Count>0 do
   begin
@@ -100,7 +100,7 @@ begin
 end;
 
 
-procedure TBaseImagelist.DoChange(AIndex: Integer);
+procedure TTUOBaseImagelist.DoChange(AIndex: Integer);
 var
   idx : Integer;
 begin
@@ -111,25 +111,25 @@ begin
     TImageListChangeLink(FChangeLinks[idx]).DoChange(AIndex);
 end;
 
-procedure TBaseImagelist.DoDraw(AIndex: Integer; ACanvas: TCanvas; APos: TPoint;
+procedure TTUOBaseImagelist.DoDraw(AIndex: Integer; ACanvas: TCanvas; APos: TPoint;
   AStates: TilDrawStates);
 begin
 
 end;
 
-function TBaseImageList.IsValidIndex(AIndex : Integer) : Boolean;
+function TTUOBaseImagelist.IsValidIndex(AIndex : Integer) : Boolean;
 begin
   Result := (AIndex>=0) and (AIndex < Count);
 end;
 
-procedure TBaseImagelist.Draw(AIndex: Integer; ACanvas: TCanvas; APos: TPoint;
+procedure TTUOBaseImagelist.Draw(AIndex: Integer; ACanvas: TCanvas; APos: TPoint;
   AStates: TilDrawStates);
 begin
   if IsValidIndex(AIndex) then
     DoDraw(AIndex, ACanvas, APos, AStates);
 end;
 
-procedure TBaseImagelist.Draw(AIndex: Integer; ACanvas: HDC; APos: TPoint;
+procedure TTUOBaseImagelist.Draw(AIndex: Integer; ACanvas: HDC; APos: TPoint;
   AStates: TilDrawStates);
 var
   Canv : TCanvas;
@@ -145,19 +145,19 @@ begin
   end;
 end;
 
-function TBaseImagelist.GetCount: Integer;
+function TTUOBaseImagelist.GetCount: Integer;
 begin
   Result:=-1;
 end;
 
-procedure TBaseImagelist.GetImageSize(AIndex: Integer; out AWidth,
+procedure TTUOBaseImagelist.GetImageSize(AIndex: Integer; out AWidth,
   AHeight: Integer);
 begin
   AWidth:=-1;
   AHeight:=-1;
 end;
 
-procedure TBaseImagelist.RegisterChangeLink(AChangeLink: TImageListChangeLink);
+procedure TTUOBaseImagelist.RegisterChangeLink(AChangeLink: TImageListChangeLink);
 begin
   if FChangeLinks.IndexOf(AChangeLink)<=-1 then
   begin
@@ -169,7 +169,7 @@ begin
   end;
 end;
 
-procedure TBaseImagelist.UnregisterChangeLink(
+procedure TTUOBaseImagelist.UnregisterChangeLink(
   AChangeLink: TImageListChangeLink);
 var
   idx : Integer;
