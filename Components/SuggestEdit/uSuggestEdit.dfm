@@ -41,7 +41,6 @@ object FormEditSuggest: TFormEditSuggest
     OnCompare = ListView1Compare
     OnDblClick = ListView1DblClick
     OnKeyDown = ListView1KeyDown
-    ExplicitHeight = 112
   end
   object Panel1: TPanel
     Left = 0

@@ -73,6 +73,7 @@ type
     FDisplaySimilarity: Boolean;
     FSuggestBoxHeight: Integer;
     FSuggestMethod: TSuggestMethod;
+    FOnItemSelected: TNotifyEvent;
     procedure SetIgnoreCase(const Value: Boolean);
     procedure SetThreshold(const Value: Integer);
     function GetWordList: TStrings;
@@ -87,6 +88,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
+    procedure HideSuggestBox;
     property TestWord: String read GetTestWord;
   published
     property Threshold: Integer read FThreshold write SetThreshold;
@@ -95,6 +97,7 @@ type
     property DisplaySimilarity: Boolean read FDisplaySimilarity write FDisplaySimilarity;
     property SuggestBoxHeight: Integer read FSuggestBoxHeight write FSuggestBoxHeight;
     property SuggestMethod: TSuggestMethod read FSuggestMethod write SetSuggestMethod;
+    property OnItemSelected: TNotifyEvent read FOnItemSelected write FOnItemSelected;
   end;
 
   procedure Register;
@@ -306,7 +309,7 @@ var
   i : Integer;
 begin
   FSuggestThread.Terminate;
-  WaitForSingleObject(FSuggestThread.Handle, 10000);
+  WaitForSingleObject(FSuggestThread.Handle, 1000);
   inherited;
 end;
 
@@ -324,6 +327,8 @@ begin
     FEdit.SetFocus;
     FEdit.SelectAll;
     Hide;
+    if Assigned(FEdit.FOnItemSelected) then
+      FEdit.FOnItemSelected(FEdit);
   end;
 end;
 
@@ -366,8 +371,12 @@ end;
 procedure TSuggestEdit.Change;
 begin
   FTestWord:=Trim(Text);
-  if not (csDesigning in ComponentState) then
-    FFormEditSuggest.ActivateSuggestBox;
+  if (not (csDesigning in ComponentState)) and (FTestWord<>EmptyStr) then
+    FFormEditSuggest.ActivateSuggestBox
+  else
+  if FTestWord=EmptyStr then
+    FFormEditSuggest.DeactivateSuggestBox;
+
   inherited;
 end;
 
@@ -411,6 +420,11 @@ end;
 function TSuggestEdit.GetWordList: TStrings;
 begin
   Result:=FWordList;
+end;
+
+procedure TSuggestEdit.HideSuggestBox;
+begin
+  FFormEditSuggest.DeactivateSuggestBox;
 end;
 
 procedure TSuggestEdit.KeyDown(var Key: Word; Shift: TShiftState);
