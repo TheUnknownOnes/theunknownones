@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package SuggestEdit;
 
 {$R *.res}
@@ -38,3 +39,45 @@ contains
   uSuggestEdit in '..\..\uSuggestEdit.pas' {FormEditSuggest};
 
 end.
+=======
+package SuggestEdit;
+
+{$R *.res}
+{$R '..\..\Bitmaps.res'}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$LIBSUFFIX '_D230'}
+{$IMPLICITBUILD OFF}
+
+requires
+  vcl,
+  rtl,
+  StringSimilarity;
+
+contains
+  uSuggestEdit in '..\..\uSuggestEdit.pas' {FormEditSuggest};
+
+end.
+>>>>>>> ca83e6edf4598a510a73fbf6153c1bf1d599421f

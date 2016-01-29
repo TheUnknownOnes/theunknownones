@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{BECC7F33-C477-42C2-BA0A-6FDF0DA48F0F}</ProjectGuid>
@@ -46,3 +47,53 @@
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
+=======
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{BECC7F33-C477-42C2-BA0A-6FDF0DA48F0F}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="SuggestEdit.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="VirtualTreeSuggestEdit.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="SuggestEdit">
+        <MSBuild Projects="SuggestEdit.dproj"/>
+    </Target>
+    <Target Name="SuggestEdit:Clean">
+        <MSBuild Projects="SuggestEdit.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SuggestEdit:Make">
+        <MSBuild Projects="SuggestEdit.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="VirtualTreeSuggestEdit">
+        <MSBuild Projects="VirtualTreeSuggestEdit.dproj"/>
+    </Target>
+    <Target Name="VirtualTreeSuggestEdit:Clean">
+        <MSBuild Projects="VirtualTreeSuggestEdit.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VirtualTreeSuggestEdit:Make">
+        <MSBuild Projects="VirtualTreeSuggestEdit.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="SuggestEdit;VirtualTreeSuggestEdit"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="SuggestEdit:Clean;VirtualTreeSuggestEdit:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="SuggestEdit:Make;VirtualTreeSuggestEdit:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
+>>>>>>> ca83e6edf4598a510a73fbf6153c1bf1d599421f

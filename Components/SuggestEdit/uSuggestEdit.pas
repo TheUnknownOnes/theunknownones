@@ -309,7 +309,7 @@ var
   i : Integer;
 begin
   FSuggestThread.Terminate;
-  WaitForSingleObject(FSuggestThread.Handle, 10000);
+  WaitForSingleObject(FSuggestThread.Handle, 1000);
   inherited;
 end;
 
