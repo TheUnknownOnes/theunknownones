@@ -1,5 +1,9 @@
 unit uJaroWinkler;
 
+// translation from: http://stackoverflow.com/questions/19123506/jaro-winkler-distance-algorithm-in-c-sharp
+// from: leebickmtu
+// translation by: Sebastian Klatte (2016)
+
 interface
 
 function StringSimilarityRatio(const Str1, Str2: String; IgnoreCase: Boolean): Double;
@@ -7,130 +11,121 @@ function StringSimilarityRatio(const Str1, Str2: String; IgnoreCase: Boolean): D
 implementation
 
 uses
-  math, SysUtils;
+  Math, SysUtils;
 
-function JaroWinkler(const AStr1, AStr2: String; p:Double=0.1): Double;
-Var
-  MaxDeviation,
-  len1,len2,
-  MatchingCost,
-  TranspositionCost,
-  PrefixLength,i,j   : integer;
-  c1,c2 : Char;
-  t1Match,t2Match:string;
-  b1,b2:array of Boolean;
-  JaroDistance:Double;
+const
+  {$REGION 'Documentation'}
+  /// <summary>
+  ///   The Winkler modification will not be applied unless the percent match
+  ///   was at or above the mWeightThreshold percent without the modification. <br />
+  ///    Winkler's paper used a default value of 0.7
+  /// </summary>
+  {$ENDREGION}
+  WEIGHT_THRESHOLD = 0.7;
+  {$REGION 'Documentation'}
+  /// <summary>
+  ///   Size of the prefix to be concidered by the Winkler modification. <br />
+  ///   Winkler's paper used a default value of 4
+  /// </summary>
+  {$ENDREGION}
+  NUM_CHARS = 4;
 
-  function FindMatches(prmTextInitial:string; b1:array of Boolean):string;
-  var
-    i:integer;
-  begin
-    Result:='';
-    //Calculates the number of characters that match
-    for i := 1 to Length(prmTextInitial) do
-    begin
-      if b1[i] then
-      begin
-        result:=result+prmTextInitial[i];
-      end;
-    end;
-  end;
-
+{$REGION 'Documentation'}
+/// <summary>
+///   Returns the Jaro-Winkler distance between the specified strings. The
+///   distance is symmetric and will fall in the range 0 (no match) to 1
+///   (perfect match).
+/// </summary>
+{$ENDREGION}
+function Proximity(const AStr1, AStr2: string): Double;
+var
+  LLen1, LLen2, LSearchRange, LIndex, LIndexInner, LMatches, LStart, LEnd, LNumTransposed, LNumHalfTransposed, LMax: Integer;
+  LMatched1, LMatched2: Array of Boolean;
+  LWeight: Double;
 begin
-  MaxDeviation:=round(Max(Length(AStr1), Length(AStr2))/2)-1;
-  if ((AStr1='') or (AStr2='')) then
+  LLen1 := Length(AStr1);
+  LLen2 := Length(AStr2);
+  if (LLen1 = 0) then
+    Exit(IfThen(LLen2 = 0, 1, 0));
+
+  LSearchRange := Max(0, Round(Max(LLen1, LLen2) / 2) - 1);
+
+  // default initialized to false
+  SetLength(LMatched1, LLen1);
+  SetLength(LMatched2, LLen2);
+
+  LMatches := 0;
+  for LIndex := 0 to LLen1 - 1 do
   begin
-    Result:=0;
-    exit;
-  end;
-
-  MatchingCost:=0;
-  TranspositionCost:=0;
-  len1:=Length(AStr1);
-  len2:=Length(AStr2);
-
-  Setlength(b1,len1+1);
-  Setlength(b2,len2+1);
-
-  for i := 0 to len1 do
-  begin
-    b1[i]:=false;
-  end;
-
-  for i := 0 to len2 do
-  begin
-    b2[i]:=false;
-  end;
-
-  for i := 1 to len1 do
-  begin
-    c1:=AStr1[i];
-    if (i<=len2) then
-      c2:=AStr2[i]
-    else
-      c2:=#0;
-
-    for j := Max(i-MaxDeviation,1) to Min(i+MaxDeviation,len2) do
+    LStart := Max(0, LIndex - LSearchRange);
+    LEnd := Min(LIndex + LSearchRange + 1, LLen2);
+    for LIndexInner := LStart to LEnd - 1 do
     begin
-      c2:=AStr2[j];
-      if c1=c2 then //MatchingCost with transposition
-      begin
-        b1[i]:=true;
-        b2[j]:=true;
-        //The character was matched, it is no longer available
-        Inc(MatchingCost);
-        break;
-      end;
-    end;
-  end;
-
-  if (MatchingCost=0) then
-  begin
-    Result:=0;
-    exit;
-  end;
-
-  t1Match:=FindMatches(AStr1,b1);
-  t2Match:=FindMatches(AStr2,b2);
-
-  if t1Match<>t2Match then
-  begin
-    for i := 1 to length(t1Match) do
-    begin
-      if t1Match[i]<>t2Match[i] then
-        Inc(TranspositionCost)
-    end;
-  end
-  else
-  begin
-    TranspositionCost:=0;
-  end;
-
-  JaroDistance:=1/3*((MatchingCost/len1)+(MatchingCost/len2)+((MatchingCost-Int(TranspositionCost/2))/MatchingCost));
-
-  //Calculate the Winkler distance
-  PrefixLength:=0;
-
-  for i := 1 to min(4,min(len1,len2)) do
-  begin
-    c1:=AStr1[i];
-    c2:=AStr2[i];
-    if c1=c2 then
-      inc(PrefixLength)
-    else
+      if LMatched2[LIndexInner] then
+        Continue;
+      if not(AStr1[LIndex + 1] = AStr2[LIndexInner + 1]) then
+        Continue;
+      LMatched1[LIndex] := True;
+      LMatched2[LIndexInner] := True;
+      Inc(LMatches);
       break;
+    end;
   end;
 
-  Result:=JaroDistance+(PrefixLength*p*(1-JaroDistance));
+  if (LMatches = 0) then
+    Exit(0);
+
+  LNumHalfTransposed := 0;
+  LIndexInner := 0;
+  for LIndex := 0 to LLen1 - 1 do
+  begin
+    if not LMatched1[LIndex] then
+      Continue;
+    while not(LMatched2[LIndexInner]) do
+      Inc(LIndexInner);
+
+    if not(AStr1[LIndex + 1] = AStr2[LIndexInner + 1]) then
+      Inc(LNumHalfTransposed);
+
+    Inc(LIndexInner);
+  end;
+
+  LNumTransposed := LNumHalfTransposed div 2;
+
+  LWeight := ((LMatches / LLen1) + (LMatches / LLen2) + ((LMatches - LNumTransposed) / LMatches)) * 1 / 3;
+
+  if (LWeight <= WEIGHT_THRESHOLD) then
+    Exit(LWeight);
+
+  LMax := Min(NUM_CHARS, Min(LLen1, LLen2));
+  LIndex := 0;
+  while (LIndex < LMax) and (AStr1[LIndex + 1] = AStr2[LIndex + 1]) do
+    Inc(LIndex);
+
+  if (LIndex = 0) then
+    Exit(LWeight);
+
+  Result := LWeight + (0.1 * LIndex * (1 - LWeight));
 end;
 
+{$REGION 'Documentation'}
+/// <summary>
+///   Returns the Jaro-Winkler distance between the specified strings. The
+///   distance is symmetric and will fall in the range 0 (perfect match) to 1
+///   (no match).
+/// </summary>
+{$ENDREGION}
+function Distance(const AStr1, AStr2: string): Double;
+begin
+  Result := 1 - Proximity(AStr1, AStr2);
+end;
 
 function StringSimilarityRatio(const Str1, Str2: String; IgnoreCase: Boolean): Double;
 begin
   if IgnoreCase then
-    Result:=JaroWinkler(AnsiUpperCase(Str1), AnsiUpperCase(Str2))
+    Result := Proximity(AnsiUpperCase(Str1), AnsiUpperCase(Str2))
   else
-    Result:=JaroWinkler(Str1, Str2);
+    Result := Proximity(Str1, Str2);
 end;
 
 end.
