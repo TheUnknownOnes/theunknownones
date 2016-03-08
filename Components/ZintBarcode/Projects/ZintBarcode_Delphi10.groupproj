@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{DF206A1B-8BB6-4ACE-86FE-E6209525C37D}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Delphi10\ZintBarcode.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10\dclZintBarcode.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10\frxZintBarcode.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ZintBarcode">
+        <MSBuild Projects="Delphi10\ZintBarcode.dproj"/>
+    </Target>
+    <Target Name="ZintBarcode:Clean">
+        <MSBuild Projects="Delphi10\ZintBarcode.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ZintBarcode:Make">
+        <MSBuild Projects="Delphi10\ZintBarcode.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclZintBarcode">
+        <MSBuild Projects="Delphi10\dclZintBarcode.dproj"/>
+    </Target>
+    <Target Name="dclZintBarcode:Clean">
+        <MSBuild Projects="Delphi10\dclZintBarcode.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclZintBarcode:Make">
+        <MSBuild Projects="Delphi10\dclZintBarcode.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="frxZintBarcode">
+        <MSBuild Projects="Delphi10\frxZintBarcode.dproj"/>
+    </Target>
+    <Target Name="frxZintBarcode:Clean">
+        <MSBuild Projects="Delphi10\frxZintBarcode.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="frxZintBarcode:Make">
+        <MSBuild Projects="Delphi10\frxZintBarcode.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ZintBarcode;dclZintBarcode;frxZintBarcode"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ZintBarcode:Clean;dclZintBarcode:Clean;frxZintBarcode:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ZintBarcode:Make;dclZintBarcode:Make;frxZintBarcode:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
