@@ -1,11 +1,11 @@
-package VirtualActionTree;
+package BaseImageList;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
-{$DEBUGINFO ON}
+{$DEBUGINFO OFF}
 {$EXTENDEDSYNTAX ON}
 {$IMPORTEDDATA ON}
 {$IOCHECKS ON}
@@ -25,21 +25,16 @@ package VirtualActionTree;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'VirtualActionTree - Runtime'}
-{$LIBSUFFIX '160'}
+{$DESCRIPTION 'TUO BaseImageList Runtime'}
+{$LIBSUFFIX '240'}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  vcl,
-  vclactnband,
-  vclx,
-  vcldb,
-  dbrtl,
-  VirtualTreesR;
+  vcl;
 
 contains
-  uVirtualActionTree in '..\..\uVirtualActionTree.pas';
+  uBaseImageList in '..\..\uBaseImageList.pas';
 
 end.

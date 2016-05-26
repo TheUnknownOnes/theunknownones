@@ -1,0 +1,132 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{579B22A0-B4BC-4A2F-9A47-335C246EF548}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Delphi10.1\EffectPNG.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10.1\EffectPNGEdit.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10.1\EffectPNGImage.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10.1\EffectPNGImageList.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10.1\EffectPNGToolbar.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10.1\dclEffectPNGEdit.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10.1\dclEffectPNGImage.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10.1\dclEffectPNGImageList.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10.1\dclEffectPNGToolbar.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="EffectPNG">
+        <MSBuild Projects="Delphi10.1\EffectPNG.dproj"/>
+    </Target>
+    <Target Name="EffectPNG:Clean">
+        <MSBuild Projects="Delphi10.1\EffectPNG.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EffectPNG:Make">
+        <MSBuild Projects="Delphi10.1\EffectPNG.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="EffectPNGEdit">
+        <MSBuild Projects="Delphi10.1\EffectPNGEdit.dproj"/>
+    </Target>
+    <Target Name="EffectPNGEdit:Clean">
+        <MSBuild Projects="Delphi10.1\EffectPNGEdit.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EffectPNGEdit:Make">
+        <MSBuild Projects="Delphi10.1\EffectPNGEdit.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="EffectPNGImage">
+        <MSBuild Projects="Delphi10.1\EffectPNGImage.dproj"/>
+    </Target>
+    <Target Name="EffectPNGImage:Clean">
+        <MSBuild Projects="Delphi10.1\EffectPNGImage.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EffectPNGImage:Make">
+        <MSBuild Projects="Delphi10.1\EffectPNGImage.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="EffectPNGImageList">
+        <MSBuild Projects="Delphi10.1\EffectPNGImageList.dproj"/>
+    </Target>
+    <Target Name="EffectPNGImageList:Clean">
+        <MSBuild Projects="Delphi10.1\EffectPNGImageList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EffectPNGImageList:Make">
+        <MSBuild Projects="Delphi10.1\EffectPNGImageList.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="EffectPNGToolbar">
+        <MSBuild Projects="Delphi10.1\EffectPNGToolbar.dproj"/>
+    </Target>
+    <Target Name="EffectPNGToolbar:Clean">
+        <MSBuild Projects="Delphi10.1\EffectPNGToolbar.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EffectPNGToolbar:Make">
+        <MSBuild Projects="Delphi10.1\EffectPNGToolbar.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclEffectPNGEdit">
+        <MSBuild Projects="Delphi10.1\dclEffectPNGEdit.dproj"/>
+    </Target>
+    <Target Name="dclEffectPNGEdit:Clean">
+        <MSBuild Projects="Delphi10.1\dclEffectPNGEdit.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclEffectPNGEdit:Make">
+        <MSBuild Projects="Delphi10.1\dclEffectPNGEdit.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclEffectPNGImage">
+        <MSBuild Projects="Delphi10.1\dclEffectPNGImage.dproj"/>
+    </Target>
+    <Target Name="dclEffectPNGImage:Clean">
+        <MSBuild Projects="Delphi10.1\dclEffectPNGImage.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclEffectPNGImage:Make">
+        <MSBuild Projects="Delphi10.1\dclEffectPNGImage.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclEffectPNGImageList">
+        <MSBuild Projects="Delphi10.1\dclEffectPNGImageList.dproj"/>
+    </Target>
+    <Target Name="dclEffectPNGImageList:Clean">
+        <MSBuild Projects="Delphi10.1\dclEffectPNGImageList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclEffectPNGImageList:Make">
+        <MSBuild Projects="Delphi10.1\dclEffectPNGImageList.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclEffectPNGToolbar">
+        <MSBuild Projects="Delphi10.1\dclEffectPNGToolbar.dproj"/>
+    </Target>
+    <Target Name="dclEffectPNGToolbar:Clean">
+        <MSBuild Projects="Delphi10.1\dclEffectPNGToolbar.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclEffectPNGToolbar:Make">
+        <MSBuild Projects="Delphi10.1\dclEffectPNGToolbar.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="EffectPNG;EffectPNGEdit;EffectPNGImage;EffectPNGImageList;EffectPNGToolbar;dclEffectPNGEdit;dclEffectPNGImage;dclEffectPNGImageList;dclEffectPNGToolbar"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="EffectPNG:Clean;EffectPNGEdit:Clean;EffectPNGImage:Clean;EffectPNGImageList:Clean;EffectPNGToolbar:Clean;dclEffectPNGEdit:Clean;dclEffectPNGImage:Clean;dclEffectPNGImageList:Clean;dclEffectPNGToolbar:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="EffectPNG:Make;EffectPNGEdit:Make;EffectPNGImage:Make;EffectPNGImageList:Make;EffectPNGToolbar:Make;dclEffectPNGEdit:Make;dclEffectPNGImage:Make;dclEffectPNGImageList:Make;dclEffectPNGToolbar:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

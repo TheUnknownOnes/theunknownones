@@ -1,11 +1,11 @@
-package dclVirtualActionTree;
+package dclEffectPNGImageList;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
-{$DEBUGINFO ON}
+{$DEBUGINFO OFF}
 {$EXTENDEDSYNTAX ON}
 {$IMPORTEDDATA ON}
 {$IOCHECKS ON}
@@ -25,16 +25,16 @@ package dclVirtualActionTree;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'VirtualActionTree - Design'}
-{$LIBSUFFIX '160'}
+{$DESCRIPTION 'TUO EffectPNGImageList'}
+{$LIBSUFFIX '240'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  VirtualActionTree;
+  EffectPNGImageList;
 
 contains
-  uRegVirtualActionTree in '..\..\Design\uRegVirtualActionTree.pas';
+  uRegEffectPNGImageList in '..\..\Design\uRegEffectPNGImageList.pas';
 
 end.
