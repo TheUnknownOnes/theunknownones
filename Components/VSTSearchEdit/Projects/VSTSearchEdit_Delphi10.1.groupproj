@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{C7D92EF4-A444-4497-899F-8A5375966364}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Delphi10.1\VSTSearchEdit.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Delphi10.1\dclVSTSearchEdit.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="VSTSearchEdit">
+        <MSBuild Projects="Delphi10.1\VSTSearchEdit.dproj"/>
+    </Target>
+    <Target Name="VSTSearchEdit:Clean">
+        <MSBuild Projects="Delphi10.1\VSTSearchEdit.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VSTSearchEdit:Make">
+        <MSBuild Projects="Delphi10.1\VSTSearchEdit.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclVSTSearchEdit">
+        <MSBuild Projects="Delphi10.1\dclVSTSearchEdit.dproj"/>
+    </Target>
+    <Target Name="dclVSTSearchEdit:Clean">
+        <MSBuild Projects="Delphi10.1\dclVSTSearchEdit.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclVSTSearchEdit:Make">
+        <MSBuild Projects="Delphi10.1\dclVSTSearchEdit.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="VSTSearchEdit;dclVSTSearchEdit"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="VSTSearchEdit:Clean;dclVSTSearchEdit:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="VSTSearchEdit:Make;dclVSTSearchEdit:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
