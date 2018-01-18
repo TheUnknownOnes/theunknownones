@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{9054EA82-9DD7-4230-86DC-A21EA64FCEED}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="D10\VirtualActionTree_D100R.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="D10\VirtualActionTree_D100D.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="VirtualActionTree_D100R">
+        <MSBuild Projects="D10\VirtualActionTree_D100R.dproj"/>
+    </Target>
+    <Target Name="VirtualActionTree_D100R:Clean">
+        <MSBuild Projects="D10\VirtualActionTree_D100R.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VirtualActionTree_D100R:Make">
+        <MSBuild Projects="D10\VirtualActionTree_D100R.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="VirtualActionTree_D100D">
+        <MSBuild Projects="D10\VirtualActionTree_D100D.dproj"/>
+    </Target>
+    <Target Name="VirtualActionTree_D100D:Clean">
+        <MSBuild Projects="D10\VirtualActionTree_D100D.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VirtualActionTree_D100D:Make">
+        <MSBuild Projects="D10\VirtualActionTree_D100D.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="VirtualActionTree_D100R;VirtualActionTree_D100D"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="VirtualActionTree_D100R:Clean;VirtualActionTree_D100D:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="VirtualActionTree_D100R:Make;VirtualActionTree_D100D:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
