@@ -1,0 +1,3 @@
+[submodule "Libraries/Zint"]
+	path = Libraries/Zint
+	url = https://github.com/landrix/Zint-Barcode-Generator-for-Delphi.git
