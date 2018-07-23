@@ -34,20 +34,13 @@ function PrepareTheString( const OriginStr : String; var ConvStr : String ) : In
               ConvStr[ i ] := Chr( 148 );
             Chr( 154 ) :
               ConvStr[ i ] := Chr( 129 );
-            ':' :
-              ConvStr[ i ] := ' ';
-            ';' :
-              ConvStr[ i ] := ' ';
-            '<' :
-              ConvStr[ i ] := ' ';
-            '>' :
-              ConvStr[ i ] := ' ';
-            '=' :
-              ConvStr[ i ] := ' ';
-            '?' :
-              ConvStr[ i ] := ' ';
-            '[' :
-              ConvStr[ i ] := ' ';
+            ':',
+            ';',
+            '<',
+            '>',
+            '=',
+            '?',
+            '[',
             ']' :
               ConvStr[ i ] := ' ';
           END;
